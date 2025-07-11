@@ -10,7 +10,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 
-import { API_CORE_URL, API_STRATEGIC_URL } from "../constants/environment";
+import { API_CORE_URL, RMU_API_STRATEGIC_URL } from "../constants/environment";
 
 const StrategicGameCreation = () => {
 
@@ -47,7 +47,7 @@ const StrategicGameCreation = () => {
     const handleSubmit = (e) => {
         try {
             e.preventDefault();
-            const url = `${API_STRATEGIC_URL}/strategic-games`;
+            const url = `${RMU_API_STRATEGIC_URL}/strategic-games`;
             const requestOptions = {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

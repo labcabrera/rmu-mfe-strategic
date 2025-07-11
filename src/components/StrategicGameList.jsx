@@ -10,7 +10,7 @@ import Stack from '@mui/material/Stack';
 
 import StrategicGameListItem from "./StrategicGameListItem";
 
-import { API_STRATEGIC_URL } from "../constants/environment";
+import { RMU_API_STRATEGIC_URL } from "../constants/environment";
 
 const StrategicGameList = () => {
 
@@ -23,7 +23,7 @@ const StrategicGameList = () => {
     const [errorMessage, setErrorMessage] = useState("");
 
     const getStrategicGames = async () => {
-        const url = `${API_STRATEGIC_URL}/strategic-games`;
+        const url = `${RMU_API_STRATEGIC_URL}/strategic-games`;
         try {
             const response = await fetch(url, { method: "GET", });
             const data = await response.json();

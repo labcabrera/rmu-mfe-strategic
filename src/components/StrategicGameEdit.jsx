@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 
-import { API_STRATEGIC_URL } from "../constants/environment";
+import { RMU_API_STRATEGIC_URL } from "../constants/environment";
 
 const StrategicGameEdit = () => {
 
@@ -30,7 +30,7 @@ const StrategicGameEdit = () => {
     const handleSubmit = (e) => {
         try {
             e.preventDefault();
-            const url = `${API_STRATEGIC_URL}/strategic-games/${strategicGame.id}`;
+            const url = `${RMU_API_STRATEGIC_URL}/strategic-games/${strategicGame.id}`;
             const requestOptions = {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },

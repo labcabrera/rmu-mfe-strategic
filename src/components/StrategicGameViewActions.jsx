@@ -12,7 +12,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 
-import { API_STRATEGIC_URL } from "../constants/environment";
+import { RMU_API_STRATEGIC_URL } from "../constants/environment";
 
 const StrategicGameViewActions = () => {
 
@@ -23,7 +23,7 @@ const StrategicGameViewActions = () => {
     const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
 
     const deleteStrategicGame = async () => {
-        const url = `${API_STRATEGIC_URL}/strategic-games/${strategicGame.id}`;
+        const url = `${RMU_API_STRATEGIC_URL}/strategic-games/${strategicGame.id}`;
         const response = await fetch(url, { method: "DELETE" });
         const deleteResponse = await response;
         if (deleteResponse.status == 204) {

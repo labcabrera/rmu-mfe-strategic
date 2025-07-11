@@ -25,3 +25,9 @@ spec:
             configMapKeyRef:
               name: rmu-shared-configmap
               key: RMU_FE_STRATEGIC_PUBLIC_PATH
+        - name: RMU_API_STRATEGIC_URL
+          valueFrom:
+            configMapKeyRef:
+              name: rmu-shared-configmap
+              key: RMU_API_STRATEGIC_URL
+
