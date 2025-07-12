@@ -10,7 +10,6 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = (_, argv) => ({
   output: {
-    //publicPath: "http://localhost:8082/",
     publicPath: process.env.RMU_FE_STRATEGIC_PUBLIC_PATH || "http://localhost:8082/"
   },
 

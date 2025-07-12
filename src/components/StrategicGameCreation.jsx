@@ -10,7 +10,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 
-import { API_CORE_URL, RMU_API_STRATEGIC_URL } from "../constants/environment";
+import { RMU_API_CORE_URL, RMU_API_STRATEGIC_URL } from "../constants/environment";
 
 const StrategicGameCreation = () => {
 
@@ -29,7 +29,7 @@ const StrategicGameCreation = () => {
     const [errorMessage, setErrorMessage] = useState("");
 
     const getRealms = async () => {
-        const url = `${API_CORE_URL}/realms`;
+        const url = `${RMU_API_CORE_URL}/realms`;
         try {
             const response = await fetch(url, { method: "GET", });
             const data = await response.json();

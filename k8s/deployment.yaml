@@ -20,14 +20,23 @@ spec:
         ports:
         - containerPort: 8080
         env:
+        
         - name: RMU_FE_STRATEGIC_PUBLIC_PATH
           valueFrom:
             configMapKeyRef:
               name: rmu-shared-configmap
               key: RMU_FE_STRATEGIC_PUBLIC_PATH
+        
         - name: RMU_API_STRATEGIC_URL
           valueFrom:
             configMapKeyRef:
               name: rmu-shared-configmap
               key: RMU_API_STRATEGIC_URL
+
+        - name: RMU_API_CORE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: rmu-shared-configmap
+              key: RMU_API_CORE_URL
+
 

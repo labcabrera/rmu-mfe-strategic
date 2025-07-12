@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField';
 
 import StrategicGameViewActions from "./StrategicGameViewActions";
 
-import { API_CORE_URL } from "../constants/environment";
+import { RMU_API_CORE_URL } from "../constants/environment";
 
 const StrategicGameView = () => {
 
@@ -17,7 +17,7 @@ const StrategicGameView = () => {
     const [realmName, setRealmName] = useState(strategicGame.realm);
 
     const getRealmName = async () => {
-        const url = `${API_CORE_URL}/realms/${strategicGame.realm}`;
+        const url = `${RMU_API_CORE_URL}/realms/${strategicGame.realm}`;
         try {
             const response = await fetch(url, { method: "GET", });
             const data = await response.json();
