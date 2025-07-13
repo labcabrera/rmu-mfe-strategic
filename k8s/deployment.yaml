@@ -18,7 +18,7 @@ spec:
       - name: rmu-fe-strategic
         image: labcabrera/rmu-fe-strategic:latest
         ports:
-        - containerPort: 8082
+        - containerPort: 80
         env:
         
         - name: RMU_FE_STRATEGIC_PUBLIC_PATH
