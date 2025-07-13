@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "📝 Generando env.js dinámicamente..."
+echo "📝 Generating env.js dynamically..."
 
 cat <<EOF > /usr/share/nginx/html/env.js
 window.env = {
@@ -10,8 +10,8 @@ window.env = {
 };
 EOF
 
-echo "✅ env.js generado:"
+echo "✅ env.js generated:"
 cat /usr/share/nginx/html/env.js
-echo "🚀 Iniciando NGINX..."
+echo "🚀 Starting NGINX..."
 
 exec "$@"
