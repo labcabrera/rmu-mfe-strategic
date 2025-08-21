@@ -9,12 +9,32 @@
     "start:local": "webpack serve --mode production --env local",
     "start:live": "webpack serve --mode development --live-reload --hot",
     "start:docker": "webpack serve --mode production --env docker",
-    "tailwind": "npx tailwindcss -i ./src/source.css -o ./src/index.css"
+    "tailwind": "npx tailwindcss -i ./src/source.css -o ./src/index.css",
+    "postinstall": "echo '{\"type\":\"module\",\"sideEffects\":false,\"version\":\"7.3.1\"}' > node_modules/@mui/material/esm/package.json && echo '{\"type\":\"module\",\"sideEffects\":false,\"version\":\"7.3.1\"}' > node_modules/@mui/icons-material/esm/package.json"
+    
   },
   "license": "GNU GENERAL PUBLIC LICENSE V3",
   "author": {
     "name": "Luis Cabrera",
     "email": "lab.cabrera@gmail.com"
+  },
+  "dependencies": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.8.1",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
+    "react-i18next": "^15.0.2",
+    "@babel/runtime": "^7.28.3",
+    "@mui/material": "^7.3.1",
+    "@mui/icons-material": "^7.3.1",
+    "@mui/lab": "^7.0.0-beta.14",
+    "@mui/x-data-grid": "^8.9.2",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@fontsource/roboto": "^5.2.6",
+    "file-loader": "^6.2.0",
+    "i18next": "^25.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.15.8",
@@ -22,28 +42,17 @@
     "@babel/preset-env": "^7.15.8",
     "@babel/preset-react": "^7.14.5",
     "autoprefixer": "^10.1.0",
-    "babel-loader": "^8.2.2",
-    "copy-webpack-plugin": "^12.0.2",
-    "css-loader": "^6.3.0",
+    "babel-loader": "^10.0.0",
+    "copy-webpack-plugin": "^13.0.0",
+    "css-loader": "^7.1.2",
     "dotenv-webpack": "^8.0.1",
     "html-webpack-plugin": "^5.3.2",
+    "json-loader": "^0.5.7",
     "postcss": "^8.2.1",
-    "postcss-loader": "^4.1.0",
-    "style-loader": "^3.3.0",
+    "postcss-loader": "^8.1.1",
+    "style-loader": "^4.0.0",
     "webpack": "^5.57.1",
-    "webpack-cli": "^4.10.0",
-    "webpack-dev-server": "^4.3.1"
-  },
-  "dependencies": {
-    "@babel/runtime": "^7.13.10",
-    "@emotion/react": "^11.13.3",
-    "@emotion/styled": "^11.13.0",
-    "@fontsource/roboto": "^5.1.0",
-    "@mui/icons-material": "^6.1.0",
-    "@mui/material": "^6.1.0",
-    "file-loader": "^6.2.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.26.0"
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2"
   }
 }

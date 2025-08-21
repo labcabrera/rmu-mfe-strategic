@@ -79,8 +79,8 @@ const StrategicGameCreation = () => {
     };
 
     return (
-        <div class="strategic-game-creation">
-            <div class="strategic-game-view-actions">
+        <div className="strategic-game-creation">
+            <div className="strategic-game-view-actions">
                 <Stack spacing={2} direction="row" sx={{
                     justifyContent: "flex-end",
                     alignItems: "flex-start",

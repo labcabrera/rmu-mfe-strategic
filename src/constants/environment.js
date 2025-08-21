@@ -1,4 +1,5 @@
 const getEnvVar = (key, defaultValue) => {
+  
   // Prioridad 1: Variables de window.ENV (runtime)
   if (typeof window !== 'undefined' && window.ENV && window.ENV[key]) {
     const value = window.ENV[key];

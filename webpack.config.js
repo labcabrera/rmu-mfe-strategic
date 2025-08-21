@@ -11,7 +11,8 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 module.exports = (_, argv) => ({
   output: {
     // publicPath: process.env.RMU_FE_STRATEGIC_PUBLIC_PATH || "http://localhost:8082/"
-    publicPath: "http://fe-strategic.rmu.local/"
+    //publicPath: "http://fe-strategic.rmu.local/"
+    publicPath: "http://localhost:8082/"
   },
 
   resolve: {
@@ -32,9 +33,7 @@ module.exports = (_, argv) => ({
     watchFiles: [path.resolve(__dirname, "src")],
     onListening: function (devServer) {
       const port = devServer.server.address().port;
-
       printCompilationMessage("compiling", port);
-
       devServer.compiler.hooks.done.tap("OutputMessagePlugin", (stats) => {
         setImmediate(() => {
           if (stats.hasErrors()) {
@@ -91,15 +90,23 @@ module.exports = (_, argv) => ({
         "./StrategicApp": "./src/App.jsx",
       },
       shared: {
-        ...deps,
-        react: {
-          singleton: true,
-          requiredVersion: deps.react,
-        },
-        "react-dom": {
-          singleton: true,
-          requiredVersion: deps["react-dom"],
-        },
+        // react: { singleton: true, strictVersion: true, requiredVersion: deps.react },
+        // 'react-dom': { singleton: true, strictVersion: true, requiredVersion: deps["react-dom"] },
+        // 'react-router-dom': { singleton: true, strictVersion: true, requiredVersion: deps["react-router-dom"] },
+        // '@mui/material': { singleton: true, strictVersion: true, requiredVersion: deps["@mui/material"] },
+        // '@mui/icons-material': { singleton: true, strictVersion: true, requiredVersion: deps["@mui/icons-material"] },
+        // '@emotion/react': { singleton: true, strictVersion: true, requiredVersion: deps["@emotion/react"] },
+        // '@emotion/styled': { singleton: true, strictVersion: true, requiredVersion: deps["@emotion/styled"] },
+        // 'keycloak-js': { singleton: true, strictVersion: true, requiredVersion: deps["keycloak-js"] },
+
+        react: { singleton: true, requiredVersion: deps.react },
+        'react-dom': { singleton: true, requiredVersion: deps["react-dom"] },
+        'react-router-dom': { singleton: true, requiredVersion: deps["react-router-dom"] },
+        '@mui/material': { singleton: true, requiredVersion: deps["@mui/material"] },
+        '@mui/icons-material': { singleton: true, requiredVersion: deps["@mui/icons-material"] },
+        '@emotion/react': { singleton: true, requiredVersion: deps["@emotion/react"] },
+        '@emotion/styled': { singleton: true, requiredVersion: deps["@emotion/styled"] },
+        // 'keycloak-js': { singleton: true, strictVersion: true, requiredVersion: deps["keycloak-js"] },
       },
     }),
     new HtmlWebPackPlugin({
