@@ -7,9 +7,9 @@ import IconButton from '@mui/material/IconButton';
 import Snackbar from '@mui/material/Snackbar';
 import TextField from '@mui/material/TextField';
 
-import StrategicGameCreationActions from './StrategicGameCreationActions';
+import StrategicGameCreateActions from './StrategicGameCreateActions';
 
-const StrategicGameCreation = () => {
+const StrategicGameCreate = () => {
   const debugMode = false;
   const [realms, setRealms] = useState([]);
   const [displayError, setDisplayError] = useState(false);
@@ -54,7 +54,7 @@ const StrategicGameCreation = () => {
 
   return (
     <>
-      <StrategicGameCreationActions formData={formData} />
+      <StrategicGameCreateActions formData={formData} />
       <Box>
         <TextField label="Name" variant="outlined" fullWidth name="name" value={formData.name} onChange={handleChange} margin="normal" required />
         <Autocomplete
@@ -99,4 +99,4 @@ const StrategicGameCreation = () => {
   );
 };
 
-export default StrategicGameCreation;
+export default StrategicGameCreate;

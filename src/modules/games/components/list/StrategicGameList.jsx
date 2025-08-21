@@ -1,18 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
-import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import Snackbar from '@mui/material/Snackbar';
-import Stack from '@mui/material/Stack';
 
 import StrategicGameListItem from './StrategicGameListItem';
 import StrategicGameListActions from './StrategicGameListActions';
 
 const StrategicGameList = () => {
-  const navigate = useNavigate();
   const [strategicGames, setStrategicGames] = useState([]);
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -31,10 +27,6 @@ const StrategicGameList = () => {
       setDisplayError(true);
       setErrorMessage(`Error loading strategic games from ${url}. ${error.message}`);
     }
-  };
-
-  const createNewGame = async () => {
-    navigate('/strategic/creation');
   };
 
   const handleSnackbarClose = () => {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -14,30 +14,39 @@ import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
+import Snackbar from '@mui/material/Snackbar';
+import CloseIcon from '@mui/icons-material/Close';
 
-import { RMU_API_STRATEGIC_URL } from '../constants/environment';
+import { RMU_API_STRATEGIC_URL } from '../../../../constants/environment';
 
 const StrategicGameViewActions = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const strategicGame = location.state?.strategicGame;
-
+  const [displayError, setDisplayError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
 
-  const deleteStrategicGame = async () => {
+  const deleteStrategicGame = () => {
     const url = `${RMU_API_STRATEGIC_URL}/strategic-games/${strategicGame.id}`;
-    const response = await fetch(url, { method: 'DELETE' });
-    const deleteResponse = await response;
-    if (deleteResponse.status == 204) {
-      navigate('/strategic');
-    } else {
-      //TODO display error
-      console.log('delete data: ' + data);
-    }
+    fetch(url, { method: 'DELETE' })
+      .then((response) => {
+        if (response.status !== 204) throw new Error(`Error: ${response.status} ${response.statusText}`);
+        return response.json();
+      })
+      .then(() => navigate('/strategic/'))
+      .catch((error) => {
+        setDisplayError(true);
+        setErrorMessage(`Error creating game from ${url}. ${error.message}`);
+      });
   };
 
   const handleEditClick = () => {
     navigate(`/strategic/edit/${strategicGame.id}`, { state: { strategicGame: strategicGame } });
+  };
+
+  const handleSnackbarClose = () => {
+    setDisplayError(false);
   };
 
   const handleDeleteClick = () => {
@@ -58,8 +67,12 @@ const StrategicGameViewActions = () => {
       <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center" sx={{ minHeight: 80 }}>
         <Box>
           <Breadcrumbs aria-label="breadcrumb">
-            <Link underline="hover" color="inherit" href="/">Home</Link>
-            <Link underline="hover" color="inherit" href="/strategic">Strategic</Link>
+            <Link underline="hover" color="inherit" href="/">
+              Home
+            </Link>
+            <Link underline="hover" color="inherit" href="/strategic">
+              Strategic
+            </Link>
             <span>Games</span>
             <span>{strategicGame.name}</span>
             <span>View</span>
@@ -74,6 +87,19 @@ const StrategicGameViewActions = () => {
           </IconButton>
         </Stack>
       </Stack>
+      <Snackbar
+        open={displayError}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        onClose={handleSnackbarClose}
+        message={errorMessage}
+        action={
+          <React.Fragment>
+            <IconButton aria-label="close" color="inherit" sx={{ p: 0.5 }} onClick={handleSnackbarClose}>
+              <CloseIcon />
+            </IconButton>
+          </React.Fragment>
+        }
+      />
       <Dialog
         open={deleteDialogOpen}
         onClose={handleDialogDeleteClose}
@@ -83,7 +109,7 @@ const StrategicGameViewActions = () => {
         <DialogTitle id="alert-dialog-title">{'Strategic game delete confirmation'}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to remove '{strategicGame.name}'? This action cannot be undone
+            Are you sure you want to remove {strategicGame.name}? This action cannot be undone
           </DialogContentText>
         </DialogContent>
         <DialogActions>

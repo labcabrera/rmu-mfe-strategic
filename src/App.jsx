@@ -1,9 +1,9 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import StrategicGameList from "./components/StrategicGameList";
-import StrategicGameView from "./components/StrategicGameView";
-import StrategicGameEdit from "./components/StrategicGameEdit";
-import StrategicGameCreation from "./components/StrategicGameCreation";
+import StrategicGameList from "./modules/games/components/list/StrategicGameList";
+import StrategicGameView from "./modules/games/components/view/StrategicGameView";
+import StrategicGameEdit from "./modules/games/components/update/StrategicGameUpdate";
+import StrategicGameCreate from "./modules/games/components/create/StrategicGameCreate";
 import "./index.css";
 
 const App = () => {
@@ -12,7 +12,7 @@ const App = () => {
       <Route path="/" element={<StrategicGameList />} />
       <Route path="/view/:strategicGameId" element={<StrategicGameView />} />
       <Route path="/edit/:strategicGameId" element={<StrategicGameEdit />} />
-      <Route path="/creation" element={<StrategicGameCreation />} />
+      <Route path="/creation" element={<StrategicGameCreate />} />
     </Routes>
   );
 };

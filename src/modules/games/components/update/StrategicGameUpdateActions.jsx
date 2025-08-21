@@ -11,7 +11,7 @@ import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 
-const StrategicGameEditActions = ({ formData }) => {
+const StrategicGameUpdateActions = ({ formData }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const strategicGame = location.state?.strategicGame;
@@ -90,4 +90,4 @@ const StrategicGameEditActions = ({ formData }) => {
   );
 };
 
-export default StrategicGameEditActions;
+export default StrategicGameUpdateActions;
