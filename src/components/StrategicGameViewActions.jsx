@@ -60,8 +60,9 @@ const StrategicGameViewActions = () => {
           <Breadcrumbs aria-label="breadcrumb">
             <Link underline="hover" color="inherit" href="/">Home</Link>
             <Link underline="hover" color="inherit" href="/strategic">Strategic</Link>
-            <span>Game</span>
+            <span>Games</span>
             <span>{strategicGame.name}</span>
+            <span>View</span>
           </Breadcrumbs>
         </Box>
         <Stack direction="row" spacing={2}>

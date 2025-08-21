@@ -59,7 +59,7 @@ const StrategicGameEditActions = ({ formData }) => {
             <Link underline="hover" color="inherit" href="/strategic">
               Strategic
             </Link>
-            <span>Game</span>
+            <span>Games</span>
             <span>{strategicGame.name}</span>
             <span>Edit</span>
           </Breadcrumbs>

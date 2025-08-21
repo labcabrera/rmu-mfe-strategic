@@ -9,6 +9,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
 
 import StrategicGameListItem from './StrategicGameListItem';
+import StrategicGameListActions from './StrategicGameListActions';
 
 const StrategicGameList = () => {
   const navigate = useNavigate();
@@ -46,18 +47,7 @@ const StrategicGameList = () => {
 
   return (
     <>
-      <Stack
-        spacing={2}
-        direction="row"
-        sx={{
-          justifyContent: 'flex-end',
-          alignItems: 'flex-start',
-        }}
-      >
-        <IconButton variant="outlined" onClick={createNewGame}>
-          <AddIcon />
-        </IconButton>
-      </Stack>
+      <StrategicGameListActions />
         <List>
           {strategicGames?.map((item) => (
             <StrategicGameListItem key={item.id} strategicGame={item} />
