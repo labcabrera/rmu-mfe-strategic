@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -11,7 +13,7 @@ import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 
-const StrategicGameEditActions = ({ formData }) => {
+const StrategicGameUpdateActions = ({ formData }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const strategicGame = location.state?.strategicGame;
@@ -33,7 +35,7 @@ const StrategicGameEditActions = ({ formData }) => {
       }
       fetch(url, requestOptions)
         .then((response) => response.json())
-        .then((data) => navigate(`/strategic/view/${data.id}`, { state: { strategicGame: data } }));
+        .then((data) => navigate(`/strategic/games/view/${data.id}`, { state: { strategicGame: data } }));
     } catch (error) {
       setDisplayError(true);
       setErrorMessage(`Error updating strategic game from ${url}. ${error.message}`);
@@ -45,7 +47,7 @@ const StrategicGameEditActions = ({ formData }) => {
   };
 
   const handleCancelClick = (e) => {
-    navigate(`/strategic/view/${strategicGame.id}`, { state: { strategicGame: strategicGame } });
+    navigate(`/strategic/games/view/${strategicGame.id}`, { state: { strategicGame: strategicGame } });
   };
 
   return (
@@ -59,7 +61,7 @@ const StrategicGameEditActions = ({ formData }) => {
             <Link underline="hover" color="inherit" href="/strategic">
               Strategic
             </Link>
-            <span>Game</span>
+            <span>Games</span>
             <span>{strategicGame.name}</span>
             <span>Edit</span>
           </Breadcrumbs>
@@ -90,4 +92,4 @@ const StrategicGameEditActions = ({ formData }) => {
   );
 };
 
-export default StrategicGameEditActions;
+export default StrategicGameUpdateActions;

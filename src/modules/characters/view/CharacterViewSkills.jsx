@@ -1,0 +1,204 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
+
+import React, { useEffect, useState } from 'react';
+
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import List from '@mui/material/List';
+import IconButton from '@mui/material/IconButton';
+import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
+import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+
+import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill } from '../../api/characters';
+import { fetchProfession } from '../../api/professions';
+import SnackbarError from '../../shared/errors/SnackbarError';
+import SelectSkill from '../../shared/selects/SelectSkill';
+
+const addSkillFormDataTemplate = {
+  skillId: '',
+  specialization: '',
+  ranks: 0,
+  customBonus: 0,
+};
+
+const CharacterViewSkillsAdd = ({ character, setCharacter }) => {
+  const [displayError, setDisplayError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [formData, setFormData] = useState(addSkillFormDataTemplate);
+
+  const handleSkillChange = (value, skill) => {
+    setFormData({ ...formData, skillId: value, specialization: skill?.specialization });
+  };
+
+  const handleSpecializationChange = (e) => {
+    setFormData({ ...formData, specialization: e.target.value });
+  };
+
+  const handleAddSkill = async () => {
+    try {
+      const updated = await addSkill(character.id, formData);
+      setCharacter(updated);
+      setFormData(addSkillFormDataTemplate);
+    } catch (error) {
+      setErrorMessage(error.message);
+      setDisplayError(true);
+    }
+  };
+
+  if (!character) return <>...</>;
+
+  return (
+    <>
+      <Grid container spacing={2} sx={{ marginTop: 2 }}>
+        <Grid item size={2}>
+          <SelectSkill value={formData.skillId} onChange={handleSkillChange} />
+        </Grid>
+        <Grid item size={2}>
+          <TextField label="Specialization" value={formData.specialization} onChange={handleSpecializationChange} />
+        </Grid>
+        <Grid item size={6}></Grid>
+        <Grid item size={2}>
+          <IconButton aria-label="delete" onClick={() => handleAddSkill()}>
+            <AddCircleOutlineIcon />
+          </IconButton>
+        </Grid>
+      </Grid>
+      <SnackbarError errorMessage={errorMessage} displayError={displayError} setDisplayError={setDisplayError} />
+    </>
+  );
+};
+
+const CharacterViewSkillsEntry = ({ character, setCharacter, skill }) => {
+  const [profession, setProfession] = useState(null);
+  const [displayError, setDisplayError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleLevelUp = async () => {
+    try {
+      const updated = await levelUpSkill(character.id, skill.skillId);
+      setCharacter(updated);
+    } catch (error) {
+      setErrorMessage(error.message);
+      setDisplayError(true);
+    }
+  };
+
+  const handleLevelDown = async () => {
+    try {
+      const updated = await levelDownSkill(character.id, skill.skillId);
+      setCharacter(updated);
+    } catch (error) {
+      setErrorMessage(error.message);
+      setDisplayError(true);
+    }
+  };
+
+  const handlesetUpProfessionalSkill = async (skill) => {
+    try {
+      const updated = await setUpProfessionalSkill(character.id, skill.skillId);
+      setCharacter(updated);
+    } catch (error) {
+      setErrorMessage(error.message);
+      setDisplayError(true);
+    }
+  };
+
+  const bindProfession = () => {
+    if (character) {
+      fetchProfession(character.info.professionId).then((profession) => {
+        setProfession(profession);
+      });
+    }
+  };
+
+  const isAvailableProfessionSkill = (skill) => {
+    if (profession) {
+      const includes = profession.professionalSkills.includes(skill.skillId);
+      const alreadyAdded = skill.professional && skill.professional.includes('professional');
+      return includes && !alreadyAdded;
+    }
+    return false;
+  };
+
+  const isProfessionalSkill = (skill) => {
+    return skill.professional && skill.professional.includes('professional');
+  };
+
+  useEffect(() => {
+    if (character) {
+      bindProfession();
+    }
+  }, [character]);
+
+  return (
+    <>
+      <Grid container spacing={2} sx={{ marginTop: 2 }}>
+        <Grid item size={2}>
+          <h4>
+            {skill.skillId}
+            {isProfessionalSkill(skill) ? <StarBorderIcon /> : ''}
+          </h4>
+        </Grid>
+        <Grid item size={1}>
+          {skill.specialization ? <h4>{skill.specialization}</h4> : null}
+        </Grid>
+        <Grid item size={1}>
+          {skill.statistics.join('/')}
+        </Grid>
+        <Grid item size={1}>
+          <TextField label="Ranks" name="ranks" value={skill.ranks} readOnly fullWidth />
+        </Grid>
+        <Grid item size={1}>
+          <TextField label="Stats" name="statBonus" value={skill.statBonus} readOnly fullWidth />
+        </Grid>
+        <Grid item size={1}>
+          <TextField label="Prof" name="professionalBonus" value={skill.professionalBonus} readOnly fullWidth />
+        </Grid>
+        <Grid item size={1}>
+          <TextField label="Dev" name="developmentBonus" value={skill.developmentBonus} readOnly fullWidth />
+        </Grid>
+        <Grid item size={1}>
+          <TextField label="Custom" name="customBonus" value={skill.customBonus} readOnly fullWidth />
+        </Grid>
+        <Grid item size={1}>
+          <TextField label="Total" name="totalBonus" value={skill.totalBonus} readOnly fullWidth />
+        </Grid>
+        <Grid item size={2}>
+          <IconButton onClick={() => handleLevelUp()}>
+            <ArrowCircleUpIcon />
+          </IconButton>
+          <IconButton onClick={() => handleLevelDown()}>
+            <ArrowCircleDownIcon />
+          </IconButton>
+          {isAvailableProfessionSkill(skill) && (
+            <IconButton aria-label="delete" onClick={() => handlesetUpProfessionalSkill(skill)}>
+              <StarBorderIcon />
+            </IconButton>
+          )}
+        </Grid>
+      </Grid>
+      <SnackbarError errorMessage={errorMessage} displayError={displayError} setDisplayError={setDisplayError} />
+    </>
+  );
+};
+
+const CharacterViewSkills = ({ character, setCharacter }) => {
+  return (
+    <Grid container spacing={2}>
+      <Grid item size={12}>
+        <h3>Skills</h3>
+      </Grid>
+      <List>
+        {character?.skills.map((item) => (
+          <CharacterViewSkillsEntry key={item.skillId} skill={item} character={character} setCharacter={setCharacter} />
+        ))}
+        <CharacterViewSkillsAdd character={character} setCharacter={setCharacter} />
+      </List>
+    </Grid>
+  );
+};
+
+export default CharacterViewSkills;

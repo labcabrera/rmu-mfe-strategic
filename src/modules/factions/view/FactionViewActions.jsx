@@ -1,5 +1,6 @@
-import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+/* eslint-disable react/prop-types */
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -14,30 +15,34 @@ import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
+import Snackbar from '@mui/material/Snackbar';
+import CloseIcon from '@mui/icons-material/Close';
+import { Link as RouterLink } from 'react-router-dom';
 
-import { RMU_API_STRATEGIC_URL } from '../constants/environment';
+import { deleteFaction } from '../../api/factions';
 
-const StrategicGameViewActions = () => {
-  const location = useLocation();
+const FactionViewActions = ({ faction }) => {
   const navigate = useNavigate();
-  const strategicGame = location.state?.strategicGame;
-
+  const [displayError, setDisplayError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
 
-  const deleteStrategicGame = async () => {
-    const url = `${RMU_API_STRATEGIC_URL}/strategic-games/${strategicGame.id}`;
-    const response = await fetch(url, { method: 'DELETE' });
-    const deleteResponse = await response;
-    if (deleteResponse.status == 204) {
-      navigate('/strategic');
-    } else {
-      //TODO display error
-      console.log('delete data: ' + data);
+  const handleDelete = () => {
+    try {
+      deleteFaction(faction.id);
+      navigate(`/strategic/games/view/${faction.gameId}`);
+    } catch (err) {
+      setDisplayError(true);
+      setErrorMessage(`Error deleting faction: ${err.message}`);
     }
   };
 
   const handleEditClick = () => {
-    navigate(`/strategic/edit/${strategicGame.id}`, { state: { strategicGame: strategicGame } });
+    navigate(`/strategic/factions/edit/${faction.id}`, { state: { faction: faction } });
+  };
+
+  const handleSnackbarClose = () => {
+    setDisplayError(false);
   };
 
   const handleDeleteClick = () => {
@@ -49,7 +54,7 @@ const StrategicGameViewActions = () => {
   };
 
   const handleDialogDelete = () => {
-    deleteStrategicGame();
+    handleDelete();
     setDeleteDialogOpen(false);
   };
 
@@ -58,10 +63,17 @@ const StrategicGameViewActions = () => {
       <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center" sx={{ minHeight: 80 }}>
         <Box>
           <Breadcrumbs aria-label="breadcrumb">
-            <Link underline="hover" color="inherit" href="/">Home</Link>
-            <Link underline="hover" color="inherit" href="/strategic">Strategic</Link>
-            <span>Game</span>
-            <span>{strategicGame.name}</span>
+            <Link underline="hover" color="inherit" href="/">
+              Home
+            </Link>
+            <Link component={RouterLink} underline="hover" color="inherit" to="/strategic/games">
+              Strategic
+            </Link>
+            <Link component={RouterLink} underline="hover" color="inherit" to="/strategic/factions">
+              Factions
+            </Link>
+            <span>{faction.name}</span>
+            <span>View</span>
           </Breadcrumbs>
         </Box>
         <Stack direction="row" spacing={2}>
@@ -73,16 +85,29 @@ const StrategicGameViewActions = () => {
           </IconButton>
         </Stack>
       </Stack>
+      <Snackbar
+        open={displayError}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        onClose={handleSnackbarClose}
+        message={errorMessage}
+        action={
+          <React.Fragment>
+            <IconButton aria-label="close" color="inherit" sx={{ p: 0.5 }} onClick={handleSnackbarClose}>
+              <CloseIcon />
+            </IconButton>
+          </React.Fragment>
+        }
+      />
       <Dialog
         open={deleteDialogOpen}
         onClose={handleDialogDeleteClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{'Strategic game delete confirmation'}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{'Faction delete confirmation'}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to remove '{strategicGame.name}'? This action cannot be undone
+            Are you sure you want to remove {faction.name}? This action cannot be undone
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -94,4 +119,4 @@ const StrategicGameViewActions = () => {
   );
 };
 
-export default StrategicGameViewActions;
+export default FactionViewActions;

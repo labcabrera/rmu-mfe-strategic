@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 
-import StrategicGameEditActions from './StrategicGameEditActions';
+import StrategicGameUpdateActions from './StrategicGameUpdateActions';
 
-const StrategicGameEdit = () => {
+const StrategicGameUpdate = () => {
   const location = useLocation();
   const strategicGame = location.state?.strategicGame;
   const [formData, setFormData] = useState({
@@ -22,7 +21,7 @@ const StrategicGameEdit = () => {
 
   return (
     <>
-      <StrategicGameEditActions formData={formData} />
+      <StrategicGameUpdateActions formData={formData} />
       <Grid container spacing={2}>
         <Grid size={12}>
           <TextField label="Name" fullWidth name="name" value={formData.name} onChange={handleChange} />
@@ -35,4 +34,4 @@ const StrategicGameEdit = () => {
   );
 };
 
-export default StrategicGameEdit;
+export default StrategicGameUpdate;
