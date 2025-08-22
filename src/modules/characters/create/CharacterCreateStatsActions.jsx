@@ -156,34 +156,42 @@ const CharacterCreateStatsActions = ({ strategicGame, formData, setFormData, set
   };
 
   const handleBoostHighest = () => {
-    if (boosts > 0) {
-      setFormData((prevState) => {
-        const highestStat = Object.keys(prevState.statistics).reduce((a, b) =>
-          prevState.statistics[a].potential > prevState.statistics[b].potential ? a : b
-        );
-        return {
-          ...prevState,
-          statistics: {
-            ...prevState.statistics,
-            [highestStat]: {
-              ...prevState.statistics[highestStat],
-              potential: prevState.statistics[highestStat].potential + 1,
-            },
-          },
-        };
-      });
-      setStatBonusFormData((prevState) => {
-        const highestStat = Object.keys(prevState).reduce((a, b) => (prevState[a].potential > prevState[b].potential ? a : b));
-        return {
-          ...prevState,
-          [highestStat]: {
-            ...prevState[highestStat],
-            potential: getStatBonus(prevState[highestStat].potential + 1),
-          },
-        };
-      });
-      setBoosts(boosts - 1);
+    console.log('handleBoostHighest');
+    const highestStat = Object.entries(formData.statistics || {}).reduce(
+      (max, entry) => (entry[1].temporary > max[1].temporary ? entry : max),
+      ['', { temporary: -Infinity }]
+    )[0];
+    console.log('highestStat', highestStat);
+    if (highestStat) {
+      updateStat(highestStat, 90, 90);
     }
+  };
+
+  const updateStat = (key, potentialValue, temporaryValue) => {
+    setFormData((prevState) => {
+      const stat = prevState.statistics[key];
+      return {
+        ...prevState,
+        statistics: {
+          ...prevState.statistics,
+          [key]: {
+            ...stat,
+            potential: potentialValue,
+            temporary: temporaryValue,
+          },
+        },
+      };
+    });
+    setStatBonusFormData((prevState) => {
+      return {
+        ...prevState,
+        [key]: {
+          ...prevState[key],
+          potential: getStatBonus(potentialValue),
+          temporary: getStatBonus(temporaryValue),
+        },
+      };
+    });
   };
 
   return (
@@ -209,7 +217,7 @@ const CharacterCreateStatsActions = ({ strategicGame, formData, setFormData, set
       </Grid>
       <Grid size={6}>Swap statistics</Grid>
       <Grid size={2}>
-        <StatButton text="Replace" onClick={handleReplacePotential} />
+        <StatButton text="Boost" onClick={handleReplacePotential} />
       </Grid>
       <Grid size={2}>
         <StatSelect name="Target" value={replaceBoostStat} setValue={setReplaceBoostStat} />
@@ -217,25 +225,15 @@ const CharacterCreateStatsActions = ({ strategicGame, formData, setFormData, set
       <Grid size={2}></Grid>
       <Grid size={6}>Replace potential stat with 78 and temporary stat with 56.</Grid>
       <Grid size={2}>
-        <StatButton text="Replace" onClick={handleBoostHighest} />
+        <StatButton text="Boost" onClick={handleBoostHighest} />
       </Grid>
       <Grid size={4}></Grid>
       <Grid size={6}>Replace your highest temporary stat with 90 and boost its potential by 10.</Grid>
-      <Grid size={1}></Grid>
-      <Grid size={1}></Grid>
-      <Grid size={1}>
-        <StatButton text="Replace" onClick={handleReplacePotential} />
+      <Grid size={2}>
+        <StatButton text="Boost" onClick={handleBoostHighest} />
       </Grid>
-      <Grid size={1}></Grid>
-      <Grid size={8}>Replace your second-highest temporary stat with 85 and boost its potential by 10..</Grid>
-      <Grid size={1}></Grid>
-      <Grid size={1}></Grid>
-      <Grid size={1}>
-        <StatButton text="Replace" onClick={handleReplacePotential} />
-      </Grid>
-      <Grid size={1}></Grid>
-      <Grid size={8}>Replace your second-highest temporary stat with 85 and boost its potential by 10..</Grid>
-      <Grid size={1}></Grid>{' '}
+      <Grid size={4}></Grid>
+      <Grid size={6}>Replace your second-highest temporary stat with 85 and boost its potential by 10..</Grid>
     </Grid>
   );
 };

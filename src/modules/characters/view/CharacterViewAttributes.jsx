@@ -10,11 +10,8 @@ import TextField from '@mui/material/TextField';
 import HeightTextField from '../../shared/input/HeightTextField';
 import InitiativeTextField from '../../shared/input/InitiativeTextField';
 import MovementTextField from '../../shared/input/MovementTextField';
-import NameTextField from '../../shared/input/NameTextField';
 import WeightTextField from '../../shared/input/WeightTextField';
-import SelectFaction from '../../shared/selects/SelectFaction';
-import SelectLevel from '../../shared/selects/SelectLevel';
-import SelectRace from '../../shared/selects/SelectRace';
+import CharacterViewStats from './CharacterViewStats';
 
 const CharacterViewAttributes = ({ formData: character }) => {
   return (
@@ -66,6 +63,13 @@ const CharacterViewAttributes = ({ formData: character }) => {
       </Grid>
       <Grid item size={12}>
         <TextField label="Description" variant="outlined" name="description" value={character.description} fullWidth multiline maxRows={4} />
+      </Grid>
+      <Grid item size={12}>
+        <Grid container spacing={2}>
+          <Grid item size={4}>
+            <CharacterViewStats character={character} />
+          </Grid>
+        </Grid>
       </Grid>
     </Grid>
   );
