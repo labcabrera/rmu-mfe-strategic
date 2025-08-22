@@ -12,13 +12,13 @@ import SaveIcon from '@mui/icons-material/Save';
 import Snackbar from '@mui/material/Snackbar';
 import CloseIcon from '@mui/icons-material/Close';
 
-const StrategicGameCreateActions = ({ formData }) => {
+const FactionCreateActions = ({ strategicGame, formData }) => {
   const navigate = useNavigate();
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const createGame = (e) => {
-    const url = `${process.env.RMU_API_STRATEGIC_URL}/strategic-games`;
+  const createFaction = (e) => {
+    const url = `${process.env.RMU_API_STRATEGIC_URL}/factions`;
     e.preventDefault();
     const requestOptions = {
       method: 'POST',
@@ -30,7 +30,9 @@ const StrategicGameCreateActions = ({ formData }) => {
         if (response.status !== 201) throw new Error(`Error: ${response.status} ${response.statusText}`);
         return response.json();
       })
-      .then((data) => navigate('/strategic/games/view/' + data.id, { state: { strategicGame: data } }))
+      .then(() => {
+        navigate('/strategic/games/view/' + strategicGame.id, { state: { strategicGame: strategicGame } });
+      })
       .catch((error) => {
         setDisplayError(true);
         setErrorMessage(`Error creating game from ${url}. ${error.message}`);
@@ -52,11 +54,11 @@ const StrategicGameCreateActions = ({ formData }) => {
             <Link underline="hover" color="inherit" href="/strategic">
               Strategic
             </Link>
-            <span>Games</span>
+            <span>Factions</span>
           </Breadcrumbs>
         </Box>
         <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>
-          <IconButton variant="outlined" onClick={createGame}>
+          <IconButton variant="outlined" onClick={createFaction}>
             <SaveIcon />
           </IconButton>
         </Stack>
@@ -78,4 +80,4 @@ const StrategicGameCreateActions = ({ formData }) => {
   );
 };
 
-export default StrategicGameCreateActions;
+export default FactionCreateActions;

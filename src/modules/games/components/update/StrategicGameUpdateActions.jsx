@@ -33,7 +33,7 @@ const StrategicGameUpdateActions = ({ formData }) => {
       }
       fetch(url, requestOptions)
         .then((response) => response.json())
-        .then((data) => navigate(`/strategic/view/${data.id}`, { state: { strategicGame: data } }));
+        .then((data) => navigate(`/strategic/games/view/${data.id}`, { state: { strategicGame: data } }));
     } catch (error) {
       setDisplayError(true);
       setErrorMessage(`Error updating strategic game from ${url}. ${error.message}`);
@@ -45,7 +45,7 @@ const StrategicGameUpdateActions = ({ formData }) => {
   };
 
   const handleCancelClick = (e) => {
-    navigate(`/strategic/view/${strategicGame.id}`, { state: { strategicGame: strategicGame } });
+    navigate(`/strategic/games/view/${strategicGame.id}`, { state: { strategicGame: strategicGame } });
   };
 
   return (

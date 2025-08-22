@@ -13,7 +13,7 @@ const StrategicGameList = () => {
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const getStrategicGames = async () => {
+  const fetchStrategicGames = async () => {
     const url = `${process.env.RMU_API_STRATEGIC_URL}/strategic-games`;
     try {
       const response = await fetch(url, { method: 'GET' });
@@ -34,18 +34,23 @@ const StrategicGameList = () => {
   };
 
   useEffect(() => {
-    getStrategicGames();
+    fetchStrategicGames();
   }, []);
 
   return (
     <>
       <StrategicGameListActions />
-        <List>
-          {strategicGames?.map((item) => (
-            <StrategicGameListItem key={item.id} strategicGame={item} />
-          ))}
-        </List>
-      <Snackbar open={displayError} anchorOrigin={{ vertical: 'top', horizontal: 'right' }} onClose={handleSnackbarClose} message={errorMessage} action={
+      <List>
+        {strategicGames?.map((item) => (
+          <StrategicGameListItem key={item.id} strategicGame={item} />
+        ))}
+      </List>
+      <Snackbar
+        open={displayError}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        onClose={handleSnackbarClose}
+        message={errorMessage}
+        action={
           <React.Fragment>
             <IconButton aria-label="close" color="inherit" sx={{ p: 0.5 }} onClick={handleSnackbarClose}>
               <CloseIcon />

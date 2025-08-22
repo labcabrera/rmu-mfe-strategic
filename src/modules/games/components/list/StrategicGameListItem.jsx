@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,7 +14,7 @@ const StrategicGameListItem = ({ strategicGame }) => {
   const navigate = useNavigate();
 
   const handleGameClick = () => {
-    navigate(`view/${strategicGame.id}`, { state: { strategicGame: strategicGame } });
+    navigate(`/strategic/games/view/${strategicGame.id}`, { state: { strategicGame: strategicGame } });
   };
 
   return (

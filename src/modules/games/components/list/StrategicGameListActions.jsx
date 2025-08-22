@@ -12,7 +12,7 @@ const StrategicGameListActions = () => {
   const navigate = useNavigate();
 
   const createNewGame = async () => {
-    navigate('/strategic/creation');
+    navigate('/strategic/games/create');
   };
 
   return (

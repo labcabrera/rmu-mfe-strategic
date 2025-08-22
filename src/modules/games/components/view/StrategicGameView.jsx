@@ -5,6 +5,7 @@ import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 
 import StrategicGameViewActions from './StrategicGameViewActions';
+import StrategicGameViewFactions from './StrategicGameViewFactions';
 
 const StrategicGameView = () => {
   const location = useLocation();
@@ -43,6 +44,7 @@ const StrategicGameView = () => {
           <TextField label="Description" name="description" value={strategicGame.description} readonly fullWidth multiline maxRows={4} />
         </Grid>
       </Grid>
+      <StrategicGameViewFactions strategicGame={strategicGame} />
     </>
   );
 };

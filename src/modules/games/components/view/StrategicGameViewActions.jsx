@@ -17,8 +17,6 @@ import Link from '@mui/material/Link';
 import Snackbar from '@mui/material/Snackbar';
 import CloseIcon from '@mui/icons-material/Close';
 
-import { RMU_API_STRATEGIC_URL } from '../../../../constants/environment';
-
 const StrategicGameViewActions = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -28,11 +26,10 @@ const StrategicGameViewActions = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
 
   const deleteStrategicGame = () => {
-    const url = `${RMU_API_STRATEGIC_URL}/strategic-games/${strategicGame.id}`;
+    const url = `${process.env.RMU_API_STRATEGIC_URL}/strategic-games/${strategicGame.id}`;
     fetch(url, { method: 'DELETE' })
       .then((response) => {
         if (response.status !== 204) throw new Error(`Error: ${response.status} ${response.statusText}`);
-        return response.json();
       })
       .then(() => navigate('/strategic/'))
       .catch((error) => {
@@ -42,7 +39,7 @@ const StrategicGameViewActions = () => {
   };
 
   const handleEditClick = () => {
-    navigate(`/strategic/edit/${strategicGame.id}`, { state: { strategicGame: strategicGame } });
+    navigate(`/strategic/games/edit/${strategicGame.id}`, { state: { strategicGame: strategicGame } });
   };
 
   const handleSnackbarClose = () => {
