@@ -2,20 +2,20 @@ const printCompilationMessage = (status, port) => {
   let messageColor, messageType, browserMessage;
 
   switch (status) {
-    case "success":
-      messageColor = "\x1b[32m";
-      messageType = "Compiled successfully!";
-      browserMessage = "You can now view";
+    case 'success':
+      messageColor = '\x1b[32m';
+      messageType = 'Compiled successfully!';
+      browserMessage = 'You can now view';
       break;
-    case "failure":
-      messageColor = "\x1b[31m";
-      messageType = "Compilation Failed!";
+    case 'failure':
+      messageColor = '\x1b[31m';
+      messageType = 'Compilation Failed!';
       browserMessage = "You can't now view";
       break;
-    case "compiling":
-      messageColor = "\x1b[94m";
-      messageType = "Compiling...";
-      browserMessage = "Compiling the";
+    case 'compiling':
+      messageColor = '\x1b[94m';
+      messageType = 'Compiling...';
+      browserMessage = 'Compiling the';
       break;
   }
 

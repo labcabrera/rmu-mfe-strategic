@@ -1,17 +1,15 @@
 /* eslint-disable react/prop-types */
-
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-
-import IconButton from '@mui/material/IconButton';
-import Stack from '@mui/material/Stack';
 import CancelIcon from '@mui/icons-material/Cancel';
-import SaveIcon from '@mui/icons-material/Save';
-import Snackbar from '@mui/material/Snackbar';
 import CloseIcon from '@mui/icons-material/Close';
+import SaveIcon from '@mui/icons-material/Save';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
+import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
+import Snackbar from '@mui/material/Snackbar';
+import Stack from '@mui/material/Stack';
 
 const StrategicGameUpdateActions = ({ formData }) => {
   const location = useLocation();

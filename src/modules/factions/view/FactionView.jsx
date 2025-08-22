@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
-
-import TextField from '@mui/material/TextField';
-import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
-
+import TextField from '@mui/material/TextField';
 import { fetchFaction, addFactionXP, addFactionGold } from '../../api/factions';
 import { fetchStrategicGame } from '../../api/strategic-games';
 import FactionViewActions from './FactionViewActions';

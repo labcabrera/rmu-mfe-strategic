@@ -1,32 +1,17 @@
 import React, { useEffect, useState } from 'react';
-
 import Autocomplete from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
-
-import StrategicGameCreateActions from './StrategicGameCreateActions';
-import { fetchRealms } from '../../api/realms';
 import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import { fetchRealms } from '../../api/realms';
+import { gameCreateTemplate } from '../../data/game-create';
 import SnackbarError from '../../shared/errors/SnackbarError';
+import StrategicGameCreateActions from './StrategicGameCreateActions';
 
 const StrategicGameCreate = () => {
   const [realms, setRealms] = useState([]);
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [formData, setFormData] = useState({
-    name: '',
-    realm: '',
-    description: '',
-    options: {
-      experienceMultiplier: 1,
-    },
-    powerLevel: {
-      statRandomMin: 11,
-      statBoostPotential: 78,
-      statBoostTemporary: 56,
-      statCreationBoost: 2,
-      statCreationSwap: 2,
-    },
-  });
+  const [formData, setFormData] = useState(gameCreateTemplate);
 
   const bindRealms = async () => {
     try {

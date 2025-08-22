@@ -1,17 +1,14 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-
 import React, { useEffect, useState } from 'react';
-
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
-import List from '@mui/material/List';
-import IconButton from '@mui/material/IconButton';
-import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
-import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
+import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-
+import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import TextField from '@mui/material/TextField';
 import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill } from '../../api/characters';
 import { fetchProfession } from '../../api/professions';
 import SnackbarError from '../../shared/errors/SnackbarError';

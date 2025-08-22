@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
-
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import Snackbar from '@mui/material/Snackbar';
-
 import { fetchStrategicGames } from '../../api/strategic-games';
-import StrategicGameListItem from './StrategicGameListItem';
 import StrategicGameListActions from './StrategicGameListActions';
+import StrategicGameListItem from './StrategicGameListItem';
 
 const StrategicGameList = () => {
   const [strategicGames, setStrategicGames] = useState([]);

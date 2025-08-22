@@ -1,10 +1,8 @@
 /* eslint-disable react/prop-types */
-
 import React from 'react';
-
-import Snackbar from '@mui/material/Snackbar';
-import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
+import Snackbar from '@mui/material/Snackbar';
 
 const SnackbarError = ({ errorMessage, displayError, setDisplayError }) => {
   const handleSnackbarClose = () => {

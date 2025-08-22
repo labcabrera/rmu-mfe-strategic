@@ -1,18 +1,15 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-
 import HeightTextField from '../../shared/input/HeightTextField';
 import InitiativeTextField from '../../shared/input/InitiativeTextField';
 import MovementTextField from '../../shared/input/MovementTextField';
 import WeightTextField from '../../shared/input/WeightTextField';
-import CharacterViewStats from './CharacterViewStats';
 import CharacterViewSkills from './CharacterViewSkills';
+import CharacterViewStats from './CharacterViewStats';
 
 const CharacterViewAttributes = ({ character, setCharacter }) => {
   return (

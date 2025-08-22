@@ -1,22 +1,19 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-
 import HeightTextField from '../../shared/input/HeightTextField';
 import InitiativeTextField from '../../shared/input/InitiativeTextField';
 import MovementTextField from '../../shared/input/MovementTextField';
 import NameTextField from '../../shared/input/NameTextField';
 import WeightTextField from '../../shared/input/WeightTextField';
 import SelectFaction from '../../shared/selects/SelectFaction';
-import SelectLevel from '../../shared/selects/SelectLevel';
-import SelectRace from '../../shared/selects/SelectRace';
-import SelectProfession from '../../shared/selects/SelectProfession';
 import SelectGame from '../../shared/selects/SelectGame';
+import SelectLevel from '../../shared/selects/SelectLevel';
+import SelectProfession from '../../shared/selects/SelectProfession';
+import SelectRace from '../../shared/selects/SelectRace';
 import GameCreateStats from './CharacterCreateStats';
 
 const CharacterCreateAttributes = ({ strategicGame, formData, setFormData }) => {

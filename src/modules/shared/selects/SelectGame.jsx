@@ -1,11 +1,8 @@
 /* eslint-disable react/prop-types */
-
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
-
 import { fetchStrategicGames } from '../../api/strategic-games';
 
 const SelectGame = ({ value, onChange, readonly = false, required = true }) => {

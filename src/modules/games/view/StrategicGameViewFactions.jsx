@@ -1,14 +1,11 @@
 /* eslint-disable react/prop-types */
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import Snackbar from '@mui/material/Snackbar';
-import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import List from '@mui/material/List';
 import Button from '@mui/material/Button';
-
+import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import Snackbar from '@mui/material/Snackbar';
 import StrategicGameViewFactionItem from './StrategicGameViewFactionItem';
 
 const StrategicGameViewFactions = ({ strategicGame }) => {

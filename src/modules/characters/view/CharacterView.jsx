@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-
 import { fetchCharacter } from '../../api/characters';
 import { fetchStrategicGame } from '../../api/strategic-games';
-import CharacterViewActions from './CharacterViewActions';
 import SnackbarError from '../../shared/errors/SnackbarError';
+import CharacterViewActions from './CharacterViewActions';
 import CharacterViewAttributes from './CharacterViewAttributes';
 
 const CharacterView = () => {

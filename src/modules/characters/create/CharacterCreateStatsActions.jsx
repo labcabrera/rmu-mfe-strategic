@@ -1,11 +1,9 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
-
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
 import MenuItem from '@mui/material/MenuItem';
-
+import TextField from '@mui/material/TextField';
 import { getStatBonus } from '../../services/stat-service';
 
 const stats = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
