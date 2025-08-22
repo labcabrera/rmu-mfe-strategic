@@ -9,9 +9,8 @@ import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 import SaveIcon from '@mui/icons-material/Save';
-import Snackbar from '@mui/material/Snackbar';
-import CloseIcon from '@mui/icons-material/Close';
 
+import { createCharacter } from '../../api/characters';
 import SnackbarError from '../../shared/errors/SnackbarError';
 
 const CharacterCreateActions = ({ formData }) => {
@@ -19,24 +18,14 @@ const CharacterCreateActions = ({ formData }) => {
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const handleCreate = (e) => {
-    const url = `${process.env.RMU_API_STRATEGIC_URL}/strategic-games`;
-    e.preventDefault();
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    };
-    fetch(url, requestOptions)
-      .then((response) => {
-        if (response.status !== 201) throw new Error(`Error: ${response.status} ${response.statusText}`);
-        return response.json();
-      })
-      .then((data) => navigate('/strategic/games/view/' + data.id, { state: { strategicGame: data } }))
-      .catch((error) => {
-        setDisplayError(true);
-        setErrorMessage(`Error creating game from ${url}. ${error.message}`);
-      });
+  const handleCreate = async () => {
+    try {
+      const data = await createCharacter(formData);
+      navigate('/strategic/characters/view/' + data.id, { state: { character: data } });
+    } catch (error) {
+      setDisplayError(true);
+      setErrorMessage(`Error creating character: ${error.message}`);
+    }
   };
 
   return (

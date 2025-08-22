@@ -21,13 +21,13 @@ const CharacterCreateAttributes = ({ formData, setFormData }) => {
 
   const onRaceChange = (raceId, raceInfo) => {
     if (raceInfo) {
-      const stats = { ...formData.statistics };
-      const keys = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
-      keys.forEach((key) => {
-        stats[key].racial = raceInfo.defaultStatBonus[key];
-        const totalBonus = stats[key].custom + stats[key].racial + stats[key].custom;
-        stats[key].totalBonus = totalBonus;
-      });
+      console.log('Race changed:', raceId, raceInfo);
+      //TODO
+      // const stats = { ...formData.statistics };
+      // const keys = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
+      // keys.forEach((key) => {
+      //   stats[key].racial = raceInfo.defaultStatBonus[key];
+      // });
       setFormData((prevState) => ({
         ...prevState,
         info: {
@@ -41,7 +41,7 @@ const CharacterCreateAttributes = ({ formData, setFormData }) => {
           ...prevState.movement,
           strideRacialBonus: raceInfo.strideBonus,
         },
-        statistics: stats,
+        // statistics: stats,
       }));
     }
   };

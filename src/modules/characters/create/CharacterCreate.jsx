@@ -1,12 +1,7 @@
-import React, { useEffect, useState } from 'react';
-
-import Autocomplete from '@mui/material/Autocomplete';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
+import React, { useState } from 'react';
 
 import CharacterCreateActions from './CharacterCreateActions';
 import SnackbarError from '../../shared/errors/SnackbarError';
-import SelectRace from '../../shared/selects/SelectRace';
 import CharacterCreateAttributes from './CharacterCreateAttributes';
 
 const CharacterCreate = () => {
@@ -32,11 +27,52 @@ const CharacterCreate = () => {
       ag: {
         potential: 78,
         temporary: 45,
+        custom: 0,
+      },
+      co: {
+        potential: 60,
+        temporary: 57,
+        custom: 0,
+      },
+      em: {
+        potential: 57,
+        temporary: 40,
+        custom: 0,
+      },
+      in: {
+        potential: 98,
+        temporary: 45,
+        custom: 0,
+      },
+      me: {
+        potential: 79,
+        temporary: 43,
+        custom: 0,
+      },
+      pr: {
+        potential: 66,
+        temporary: 15,
+        custom: 0,
       },
       qu: {
         potential: 98,
         temporary: 96,
         custom: 1,
+      },
+      re: {
+        potential: 99,
+        temporary: 55,
+        custom: 0,
+      },
+      sd: {
+        potential: 43,
+        temporary: 42,
+        custom: 0,
+      },
+      st: {
+        potential: 83,
+        temporary: 61,
+        custom: 0,
       },
     },
     movement: {
