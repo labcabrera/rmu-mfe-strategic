@@ -8,11 +8,11 @@ import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 import AddIcon from '@mui/icons-material/Add';
 
-const FactionListActions = () => {
+const CharacterListActions = () => {
   const navigate = useNavigate();
 
-  const createNewGame = async () => {
-    navigate('/strategic/games/create');
+  const handleCreate = async () => {
+    navigate('/strategic/characters/create');
   };
 
   return (
@@ -26,11 +26,11 @@ const FactionListActions = () => {
             <Link underline="hover" color="inherit" href="/strategic">
               Strategic
             </Link>
-            <span>Factions</span>
+            <span>Characters</span>
           </Breadcrumbs>
         </Box>
         <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>
-          <IconButton variant="outlined" onClick={createNewGame}>
+          <IconButton variant="outlined" onClick={handleCreate}>
             <AddIcon />
           </IconButton>
         </Stack>
@@ -39,4 +39,4 @@ const FactionListActions = () => {
   );
 };
 
-export default FactionListActions;
+export default CharacterListActions;

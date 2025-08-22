@@ -5,19 +5,19 @@ import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import Snackbar from '@mui/material/Snackbar';
 
-import { fetchFactions } from '../../api/factions';
-import FactionListItem from './FactionListItem';
-import FactionListActions from './FactionListActions';
+import { fetchCharacters } from '../../api/characters';
+import CharacterListItem from './CharacterListItem';
+import CharacterListActions from './CharacterListActions';
 
-const FactionList = () => {
-  const [factions, setFactions] = useState([]);
+const CharacterList = () => {
+  const [characters, setCharacters] = useState([]);
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const bindFactions = async () => {
+  const bindCharacters = async () => {
     try {
-      const games = await fetchFactions(0, 10);
-      setFactions(games);
+      const games = await fetchCharacters('', 0, 10);
+      setCharacters(games);
     } catch (error) {
       setDisplayError(true);
       setErrorMessage(`Error fetching factions. ${error.message}`);
@@ -29,15 +29,15 @@ const FactionList = () => {
   };
 
   useEffect(() => {
-    bindFactions();
+    bindCharacters();
   }, []);
 
   return (
     <>
-      <FactionListActions />
+      <CharacterListActions />
       <List>
-        {factions?.map((item) => (
-          <FactionListItem key={item.id} strategicGame={item} />
+        {characters?.map((item) => (
+          <CharacterListItem key={item.id} strategicGame={item} />
         ))}
       </List>
       <Snackbar
@@ -57,4 +57,4 @@ const FactionList = () => {
   );
 };
 
-export default FactionList;
+export default CharacterList;

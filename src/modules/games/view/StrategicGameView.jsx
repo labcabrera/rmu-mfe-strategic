@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
@@ -7,8 +7,10 @@ import Grid from '@mui/material/Grid';
 import { fetchStrategicGame } from '../../api/strategic-games';
 import StrategicGameViewActions from './StrategicGameViewActions';
 import StrategicGameViewFactions from './StrategicGameViewFactions';
+import Button from '@mui/material/Button';
 
 const StrategicGameView = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const { gameId } = useParams();
   const [strategicGame, setStrategicGame] = useState(location.state?.strategicGame || null);
@@ -34,6 +36,10 @@ const StrategicGameView = () => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleCreateCharacter = () => {
+    navigate(`/strategic/characters/create?gameId=${strategicGame.id}`, { state: { strategicGame: strategicGame } });
   };
 
   useEffect(() => {
@@ -65,6 +71,9 @@ const StrategicGameView = () => {
         </Grid>
       </Grid>
       <StrategicGameViewFactions strategicGame={strategicGame} />
+      <Button variant="outlined" onClick={() => handleCreateCharacter()}>
+        Add character
+      </Button>
     </>
   );
 };

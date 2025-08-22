@@ -8,6 +8,9 @@ import StrategicGameCreate from './modules/games/create/StrategicGameCreate';
 import FactionCreate from './modules/factions/create/FactionCreate';
 import FactionView from './modules/factions/view/FactionView';
 import FactionList from './modules/factions/list/FactionList';
+import CharacterList from './modules/characters/list/CharacterList';
+import CharacterView from './modules/characters/view/CharacterView';
+import CharacterCreate from './modules/characters/create/CharacterCreate';
 
 import './index.css';
 
@@ -30,6 +33,9 @@ const App = () => {
       <Route path="/factions" element={<FactionList />} />
       <Route path="/factions/view/:factionId" element={<FactionView />} />
       <Route path="/factions/create" element={<FactionCreate />} />
+      <Route path="/characters" element={<CharacterList />} />
+      <Route path="/characters/view/:characterId" element={<CharacterView />} />
+      <Route path="/characters/create" element={<CharacterCreate />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
