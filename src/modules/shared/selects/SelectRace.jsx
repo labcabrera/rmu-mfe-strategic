@@ -10,7 +10,7 @@ import TextField from '@mui/material/TextField';
 
 import { fetchRaces } from '../../api/races';
 
-const SelectRace = ({ value, onChange }) => {
+const SelectRace = ({ value, onChange, readonly = false }) => {
   const { t } = useTranslation();
   const [races, setRaces] = useState([]);
 
@@ -23,7 +23,6 @@ const SelectRace = ({ value, onChange }) => {
   useEffect(() => {
     const fetchData = async () => {
       const data = await fetchRaces('', 0, 100);
-      console.log('races: ', data);
       setRaces(data);
     };
     fetchData();
@@ -39,6 +38,7 @@ const SelectRace = ({ value, onChange }) => {
       label={t('race')}
       value={value === undefined || value === null || races.length === 0 ? '' : value}
       variant="outlined"
+      readOnly={readonly}
       fullWidth
       onChange={handleChange}
       slotProps={{

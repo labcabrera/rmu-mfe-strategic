@@ -1,16 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
-import { Link as RouterLink } from 'react-router-dom';
-
-import TextField from '@mui/material/TextField';
-import Grid from '@mui/material/Grid';
-import Link from '@mui/material/Link';
+import { useParams } from 'react-router-dom';
 
 import { fetchCharacter } from '../../api/characters';
 import { fetchStrategicGame } from '../../api/strategic-games';
 import CharacterViewActions from './CharacterViewActions';
-
 import SnackbarError from '../../shared/errors/SnackbarError';
+import CharacterViewAttributes from './CharacterViewAttributes';
 
 const CharacterView = () => {
   const { characterId } = useParams();
@@ -48,29 +43,7 @@ const CharacterView = () => {
   return (
     <>
       <CharacterViewActions faction={character} />
-      <Grid container spacing={2}>
-        <Grid size={12}>
-          <Link component={RouterLink} underline="hover" color="inherit" to={`/strategic/games/view/${strategicGame.id}`}>
-            {strategicGame.name}
-          </Link>
-        </Grid>
-        <Grid size={4}>
-          <TextField label="Name" name="name" value={character.name} readonly fullWidth />
-        </Grid>
-        <Grid size={8}></Grid>
-        <Grid size={4}>
-          <TextField label="Available XP" name="availableXp" value={character.name} readonly fullWidth />
-        </Grid>
-        <Grid size={8}></Grid>
-        <Grid size={4}>
-          <TextField label="Available Gold" name="availableGold" value={character.name} readonly fullWidth />
-        </Grid>
-        <Grid size={8}></Grid>
-        <Grid size={12}>
-          <TextField label="Description" name="description" value={character.description} readonly fullWidth multiline maxRows={4} />
-        </Grid>
-      </Grid>
-
+      <CharacterViewAttributes formData={character} />
       <SnackbarError errorMessage={errorMessage} displayError={displayError} setDisplayError={setDisplayError} />
       <pre>{JSON.stringify(character, null, 2)}</pre>
     </>

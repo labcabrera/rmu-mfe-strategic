@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import CharacterCreateActions from './CharacterCreateActions';
 import SnackbarError from '../../shared/errors/SnackbarError';
 import CharacterCreateAttributes from './CharacterCreateAttributes';
 
 const CharacterCreate = () => {
+  const [searchParams] = useSearchParams();
+  const gameId = searchParams.get('gameId');
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [formData, setFormData] = useState({
     name: 'Orc - Scimitar - Lvl 2',
-    gameId: '{{strategic-game-id}}',
+    gameId: '',
     factionId: '',
     info: {
       level: 2,
@@ -119,6 +122,15 @@ const CharacterCreate = () => {
     ],
     description: 'Lorem ipsum',
   });
+
+  useEffect(() => {
+    if (gameId) {
+      setFormData((prevState) => ({
+        ...prevState,
+        gameId: gameId,
+      }));
+    }
+  }, [gameId]);
 
   return (
     <>

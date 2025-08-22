@@ -21,7 +21,7 @@ import { Link as RouterLink } from 'react-router-dom';
 
 import { deleteFaction } from '../../api/factions';
 
-const CharacterViewActions = ({ faction }) => {
+const CharacterViewActions = ({ faction: character }) => {
   const navigate = useNavigate();
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -29,16 +29,16 @@ const CharacterViewActions = ({ faction }) => {
 
   const handleDelete = () => {
     try {
-      deleteFaction(faction.id);
-      navigate(`/strategic/games/view/${faction.gameId}`);
+      deleteFaction(character.id);
+      navigate(`/strategic/games/view/${character.gameId}`);
     } catch (err) {
       setDisplayError(true);
-      setErrorMessage(`Error deleting faction: ${err.message}`);
+      setErrorMessage(`Error deleting character: ${err.message}`);
     }
   };
 
   const handleEditClick = () => {
-    navigate(`/strategic/factions/edit/${faction.id}`, { state: { faction: faction } });
+    navigate(`/strategic/characters/edit/${character.id}`, { state: { character } });
   };
 
   const handleSnackbarClose = () => {
@@ -69,10 +69,10 @@ const CharacterViewActions = ({ faction }) => {
             <Link component={RouterLink} underline="hover" color="inherit" to="/strategic/games">
               Strategic
             </Link>
-            <Link component={RouterLink} underline="hover" color="inherit" to="/strategic/factions">
-              Factions
+            <Link component={RouterLink} underline="hover" color="inherit" to="/strategic/characters">
+              Characters
             </Link>
-            <span>{faction.name}</span>
+            <span>{character.name}</span>
             <span>View</span>
           </Breadcrumbs>
         </Box>
@@ -107,7 +107,7 @@ const CharacterViewActions = ({ faction }) => {
         <DialogTitle id="alert-dialog-title">{'Faction delete confirmation'}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to remove {faction.name}? This action cannot be undone
+            Are you sure you want to remove {character.name}? This action cannot be undone
           </DialogContentText>
         </DialogContent>
         <DialogActions>
