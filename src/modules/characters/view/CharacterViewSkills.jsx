@@ -4,11 +4,13 @@ import { useTranslation } from 'react-i18next';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill } from '../../api/characters';
 import { fetchProfession } from '../../api/professions';
 import SnackbarError from '../../shared/errors/SnackbarError';
@@ -171,6 +173,9 @@ const CharacterViewSkillsEntry = ({ character, setCharacter, skill }) => {
           <IconButton onClick={() => handleLevelDown()}>
             <ArrowCircleDownIcon />
           </IconButton>
+          <IconButton onClick={() => handleLevelDown()}>
+            <DeleteForeverIcon />
+          </IconButton>
           {isAvailableProfessionSkill(skill) && (
             <IconButton aria-label="delete" onClick={() => handlesetUpProfessionalSkill(skill)}>
               <StarBorderIcon />
@@ -186,9 +191,11 @@ const CharacterViewSkillsEntry = ({ character, setCharacter, skill }) => {
 const CharacterViewSkills = ({ character, setCharacter }) => {
   const { t } = useTranslation();
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} sx={{ marginTop: 2 }}>
       <Grid item size={12}>
-        <h3>{t('skills')}</h3>
+        <Typography color="secondary" variant="h5">
+          {t('skills')}
+        </Typography>
       </Grid>
       <List>
         {character?.skills.map((item) => (
