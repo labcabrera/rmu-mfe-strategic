@@ -72,9 +72,7 @@ const StrategicGameViewFactions = ({ strategicGame }) => {
             </IconButton>
           </React.Fragment>
         }
-      />{' '}
-      <pre>Strategic game view Factions: {JSON.stringify(factions, null, 2)}</pre>
-      <pre>Strategic game view strategicGame: {JSON.stringify(strategicGame, null, 2)}</pre>
+      />
     </>
   );
 };

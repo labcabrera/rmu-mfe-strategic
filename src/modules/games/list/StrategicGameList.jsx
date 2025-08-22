@@ -16,7 +16,7 @@ const StrategicGameList = () => {
 
   const bindStrategicGames = async () => {
     try {
-      const games = await fetchStrategicGames(0, 10);
+      const games = await fetchStrategicGames('', 0, 10);
       setStrategicGames(games);
     } catch (error) {
       setStrategicGames([]);

@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from 'react';
 
-import CloseIcon from '@mui/icons-material/Close';
 import Autocomplete from '@mui/material/Autocomplete';
-import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
-import Snackbar from '@mui/material/Snackbar';
 import TextField from '@mui/material/TextField';
 
 import StrategicGameCreateActions from './StrategicGameCreateActions';
 import { fetchRealms } from '../../api/realms';
+import Grid from '@mui/material/Grid';
+import SnackbarError from '../../shared/errors/SnackbarError';
 
 const StrategicGameCreate = () => {
-  const debugMode = false;
   const [realms, setRealms] = useState([]);
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -19,6 +16,16 @@ const StrategicGameCreate = () => {
     name: '',
     realm: '',
     description: '',
+    options: {
+      experienceMultiplier: 1,
+    },
+    powerLevel: {
+      statRandomMin: 11,
+      statBoostPotential: 78,
+      statBoostTemporary: 56,
+      statCreationBoost: 2,
+      statCreationSwap: 2,
+    },
   });
 
   const bindRealms = async () => {
@@ -30,10 +37,6 @@ const StrategicGameCreate = () => {
       setErrorMessage(`Error loading realms. ${error.message}`);
     }
   };
-
-  useEffect(() => {
-    bindRealms();
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,53 +50,150 @@ const StrategicGameCreate = () => {
     };
   };
 
-  const handleSnackbarClose = () => {
-    setDisplayError(false);
+  const handleExperienceMultiplierChange = (e) => {
+    const { value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      options: {
+        ...prevData.options,
+        experienceMultiplier: parseInt(value),
+      },
+    }));
   };
+
+  const handlePowerLevelChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      powerLevel: {
+        ...prevData.powerLevel,
+        [name]: parseInt(value),
+      },
+    }));
+  };
+
+  useEffect(() => {
+    bindRealms();
+  }, []);
 
   return (
     <>
       <StrategicGameCreateActions formData={formData} />
-      <Box>
-        <TextField label="Name" variant="outlined" fullWidth name="name" value={formData.name} onChange={handleChange} margin="normal" required />
-        <Autocomplete
-          disablePortal
-          options={realms}
-          onChange={(event, newValue) => {
-            setFormData({ ...formData, realm: newValue.value });
-          }}
-          renderInput={(params) => <TextField {...params} label="Realm" />}
-        />
-        <TextField
-          label="Description"
-          variant="outlined"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          fullWidth
-          multiline
-          maxRows={4}
-          margin="normal"
-        />
-      </Box>
-      <Snackbar
-        open={displayError}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        onClose={handleSnackbarClose}
-        message={errorMessage}
-        action={
-          <React.Fragment>
-            <IconButton aria-label="close" color="inherit" sx={{ p: 0.5 }} onClick={handleSnackbarClose}>
-              <CloseIcon />
-            </IconButton>
-          </React.Fragment>
-        }
-      />
-      {debugMode ? (
-        <div>
-          <pre>{JSON.stringify(formData, null, 2)}</pre>
-        </div>
-      ) : null}
+      <Grid container spacing={2}>
+        <Grid item size={4}>
+          <TextField label="Name" variant="outlined" fullWidth name="name" value={formData.name} onChange={handleChange} margin="normal" required />
+        </Grid>
+        <Grid size={8}></Grid>
+
+        <Grid item size={4}>
+          <Autocomplete
+            disablePortal
+            options={realms}
+            onChange={(event, newValue) => {
+              setFormData({ ...formData, realm: newValue.value });
+            }}
+            renderInput={(params) => <TextField {...params} label="Realm" />}
+          />
+        </Grid>
+        <Grid size={8}></Grid>
+
+        <Grid item size={4}>
+          <TextField
+            label="Description"
+            variant="outlined"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            fullWidth
+            multiline
+            maxRows={4}
+            margin="normal"
+          />
+        </Grid>
+        <Grid size={8}></Grid>
+
+        <Grid size={12}>Options</Grid>
+        <Grid size={4}>
+          <TextField
+            label="Experience multiplier"
+            name="experienceMultiplier"
+            type="number"
+            variant="outlined"
+            value={formData.options.experienceMultiplier}
+            onChange={handleExperienceMultiplierChange}
+            required
+            fullWidth
+          />
+        </Grid>
+        <Grid size={8}></Grid>
+
+        <Grid size={12}>Power level</Grid>
+        <Grid size={4}>
+          <TextField
+            label="Stat random min"
+            name="statRandomMin"
+            variant="outlined"
+            type="number"
+            value={formData.powerLevel.statRandomMin}
+            onChange={handlePowerLevelChange}
+            fullWidth
+            required
+          />
+        </Grid>
+        <Grid size={8}></Grid>
+
+        <Grid size={4}>
+          <TextField
+            label="Stat Boost Potential"
+            name="statBoostPotential"
+            variant="outlined"
+            type="number"
+            value={formData.powerLevel.statBoostPotential}
+            onChange={handlePowerLevelChange}
+            fullWidth
+            required
+          />
+        </Grid>
+        <Grid size={4}>
+          <TextField
+            label="Stat Boost Temporary"
+            name="statBoostTemporary"
+            variant="outlined"
+            type="number"
+            value={formData.powerLevel.statBoostTemporary}
+            onChange={handlePowerLevelChange}
+            fullWidth
+            required
+          />
+        </Grid>
+        <Grid size={4}></Grid>
+        <Grid size={4}>
+          <TextField
+            label="Stat Creation Boost"
+            name="statCreationBoost"
+            variant="outlined"
+            type="number"
+            value={formData.powerLevel.statCreationBoost}
+            onChange={handlePowerLevelChange}
+            fullWidth
+            required
+          />
+        </Grid>
+        <Grid size={4}>
+          <TextField
+            label="Stat Creation Swap"
+            name="statCreationSwap"
+            variant="outlined"
+            type="number"
+            value={formData.powerLevel.statCreationSwap}
+            onChange={handlePowerLevelChange}
+            fullWidth
+            required
+          />
+        </Grid>
+      </Grid>
+      <SnackbarError displayError={displayError} errorMessage={errorMessage} setDisplayError={setDisplayError} />
+      <pre>{JSON.stringify(formData, null, 2)}</pre>
     </>
   );
 };

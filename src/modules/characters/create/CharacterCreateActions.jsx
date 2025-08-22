@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
@@ -36,10 +37,13 @@ const CharacterCreateActions = ({ formData }) => {
             <Link underline="hover" color="inherit" href="/">
               Home
             </Link>
-            <Link underline="hover" color="inherit" href="/strategic">
+            <Link underline="hover" color="inherit" href="/strategic/games">
               Strategic
             </Link>
-            <span>Games</span>
+            <Link component={RouterLink} underline="hover" color="inherit" to="/strategic/characters">
+              Characters
+            </Link>
+            <span>Create</span>
           </Breadcrumbs>
         </Box>
         <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>

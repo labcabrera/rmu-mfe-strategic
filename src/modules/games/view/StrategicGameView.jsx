@@ -69,6 +69,79 @@ const StrategicGameView = () => {
         <Grid size={12}>
           <TextField label="Description" name="description" value={strategicGame.description} readonly fullWidth multiline maxRows={4} />
         </Grid>
+        <Grid size={12}>Options</Grid>
+        <Grid size={4}>
+          <TextField
+            label="Experience multiplier"
+            name="experienceMultiplier"
+            type="number"
+            variant="outlined"
+            value={strategicGame.options.experienceMultiplier}
+            required
+            fullWidth
+          />
+        </Grid>
+        <Grid size={8}></Grid>
+
+        <Grid size={12}>Power level</Grid>
+        <Grid size={4}>
+          <TextField
+            label="Stat random min"
+            name="statRandomMin"
+            variant="outlined"
+            type="number"
+            value={strategicGame.powerLevel.statRandomMin}
+            fullWidth
+            required
+          />
+        </Grid>
+        <Grid size={8}></Grid>
+
+        <Grid size={4}>
+          <TextField
+            label="Stat Boost Potential"
+            name="statBoostPotential"
+            variant="outlined"
+            type="number"
+            value={strategicGame.powerLevel.statBoostPotential}
+            fullWidth
+            required
+          />
+        </Grid>
+        <Grid size={4}>
+          <TextField
+            label="Stat Boost Temporary"
+            name="statBoostTemporary"
+            variant="outlined"
+            type="number"
+            value={strategicGame.powerLevel.statBoostTemporary}
+            fullWidth
+            required
+          />
+        </Grid>
+        <Grid size={4}></Grid>
+        <Grid size={4}>
+          <TextField
+            label="Stat Creation Boost"
+            name="statCreationBoost"
+            variant="outlined"
+            type="number"
+            value={strategicGame.powerLevel.statCreationBoost}
+            fullWidth
+            required
+          />
+        </Grid>
+        <Grid size={4}>
+          <TextField
+            label="Stat Creation Swap"
+            name="statCreationSwap"
+            variant="outlined"
+            type="number"
+            value={strategicGame.powerLevel.statCreationSwap}
+            fullWidth
+            required
+          />
+        </Grid>
       </Grid>
       <StrategicGameViewFactions strategicGame={strategicGame} />
       <Button variant="outlined" onClick={() => handleCreateCharacter()}>

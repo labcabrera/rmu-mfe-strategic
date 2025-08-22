@@ -16,7 +16,7 @@ const FactionList = () => {
 
   const bindFactions = async () => {
     try {
-      const games = await fetchFactions(0, 10);
+      const games = await fetchFactions('', 0, 10);
       setFactions(games);
     } catch (error) {
       setDisplayError(true);

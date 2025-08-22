@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
@@ -9,36 +10,23 @@ import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 import SaveIcon from '@mui/icons-material/Save';
-import Snackbar from '@mui/material/Snackbar';
-import CloseIcon from '@mui/icons-material/Close';
+import SnackbarError from '../../shared/errors/SnackbarError';
+
+import { createStrategicGame } from './../../api/strategic-games';
 
 const StrategicGameCreateActions = ({ formData }) => {
   const navigate = useNavigate();
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const createGame = (e) => {
-    const url = `${process.env.RMU_API_STRATEGIC_URL}/strategic-games`;
-    e.preventDefault();
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    };
-    fetch(url, requestOptions)
-      .then((response) => {
-        if (response.status !== 201) throw new Error(`Error: ${response.status} ${response.statusText}`);
-        return response.json();
-      })
-      .then((data) => navigate('/strategic/games/view/' + data.id, { state: { strategicGame: data } }))
-      .catch((error) => {
-        setDisplayError(true);
-        setErrorMessage(`Error creating game from ${url}. ${error.message}`);
-      });
-  };
-
-  const handleSnackbarClose = () => {
-    setDisplayError(false);
+  const createGame = async () => {
+    try {
+      const data = await createStrategicGame(formData);
+      navigate('/strategic/games/view/' + data.id, { state: { strategicGame: data } });
+    } catch (error) {
+      setDisplayError(true);
+      setErrorMessage(`Error creating game. ${error.message}`);
+    }
   };
 
   return (
@@ -49,7 +37,7 @@ const StrategicGameCreateActions = ({ formData }) => {
             <Link underline="hover" color="inherit" href="/">
               Home
             </Link>
-            <Link underline="hover" color="inherit" href="/strategic">
+            <Link component={RouterLink} underline="hover" color="inherit" to="/strategic">
               Strategic
             </Link>
             <span>Games</span>
@@ -61,19 +49,7 @@ const StrategicGameCreateActions = ({ formData }) => {
           </IconButton>
         </Stack>
       </Stack>
-      <Snackbar
-        open={displayError}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        onClose={handleSnackbarClose}
-        message={errorMessage}
-        action={
-          <React.Fragment>
-            <IconButton aria-label="close" color="inherit" sx={{ p: 0.5 }} onClick={handleSnackbarClose}>
-              <CloseIcon />
-            </IconButton>
-          </React.Fragment>
-        }
-      />
+      <SnackbarError displayError={displayError} errorMessage={errorMessage} setDisplayError={setDisplayError} />
     </>
   );
 };
