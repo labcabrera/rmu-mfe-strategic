@@ -15,6 +15,7 @@ import WeightTextField from '../../shared/input/WeightTextField';
 import SelectFaction from '../../shared/selects/SelectFaction';
 import SelectLevel from '../../shared/selects/SelectLevel';
 import SelectRace from '../../shared/selects/SelectRace';
+import SelectProfession from '../../shared/selects/SelectProfession';
 
 const CharacterCreateAttributes = ({ formData, setFormData }) => {
   const { t, i18n } = useTranslation();
@@ -42,6 +43,19 @@ const CharacterCreateAttributes = ({ formData, setFormData }) => {
           strideRacialBonus: raceInfo.strideBonus,
         },
         // statistics: stats,
+      }));
+    }
+  };
+
+  const onProfessionChange = (professionId, professionInfo) => {
+    console.log('Profession changed:', professionId, professionInfo);
+    if (professionInfo) {
+      setFormData((prevState) => ({
+        ...prevState,
+        info: {
+          ...prevState.info,
+          professionId: professionId,
+        },
       }));
     }
   };
@@ -82,10 +96,13 @@ const CharacterCreateAttributes = ({ formData, setFormData }) => {
   return (
     <Grid container spacing={2}>
       <Grid item size={4}>
+        <NameTextField value={formData.name} onChange={handleChange} generateRandom={true} generateRandomRaceValue={formData.info.race} />
+      </Grid>
+      <Grid item size={4}>
         <SelectRace value={formData.info.race} onChange={onRaceChange} />
       </Grid>
       <Grid item size={4}>
-        <NameTextField value={formData.name} onChange={handleChange} generateRandom={true} generateRandomRaceValue={formData.info.race} />
+        <SelectProfession value={formData.info.profession} onChange={onProfessionChange} />
       </Grid>
       <Grid item size={4}>
         <SelectFaction value={formData.faction} onChange={onFactionChange} />

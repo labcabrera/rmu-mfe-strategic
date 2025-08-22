@@ -8,10 +8,10 @@ import TextField from '@mui/material/TextField';
 
 import { fetchRandomName } from '../../api/npc-random-names';
 
-const NameTextField = ({ value, onChange, required = false, generateRandom, generateRandomRaceValue }) => {
+const NameTextField = ({ value, onChange, required = true, generateRandom, generateRandomRaceValue }) => {
   const { t } = useTranslation();
 
-  const handleRandomNameClick = async (e) => {
+  const handleRandomNameClick = async () => {
     var race = 'generic';
     if (generateRandomRaceValue) {
       race = generateRandomRaceValue;

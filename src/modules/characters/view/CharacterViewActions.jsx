@@ -19,7 +19,7 @@ import Snackbar from '@mui/material/Snackbar';
 import CloseIcon from '@mui/icons-material/Close';
 import { Link as RouterLink } from 'react-router-dom';
 
-import { deleteFaction } from '../../api/factions';
+import { deleteCharacter } from '../../api/characters';
 
 const CharacterViewActions = ({ faction: character }) => {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ const CharacterViewActions = ({ faction: character }) => {
 
   const handleDelete = () => {
     try {
-      deleteFaction(character.id);
+      deleteCharacter(character.id);
       navigate(`/strategic/games/view/${character.gameId}`);
     } catch (err) {
       setDisplayError(true);

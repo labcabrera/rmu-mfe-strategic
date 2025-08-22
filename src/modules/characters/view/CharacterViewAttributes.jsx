@@ -62,7 +62,7 @@ const CharacterViewAttributes = ({ formData: character }) => {
         <MovementTextField i18nLabel="stride-racial-bonus" value={character.movement.strideRacialBonus} />
       </Grid>
       <Grid item size={4}>
-        <InitiativeTextField value={character.initiative.customBonus} />
+        <InitiativeTextField i18nLabel="initiative" value={character.initiative.totalBonus} />
       </Grid>
       <Grid item size={12}>
         <TextField label="Description" variant="outlined" name="description" value={character.description} fullWidth multiline maxRows={4} />
