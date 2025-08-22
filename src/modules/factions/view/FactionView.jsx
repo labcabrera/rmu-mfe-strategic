@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
+import Link from '@mui/material/Link';
 
 import { fetchFaction, addFactionXP, addFactionGold } from '../../api/factions';
 import { fetchStrategicGame } from '../../api/strategic-games';
@@ -13,12 +15,19 @@ const FactionView = () => {
   const location = useLocation();
   const { factionId } = useParams();
   const [faction, setFaction] = useState(location.state?.faction || null);
-  const [gameName, setGameName] = useState(null);
+  const [strategicGame, setStrategicGame] = useState(null);
 
   const bindFaction = async (faction) => {
     setFaction(await fetchFaction(factionId));
+    console.log('fetching game ' + faction.gameId);
+    await bindGame();
+  };
+
+  const bindGame = async () => {
+    console.log('fetching game ' + faction.gameId);
     const strategicGame = await fetchStrategicGame(faction.gameId);
-    setGameName(strategicGame.name);
+    setStrategicGame(strategicGame);
+    console.log('game ok ' + faction.gameId);
   };
 
   const handleAddXP = async (amount) => {
@@ -38,19 +47,22 @@ const FactionView = () => {
   useEffect(() => {
     if (!faction && factionId) {
       bindFaction(faction);
+    } else {
+      bindGame();
     }
   }, [faction, factionId]);
 
-  if (!faction) return <div>Loading...</div>;
+  if (!faction || !strategicGame) return <div>Loading...</div>;
 
   return (
     <>
       <FactionViewActions faction={faction} />
       <Grid container spacing={2}>
-        <Grid size={4}>
-          <TextField label="Game" name="game" value={gameName} readonly fullWidth />
+        <Grid size={12}>
+          <Link component={RouterLink} underline="hover" color="inherit" to={`/strategic/games/view/${strategicGame.id}`}>
+            {strategicGame.name}
+          </Link>
         </Grid>
-        <Grid size={8}></Grid>
         <Grid size={4}>
           <TextField label="Name" name="name" value={faction.name} readonly fullWidth />
         </Grid>

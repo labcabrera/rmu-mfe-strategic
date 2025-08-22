@@ -26,7 +26,7 @@ const FactionListAction = () => {
             <Link underline="hover" color="inherit" href="/strategic">
               Strategic
             </Link>
-            <span>Games</span>
+            <span>Factions</span>
           </Breadcrumbs>
         </Box>
         <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>

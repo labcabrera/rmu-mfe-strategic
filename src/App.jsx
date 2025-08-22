@@ -11,6 +11,14 @@ import FactionList from './modules/factions/list/FactionList';
 
 import './index.css';
 
+//TODO provisional component
+const NotFound = () => (
+  <div>
+    <h2>Not found</h2>
+    <p>The requested route does not exist.</p>
+  </div>
+);
+
 const App = () => {
   return (
     <Routes>
@@ -22,6 +30,7 @@ const App = () => {
       <Route path="/factions" element={<FactionList />} />
       <Route path="/factions/view/:factionId" element={<FactionView />} />
       <Route path="/factions/create" element={<FactionCreate />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };
