@@ -5,23 +5,22 @@ import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import Snackbar from '@mui/material/Snackbar';
 
-import { fetchStrategicGames } from '../../../api/strategic-games';
-import StrategicGameListItem from './StrategicGameListItem';
-import StrategicGameListActions from './StrategicGameListActions';
+import { fetchFactions } from '../../api/factions';
+import FactionListItem from './FactionListItem';
+import FactionListAction from './FactionListActions';
 
-const StrategicGameList = () => {
-  const [strategicGames, setStrategicGames] = useState([]);
+const FactionList = () => {
+  const [factions, setFactions] = useState([]);
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const bindStrategicGames = async () => {
+  const bindFactions = async () => {
     try {
-      const games = await fetchStrategicGames(0, 10);
-      setStrategicGames(games);
+      const games = await fetchFactions(0, 10);
+      setFactions(games);
     } catch (error) {
-      setStrategicGames([]);
       setDisplayError(true);
-      setErrorMessage(`Error loading strategic games. ${error.message}`);
+      setErrorMessage(`Error fetching factions. ${error.message}`);
     }
   };
 
@@ -30,15 +29,15 @@ const StrategicGameList = () => {
   };
 
   useEffect(() => {
-    bindStrategicGames();
+    bindFactions();
   }, []);
 
   return (
     <>
-      <StrategicGameListActions />
+      <FactionListAction />
       <List>
-        {strategicGames?.map((item) => (
-          <StrategicGameListItem key={item.id} strategicGame={item} />
+        {factions?.map((item) => (
+          <FactionListItem key={item.id} strategicGame={item} />
         ))}
       </List>
       <Snackbar
@@ -58,4 +57,4 @@ const StrategicGameList = () => {
   );
 };
 
-export default StrategicGameList;
+export default FactionList;

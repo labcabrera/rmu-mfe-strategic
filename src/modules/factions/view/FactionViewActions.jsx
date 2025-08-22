@@ -69,7 +69,9 @@ const FactionViewActions = ({ faction }) => {
             <Link component={RouterLink} underline="hover" color="inherit" to="/strategic/games">
               Strategic
             </Link>
-            <span>Factions</span>
+            <Link component={RouterLink} underline="hover" color="inherit" to="/strategic/factions">
+              Factions
+            </Link>
             <span>{faction.name}</span>
             <span>View</span>
           </Breadcrumbs>

@@ -7,8 +7,8 @@ import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import List from '@mui/material/List';
-
 import Button from '@mui/material/Button';
+
 import StrategicGameViewFactionItem from './StrategicGameViewFactionItem';
 
 const StrategicGameViewFactions = ({ strategicGame }) => {

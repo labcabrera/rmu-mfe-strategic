@@ -4,7 +4,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 
-import { fetchStrategicGame } from '../../../api/strategic-games';
+import { fetchStrategicGame } from '../../api/strategic-games';
 import StrategicGameViewActions from './StrategicGameViewActions';
 import StrategicGameViewFactions from './StrategicGameViewFactions';
 

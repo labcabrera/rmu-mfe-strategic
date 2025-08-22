@@ -19,7 +19,7 @@ import Snackbar from '@mui/material/Snackbar';
 import CloseIcon from '@mui/icons-material/Close';
 import { Link as RouterLink } from 'react-router-dom';
 
-import { deleteStrategicGame } from '../../../api/strategic-games';
+import { deleteStrategicGame } from '../../api/strategic-games';
 
 const StrategicGameViewActions = ({ strategicGame }) => {
   const navigate = useNavigate();

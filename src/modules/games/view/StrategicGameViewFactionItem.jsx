@@ -7,7 +7,7 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import ListItemText from '@mui/material/ListItemText';
 
-import witchKing from '../../../../assets/witch-king.jpg';
+import witchKing from '../../../assets/witch-king.jpg';
 
 const StrategicGameViewFactionItem = ({ faction }) => {
   const navigate = useNavigate();

@@ -7,6 +7,16 @@ export async function fetchFaction(factionId) {
   return await response.json();
 }
 
+export async function fetchFactions(page, size) {
+  const url = `${process.env.RMU_API_STRATEGIC_URL}/factions?page=${page}&size=${size}`;
+  const response = await fetch(url, { method: 'GET' });
+  if (response.status != 200) {
+    throw new Error(`Faction fetch error response: ${response.statusText}. (${url})`);
+  }
+  const pageContent = await response.json();
+  return pageContent.content;
+}
+
 export async function deleteFaction(factionId) {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/factions/${factionId}`;
   const response = await fetch(url, { method: 'DELETE' });

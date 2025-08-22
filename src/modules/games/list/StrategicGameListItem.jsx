@@ -8,7 +8,7 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 
-import witchKing from '../../../../assets/witch-king.jpg';
+import witchKing from '../../../assets/witch-king.jpg';
 
 const StrategicGameListItem = ({ strategicGame }) => {
   const navigate = useNavigate();

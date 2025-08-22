@@ -8,7 +8,7 @@ import Snackbar from '@mui/material/Snackbar';
 import TextField from '@mui/material/TextField';
 
 import StrategicGameCreateActions from './StrategicGameCreateActions';
-import { fetchRealms } from '../../../api/realms';
+import { fetchRealms } from '../../api/realms';
 
 const StrategicGameCreate = () => {
   const debugMode = false;
