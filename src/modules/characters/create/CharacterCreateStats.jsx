@@ -119,7 +119,7 @@ const StatSelect = ({ name, value, setValue }) => {
   );
 };
 
-const CharacterCreateStats = ({ formData, setFormData }) => {
+const CharacterCreateStats = ({ strategicGame, formData, setFormData }) => {
   const [statBonusFormData, setStatBonusFormData] = useState({
     ag: { potential: 0, temporary: 0 },
     co: { potential: 0, temporary: 0 },
@@ -135,6 +135,7 @@ const CharacterCreateStats = ({ formData, setFormData }) => {
   const [boosts, setBoosts] = useState(2);
   const [sourceBoostStat, setSourceBoostStat] = useState('');
   const [targetBoostStat, setTargetBoostStat] = useState('');
+  const [replaceBoostStat, setReplaceBoostStat] = useState('');
 
   const randomStatValue = () => {
     const min = 11;
@@ -217,17 +218,30 @@ const CharacterCreateStats = ({ formData, setFormData }) => {
   };
 
   const handleReplacePotential = () => {
-    if (boosts > 0 && targetBoostStat) {
+    const potentialValue = strategicGame?.powerLevel.statBoostPotential || 78;
+    const temporaryValue = strategicGame?.powerLevel.statBoostTemporary || 56;
+    if (boosts > 0 && replaceBoostStat) {
       setFormData((prevState) => {
-        const targetStat = prevState.statistics[targetBoostStat];
+        const targetStat = prevState.statistics[replaceBoostStat];
         return {
           ...prevState,
           statistics: {
             ...prevState.statistics,
-            [targetBoostStat]: {
+            [replaceBoostStat]: {
               ...targetStat,
-              potential: 78,
+              potential: potentialValue,
+              temporary: temporaryValue,
             },
+          },
+        };
+      });
+      setStatBonusFormData((prevState) => {
+        return {
+          ...prevState,
+          [replaceBoostStat]: {
+            ...prevState[replaceBoostStat],
+            potential: getStatBonus(potentialValue),
+            temporary: getStatBonus(temporaryValue),
           },
         };
       });
@@ -273,7 +287,7 @@ const CharacterCreateStats = ({ formData, setFormData }) => {
           <StatButton text="Replace" onClick={handleReplacePotential} />
         </Grid>
         <Grid size={1}>
-          <StatSelect name="Target" value={targetBoostStat} setValue={setTargetBoostStat} />
+          <StatSelect name="Target" value={replaceBoostStat} setValue={setReplaceBoostStat} />
         </Grid>
         <Grid size={8}>Replace potential stat with 78 and temporary stat with 56.</Grid>
         <Grid size={1}></Grid>
@@ -304,6 +318,8 @@ const CharacterCreateStats = ({ formData, setFormData }) => {
       </Grid>
       <pre>sourceBoostStat: {JSON.stringify(sourceBoostStat, null, 2)}</pre>
       <pre>targetBoostStat: {JSON.stringify(targetBoostStat, null, 2)}</pre>
+      <pre>replaceBoostStat: {JSON.stringify(replaceBoostStat, null, 2)}</pre>
+      <pre>strategicGame: {JSON.stringify(strategicGame, null, 2)}</pre>
     </>
   );
 };

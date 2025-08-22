@@ -19,7 +19,7 @@ import SelectProfession from '../../shared/selects/SelectProfession';
 import SelectGame from '../../shared/selects/SelectGame';
 import GameCreateStats from './CharacterCreateStats';
 
-const CharacterCreateAttributes = ({ formData, setFormData }) => {
+const CharacterCreateAttributes = ({ strategicGame, formData, setFormData }) => {
   const { t, i18n } = useTranslation();
 
   const onRaceChange = (raceId, raceInfo) => {
@@ -151,7 +151,7 @@ const CharacterCreateAttributes = ({ formData, setFormData }) => {
           />
         </Grid>
       </Grid>
-      <GameCreateStats formData={formData} setFormData={setFormData} />
+      <GameCreateStats formData={formData} setFormData={setFormData} strategicGame={strategicGame} />
     </>
   );
 };
