@@ -1,5 +1,6 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
+import './i18n';
 import './index.css';
 import CharacterCreate from './modules/characters/create/CharacterCreate';
 import CharacterList from './modules/characters/list/CharacterList';

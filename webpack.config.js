@@ -71,6 +71,11 @@ module.exports = (_, argv) => ({
         test: /\.(ico|jpg|jpeg|png|gif|jfif)$/i,
         use: ['file-loader'],
       },
+      {
+        test: /\.json$/,
+        type: 'javascript/auto',
+        use: 'json-loader',
+      },
     ],
   },
 

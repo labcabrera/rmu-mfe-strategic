@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import HeightTextField from '../../shared/input/HeightTextField';
@@ -10,19 +11,20 @@ import CharacterViewSkills from './CharacterViewSkills';
 import CharacterViewStats from './CharacterViewStats';
 
 const CharacterViewAttributes = ({ character, setCharacter }) => {
+  const { t } = useTranslation();
   return (
     <Grid container spacing={2}>
       <Grid item size={3}>
-        <TextField label="Name" name="name" value={character.name} readOnly fullWidth />
+        <TextField label={t('name')} name="name" value={character.name} readOnly fullWidth />
       </Grid>
       <Grid item size={3}>
-        <TextField label="Race" name="race" value={character.info.race} readOnly fullWidth />
+        <TextField label={t('race')} name="race" value={t(character.info.race)} readOnly fullWidth />
       </Grid>
       <Grid item size={3}>
-        <TextField label="Profession" name="profession" value={character.info.professionId} readOnly fullWidth />
+        <TextField label={t('profession')} name="profession" value={t(character.info.professionId)} readOnly fullWidth />
       </Grid>
       <Grid item size={3}>
-        <TextField label="Faction" name="faction" value={character.factionId} readOnly fullWidth />
+        <TextField label={t('faction')} name="faction" value={character.factionId} readOnly fullWidth />
       </Grid>
       <Grid size={12}>
         <h3>Experience</h3>

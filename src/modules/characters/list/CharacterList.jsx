@@ -35,7 +35,7 @@ const CharacterList = () => {
       <CharacterListActions />
       <List>
         {characters?.map((item) => (
-          <CharacterListItem key={item.id} strategicGame={item} />
+          <CharacterListItem key={item.id} character={item} />
         ))}
       </List>
       <Snackbar

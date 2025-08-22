@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
@@ -68,6 +69,7 @@ const CharacterViewSkillsAdd = ({ character, setCharacter }) => {
 };
 
 const CharacterViewSkillsEntry = ({ character, setCharacter, skill }) => {
+  const { t } = useTranslation();
   const [profession, setProfession] = useState(null);
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -134,7 +136,7 @@ const CharacterViewSkillsEntry = ({ character, setCharacter, skill }) => {
       <Grid container spacing={2} sx={{ marginTop: 2 }}>
         <Grid item size={2}>
           <h4>
-            {skill.skillId}
+            {t(skill.skillId)}
             {isProfessionalSkill(skill) ? <StarBorderIcon /> : ''}
           </h4>
         </Grid>
@@ -145,22 +147,22 @@ const CharacterViewSkillsEntry = ({ character, setCharacter, skill }) => {
           {skill.statistics.join('/')}
         </Grid>
         <Grid item size={1}>
-          <TextField label="Ranks" name="ranks" value={skill.ranks} readOnly fullWidth />
+          <TextField label={t('ranks')} name="ranks" value={skill.ranks} readOnly fullWidth />
         </Grid>
         <Grid item size={1}>
-          <TextField label="Stats" name="statBonus" value={skill.statBonus} readOnly fullWidth />
+          <TextField label={t('stats')} name="statBonus" value={skill.statBonus} readOnly fullWidth />
         </Grid>
         <Grid item size={1}>
-          <TextField label="Prof" name="professionalBonus" value={skill.professionalBonus} readOnly fullWidth />
+          <TextField label={t('prof')} name="professionalBonus" value={skill.professionalBonus} readOnly fullWidth />
         </Grid>
         <Grid item size={1}>
-          <TextField label="Dev" name="developmentBonus" value={skill.developmentBonus} readOnly fullWidth />
+          <TextField label={t('dev')} name="developmentBonus" value={skill.developmentBonus} readOnly fullWidth />
         </Grid>
         <Grid item size={1}>
-          <TextField label="Custom" name="customBonus" value={skill.customBonus} readOnly fullWidth />
+          <TextField label={t('custom')} name="customBonus" value={skill.customBonus} readOnly fullWidth />
         </Grid>
         <Grid item size={1}>
-          <TextField label="Total" name="totalBonus" value={skill.totalBonus} readOnly fullWidth />
+          <TextField label={t('total')} name="totalBonus" value={skill.totalBonus} readOnly fullWidth />
         </Grid>
         <Grid item size={2}>
           <IconButton onClick={() => handleLevelUp()}>
@@ -182,10 +184,11 @@ const CharacterViewSkillsEntry = ({ character, setCharacter, skill }) => {
 };
 
 const CharacterViewSkills = ({ character, setCharacter }) => {
+  const { t } = useTranslation();
   return (
     <Grid container spacing={2}>
       <Grid item size={12}>
-        <h3>Skills</h3>
+        <h3>{t('skills')}</h3>
       </Grid>
       <List>
         {character?.skills.map((item) => (
