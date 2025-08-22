@@ -43,7 +43,7 @@ const CharacterView = () => {
   return (
     <>
       <CharacterViewActions faction={character} />
-      <CharacterViewAttributes formData={character} />
+      <CharacterViewAttributes character={character} setCharacter={setCharacter} />
       <SnackbarError errorMessage={errorMessage} displayError={displayError} setDisplayError={setDisplayError} />
       <pre>{JSON.stringify(character, null, 2)}</pre>
     </>

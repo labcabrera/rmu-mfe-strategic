@@ -36,15 +36,6 @@ const SelectProfession = ({ value, onChange }) => {
       required
       fullWidth
       onChange={handleProfessionChange}
-      slotProps={{
-        input: {
-          startAdornment: (
-            <InputAdornment position="start">
-              <Avatar src="/static/images/generic/profession.png" sx={{ width: 25, height: 25 }} />
-            </InputAdornment>
-          ),
-        },
-      }}
     >
       {professions.map((option) => (
         <MenuItem key={option.id} value={option.id}>

@@ -37,7 +37,7 @@ const CharacterCreateActions = ({ formData }) => {
             <Link underline="hover" color="inherit" href="/">
               Home
             </Link>
-            <Link underline="hover" color="inherit" href="/strategic/games">
+            <Link component={RouterLink} color="inherit" to="/strategic/games">
               Strategic
             </Link>
             <Link component={RouterLink} underline="hover" color="inherit" to="/strategic/characters">
