@@ -1,12 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import IconButton from '@mui/material/IconButton';
-import Stack from '@mui/material/Stack';
+import AddIcon from '@mui/icons-material/Add';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
+import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
-import AddIcon from '@mui/icons-material/Add';
+import Stack from '@mui/material/Stack';
 
 const StrategicGameListActions = () => {
   const navigate = useNavigate();

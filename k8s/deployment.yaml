@@ -15,29 +15,26 @@ spec:
         app: rmu-fe-strategic
     spec:
       containers:
-      - name: rmu-fe-strategic
-        image: labcabrera/rmu-fe-strategic:latest
-        ports:
-        # - containerPort: 80
-        - containerPort: 8082
-        env:
-        
-        - name: RMU_FE_STRATEGIC_PUBLIC_PATH
-          valueFrom:
-            configMapKeyRef:
-              name: rmu-shared-configmap
-              key: RMU_FE_STRATEGIC_PUBLIC_PATH
-        
-        - name: RMU_API_STRATEGIC_URL
-          valueFrom:
-            configMapKeyRef:
-              name: rmu-shared-configmap
-              key: RMU_API_STRATEGIC_URL
+        - name: rmu-fe-strategic
+          image: labcabrera/rmu-fe-strategic:latest
+          ports:
+            # - containerPort: 80
+            - containerPort: 8082
+          env:
+            - name: RMU_FE_STRATEGIC_PUBLIC_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: rmu-shared-configmap
+                  key: RMU_FE_STRATEGIC_PUBLIC_PATH
 
-        - name: RMU_API_CORE_URL
-          valueFrom:
-            configMapKeyRef:
-              name: rmu-shared-configmap
-              key: RMU_API_CORE_URL
+            - name: RMU_API_STRATEGIC_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: rmu-shared-configmap
+                  key: RMU_API_STRATEGIC_URL
 
-
+            - name: RMU_API_CORE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: rmu-shared-configmap
+                  key: RMU_API_CORE_URL

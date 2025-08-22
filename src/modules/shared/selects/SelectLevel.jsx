@@ -1,6 +1,5 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
-
 import Avatar from '@mui/material/Avatar';
 import InputAdornment from '@mui/material/InputAdornment';
 import MenuItem from '@mui/material/MenuItem';

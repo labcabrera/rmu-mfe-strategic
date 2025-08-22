@@ -1,16 +1,14 @@
 /* eslint-disable react/prop-types */
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import IconButton from '@mui/material/IconButton';
-import Stack from '@mui/material/Stack';
+import CloseIcon from '@mui/icons-material/Close';
+import SaveIcon from '@mui/icons-material/Save';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
+import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
-import SaveIcon from '@mui/icons-material/Save';
 import Snackbar from '@mui/material/Snackbar';
-import CloseIcon from '@mui/icons-material/Close';
+import Stack from '@mui/material/Stack';
 
 const FactionCreateActions = ({ strategicGame, formData }) => {
   const navigate = useNavigate();

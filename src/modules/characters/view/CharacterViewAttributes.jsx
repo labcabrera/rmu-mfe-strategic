@@ -1,33 +1,36 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-
+import Typography from '@mui/material/Typography';
 import HeightTextField from '../../shared/input/HeightTextField';
 import InitiativeTextField from '../../shared/input/InitiativeTextField';
 import MovementTextField from '../../shared/input/MovementTextField';
 import WeightTextField from '../../shared/input/WeightTextField';
-import CharacterViewStats from './CharacterViewStats';
 import CharacterViewSkills from './CharacterViewSkills';
+import CharacterViewStats from './CharacterViewStats';
 
 const CharacterViewAttributes = ({ character, setCharacter }) => {
+  const { t } = useTranslation();
   return (
     <Grid container spacing={2}>
-      <Grid item size={3}>
-        <TextField label="Name" name="name" value={character.name} readOnly fullWidth />
+      <Grid size={12}>
+        <Typography color="secondary" variant="h4">
+          {t('information')}
+        </Typography>
       </Grid>
       <Grid item size={3}>
-        <TextField label="Race" name="race" value={character.info.race} readOnly fullWidth />
+        <TextField label={t('name')} name="name" value={character.name} readOnly fullWidth />
       </Grid>
       <Grid item size={3}>
-        <TextField label="Profession" name="profession" value={character.info.professionId} readOnly fullWidth />
+        <TextField label={t('race')} name="race" value={t(character.info.race)} readOnly fullWidth />
       </Grid>
       <Grid item size={3}>
-        <TextField label="Faction" name="faction" value={character.factionId} readOnly fullWidth />
+        <TextField label={t('profession')} name="profession" value={t(character.info.professionId)} readOnly fullWidth />
+      </Grid>
+      <Grid item size={3}>
+        <TextField label={t('faction')} name="faction" value={character.factionId} readOnly fullWidth />
       </Grid>
       <Grid size={12}>
         <h3>Experience</h3>
@@ -81,9 +84,6 @@ const CharacterViewAttributes = ({ character, setCharacter }) => {
         <InitiativeTextField i18nLabel="initiative" value={character.initiative.totalBonus} />
       </Grid>
       <Grid item size={12}>
-        <TextField label="Description" variant="outlined" name="description" value={character.description} fullWidth multiline maxRows={4} />
-      </Grid>
-      <Grid item size={12}>
         <Grid container spacing={2}>
           <Grid item size={4}>
             <CharacterViewStats character={character} />
@@ -92,6 +92,9 @@ const CharacterViewAttributes = ({ character, setCharacter }) => {
             <CharacterViewSkills character={character} setCharacter={setCharacter} />
           </Grid>
         </Grid>
+      </Grid>
+      <Grid item size={12}>
+        <TextField label="Description" variant="outlined" name="description" value={character.description} fullWidth multiline maxRows={4} />
       </Grid>
     </Grid>
   );

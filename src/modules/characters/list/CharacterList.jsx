@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
-
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import Snackbar from '@mui/material/Snackbar';
-
 import { fetchCharacters } from '../../api/characters';
-import CharacterListItem from './CharacterListItem';
 import CharacterListActions from './CharacterListActions';
+import CharacterListItem from './CharacterListItem';
 
 const CharacterList = () => {
   const [characters, setCharacters] = useState([]);
@@ -37,7 +35,7 @@ const CharacterList = () => {
       <CharacterListActions />
       <List>
         {characters?.map((item) => (
-          <CharacterListItem key={item.id} strategicGame={item} />
+          <CharacterListItem key={item.id} character={item} />
         ))}
       </List>
       <Snackbar

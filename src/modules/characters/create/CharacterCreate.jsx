@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-
-import CharacterCreateActions from './CharacterCreateActions';
-import SnackbarError from '../../shared/errors/SnackbarError';
-import CharacterCreateAttributes from './CharacterCreateAttributes';
-import { characterCreateTemplate } from '../../data/character-create';
 import { fetchStrategicGame } from '../../api/strategic-games';
+import { characterCreateTemplate } from '../../data/character-create';
+import SnackbarError from '../../shared/errors/SnackbarError';
+import CharacterCreateActions from './CharacterCreateActions';
+import CharacterCreateAttributes from './CharacterCreateAttributes';
 
 const CharacterCreate = () => {
   const [searchParams] = useSearchParams();

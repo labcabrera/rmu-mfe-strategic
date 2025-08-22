@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-
-import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
-
+import TextField from '@mui/material/TextField';
 import StrategicGameUpdateActions from './StrategicGameUpdateActions';
 
 const StrategicGameUpdate = () => {

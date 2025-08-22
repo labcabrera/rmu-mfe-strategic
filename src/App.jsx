@@ -1,18 +1,17 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
-
-import StrategicGameList from './modules/games/list/StrategicGameList';
-import StrategicGameView from './modules/games/view/StrategicGameView';
-import StrategicGameEdit from './modules/games/update/StrategicGameUpdate';
-import StrategicGameCreate from './modules/games/create/StrategicGameCreate';
-import FactionCreate from './modules/factions/create/FactionCreate';
-import FactionView from './modules/factions/view/FactionView';
-import FactionList from './modules/factions/list/FactionList';
+import './i18n';
+import './index.css';
+import CharacterCreate from './modules/characters/create/CharacterCreate';
 import CharacterList from './modules/characters/list/CharacterList';
 import CharacterView from './modules/characters/view/CharacterView';
-import CharacterCreate from './modules/characters/create/CharacterCreate';
-
-import './index.css';
+import FactionCreate from './modules/factions/create/FactionCreate';
+import FactionList from './modules/factions/list/FactionList';
+import FactionView from './modules/factions/view/FactionView';
+import StrategicGameCreate from './modules/games/create/StrategicGameCreate';
+import StrategicGameList from './modules/games/list/StrategicGameList';
+import StrategicGameEdit from './modules/games/update/StrategicGameUpdate';
+import StrategicGameView from './modules/games/view/StrategicGameView';
 
 //TODO provisional component
 const NotFound = () => (

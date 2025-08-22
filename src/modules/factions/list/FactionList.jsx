@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
-
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import Snackbar from '@mui/material/Snackbar';
-
 import { fetchFactions } from '../../api/factions';
-import FactionListItem from './FactionListItem';
 import FactionListActions from './FactionListActions';
+import FactionListItem from './FactionListItem';
 
 const FactionList = () => {
   const [factions, setFactions] = useState([]);

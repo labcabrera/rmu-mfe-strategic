@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
-
-import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
-
+import TextField from '@mui/material/TextField';
 import { fetchStrategicGame } from '../../api/strategic-games';
 import StrategicGameViewActions from './StrategicGameViewActions';
 import StrategicGameViewFactions from './StrategicGameViewFactions';
-import Button from '@mui/material/Button';
 
 const StrategicGameView = () => {
   const navigate = useNavigate();

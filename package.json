@@ -1,6 +1,6 @@
 {
   "name": "rmu-fe-strategic",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "scripts": {
     "build": "webpack --mode production",
     "build:dev": "webpack --mode development",
@@ -42,6 +42,7 @@
     "@babel/preset-env": "^7.15.8",
     "@babel/preset-react": "^7.14.5",
     "@eslint/js": "^9.33.0",
+    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "autoprefixer": "^10.1.0",
     "babel-loader": "^10.0.0",
     "copy-webpack-plugin": "^13.0.0",

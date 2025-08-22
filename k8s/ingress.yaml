@@ -4,9 +4,9 @@ metadata:
   name: rmu-fe-strategic-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+    nginx.ingress.kubernetes.io/force-ssl-redirect: 'false'
+    nginx.ingress.kubernetes.io/backend-protocol: 'HTTP'
 spec:
   ingressClassName: nginx
   rules:

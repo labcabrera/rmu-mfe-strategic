@@ -1,10 +1,9 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-
 import React from 'react';
-
+import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 
 const CharacterViewStatsEntry = ({ statKey, statName, character: character }) => {
   return (
@@ -30,11 +29,14 @@ const CharacterViewStatsEntry = ({ statKey, statName, character: character }) =>
 };
 
 const CharacterViewStats = ({ character }) => {
+  const { t } = useTranslation();
   return (
     <>
       <Grid container spacing={2} sx={{ marginTop: 2 }}>
         <Grid size={12}>
-          <h3>Stats</h3>
+          <Typography color="secondary" variant="h5">
+            {t('stats')}
+          </Typography>
         </Grid>
         <Grid size={12}>
           <Grid container spacing={2} sx={{ marginTop: 2 }}>

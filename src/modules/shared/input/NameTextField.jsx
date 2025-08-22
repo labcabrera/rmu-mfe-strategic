@@ -1,14 +1,13 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
-
 import { fetchRandomName } from '../../api/npc-random-names';
 
-const NameTextField = ({ value, onChange, required = true, generateRandom, generateRandomRaceValue }) => {
+const NameTextField = ({ value, onChange, required = true, generateRandomRaceValue }) => {
   const { t } = useTranslation();
 
   const handleRandomNameClick = async () => {

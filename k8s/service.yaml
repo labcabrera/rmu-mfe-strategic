@@ -6,8 +6,8 @@ spec:
   selector:
     app: rmu-fe-strategic
   ports:
-  - protocol: TCP
-    port: 80
-    # targetPort: 80
-    targetPort: 8082
+    - protocol: TCP
+      port: 80
+      # targetPort: 80
+      targetPort: 8082
   type: ClusterIP
