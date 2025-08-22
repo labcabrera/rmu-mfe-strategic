@@ -44,7 +44,7 @@ const StrategicGameUpdateActions = ({ formData }) => {
     setDisplayError(false);
   };
 
-  const handleCancelClick = (e) => {
+  const handleCancelClick = () => {
     navigate(`/strategic/games/view/${strategicGame.id}`, { state: { strategicGame: strategicGame } });
   };
 
