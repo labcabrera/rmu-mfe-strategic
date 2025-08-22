@@ -8,6 +8,7 @@ import Snackbar from '@mui/material/Snackbar';
 import TextField from '@mui/material/TextField';
 
 import StrategicGameCreateActions from './StrategicGameCreateActions';
+import { fetchRealms } from '../../../api/realms';
 
 const StrategicGameCreate = () => {
   const debugMode = false;
@@ -20,20 +21,18 @@ const StrategicGameCreate = () => {
     description: '',
   });
 
-  const getRealms = async () => {
-    const url = `${process.env.RMU_API_CORE_URL}/realms`;
+  const bindRealms = async () => {
     try {
-      const response = await fetch(url, { method: 'GET' });
-      const data = await response.json();
+      const data = await fetchRealms();
       setRealms(data.content.map(mapRealm));
     } catch (error) {
       setDisplayError(true);
-      setErrorMessage(`Error loading realms from ${url}. ${error.message}`);
+      setErrorMessage(`Error loading realms. ${error.message}`);
     }
   };
 
   useEffect(() => {
-    getRealms();
+    bindRealms();
   }, []);
 
   const handleChange = (e) => {

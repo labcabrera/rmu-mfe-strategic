@@ -5,6 +5,7 @@ import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import Snackbar from '@mui/material/Snackbar';
 
+import { fetchStrategicGames } from '../../../api/strategic-games';
 import StrategicGameListItem from './StrategicGameListItem';
 import StrategicGameListActions from './StrategicGameListActions';
 
@@ -13,19 +14,14 @@ const StrategicGameList = () => {
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const fetchStrategicGames = async () => {
-    const url = `${process.env.RMU_API_STRATEGIC_URL}/strategic-games`;
+  const bindStrategicGames = async () => {
     try {
-      const response = await fetch(url, { method: 'GET' });
-      if (response.status != 200) {
-        throw new Error(`Strategic fetch error response: ${response.statusText}`);
-      }
-      const data = await response.json();
-      console.log('fetch data:', data);
-      setStrategicGames(data.content);
+      const games = await fetchStrategicGames(0, 10);
+      setStrategicGames(games);
     } catch (error) {
+      setStrategicGames([]);
       setDisplayError(true);
-      setErrorMessage(`Error loading strategic games from ${url}. ${error.message}`);
+      setErrorMessage(`Error loading strategic games. ${error.message}`);
     }
   };
 
@@ -34,7 +30,7 @@ const StrategicGameList = () => {
   };
 
   useEffect(() => {
-    fetchStrategicGames();
+    bindStrategicGames();
   }, []);
 
   return (

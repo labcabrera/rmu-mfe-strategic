@@ -1,21 +1,24 @@
-import React from "react";
-import { Route, Routes } from "react-router-dom";
+import React from 'react';
+import { Route, Routes } from 'react-router-dom';
 
-import StrategicGameList from "./modules/games/components/list/StrategicGameList";
-import StrategicGameView from "./modules/games/components/view/StrategicGameView";
-import StrategicGameEdit from "./modules/games/components/update/StrategicGameUpdate";
-import StrategicGameCreate from "./modules/games/components/create/StrategicGameCreate";
-import FactionCreate from "./modules/factions/create/FactionCreate";
+import StrategicGameList from './modules/games/components/list/StrategicGameList';
+import StrategicGameView from './modules/games/components/view/StrategicGameView';
+import StrategicGameEdit from './modules/games/components/update/StrategicGameUpdate';
+import StrategicGameCreate from './modules/games/components/create/StrategicGameCreate';
+import FactionCreate from './modules/factions/create/FactionCreate';
+import FactionView from './modules/factions/view/FactionView';
 
-import "./index.css";
+import './index.css';
 
 const App = () => {
   return (
     <Routes>
       <Route path="/" element={<StrategicGameList />} />
-      <Route path="/games/view/:strategicGameId" element={<StrategicGameView />} />
-      <Route path="/games/edit/:strategicGameId" element={<StrategicGameEdit />} />
+      <Route path="/games" element={<StrategicGameList />} />
+      <Route path="/games/view/:gameId" element={<StrategicGameView />} />
+      <Route path="/games/edit/:gameId" element={<StrategicGameEdit />} />
       <Route path="/games/create" element={<StrategicGameCreate />} />
+      <Route path="/factions/view/:factionId" element={<FactionView />} />
       <Route path="/factions/create" element={<FactionCreate />} />
     </Routes>
   );

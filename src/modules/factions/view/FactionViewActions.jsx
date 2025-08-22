@@ -19,36 +19,26 @@ import Snackbar from '@mui/material/Snackbar';
 import CloseIcon from '@mui/icons-material/Close';
 import { Link as RouterLink } from 'react-router-dom';
 
-import { deleteStrategicGame } from '../../../api/strategic-games';
+import { deleteFaction } from '../../api/factions';
 
-const StrategicGameViewActions = ({ strategicGame }) => {
+const FactionViewActions = ({ faction }) => {
   const navigate = useNavigate();
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     try {
-      await deleteStrategicGame(strategicGame.id);
-      navigate('/strategic/games');
-    } catch (error) {
+      deleteFaction(faction.id);
+      navigate(`/strategic/games/view/${faction.gameId}`);
+    } catch (err) {
       setDisplayError(true);
-      setErrorMessage(`Error deleting game: ${error.message}`);
+      setErrorMessage(`Error deleting faction: ${err.message}`);
     }
-    // const url = `${process.env.RMU_API_STRATEGIC_URL}/strategic-games/${strategicGame.id}`;
-    // fetch(url, { method: 'DELETE' })
-    //   .then((response) => {
-    //     if (response.status !== 204) throw new Error(`Error: ${response.status} ${response.statusText}`);
-    //   })
-    //   .then(() => navigate('/strategic/'))
-    //   .catch((error) => {
-    //     setDisplayError(true);
-    //     setErrorMessage(`Error creating game from ${url}. ${error.message}`);
-    //   });
   };
 
   const handleEditClick = () => {
-    navigate(`/strategic/games/edit/${strategicGame.id}`, { state: { strategicGame: strategicGame } });
+    navigate(`/strategic/factions/edit/${faction.id}`, { state: { faction: faction } });
   };
 
   const handleSnackbarClose = () => {
@@ -79,10 +69,8 @@ const StrategicGameViewActions = ({ strategicGame }) => {
             <Link component={RouterLink} underline="hover" color="inherit" to="/strategic/games">
               Strategic
             </Link>
-            <Link component={RouterLink} underline="hover" color="inherit" to="/strategic/games">
-              Games
-            </Link>
-            <span>{strategicGame.name}</span>
+            <span>Factions</span>
+            <span>{faction.name}</span>
             <span>View</span>
           </Breadcrumbs>
         </Box>
@@ -114,10 +102,10 @@ const StrategicGameViewActions = ({ strategicGame }) => {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{'Strategic game delete confirmation'}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{'Faction delete confirmation'}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to remove {strategicGame.name}? This action cannot be undone
+            Are you sure you want to remove {faction.name}? This action cannot be undone
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -129,4 +117,4 @@ const StrategicGameViewActions = ({ strategicGame }) => {
   );
 };
 
-export default StrategicGameViewActions;
+export default FactionViewActions;
