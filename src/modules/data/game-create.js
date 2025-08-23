@@ -4,6 +4,8 @@ export const gameCreateTemplate = {
   description: '',
   options: {
     experienceMultiplier: 1,
+    fatigueMultiplier: 1,
+    boardScaleMultiplier: 1,
   },
   powerLevel: {
     statRandomMin: 11,

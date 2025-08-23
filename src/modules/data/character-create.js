@@ -82,29 +82,31 @@ export const characterCreateTemplate = {
     {
       skillId: 'perception',
       ranks: 0,
-      customBonus: 5,
+    },
+    {
+      skillId: 'body-development',
+      ranks: 0,
+    },
+    {
+      skillId: 'melee-weapon@blade',
+      ranks: 0,
+    },
+    {
+      skillId: 'armor-maneuver',
+      ranks: 0,
     },
   ],
   items: [
     {
-      name: 'Ork scimitar',
-      itemTypeId: 'scimitar',
-      info: {
-        bonus: 5,
-      },
+      name: 'Basic dagger',
+      itemTypeId: 'dagger',
     },
     {
       name: 'Ork dagger',
       itemTypeId: 'dagger',
-      info: {
-        bonus: 0,
-      },
     },
     {
-      itemTypeId: 'target-shield',
-    },
-    {
-      itemTypeId: 'rigid-leather-full-suit',
+      itemTypeId: 'heavy-cloth-full-suit',
     },
   ],
   description: 'Lorem ipsum',

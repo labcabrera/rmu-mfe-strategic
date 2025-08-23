@@ -35,13 +35,22 @@ const StrategicGameCreate = () => {
     };
   };
 
-  const handleExperienceMultiplierChange = (e) => {
-    const { value } = e.target;
+  const handleOptionsChange = (e) => {
+    const { name, value } = e.target;
+    console.log(name, value);
+    let data = value;
+    if (value.includes('-') || value.includes('.')) {
+      const parsed = Number(value);
+      data = !isNaN(parsed) && value.match(/^[-+]?\d*\.?\d+$/) ? parsed : value;
+    } else {
+      const parsed = Number(value);
+      data = !isNaN(parsed) ? parsed : value;
+    }
     setFormData((prevData) => ({
       ...prevData,
       options: {
         ...prevData.options,
-        experienceMultiplier: parseInt(value),
+        [name]: data,
       },
     }));
   };
@@ -102,10 +111,31 @@ const StrategicGameCreate = () => {
           <TextField
             label="Experience multiplier"
             name="experienceMultiplier"
-            type="number"
             variant="outlined"
             value={formData.options.experienceMultiplier}
-            onChange={handleExperienceMultiplierChange}
+            onChange={handleOptionsChange}
+            required
+            fullWidth
+          />
+        </Grid>
+        <Grid size={4}>
+          <TextField
+            label="Fatigue multiplier"
+            name="fatigueMultiplier"
+            variant="outlined"
+            value={formData.options.fatigueMultiplier}
+            onChange={handleOptionsChange}
+            required
+            fullWidth
+          />
+        </Grid>
+        <Grid size={4}>
+          <TextField
+            label="Board scale"
+            name="boardScaleMultiplier"
+            variant="outlined"
+            value={formData.options.boardScaleMultiplier}
+            onChange={handleOptionsChange}
             required
             fullWidth
           />

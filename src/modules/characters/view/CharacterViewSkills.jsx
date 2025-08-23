@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
@@ -12,7 +12,6 @@ import List from '@mui/material/List';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../api/characters';
-import { fetchProfession } from '../../api/professions';
 import SnackbarError from '../../shared/errors/SnackbarError';
 import SelectSkill from '../../shared/selects/SelectSkill';
 
@@ -24,6 +23,7 @@ const addSkillFormDataTemplate = {
 };
 
 const CharacterViewSkillsAdd = ({ character, setCharacter }) => {
+  const { t } = useTranslation();
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [skill, setSkill] = useState(null);
@@ -66,7 +66,16 @@ const CharacterViewSkillsAdd = ({ character, setCharacter }) => {
             <TextField label="Specialization" value={formData.specialization} onChange={handleSpecializationChange} />
           ) : null}
         </Grid>
-        <Grid item size={6}></Grid>
+        <Grid item size={5}></Grid>
+        <Grid item size={1}>
+          <TextField
+            label={t('dev')}
+            name="availableDevelopmentPoints"
+            value={`${character.experience.availableDevelopmentPoints} / ${character.experience.developmentPoints}`}
+            readOnly
+            fullWidth
+          />
+        </Grid>
         <Grid item size={2}>
           <IconButton aria-label="delete" onClick={() => handleAddSkill()}>
             <AddCircleOutlineIcon />
@@ -78,9 +87,8 @@ const CharacterViewSkillsAdd = ({ character, setCharacter }) => {
   );
 };
 
-const CharacterViewSkillsEntry = ({ character, setCharacter, skill }) => {
+const CharacterViewSkillsEntry = ({ character, setCharacter, skill, profession }) => {
   const { t } = useTranslation();
-  const [profession, setProfession] = useState(null);
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -124,14 +132,6 @@ const CharacterViewSkillsEntry = ({ character, setCharacter, skill }) => {
     }
   };
 
-  const bindProfession = () => {
-    if (character) {
-      fetchProfession(character.info.professionId).then((profession) => {
-        setProfession(profession);
-      });
-    }
-  };
-
   const isAvailableProfessionSkill = (skill) => {
     if (profession) {
       const includes = profession.professionalSkills.includes(skill.skillId);
@@ -144,12 +144,6 @@ const CharacterViewSkillsEntry = ({ character, setCharacter, skill }) => {
   const isProfessionalSkill = (skill) => {
     return skill.professional && skill.professional.includes('professional');
   };
-
-  useEffect(() => {
-    if (character) {
-      bindProfession();
-    }
-  }, [character]);
 
   return (
     <>
@@ -206,7 +200,7 @@ const CharacterViewSkillsEntry = ({ character, setCharacter, skill }) => {
   );
 };
 
-const CharacterViewSkills = ({ character, setCharacter }) => {
+const CharacterViewSkills = ({ character, setCharacter, profession }) => {
   const { t } = useTranslation();
   return (
     <Grid container spacing={2} sx={{ marginTop: 2 }}>
@@ -217,7 +211,7 @@ const CharacterViewSkills = ({ character, setCharacter }) => {
       </Grid>
       <List>
         {character?.skills.map((item) => (
-          <CharacterViewSkillsEntry key={item.skillId} skill={item} character={character} setCharacter={setCharacter} />
+          <CharacterViewSkillsEntry key={item.skillId} skill={item} character={character} setCharacter={setCharacter} profession={profession} />
         ))}
         <CharacterViewSkillsAdd character={character} setCharacter={setCharacter} />
       </List>

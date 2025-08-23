@@ -7,7 +7,7 @@ import CharacterViewInfo from './CharacterViewInfo';
 import CharacterViewSkills from './CharacterViewSkills';
 import CharacterViewStats from './CharacterViewStats';
 
-const CharacterViewAttributes = ({ character, setCharacter, faction }) => {
+const CharacterViewAttributes = ({ character, setCharacter, faction, profession }) => {
   const { t } = useTranslation();
   return (
     <>
@@ -17,7 +17,7 @@ const CharacterViewAttributes = ({ character, setCharacter, faction }) => {
           <CharacterViewStats character={character} />
         </Grid>
       </Grid>
-      <CharacterViewSkills character={character} setCharacter={setCharacter} />
+      <CharacterViewSkills character={character} setCharacter={setCharacter} profession={profession} />
       <Grid container spacing={2}>
         <Grid item size={12}>
           <TextField label={t('lore')} variant="outlined" name="description" value={character.description} fullWidth multiline maxRows={4} />

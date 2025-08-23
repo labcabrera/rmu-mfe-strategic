@@ -74,6 +74,17 @@ const CharacterViewInfo = ({ character, faction }) => {
         </Grid>
         <Grid size={12}>
           <Typography color="secondary" variant="h5">
+            {t('defense')}
+          </Typography>
+        </Grid>
+        <Grid item size={3}>
+          <TextField label={t('armor-type')} name="armorType" value={character.defense.armorType} readOnly fullWidth />
+        </Grid>
+        <Grid item size={3}>
+          <TextField label={t('defensive-bonus')} name="armorClass" value={character.defense.defensiveBonus} readOnly fullWidth />
+        </Grid>
+        <Grid size={12}>
+          <Typography color="secondary" variant="h5">
             {t('movement')}
           </Typography>
         </Grid>
