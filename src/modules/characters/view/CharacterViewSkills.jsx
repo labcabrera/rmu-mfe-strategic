@@ -11,7 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill } from '../../api/characters';
+import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../api/characters';
 import { fetchProfession } from '../../api/professions';
 import SnackbarError from '../../shared/errors/SnackbarError';
 import SelectSkill from '../../shared/selects/SelectSkill';
@@ -106,6 +106,16 @@ const CharacterViewSkillsEntry = ({ character, setCharacter, skill }) => {
     }
   };
 
+  const handleDeleteSkill = async (skill) => {
+    try {
+      const updated = await deleteSkill(character.id, skill.skillId);
+      setCharacter(updated);
+    } catch (error) {
+      setErrorMessage(error.message);
+      setDisplayError(true);
+    }
+  };
+
   const bindProfession = () => {
     if (character) {
       fetchProfession(character.info.professionId).then((profession) => {
@@ -173,7 +183,7 @@ const CharacterViewSkillsEntry = ({ character, setCharacter, skill }) => {
           <IconButton onClick={() => handleLevelDown()}>
             <ArrowCircleDownIcon />
           </IconButton>
-          <IconButton onClick={() => handleLevelDown()}>
+          <IconButton onClick={() => handleDeleteSkill(skill)}>
             <DeleteForeverIcon />
           </IconButton>
           {isAvailableProfessionSkill(skill) && (

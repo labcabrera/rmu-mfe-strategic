@@ -60,6 +60,20 @@ export async function addSkill(characterId, data) {
   return await response.json();
 }
 
+export async function deleteSkill(characterId, skillId) {
+  const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/skills/${skillId}`;
+  const response = await fetch(url, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  if (response.status != 200) {
+    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+  }
+  return await response.json();
+}
+
 export async function levelUpSkill(characterId, skillId) {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/skills/${skillId}/level-up`;
   const response = await fetch(url, {
