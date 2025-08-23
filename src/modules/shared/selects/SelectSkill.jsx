@@ -20,7 +20,10 @@ const SelectSkill = ({ value, onChange, readonly = false, required = true }) => 
   useEffect(() => {
     const fetchData = async () => {
       const data = await fetchSkills();
-      data.sort((a, b) => a.id.localeCompare(b.id));
+      data.map((e) => {
+        e.name = t(e.id);
+      });
+      data.sort((a, b) => a.name.localeCompare(b.name));
       setSkills(data);
     };
     fetchData();
@@ -50,7 +53,7 @@ const SelectSkill = ({ value, onChange, readonly = false, required = true }) => 
     >
       {skills.map((option, index) => (
         <MenuItem key={index} value={option.id}>
-          {option.id}
+          {option.name}
         </MenuItem>
       ))}
     </TextField>

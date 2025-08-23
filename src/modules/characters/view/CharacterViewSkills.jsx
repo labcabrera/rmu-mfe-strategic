@@ -26,14 +26,20 @@ const addSkillFormDataTemplate = {
 const CharacterViewSkillsAdd = ({ character, setCharacter }) => {
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [skill, setSkill] = useState(null);
   const [formData, setFormData] = useState(addSkillFormDataTemplate);
 
   const handleSkillChange = (value, skill) => {
     setFormData({ ...formData, skillId: value, specialization: skill?.specialization });
+    setSkill(skill);
   };
 
   const handleSpecializationChange = (e) => {
     setFormData({ ...formData, specialization: e.target.value });
+  };
+
+  const isSpecializationAllowed = () => {
+    return skill && skill.specializations && skill.specializations.length > 0;
   };
 
   const handleAddSkill = async () => {
@@ -56,7 +62,9 @@ const CharacterViewSkillsAdd = ({ character, setCharacter }) => {
           <SelectSkill value={formData.skillId} onChange={handleSkillChange} />
         </Grid>
         <Grid item size={2}>
-          <TextField label="Specialization" value={formData.specialization} onChange={handleSpecializationChange} />
+          {isSpecializationAllowed() ? (
+            <TextField label="Specialization" value={formData.specialization} onChange={handleSpecializationChange} />
+          ) : null}
         </Grid>
         <Grid item size={6}></Grid>
         <Grid item size={2}>

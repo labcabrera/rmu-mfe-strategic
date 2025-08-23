@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
-import CloseIcon from '@mui/icons-material/Close';
-import IconButton from '@mui/material/IconButton';
+import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 
 const SnackbarError = ({ errorMessage, displayError, setDisplayError }) => {
@@ -10,19 +9,11 @@ const SnackbarError = ({ errorMessage, displayError, setDisplayError }) => {
   };
 
   return (
-    <Snackbar
-      open={displayError}
-      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      onClose={handleSnackbarClose}
-      message={errorMessage}
-      action={
-        <React.Fragment>
-          <IconButton aria-label="close" color="inherit" sx={{ p: 0.5 }} onClick={handleSnackbarClose}>
-            <CloseIcon />
-          </IconButton>
-        </React.Fragment>
-      }
-    />
+    <Snackbar open={displayError} anchorOrigin={{ vertical: 'top', horizontal: 'right' }} autoHideDuration={6000} onClose={handleSnackbarClose}>
+      <Alert severity="error" sx={{ width: '100%' }} variant="filled" onClose={handleSnackbarClose}>
+        {errorMessage}
+      </Alert>
+    </Snackbar>
   );
 };
 
