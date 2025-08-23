@@ -19,7 +19,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
 import { deleteCharacter } from '../../api/characters';
 
-const CharacterViewActions = ({ faction: character }) => {
+const CharacterViewActions = ({ character }) => {
   const navigate = useNavigate();
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');

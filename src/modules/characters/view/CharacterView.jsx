@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchCharacter } from '../../api/characters';
+import { fetchFaction } from '../../api/factions';
 import { fetchStrategicGame } from '../../api/strategic-games';
 import SnackbarError from '../../shared/errors/SnackbarError';
 import CharacterViewActions from './CharacterViewActions';
@@ -12,6 +13,7 @@ const CharacterView = () => {
   const [strategicGame, setStrategicGame] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [displayError, setDisplayError] = useState(false);
+  const [faction, setFaction] = useState(null);
 
   useEffect(() => {
     if (characterId) {
@@ -35,14 +37,22 @@ const CharacterView = () => {
           setDisplayError(true);
         });
     }
+    if (character && character.factionId) {
+      fetchFaction(character.factionId)
+        .then((factionData) => setFaction(factionData))
+        .catch((err) => {
+          setErrorMessage(`Error fetching faction: ${err.message}`);
+          setDisplayError(true);
+        });
+    }
   }, [character]);
 
-  if (!character || !strategicGame) return <div>Loading...</div>;
+  if (!character || !strategicGame || !faction) return <div>Loading...</div>;
 
   return (
     <>
-      <CharacterViewActions faction={character} />
-      <CharacterViewAttributes character={character} setCharacter={setCharacter} />
+      <CharacterViewActions character={character} />
+      <CharacterViewAttributes character={character} setCharacter={setCharacter} faction={faction} />
       <SnackbarError errorMessage={errorMessage} displayError={displayError} setDisplayError={setDisplayError} />
       <pre>{JSON.stringify(character, null, 2)}</pre>
     </>

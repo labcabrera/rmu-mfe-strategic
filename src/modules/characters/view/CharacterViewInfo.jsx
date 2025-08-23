@@ -9,7 +9,7 @@ import InitiativeTextField from '../../shared/input/InitiativeTextField';
 import MovementTextField from '../../shared/input/MovementTextField';
 import WeightTextField from '../../shared/input/WeightTextField';
 
-const CharacterViewInfo = ({ character }) => {
+const CharacterViewInfo = ({ character, faction }) => {
   const { t } = useTranslation();
 
   return (
@@ -30,7 +30,7 @@ const CharacterViewInfo = ({ character }) => {
           <TextField label={t('profession')} name="profession" value={t(character.info.professionId)} readOnly fullWidth />
         </Grid>
         <Grid item size={3}>
-          <TextField label={t('faction')} name="faction" value={character.factionId} readOnly fullWidth />
+          <TextField label={t('faction')} name="faction" value={faction.name} readOnly fullWidth />
         </Grid>
         <Grid size={12}>
           <Typography color="secondary" variant="h5">
@@ -38,19 +38,19 @@ const CharacterViewInfo = ({ character }) => {
           </Typography>
         </Grid>
         <Grid item size={3}>
-          <TextField label="Current level" name="currentLevel" value={character.experience.level} readOnly fullWidth />
+          <TextField label={t('current-level')} name="currentLevel" value={character.experience.level} readOnly fullWidth />
         </Grid>
         <Grid item size={3}>
-          <TextField label="Available level" name="availableLevel" value={character.experience.availableLevel} readOnly fullWidth />
+          <TextField label={t('available-level')} name="availableLevel" value={character.experience.availableLevel} readOnly fullWidth />
         </Grid>
         <Grid item size={3}>
-          <TextField label="XP" name="experience" value={character.experience.xp} readOnly fullWidth />
+          <TextField label={t('xp')} name="experience" value={character.experience.xp} readOnly fullWidth />
         </Grid>
         <Grid item size={3}>
           <TextField
-            label="Available Development Points"
+            label={t('available-development-points')}
             name="availableDevelopmentPoints"
-            value={character.experience.availableDevelopmentPoints}
+            value={`${character.experience.availableDevelopmentPoints} / ${character.experience.developmentPoints}`}
             readOnly
             fullWidth
           />
@@ -61,10 +61,7 @@ const CharacterViewInfo = ({ character }) => {
           </Typography>
         </Grid>
         <Grid item size={3}>
-          <TextField label="size" name="size" value={character.info.sizeId} readOnly fullWidth />
-        </Grid>
-        <Grid item size={3}>
-          <TextField label="Base movement rate" name="baseMovementRate" value={character.movement.baseMovementRate} readOnly fullWidth />
+          <TextField label={t('size')} name="size" value={character.info.sizeId} readOnly fullWidth />
         </Grid>
         <Grid item size={3}>
           <HeightTextField value={character.info.height} readOnly fullWidth />
@@ -73,19 +70,35 @@ const CharacterViewInfo = ({ character }) => {
           <WeightTextField value={character.info.weight} readOnly fullWidth />
         </Grid>
         <Grid item size={3}>
-          <TextField label="Hit points" name="hitPoints" value={character.hp.max} readOnly fullWidth />
+          <TextField label={t('hit-points')} name="hitPoints" value={character.hp.max} readOnly fullWidth />
+        </Grid>
+        <Grid size={12}>
+          <Typography color="secondary" variant="h5">
+            {t('movement')}
+          </Typography>
         </Grid>
         <Grid item size={3}>
-          <MovementTextField i18nLabel="stride-custom-bonus" value={character.movement.strideCustomBonus} />
+          <MovementTextField i18nLabel={t('stride-stat-bonus')} value={character.movement.strideQuBonus} />
         </Grid>
         <Grid item size={3}>
-          <MovementTextField i18nLabel="stride-racial-bonus" value={character.movement.strideRacialBonus} />
+          <MovementTextField i18nLabel={t('stride-racial-bonus')} value={character.movement.strideRacialBonus} />
         </Grid>
         <Grid item size={3}>
-          <InitiativeTextField i18nLabel="initiative" value={character.initiative.totalBonus} />
+          <MovementTextField i18nLabel={t('base-movement-rate')} value={character.movement.baseMovementRate} />
+        </Grid>
+        <Grid size={12}>
+          <Typography color="secondary" variant="h5">
+            {t('initiative')}
+          </Typography>
         </Grid>
         <Grid item size={3}>
-          <InitiativeTextField i18nLabel="initiative" value={character.initiative.totalBonus} />
+          <InitiativeTextField i18nLabel={t('initiative-base-bonus')} value={character.initiative.baseBonus} />
+        </Grid>
+        <Grid item size={3}>
+          <InitiativeTextField i18nLabel={t('initiative-custom-bonus')} value={character.initiative.customBonus} />
+        </Grid>
+        <Grid item size={3}>
+          <InitiativeTextField i18nLabel={t('initiative-total-bonus')} value={character.initiative.totalBonus} />
         </Grid>
       </Grid>
     </>

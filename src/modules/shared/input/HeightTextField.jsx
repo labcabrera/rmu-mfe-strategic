@@ -5,7 +5,7 @@ import Avatar from '@mui/material/Avatar';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 
-const HeightTextField = ({ value, onChange }) => {
+const HeightTextField = ({ value, onChange, readOnly = false }) => {
   const { t } = useTranslation();
 
   return (
@@ -15,7 +15,8 @@ const HeightTextField = ({ value, onChange }) => {
       fullWidth
       value={value}
       onChange={onChange}
-      required
+      required={!readOnly}
+      readOnly={readOnly}
       slotProps={{
         input: {
           startAdornment: (
