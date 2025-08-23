@@ -17,6 +17,11 @@ const InitiativeTextField = ({ value, onChange, i18nLabel = 'initiative', disabl
       onChange={onChange}
       disabled={disabled}
       required={required}
+      sx={{
+        '& .MuiInputBase-input': {
+          textAlign: 'right',
+        },
+      }}
       slotProps={{
         input: {
           startAdornment: (

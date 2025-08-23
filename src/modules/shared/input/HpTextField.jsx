@@ -17,6 +17,11 @@ const HpTextField = ({ value, onChange, i18nLabel = 'hit-points', disabled = fal
       onChange={onChange}
       required={required}
       disabled={disabled}
+      sx={{
+        '& .MuiInputBase-input': {
+          textAlign: 'right',
+        },
+      }}
       slotProps={{
         input: {
           startAdornment: (

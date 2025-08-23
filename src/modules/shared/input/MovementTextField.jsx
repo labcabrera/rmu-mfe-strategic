@@ -17,6 +17,11 @@ const MovementTextField = ({ value, onChange, i18nLabel = 'movement', disabled =
       required={required}
       variant="outlined"
       fullWidth
+      sx={{
+        '& .MuiInputBase-input': {
+          textAlign: 'right',
+        },
+      }}
       slotProps={{
         input: {
           startAdornment: (

@@ -161,22 +161,91 @@ const CharacterViewSkillsEntry = ({ character, setCharacter, skill, profession }
           {skill.statistics.join('/')}
         </Grid>
         <Grid item size={1}>
-          <TextField label={t('ranks')} name="ranks" value={skill.ranks} readOnly fullWidth />
+          <TextField
+            label={t('ranks')}
+            name="ranks"
+            value={skill.ranks}
+            readOnly
+            fullWidth
+            sx={{
+              '& .MuiInputBase-input': {
+                textAlign: 'right',
+              },
+            }}
+          />
         </Grid>
         <Grid item size={1}>
-          <TextField label={t('stats')} name="statBonus" value={skill.statBonus} readOnly fullWidth />
+          <TextField
+            label={t('stats')}
+            name="statBonus"
+            value={skill.statBonus}
+            readOnly
+            fullWidth
+            sx={{
+              '& .MuiInputBase-input': {
+                color: skill.statBonus < 0 ? '#ffab91' : skill.statBonus > 0 ? '#a5d6a7' : 'white',
+                textAlign: 'right',
+              },
+            }}
+          />
         </Grid>
         <Grid item size={1}>
-          <TextField label={t('prof')} name="professionalBonus" value={skill.professionalBonus} readOnly fullWidth />
+          <TextField
+            label={t('prof')}
+            name="professionalBonus"
+            value={skill.professionalBonus}
+            readOnly
+            fullWidth
+            sx={{
+              '& .MuiInputBase-input': {
+                textAlign: 'right',
+              },
+            }}
+          />
         </Grid>
         <Grid item size={1}>
-          <TextField label={t('dev')} name="developmentBonus" value={skill.developmentBonus} readOnly fullWidth />
+          <TextField
+            label={t('dev')}
+            name="developmentBonus"
+            value={skill.developmentBonus}
+            readOnly
+            fullWidth
+            sx={{
+              '& .MuiInputBase-input': {
+                textAlign: 'right',
+              },
+            }}
+          />
         </Grid>
         <Grid item size={1}>
-          <TextField label={t('custom')} name="customBonus" value={skill.customBonus} readOnly fullWidth />
+          <TextField
+            label={t('custom')}
+            name="customBonus"
+            value={skill.customBonus}
+            readOnly
+            fullWidth
+            sx={{
+              '& .MuiInputBase-input': {
+                textAlign: 'right',
+              },
+            }}
+          />
         </Grid>
         <Grid item size={1}>
-          <TextField label={t('total')} name="totalBonus" value={skill.totalBonus} readOnly fullWidth />
+          <TextField
+            label={t('total')}
+            name="totalBonus"
+            value={skill.totalBonus}
+            readOnly
+            fullWidth
+            sx={{
+              '& .MuiInputBase-input': {
+                color: skill.totalBonus < 0 ? '#ffab91' : skill.totalBonus > 0 ? '#a5d6a7' : 'white',
+                fontWeight: 'bold',
+                textAlign: 'right',
+              },
+            }}
+          />
         </Grid>
         <Grid item size={2}>
           <IconButton onClick={() => handleLevelUp()}>

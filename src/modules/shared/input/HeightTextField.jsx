@@ -17,6 +17,11 @@ const HeightTextField = ({ value, onChange, readOnly = false }) => {
       onChange={onChange}
       required={!readOnly}
       readOnly={readOnly}
+      sx={{
+        '& .MuiInputBase-input': {
+          textAlign: 'right',
+        },
+      }}
       slotProps={{
         input: {
           startAdornment: (

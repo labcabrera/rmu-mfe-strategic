@@ -16,6 +16,11 @@ const DefenseTextField = ({ value, onChange, i18nLabel = 'defensive-bonus', disa
       fullWidth
       variant="outlined"
       onChange={onChange}
+      sx={{
+        '& .MuiInputBase-input': {
+          textAlign: 'right',
+        },
+      }}
       slotProps={{
         input: {
           startAdornment: (

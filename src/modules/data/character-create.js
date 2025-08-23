@@ -80,10 +80,6 @@ export const characterCreateTemplate = {
   },
   skills: [
     {
-      skillId: 'perception',
-      ranks: 0,
-    },
-    {
       skillId: 'body-development',
       ranks: 0,
     },
@@ -93,6 +89,30 @@ export const characterCreateTemplate = {
     },
     {
       skillId: 'armor-maneuver',
+      ranks: 0,
+    },
+    {
+      skillId: 'perception',
+      ranks: 0,
+    },
+    {
+      skillId: 'jumping',
+      ranks: 0,
+    },
+    {
+      skillId: 'running',
+      ranks: 0,
+    },
+    {
+      skillId: 'leadership',
+      ranks: 0,
+    },
+    {
+      skillId: 'multiple-attacks',
+      ranks: 0,
+    },
+    {
+      skillId: 'medicine',
       ranks: 0,
     },
   ],

@@ -4,7 +4,9 @@ import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import DefenseTextField from '../../shared/input/DefenseTextField';
 import HeightTextField from '../../shared/input/HeightTextField';
+import HpTextField from '../../shared/input/HpTextField';
 import InitiativeTextField from '../../shared/input/InitiativeTextField';
 import MovementTextField from '../../shared/input/MovementTextField';
 import WeightTextField from '../../shared/input/WeightTextField';
@@ -38,13 +40,46 @@ const CharacterViewInfo = ({ character, faction }) => {
           </Typography>
         </Grid>
         <Grid item size={3}>
-          <TextField label={t('current-level')} name="currentLevel" value={character.experience.level} readOnly fullWidth />
+          <TextField
+            label={t('current-level')}
+            name="currentLevel"
+            value={character.experience.level}
+            readOnly
+            fullWidth
+            sx={{
+              '& .MuiInputBase-input': {
+                textAlign: 'right',
+              },
+            }}
+          />
         </Grid>
         <Grid item size={3}>
-          <TextField label={t('available-level')} name="availableLevel" value={character.experience.availableLevel} readOnly fullWidth />
+          <TextField
+            label={t('available-level')}
+            name="availableLevel"
+            value={character.experience.availableLevel}
+            readOnly
+            fullWidth
+            sx={{
+              '& .MuiInputBase-input': {
+                textAlign: 'right',
+              },
+            }}
+          />
         </Grid>
         <Grid item size={3}>
-          <TextField label={t('xp')} name="experience" value={character.experience.xp} readOnly fullWidth />
+          <TextField
+            label={t('xp')}
+            name="experience"
+            value={character.experience.xp}
+            readOnly
+            fullWidth
+            sx={{
+              '& .MuiInputBase-input': {
+                textAlign: 'right',
+              },
+            }}
+          />
         </Grid>
         <Grid item size={3}>
           <TextField
@@ -53,6 +88,11 @@ const CharacterViewInfo = ({ character, faction }) => {
             value={`${character.experience.availableDevelopmentPoints} / ${character.experience.developmentPoints}`}
             readOnly
             fullWidth
+            sx={{
+              '& .MuiInputBase-input': {
+                textAlign: 'right',
+              },
+            }}
           />
         </Grid>
         <Grid size={12}>
@@ -70,7 +110,7 @@ const CharacterViewInfo = ({ character, faction }) => {
           <WeightTextField value={character.info.weight} readOnly fullWidth />
         </Grid>
         <Grid item size={3}>
-          <TextField label={t('hit-points')} name="hitPoints" value={character.hp.max} readOnly fullWidth />
+          <HpTextField value={character.hp.current} readOnly fullWidth />
         </Grid>
         <Grid size={12}>
           <Typography color="secondary" variant="h5">
@@ -78,10 +118,10 @@ const CharacterViewInfo = ({ character, faction }) => {
           </Typography>
         </Grid>
         <Grid item size={3}>
-          <TextField label={t('armor-type')} name="armorType" value={character.defense.armorType} readOnly fullWidth />
+          <DefenseTextField i18nLabel={'armor-type'} value={character.defense.armorType} readOnly />
         </Grid>
         <Grid item size={3}>
-          <TextField label={t('defensive-bonus')} name="armorClass" value={character.defense.defensiveBonus} readOnly fullWidth />
+          <DefenseTextField i18nLabel={'defensive-bonus'} value={character.defense.defensiveBonus} readOnly />
         </Grid>
         <Grid size={12}>
           <Typography color="secondary" variant="h5">
