@@ -122,10 +122,6 @@ export const characterCreateTemplate = {
       itemTypeId: 'dagger',
     },
     {
-      name: 'Ork dagger',
-      itemTypeId: 'dagger',
-    },
-    {
       itemTypeId: 'heavy-cloth-full-suit',
     },
   ],
