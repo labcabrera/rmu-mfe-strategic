@@ -8,6 +8,7 @@ import TextField from '@mui/material/TextField';
 import { fetchFaction, addFactionXP, addFactionGold } from '../../api/factions';
 import { fetchStrategicGame } from '../../api/strategic-games';
 import FactionViewActions from './FactionViewActions';
+import FactionViewCharacters from './FactionViewCharacters';
 
 const FactionView = () => {
   const location = useLocation();
@@ -97,6 +98,7 @@ const FactionView = () => {
           <TextField label="Description" name="description" value={faction.description} readonly fullWidth multiline maxRows={4} />
         </Grid>
       </Grid>
+      <FactionViewCharacters faction={faction} />
       <pre>{JSON.stringify(faction, null, 2)}</pre>
     </>
   );
