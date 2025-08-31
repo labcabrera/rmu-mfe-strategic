@@ -4,12 +4,12 @@ import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import DefenseTextField from '../../shared/input/DefenseTextField';
-import HeightTextField from '../../shared/input/HeightTextField';
-import HpTextField from '../../shared/input/HpTextField';
-import InitiativeTextField from '../../shared/input/InitiativeTextField';
-import MovementTextField from '../../shared/input/MovementTextField';
-import WeightTextField from '../../shared/input/WeightTextField';
+import DefenseTextField from '../../shared/inputs/DefenseTextField';
+import HeightTextField from '../../shared/inputs/HeightTextField';
+import HpTextField from '../../shared/inputs/HpTextField';
+import InitiativeTextField from '../../shared/inputs/InitiativeTextField';
+import MovementTextField from '../../shared/inputs/MovementTextField';
+import WeightTextField from '../../shared/inputs/WeightTextField';
 
 const CharacterViewInfo = ({ character, faction }) => {
   const { t } = useTranslation();
