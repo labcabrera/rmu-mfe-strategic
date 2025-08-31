@@ -32,6 +32,21 @@ export async function createCharacter(characterData) {
   return await response.json();
 }
 
+export async function updateCharacter(characterId, character) {
+  const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}`;
+  const response = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(character),
+  });
+  if (response.status != 200) {
+    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+  }
+  return await response.json();
+}
+
 export async function deleteCharacter(characterId) {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}`;
   const response = await fetch(url, {

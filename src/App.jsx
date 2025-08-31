@@ -4,6 +4,7 @@ import './i18n';
 import './index.css';
 import CharacterCreate from './modules/characters/create/CharacterCreate';
 import CharacterList from './modules/characters/list/CharacterList';
+import CharacterUpdate from './modules/characters/update/CharacterUpdate';
 import CharacterView from './modules/characters/view/CharacterView';
 import FactionCreate from './modules/factions/create/FactionCreate';
 import FactionList from './modules/factions/list/FactionList';
@@ -35,6 +36,7 @@ const App = () => {
       <Route path="/characters" element={<CharacterList />} />
       <Route path="/characters/view/:characterId" element={<CharacterView />} />
       <Route path="/characters/create" element={<CharacterCreate />} />
+      <Route path="/characters/edit/:characterId" element={<CharacterUpdate />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
