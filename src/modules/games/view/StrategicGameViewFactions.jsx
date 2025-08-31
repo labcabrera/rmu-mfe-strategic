@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import Snackbar from '@mui/material/Snackbar';
+import Typography from '@mui/material/Typography';
 import StrategicGameViewFactionItem from './StrategicGameViewFactionItem';
 
 const StrategicGameViewFactions = ({ strategicGame }) => {
@@ -42,7 +43,9 @@ const StrategicGameViewFactions = ({ strategicGame }) => {
 
   return (
     <>
-      Faction view for game ID: {strategicGame.name}
+      <Typography variant="h6" color="secondary">
+        Factions
+      </Typography>
       <List>
         {factions?.map((item) => (
           <StrategicGameViewFactionItem

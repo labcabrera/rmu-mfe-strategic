@@ -13,6 +13,8 @@ const FactionCreate = () => {
     gameId: gameId,
     name: '',
     description: '',
+    availableGold: '1',
+    availableXP: '200000',
   });
 
   const handleChange = (e) => {

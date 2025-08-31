@@ -64,81 +64,35 @@ const StrategicGameView = () => {
         <Grid size={4}>
           <TextField label="Status" name="status" value={strategicGame.status} readonly fullWidth />
         </Grid>
-        <Grid size={12}>
-          <TextField label="Description" name="description" value={strategicGame.description} readonly fullWidth multiline maxRows={4} />
-        </Grid>
+        {strategicGame && strategicGame.description && (
+          <Grid size={12}>
+            <TextField label="Description" name="description" value={strategicGame.description} readonly fullWidth multiline maxRows={4} />
+          </Grid>
+        )}
         <Grid size={12}>Options</Grid>
         <Grid size={4}>
-          <TextField
-            label="Experience multiplier"
-            name="experienceMultiplier"
-            type="number"
-            variant="outlined"
-            value={strategicGame.options.experienceMultiplier}
-            required
-            fullWidth
-          />
+          <TextField label="Experience multiplier" name="experienceMultiplier" value={strategicGame.options.experienceMultiplier} fullWidth />
         </Grid>
         <Grid size={8}></Grid>
 
         <Grid size={12}>Power level</Grid>
         <Grid size={4}>
-          <TextField
-            label="Stat random min"
-            name="statRandomMin"
-            variant="outlined"
-            type="number"
-            value={strategicGame.powerLevel.statRandomMin}
-            fullWidth
-            required
-          />
+          <TextField label="Stat random min" name="statRandomMin" value={strategicGame.powerLevel.statRandomMin} fullWidth />
         </Grid>
         <Grid size={8}></Grid>
 
         <Grid size={4}>
-          <TextField
-            label="Stat Boost Potential"
-            name="statBoostPotential"
-            variant="outlined"
-            type="number"
-            value={strategicGame.powerLevel.statBoostPotential}
-            fullWidth
-            required
-          />
+          <TextField label="Stat Boost Potential" name="statBoostPotential" value={strategicGame.powerLevel.statBoostPotential} fullWidth />
         </Grid>
         <Grid size={4}>
-          <TextField
-            label="Stat Boost Temporary"
-            name="statBoostTemporary"
-            variant="outlined"
-            type="number"
-            value={strategicGame.powerLevel.statBoostTemporary}
-            fullWidth
-            required
-          />
+          <TextField label="Stat Boost Temporary" name="statBoostTemporary" value={strategicGame.powerLevel.statBoostTemporary} fullWidth />
         </Grid>
         <Grid size={4}></Grid>
         <Grid size={4}>
-          <TextField
-            label="Stat Creation Boost"
-            name="statCreationBoost"
-            variant="outlined"
-            type="number"
-            value={strategicGame.powerLevel.statCreationBoost}
-            fullWidth
-            required
-          />
+          <TextField label="Stat Creation Boost" name="statCreationBoost" value={strategicGame.powerLevel.statCreationBoost} fullWidth />
         </Grid>
         <Grid size={4}>
-          <TextField
-            label="Stat Creation Swap"
-            name="statCreationSwap"
-            variant="outlined"
-            type="number"
-            value={strategicGame.powerLevel.statCreationSwap}
-            fullWidth
-            required
-          />
+          <TextField label="Stat Creation Swap" name="statCreationSwap" value={strategicGame.powerLevel.statCreationSwap} fullWidth />
         </Grid>
       </Grid>
       <StrategicGameViewFactions strategicGame={strategicGame} />
