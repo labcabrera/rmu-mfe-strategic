@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { addFactionXP, addFactionGold } from '../../api/factions';
@@ -34,16 +34,9 @@ const HeaderCategory = ({ i18nLabel }) => {
   );
 };
 
-const OptionButton = ({ onClick, label, icon = <AddCircleOutlineIcon /> }) => {
-  return (
-    <Button sx={{ minWidth: 100 }} startIcon={icon} variant="outlined" onClick={onClick}>
-      {label}
-    </Button>
-  );
-};
-
 const FactionViewAttributes = ({ faction, setFaction, strategicGame }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleOpenGame = () => {
     navigate(`/strategic/games/view/${strategicGame.id}`);
@@ -67,32 +60,78 @@ const FactionViewAttributes = ({ faction, setFaction, strategicGame }) => {
     <Grid container spacing={2} alignItems="center">
       <HeaderCategory i18nLabel="information" />
 
-      <InfoField i18n="game" value={strategicGame?.name} size={6} />
-      <Grid size={5}>
-        <Box display="flex" gap={2}>
-          <OptionButton onClick={() => handleOpenGame()} label="View" icon={<ArrowForwardIcon />} />
-        </Box>
+      <Grid size={10}>
+        <TextField
+          label={t('game')}
+          variant="standard"
+          fullWidth
+          value={strategicGame?.name || ''}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton edge="end" onClick={() => handleOpenGame()}>
+                  <ArrowForwardIcon />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
       </Grid>
 
-      <InfoField i18n="name" value={faction.name} size={6} />
-      <Grid size={4}></Grid>
+      <InfoField i18n="name" value={faction.name} size={10} />
 
-      <InfoField i18n="available-xp" value={faction.factionManagement.availableXP} size={6} />
-      <Grid size={4}>
-        <Box display="flex" gap={2}>
-          <OptionButton onClick={() => handleAddXP(10000)} label="10K" icon={<AddCircleOutlineIcon />} />
-          <OptionButton onClick={() => handleAddXP(-10000)} label="10K" icon={<RemoveCircleOutlineIcon />} />
-        </Box>
+      <Grid size={10}>
+        <TextField
+          label={t('available-xp')}
+          variant="standard"
+          fullWidth
+          value={faction.factionManagement.availableXP}
+          InputProps={{
+            endAdornment: (
+              <>
+                <InputAdornment position="end">
+                  <IconButton edge="end" onClick={() => handleAddXP(10000)}>
+                    <AddCircleOutlineIcon />
+                  </IconButton>
+                </InputAdornment>
+                <InputAdornment position="end">
+                  <IconButton edge="end" onClick={() => handleAddXP(-10000)}>
+                    <RemoveCircleOutlineIcon />
+                  </IconButton>
+                </InputAdornment>
+              </>
+            ),
+          }}
+        />
       </Grid>
 
-      <InfoField i18n="available-gold" value={faction.factionManagement.availableGold} size={6} />
-      <Grid size={4}>
-        <Box display="flex" gap={2}>
-          <OptionButton onClick={() => handleAddGold(1)} label="1G" icon={<AddCircleOutlineIcon />} />
-          <OptionButton onClick={() => handleAddGold(-1)} label="1G" icon={<RemoveCircleOutlineIcon />} />
-        </Box>
+      <Grid size={10}>
+        <TextField
+          label={t('available-gold')}
+          variant="standard"
+          fullWidth
+          value={faction.factionManagement.availableGold}
+          InputProps={{
+            endAdornment: (
+              <>
+                <InputAdornment position="end">
+                  <IconButton edge="end" onClick={() => handleAddGold(1)}>
+                    <AddCircleOutlineIcon />
+                  </IconButton>
+                </InputAdornment>
+                <InputAdornment position="end">
+                  <IconButton edge="end" onClick={() => handleAddGold(-1)}>
+                    <RemoveCircleOutlineIcon />
+                  </IconButton>
+                </InputAdornment>
+              </>
+            ),
+          }}
+        />
       </Grid>
-      <InfoField i18n="description" value={faction.description} size={6} />
+      <Grid size={10}>
+        <TextField label={t('description')} variant="standard" fullWidth value={faction.description} />
+      </Grid>
     </Grid>
   );
 };
