@@ -4,10 +4,9 @@ import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import CharacterViewInfo from './CharacterViewInfo';
-import CharacterViewSkills from './CharacterViewSkills';
 import CharacterViewStats from './CharacterViewStats';
 
-const CharacterViewAttributes = ({ character, setCharacter, faction, profession, strategicGame }) => {
+const CharacterViewAttributes = ({ character, faction, strategicGame }) => {
   const { t } = useTranslation();
   return (
     <>
@@ -19,11 +18,8 @@ const CharacterViewAttributes = ({ character, setCharacter, faction, profession,
           <CharacterViewStats character={character} />
         </Grid>
       </Grid>
-      <CharacterViewSkills character={character} setCharacter={setCharacter} profession={profession} />
-      <Grid container spacing={2}>
-        <Grid item size={12}>
-          <TextField label={t('lore')} variant="outlined" name="description" value={character.description} fullWidth multiline maxRows={4} />
-        </Grid>
+      <Grid item size={6}>
+        <TextField label={t('description')} variant="standard" name="description" value={character.description} fullWidth multiline maxRows={4} />
       </Grid>
     </>
   );

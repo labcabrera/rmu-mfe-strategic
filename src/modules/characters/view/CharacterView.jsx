@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchCharacter } from '../../api/characters';
@@ -6,7 +7,7 @@ import { fetchProfession } from '../../api/professions';
 import { fetchStrategicGame } from '../../api/strategic-games';
 import SnackbarError from '../../shared/errors/SnackbarError';
 import CharacterViewActions from './CharacterViewActions';
-import CharacterViewAttributes from './CharacterViewAttributes';
+import CharacterViewTabs from './CharacterViewTabs';
 
 const CharacterView = () => {
   const { characterId } = useParams();
@@ -63,17 +64,8 @@ const CharacterView = () => {
   return (
     <>
       <CharacterViewActions character={character} />
-      <CharacterViewAttributes
-        character={character}
-        setCharacter={setCharacter}
-        faction={faction}
-        profession={profession}
-        strategicGame={strategicGame}
-      />
+      <CharacterViewTabs character={character} setCharacter={setCharacter} strategicGame={strategicGame} faction={faction} profession={profession} />
       <SnackbarError errorMessage={errorMessage} displayError={displayError} setDisplayError={setDisplayError} />
-      <pre>Character: {JSON.stringify(character, null, 2)}</pre>
-      <pre>Profession: {JSON.stringify(profession, null, 2)}</pre>
-      <pre>Faction: {JSON.stringify(faction, null, 2)}</pre>
     </>
   );
 };
