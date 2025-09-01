@@ -139,3 +139,17 @@ export async function fetchCharacterSizes() {
   }
   return await response.json();
 }
+
+export async function equipItem(characterId, slot, itemId) {
+  const request = { slot: slot, itemId: itemId };
+  const url = `${process.env.RMU_API_CORE_URL}/characters/${characterId}/equipment`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(request),
+  });
+  if (response.status != 200) {
+    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+  }
+  return await response.json();
+}

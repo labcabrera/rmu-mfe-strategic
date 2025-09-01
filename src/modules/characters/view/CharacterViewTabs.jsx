@@ -3,6 +3,7 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
+import CharacterViewAttacks from './CharacterViewAttacks';
 import CharacterViewAttributes from './CharacterViewAttributes';
 import CharacterViewItems from './CharacterViewItems';
 import CharacterViewSkills from './CharacterViewSkills';
@@ -56,10 +57,10 @@ const CharacterViewTabs = ({ character, setCharacter, strategicGame, faction, pr
           <CharacterViewSkills character={character} setCharacter={setCharacter} profession={profession} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={2}>
-          <CharacterViewItems character={character} />
+          <CharacterViewItems character={character} setCharacter={setCharacter} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={3}>
-          TODO
+          <CharacterViewAttacks character={character} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={4}>
           <pre>Character: {JSON.stringify(character, null, 2)}</pre>

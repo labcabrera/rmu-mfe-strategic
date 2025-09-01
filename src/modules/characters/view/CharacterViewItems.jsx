@@ -7,13 +7,18 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import CharacterViewEquipment from './CharacterViewEquipment';
 
-const CharacterViewItems = ({ character }) => {
+const CharacterViewItems = ({ character, setCharacter }) => {
   const { t } = useTranslation();
+
+  // TODO Stash / Carried
 
   return (
     <>
       <Grid container spacing={2}>
+        <CharacterViewEquipment character={character} setCharacter={setCharacter} />
+
         <Table aria-label="item table">
           <TableHead>
             <TableRow>
