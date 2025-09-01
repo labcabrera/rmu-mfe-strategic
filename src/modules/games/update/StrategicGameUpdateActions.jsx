@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
@@ -10,6 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import Snackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
+import { updateStrategicGame } from '../../api/strategic-games';
 
 const StrategicGameUpdateActions = ({ formData }) => {
   const location = useLocation();
@@ -18,26 +20,13 @@ const StrategicGameUpdateActions = ({ formData }) => {
   const [displayError, setDisplayError] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
 
-  const updateGame = async (e) => {
-    const url = `${process.env.RMU_API_STRATEGIC_URL}/strategic-games/${strategicGame.id}`;
-    try {
-      e.preventDefault();
-      const requestOptions = {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      };
-      const response = await fetch(url, requestOptions);
-      if (response.status != 200) {
-        throw new Error(`Error updating strategic game: ${response.statusText}`);
-      }
-      fetch(url, requestOptions)
-        .then((response) => response.json())
-        .then((data) => navigate(`/strategic/games/view/${data.id}`, { state: { strategicGame: data } }));
-    } catch (error) {
-      setDisplayError(true);
-      setErrorMessage(`Error updating strategic game from ${url}. ${error.message}`);
-    }
+  const updateGame = async () => {
+    updateStrategicGame(strategicGame.id, formData)
+      .then((data) => navigate(`/strategic/games/view/${data.id}`, { state: { strategicGame: data } }))
+      .catch((error) => {
+        setDisplayError(true);
+        setErrorMessage(`Error updating strategic game: ${error.message}`);
+      });
   };
 
   const handleSnackbarClose = () => {
@@ -56,7 +45,7 @@ const StrategicGameUpdateActions = ({ formData }) => {
             <Link underline="hover" color="inherit" href="/">
               Home
             </Link>
-            <Link underline="hover" color="inherit" href="/strategic">
+            <Link component={RouterLink} color="inherit" to="/strategic">
               Strategic
             </Link>
             <span>Games</span>

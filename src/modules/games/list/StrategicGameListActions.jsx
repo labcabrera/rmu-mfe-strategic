@@ -1,8 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import AddIcon from '@mui/icons-material/Add';
+import { Link as RouterLink } from 'react-router-dom';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import AddCircleOutlineSharpIcon from '@mui/icons-material/AddCircleOutlineSharp';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import IconButton from '@mui/material/IconButton';
@@ -24,7 +23,7 @@ const StrategicGameListActions = () => {
             <Link underline="hover" color="inherit" href="/">
               Home
             </Link>
-            <Link underline="hover" color="inherit" href="/strategic">
+            <Link component={RouterLink} underline="hover" color="inherit" to="/strategic">
               Strategic
             </Link>
             <span>Games</span>

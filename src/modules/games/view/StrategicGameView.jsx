@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
+import { fetchFactions } from '../../api/factions';
 import { fetchStrategicGame } from '../../api/strategic-games';
+import SnackbarError from '../../shared/errors/SnackbarError';
 import StrategicGameViewActions from './StrategicGameViewActions';
 import StrategicGameViewAttributes from './StrategicGameViewAttributes';
 import StrategicGameViewFactions from './StrategicGameViewFactions';
@@ -10,17 +12,29 @@ const StrategicGameView = () => {
   const location = useLocation();
   const { gameId } = useParams();
   const [strategicGame, setStrategicGame] = useState(location.state?.strategicGame || null);
+  const [factions, setFactions] = useState([]);
   const [realm, setRealm] = useState(null);
+  const [displayError, setDisplayError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const bindStrategicGame = async () => {
+  const bindStrategicGame = async (gameId) => {
     try {
-      console.log('Binding strategic game:', gameId);
       const game = await fetchStrategicGame(gameId);
-      console.log('Fetched strategic game:', game);
       setStrategicGame(game);
     } catch (err) {
       console.log('Error binding strategic games', err);
     }
+  };
+
+  const bindFactions = (gameId) => {
+    fetchFactions(`gameId==${gameId}`, 0, 100)
+      .then((data) => {
+        setFactions(data);
+      })
+      .catch((err) => {
+        setDisplayError(true);
+        setErrorMessage('Error binding factions ' + err.message);
+      });
   };
 
   const getRealmName = async () => {
@@ -35,13 +49,18 @@ const StrategicGameView = () => {
   };
 
   useEffect(() => {
-    console.log('StrategicGameView useEffect - gameId:', gameId, ' strategicGame:', strategicGame);
     if (!strategicGame && gameId) {
       bindStrategicGame();
     } else {
       getRealmName();
     }
   }, [strategicGame, gameId]);
+
+  useEffect(() => {
+    if (strategicGame) {
+      bindFactions(strategicGame.id);
+    }
+  }, [strategicGame]);
 
   if (!strategicGame) return <div>Loading...</div>;
 
@@ -53,9 +72,10 @@ const StrategicGameView = () => {
           <StrategicGameViewAttributes strategicGame={strategicGame} realm={realm} />
         </Grid>
         <Grid item size={6}>
-          <StrategicGameViewFactions strategicGame={strategicGame} />
+          <StrategicGameViewFactions strategicGame={strategicGame} factions={factions} setFactions={setFactions} />
         </Grid>
       </Grid>
+      <SnackbarError errorMessage={errorMessage} displayError={displayError} setDisplayError={setDisplayError} />
     </>
   );
 };

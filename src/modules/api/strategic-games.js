@@ -30,6 +30,19 @@ export async function createStrategicGame(gameData) {
   return await response.json();
 }
 
+export async function updateStrategicGame(gameId, gameData) {
+  const url = `${process.env.RMU_API_STRATEGIC_URL}/strategic-games/${gameId}`;
+  const response = await fetch(url, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(gameData),
+  });
+  if (response.status != 200) {
+    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+  }
+  return await response.json();
+}
+
 export async function deleteStrategicGame(gameId) {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/strategic-games/${gameId}`;
   const response = await fetch(url, { method: 'DELETE' });

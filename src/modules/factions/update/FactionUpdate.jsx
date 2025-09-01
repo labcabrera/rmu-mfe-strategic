@@ -15,8 +15,6 @@ const FactionUpdate = () => {
     <>
       <FactionUpdateActions formData={formData} faction={faction} />
       <FactionUpdateAttributes formData={formData} setFormData={setFormData} />
-      <pre>{JSON.stringify(formData, null, 2)}</pre>
-      <pre>{JSON.stringify(faction, null, 2)}</pre>
     </>
   );
 };
