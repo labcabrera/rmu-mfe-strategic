@@ -1,9 +1,12 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import Grid from '@mui/material/Grid';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
+import Typography from '@mui/material/Typography';
 import { fetchCharacters } from '../../api/characters';
 import CharacterAvatar from '../../shared/avatars/CharacterAvatar';
 import SnackbarError from '../../shared/errors/SnackbarError';
@@ -28,7 +31,7 @@ const FactionViewCharactersItem = ({ character }) => {
 };
 
 const FactionViewCharacters = ({ faction }) => {
-  // const navigate = useNavigate();
+  const { t } = useTranslation();
   const [characters, setCharacters] = useState([]);
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -55,10 +58,18 @@ const FactionViewCharacters = ({ faction }) => {
 
   return (
     <>
-      <h3>Characters {faction.name}</h3>
-      {characters.map((character) => (
-        <FactionViewCharactersItem key={character.id} character={character} />
-      ))}
+      <Grid>
+        <Grid size={12}>
+          <Typography variant="h6" color="primary">
+            {t('characters')}
+          </Typography>
+        </Grid>
+        <Grid size={12}>
+          {characters.map((character) => (
+            <FactionViewCharactersItem key={character.id} character={character} />
+          ))}
+        </Grid>
+      </Grid>
       <SnackbarError open={displayError} message={errorMessage} onClose={() => setDisplayError(false)} />
     </>
   );

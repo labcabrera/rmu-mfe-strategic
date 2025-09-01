@@ -5,13 +5,15 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
-const InfoSection = ({ label, value, size = 2 }) => (
-  <>
+const InfoField = ({ i18n, value, size = 2 }) => {
+  const { t } = useTranslation();
+
+  return (
     <Grid item size={size}>
-      <TextField label={label} variant="standard" value={value} fullWidth />
+      <TextField label={t(i18n)} variant="standard" value={value} fullWidth />
     </Grid>
-  </>
-);
+  );
+};
 
 const StrategicGameViewAttributes = ({ strategicGame, realm }) => {
   const { t } = useTranslation();
@@ -27,9 +29,9 @@ const StrategicGameViewAttributes = ({ strategicGame, realm }) => {
           </Typography>
         </Grid>
 
-        <InfoSection label={t('name')} value={strategicGame.name} />
-        <InfoSection label={t('realm')} value={realm?.name || ''} />
-        <InfoSection label={t('status')} value={t(`status-${strategicGame.status}`)} />
+        <InfoField i18n="name" value={strategicGame.name} />
+        <InfoField i18n="realm" value={realm?.name || ''} />
+        <InfoField i18n="status" value={t(`status-${strategicGame.status}`)} />
 
         <Grid size={12}>
           <Typography variant="h6" color="primary">
@@ -37,10 +39,10 @@ const StrategicGameViewAttributes = ({ strategicGame, realm }) => {
           </Typography>
         </Grid>
 
-        <InfoSection label={t('experience-multiplier')} value={strategicGame.options.experienceMultiplier} size={1} />
-        <InfoSection label={t('fatigue-multiplier')} value={strategicGame.options.fatigueMultiplier} size={1} />
-        <InfoSection label={t('board-scale-multiplier')} value={strategicGame.options.boardScaleMultiplier} size={1} />
-        <InfoSection label={t('letality')} value={strategicGame.options.letality} size={1} />
+        <InfoField i18n="experience-multiplier" value={strategicGame.options.experienceMultiplier} size={1} />
+        <InfoField i18n="fatigue-multiplier" value={strategicGame.options.fatigueMultiplier} size={1} />
+        <InfoField i18n="board-scale-multiplier" value={strategicGame.options.boardScaleMultiplier} size={1} />
+        <InfoField i18n="letality" value={strategicGame.options.letality} size={1} />
 
         <Grid size={12}>
           <Typography variant="h6" color="primary">
@@ -48,13 +50,13 @@ const StrategicGameViewAttributes = ({ strategicGame, realm }) => {
           </Typography>
         </Grid>
 
-        <InfoSection label={t('stat-random-min')} value={strategicGame.powerLevel.statRandomMin} size={1} />
-        <InfoSection label={t('stat-boost-potential')} value={strategicGame.powerLevel.statBoostPotential} size={1} />
-        <InfoSection label={t('stat-boost-temporary')} value={strategicGame.powerLevel.statBoostTemporary} size={1} />
-        <InfoSection label={t('stat-creation-boosts')} value={strategicGame.powerLevel.statCreationBoost} size={1} />
-        <InfoSection label={t('stat-creation-swaps')} value={strategicGame.powerLevel.statCreationSwap} size={1} />
+        <InfoField i18n="stat-random-min" value={strategicGame.powerLevel.statRandomMin} size={1} />
+        <InfoField i18n="stat-boost-potential" value={strategicGame.powerLevel.statBoostPotential} size={1} />
+        <InfoField i18n="stat-boost-temporary" value={strategicGame.powerLevel.statBoostTemporary} size={1} />
+        <InfoField i18n="stat-creation-boosts" value={strategicGame.powerLevel.statCreationBoost} size={1} />
+        <InfoField i18n="stat-creation-swaps" value={strategicGame.powerLevel.statCreationSwap} size={1} />
 
-        {strategicGame && strategicGame.description && <InfoSection label={t('description')} value={strategicGame.description} size={12} />}
+        {strategicGame && strategicGame.description && <InfoField i18n="description" value={strategicGame.description} size={12} />}
       </Grid>
     </>
   );

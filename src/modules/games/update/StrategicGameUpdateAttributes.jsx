@@ -15,7 +15,7 @@ const FormField = ({ i18nLabel, name, value, onChange, size = 2 }) => {
   );
 };
 
-const SeparatorInfo = ({ i18nLabel }) => {
+const HeaderCategory = ({ i18nLabel }) => {
   const { t } = useTranslation();
 
   return (
@@ -47,9 +47,9 @@ const StrategicGameUpdateAttributes = ({ formData, setFormData }) => {
 
   return (
     <Grid container spacing={2}>
-      <SeparatorInfo i18nLabel="information" />
+      <HeaderCategory i18nLabel="information" />
       <FormField i18nLabel="name" name="name" value={formData.name} onChange={handleChange} />
-      <SeparatorInfo i18nLabel="options" />
+      <HeaderCategory i18nLabel="options" />
       <FormField
         i18nLabel="experience-multiplier"
         name="experienceMultiplier"
@@ -72,7 +72,7 @@ const StrategicGameUpdateAttributes = ({ formData, setFormData }) => {
         size={1}
       />
       <FormField i18nLabel="letality" name="letality" value={formData.options.letality} onChange={handleOptionsChange} size={1} />
-      <SeparatorInfo i18nLabel="power-level" />
+      <HeaderCategory i18nLabel="power-level" />
       <FormField
         i18nLabel="stat-random-min"
         name="statRandomMin"

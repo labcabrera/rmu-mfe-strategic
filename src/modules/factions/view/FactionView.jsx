@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { Link as RouterLink } from 'react-router-dom';
-import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
-import Link from '@mui/material/Link';
-import TextField from '@mui/material/TextField';
-import { fetchFaction, addFactionXP, addFactionGold } from '../../api/factions';
+import { fetchFaction } from '../../api/factions';
 import { fetchStrategicGame } from '../../api/strategic-games';
 import FactionViewActions from './FactionViewActions';
+import FactionViewAttributes from './FactionViewAttributes';
 import FactionViewCharacters from './FactionViewCharacters';
 
 const FactionView = () => {
@@ -29,20 +25,6 @@ const FactionView = () => {
     console.log('game ok ' + faction.gameId);
   };
 
-  const handleAddXP = async (amount) => {
-    if (faction) {
-      const updatedFaction = await addFactionXP(faction.id, amount);
-      setFaction(updatedFaction);
-    }
-  };
-
-  const handleAddGold = async (amount) => {
-    if (faction) {
-      const updatedFaction = await addFactionGold(faction.id, amount);
-      setFaction(updatedFaction);
-    }
-  };
-
   useEffect(() => {
     if (!faction && factionId) {
       bindFaction(faction);
@@ -56,48 +38,7 @@ const FactionView = () => {
   return (
     <>
       <FactionViewActions faction={faction} />
-      <Grid container spacing={2}>
-        <Grid size={12}>
-          <Link component={RouterLink} underline="hover" color="inherit" to={`/strategic/games/view/${strategicGame.id}`}>
-            {strategicGame.name}
-          </Link>
-        </Grid>
-        <Grid size={4}>
-          <TextField label="Name" name="name" value={faction.name} readonly fullWidth />
-        </Grid>
-        <Grid size={8}></Grid>
-        <Grid size={4}>
-          <TextField label="Available XP" name="availableXp" value={faction.factionManagement.availableXP} readonly fullWidth />
-        </Grid>
-        <Grid size={1}>
-          <Button
-            variant="outlined"
-            onClick={() => {
-              handleAddXP(10000);
-            }}
-          >
-            +10K
-          </Button>
-        </Grid>
-        <Grid size={7}></Grid>
-        <Grid size={4}>
-          <TextField label="Available Gold" name="availableGold" value={faction.factionManagement.availableGold} readonly fullWidth />
-        </Grid>
-        <Grid size={1}>
-          <Button
-            variant="outlined"
-            onClick={() => {
-              handleAddGold(1);
-            }}
-          >
-            +1G
-          </Button>
-        </Grid>
-        <Grid size={7}></Grid>
-        <Grid size={12}>
-          <TextField label="Description" name="description" value={faction.description} readonly fullWidth multiline maxRows={4} />
-        </Grid>
-      </Grid>
+      <FactionViewAttributes faction={faction} setFaction={setFaction} strategicGame={strategicGame} />
       <FactionViewCharacters faction={faction} />
       <pre>{JSON.stringify(faction, null, 2)}</pre>
     </>
