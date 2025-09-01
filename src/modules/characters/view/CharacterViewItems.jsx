@@ -1,8 +1,9 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Button from '@mui/material/Button';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -52,7 +53,9 @@ const CharacterViewItems = ({ character, setCharacter }) => {
                 <TableCell align="right">{row.info.weight}</TableCell>
                 <TableCell align="right">{row.info.strength}</TableCell>
                 <TableCell align="right">
-                  <Button onClick={() => handleDelete(row.id)}>Delete</Button>
+                  <IconButton aria-label="delete" onClick={() => handleDelete(row.id)}>
+                    <DeleteIcon />
+                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}

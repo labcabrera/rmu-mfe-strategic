@@ -126,7 +126,7 @@ const CharacterViewInfo = ({ character, strategicGame, faction }) => {
           <TextField
             label={t('xp')}
             name="experience"
-            value={character.experience.xp}
+            value={new Intl.NumberFormat('en-EN').format(character.experience.xp)}
             readOnly
             fullWidth
             variant="standard"

@@ -17,6 +17,19 @@ export async function fetchFactions(rsql, page, size) {
   return pageContent.content;
 }
 
+export async function updateFaction(factionId, data) {
+  const url = `${process.env.RMU_API_STRATEGIC_URL}/factions/${factionId}`;
+  const response = await fetch(url, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (response.status != 200) {
+    throw new Error(`Error updating faction: ${response.statusText}. (${url})`);
+  }
+  return await response.json();
+}
+
 export async function deleteFaction(factionId) {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/factions/${factionId}`;
   const response = await fetch(url, { method: 'DELETE' });
