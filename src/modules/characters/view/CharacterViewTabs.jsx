@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import CharacterViewAttributes from './CharacterViewAttributes';
+import CharacterViewItems from './CharacterViewItems';
 import CharacterViewSkills from './CharacterViewSkills';
 
 function CustomTabPanel(props) {
@@ -55,7 +56,7 @@ const CharacterViewTabs = ({ character, setCharacter, strategicGame, faction, pr
           <CharacterViewSkills character={character} setCharacter={setCharacter} profession={profession} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={2}>
-          TODO
+          <CharacterViewItems character={character} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={3}>
           TODO
