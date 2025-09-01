@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useParams, useNavigate } from 'react-router-dom';
-import Button from '@mui/material/Button';
+import { useLocation, useParams } from 'react-router-dom';
+import Grid from '@mui/material/Grid';
 import { fetchStrategicGame } from '../../api/strategic-games';
 import StrategicGameViewActions from './StrategicGameViewActions';
 import StrategicGameViewAttributes from './StrategicGameViewAttributes';
 import StrategicGameViewFactions from './StrategicGameViewFactions';
 
 const StrategicGameView = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const { gameId } = useParams();
   const [strategicGame, setStrategicGame] = useState(location.state?.strategicGame || null);
@@ -35,10 +34,6 @@ const StrategicGameView = () => {
     }
   };
 
-  const handleCreateCharacter = () => {
-    navigate(`/strategic/characters/create?gameId=${strategicGame.id}`, { state: { strategicGame: strategicGame } });
-  };
-
   useEffect(() => {
     console.log('StrategicGameView useEffect - gameId:', gameId, ' strategicGame:', strategicGame);
     if (!strategicGame && gameId) {
@@ -53,11 +48,14 @@ const StrategicGameView = () => {
   return (
     <>
       <StrategicGameViewActions strategicGame={strategicGame} />
-      <StrategicGameViewAttributes strategicGame={strategicGame} realm={realm} />
-      <StrategicGameViewFactions strategicGame={strategicGame} />
-      <Button variant="outlined" onClick={() => handleCreateCharacter()}>
-        Add character
-      </Button>
+      <Grid container spacing={2}>
+        <Grid item size={6}>
+          <StrategicGameViewAttributes strategicGame={strategicGame} realm={realm} />
+        </Grid>
+        <Grid item size={6}>
+          <StrategicGameViewFactions strategicGame={strategicGame} />
+        </Grid>
+      </Grid>
     </>
   );
 };

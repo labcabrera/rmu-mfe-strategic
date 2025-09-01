@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
+import Grid from '@mui/material/Grid';
+import { fetchCharacters } from '../../api/characters';
 import { fetchFaction } from '../../api/factions';
 import { fetchStrategicGame } from '../../api/strategic-games';
+import SnackbarError from '../../shared/errors/SnackbarError';
 import FactionViewActions from './FactionViewActions';
 import FactionViewAttributes from './FactionViewAttributes';
 import FactionViewCharacters from './FactionViewCharacters';
@@ -11,6 +14,9 @@ const FactionView = () => {
   const { factionId } = useParams();
   const [faction, setFaction] = useState(location.state?.faction || null);
   const [strategicGame, setStrategicGame] = useState(null);
+  const [characters, setCharacters] = useState([]);
+  const [displayError, setDisplayError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const bindFaction = async (faction) => {
     setFaction(await fetchFaction(factionId));
@@ -25,6 +31,22 @@ const FactionView = () => {
     console.log('game ok ' + faction.gameId);
   };
 
+  const bindCharacters = () => {
+    console.log('Binding characters for faction:', faction.id);
+    fetchCharacters(`factionId==${faction.id}`, 0, 100)
+      .then((data) => setCharacters(data))
+      .catch((error) => {
+        setDisplayError(true);
+        setErrorMessage(`Error fetching characters: ${error.message}`);
+      });
+  };
+
+  useEffect(() => {
+    if (faction && faction.id) {
+      bindCharacters();
+    }
+  }, [faction]);
+
   useEffect(() => {
     if (!faction && factionId) {
       bindFaction(faction);
@@ -38,8 +60,15 @@ const FactionView = () => {
   return (
     <>
       <FactionViewActions faction={faction} />
-      <FactionViewAttributes faction={faction} setFaction={setFaction} strategicGame={strategicGame} />
-      <FactionViewCharacters faction={faction} />
+      <Grid container spacing={2}>
+        <Grid size={6}>
+          <FactionViewAttributes faction={faction} setFaction={setFaction} strategicGame={strategicGame} />
+        </Grid>
+        <Grid size={6}>
+          <FactionViewCharacters faction={faction} characters={characters} />
+        </Grid>
+      </Grid>
+      <SnackbarError open={displayError} message={errorMessage} onClose={() => setDisplayError(false)} />
       <pre>{JSON.stringify(faction, null, 2)}</pre>
     </>
   );

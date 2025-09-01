@@ -67,26 +67,26 @@ const FactionViewAttributes = ({ faction, setFaction, strategicGame }) => {
     <Grid container spacing={2} alignItems="center">
       <HeaderCategory i18nLabel="information" />
 
-      <InfoField i18n="game" value={strategicGame?.name} size={2} />
-      <Grid size={10}>
+      <InfoField i18n="game" value={strategicGame?.name} size={6} />
+      <Grid size={5}>
         <Box display="flex" gap={2}>
           <OptionButton onClick={() => handleOpenGame()} label="View" icon={<ArrowForwardIcon />} />
         </Box>
       </Grid>
 
-      <InfoField i18n="name" value={faction.name} size={2} />
-      <Grid size={10}></Grid>
+      <InfoField i18n="name" value={faction.name} size={6} />
+      <Grid size={4}></Grid>
 
-      <InfoField i18n="available-xp" value={faction.factionManagement.availableXP} size={2} />
-      <Grid size={10}>
+      <InfoField i18n="available-xp" value={faction.factionManagement.availableXP} size={6} />
+      <Grid size={4}>
         <Box display="flex" gap={2}>
           <OptionButton onClick={() => handleAddXP(10000)} label="10K" icon={<AddCircleOutlineIcon />} />
           <OptionButton onClick={() => handleAddXP(-10000)} label="10K" icon={<RemoveCircleOutlineIcon />} />
         </Box>
       </Grid>
 
-      <InfoField i18n="available-gold" value={faction.factionManagement.availableGold} size={2} />
-      <Grid size={10}>
+      <InfoField i18n="available-gold" value={faction.factionManagement.availableGold} size={6} />
+      <Grid size={4}>
         <Box display="flex" gap={2}>
           <OptionButton onClick={() => handleAddGold(1)} label="1G" icon={<AddCircleOutlineIcon />} />
           <OptionButton onClick={() => handleAddGold(-1)} label="1G" icon={<RemoveCircleOutlineIcon />} />

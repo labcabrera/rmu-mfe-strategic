@@ -5,7 +5,7 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
-const InfoField = ({ i18n, value, size = 2 }) => {
+const InfoField = ({ i18n, value, size = 4 }) => {
   const { t } = useTranslation();
 
   return (
@@ -39,10 +39,10 @@ const StrategicGameViewAttributes = ({ strategicGame, realm }) => {
           </Typography>
         </Grid>
 
-        <InfoField i18n="experience-multiplier" value={strategicGame.options.experienceMultiplier} size={1} />
-        <InfoField i18n="fatigue-multiplier" value={strategicGame.options.fatigueMultiplier} size={1} />
-        <InfoField i18n="board-scale-multiplier" value={strategicGame.options.boardScaleMultiplier} size={1} />
-        <InfoField i18n="letality" value={strategicGame.options.letality} size={1} />
+        <InfoField i18n="experience-multiplier" value={strategicGame.options.experienceMultiplier} size={2} />
+        <InfoField i18n="fatigue-multiplier" value={strategicGame.options.fatigueMultiplier} size={2} />
+        <InfoField i18n="board-scale-multiplier" value={strategicGame.options.boardScaleMultiplier} size={2} />
+        <InfoField i18n="letality" value={strategicGame.options.letality} size={2} />
 
         <Grid size={12}>
           <Typography variant="h6" color="primary">
@@ -50,11 +50,11 @@ const StrategicGameViewAttributes = ({ strategicGame, realm }) => {
           </Typography>
         </Grid>
 
-        <InfoField i18n="stat-random-min" value={strategicGame.powerLevel.statRandomMin} size={1} />
-        <InfoField i18n="stat-boost-potential" value={strategicGame.powerLevel.statBoostPotential} size={1} />
-        <InfoField i18n="stat-boost-temporary" value={strategicGame.powerLevel.statBoostTemporary} size={1} />
-        <InfoField i18n="stat-creation-boosts" value={strategicGame.powerLevel.statCreationBoost} size={1} />
-        <InfoField i18n="stat-creation-swaps" value={strategicGame.powerLevel.statCreationSwap} size={1} />
+        <InfoField i18n="stat-random-min" value={strategicGame.powerLevel.statRandomMin} size={2} />
+        <InfoField i18n="stat-boost-potential" value={strategicGame.powerLevel.statBoostPotential} size={2} />
+        <InfoField i18n="stat-boost-temporary" value={strategicGame.powerLevel.statBoostTemporary} size={2} />
+        <InfoField i18n="stat-creation-boosts" value={strategicGame.powerLevel.statCreationBoost} size={2} />
+        <InfoField i18n="stat-creation-swaps" value={strategicGame.powerLevel.statCreationSwap} size={2} />
 
         {strategicGame && strategicGame.description && <InfoField i18n="description" value={strategicGame.description} size={12} />}
       </Grid>
