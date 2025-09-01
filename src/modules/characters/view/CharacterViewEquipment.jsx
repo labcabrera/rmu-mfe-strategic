@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -12,13 +13,14 @@ import Typography from '@mui/material/Typography';
 import { equipItem } from '../../api/characters';
 
 const EquipmentSlot = ({ character, setCharacter, slot, itemId }) => {
+  const { t } = useTranslation();
   const item = character.equipment[slot] ? character.items.find((e) => e.id === itemId) : null;
 
   const getSlotOptions = (character, slot) => {
     if (slot === 'mainHand') {
       return character.items.filter((e) => e.category === 'weapon');
     } else if (slot === 'offHand') {
-      return character.items.filter((e) => e.category === 'shield' || e.category === 'weapon');
+      return character.items.filter((e) => e.category === 'shield' || (e.category === 'weapon' && e.weapon && e.weapon.requiredHands < 2));
     } else if (slot === 'body') {
       return character.items.filter((e) => e.category === 'armor');
     }
@@ -27,7 +29,6 @@ const EquipmentSlot = ({ character, setCharacter, slot, itemId }) => {
 
   const handleEquipmentChange = (event) => {
     const newItemId = event.target.value;
-    console.log(`Change ${slot} to: ${newItemId}`);
     equipItem(character.id, slot, newItemId)
       .then((data) => setCharacter(data))
       .catch((err) => console.error(err));
@@ -39,7 +40,7 @@ const EquipmentSlot = ({ character, setCharacter, slot, itemId }) => {
         <CardMedia sx={{ height: 200 }} image={`/static/images/items/placeholder.png`} title={`No item equipped`} />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            {slot}
+            {t(slot)}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             No item equipped
@@ -64,10 +65,20 @@ const EquipmentSlot = ({ character, setCharacter, slot, itemId }) => {
       <CardMedia sx={{ height: 200 }} image={`/static/images/items/${item.itemTypeId}.png`} title={item.name} />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
-          {slot}
+          {t(slot)}
         </Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           {item.itemTypeId}
+          {item.weapon && (
+            <>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                {item.weapon.skillId}
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                Fumble: {item.weapon.fumble}
+              </Typography>
+            </>
+          )}
         </Typography>
       </CardContent>
       <CardActions>

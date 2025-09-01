@@ -144,6 +144,18 @@ export async function addItem(characterId, data) {
   return await response.json();
 }
 
+export async function deleteItem(characterId, itemId) {
+  const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/items/${itemId}`;
+  const response = await fetch(url, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (response.status != 200) {
+    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+  }
+  return await response.json();
+}
+
 export async function equipItem(characterId, slot, itemId) {
   const request = { slot: slot, itemId: itemId };
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/equipment`;
