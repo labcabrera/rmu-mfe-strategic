@@ -131,10 +131,14 @@ export async function setUpProfessionalSkill(characterId, skillId) {
   return await response.json();
 }
 
-export async function fetchCharacterSizes() {
-  const url = `${process.env.RMU_API_CORE_URL}/character-sizes`;
-  const response = await fetch(url, { method: 'GET' });
-  if (response.status != 200) {
+export async function addItem(characterId, data) {
+  const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/items`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (response.status != 201) {
     throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
   }
   return await response.json();
@@ -142,12 +146,22 @@ export async function fetchCharacterSizes() {
 
 export async function equipItem(characterId, slot, itemId) {
   const request = { slot: slot, itemId: itemId };
-  const url = `${process.env.RMU_API_CORE_URL}/characters/${characterId}/equipment`;
+  const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/equipment`;
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(request),
   });
+  if (response.status != 201) {
+    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+  }
+  return await response.json();
+}
+
+//TODO move
+export async function fetchCharacterSizes() {
+  const url = `${process.env.RMU_API_CORE_URL}/character-sizes`;
+  const response = await fetch(url, { method: 'GET' });
   if (response.status != 200) {
     throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
   }

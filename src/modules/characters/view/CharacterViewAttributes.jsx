@@ -8,6 +8,7 @@ import CharacterViewStats from './CharacterViewStats';
 
 const CharacterViewAttributes = ({ character, faction, strategicGame }) => {
   const { t } = useTranslation();
+
   return (
     <>
       <Grid container spacing={10}>

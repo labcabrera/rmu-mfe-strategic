@@ -7,6 +7,7 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import CharacterViewAddItem from './CharacterViewAddItem';
 import CharacterViewEquipment from './CharacterViewEquipment';
 
 const CharacterViewItems = ({ character, setCharacter }) => {
@@ -44,7 +45,10 @@ const CharacterViewItems = ({ character, setCharacter }) => {
           </TableBody>
         </Table>
       </Grid>
-      <pre>{JSON.stringify(character.items, null, 2)}</pre>
+
+      <CharacterViewAddItem character={character} setCharacter={setCharacter} />
+
+      {/* <pre>{JSON.stringify(character.items, null, 2)}</pre> */}
     </>
   );
 };

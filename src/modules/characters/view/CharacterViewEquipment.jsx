@@ -12,11 +12,15 @@ import Typography from '@mui/material/Typography';
 import { equipItem } from '../../api/characters';
 
 const EquipmentSlot = ({ character, setCharacter, slot, itemId }) => {
-  const item = character.items.find((item) => item.id === itemId);
+  const item = character.equipment[slot] ? character.items.find((e) => e.id === itemId) : null;
 
   const getSlotOptions = (character, slot) => {
     if (slot === 'mainHand') {
-      return character.items.filter((item) => item.category === 'weapon');
+      return character.items.filter((e) => e.category === 'weapon');
+    } else if (slot === 'offHand') {
+      return character.items.filter((e) => e.category === 'shield' || e.category === 'weapon');
+    } else if (slot === 'body') {
+      return character.items.filter((e) => e.category === 'armor');
     }
     return [];
   };
@@ -29,9 +33,9 @@ const EquipmentSlot = ({ character, setCharacter, slot, itemId }) => {
       .catch((err) => console.error(err));
   };
 
-  if (item == null) {
+  if (!item) {
     return (
-      <Card sx={{ maxWidth: 400, minWidth: 280 }}>
+      <Card sx={{ maxWidth: 300, minWidth: 300 }}>
         <CardMedia sx={{ height: 200 }} image={`/static/images/items/placeholder.png`} title={`No item equipped`} />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
@@ -43,7 +47,7 @@ const EquipmentSlot = ({ character, setCharacter, slot, itemId }) => {
         </CardContent>
         <CardActions>
           {getSlotOptions(character, slot).length > 0 && (
-            <Select value={item.itemTypeId} onChange={(e) => console.log(`Change item type to: ${e.target.value}`)}>
+            <Select onChange={(e) => handleEquipmentChange(e)} variant="standard">
               {getSlotOptions(character, slot).map((option) => (
                 <MenuItem key={option.id} value={option.id}>
                   {option.name}
@@ -56,7 +60,7 @@ const EquipmentSlot = ({ character, setCharacter, slot, itemId }) => {
     );
   }
   return (
-    <Card sx={{ maxWidth: 400, minWidth: 300 }}>
+    <Card sx={{ maxWidth: 300, minWidth: 300 }}>
       <CardMedia sx={{ height: 200 }} image={`/static/images/items/${item.itemTypeId}.png`} title={item.name} />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
@@ -69,7 +73,7 @@ const EquipmentSlot = ({ character, setCharacter, slot, itemId }) => {
       <CardActions>
         <Button size="small">Unequip</Button>
         {getSlotOptions(character, slot).length > 0 && (
-          <Select value={item.itemTypeId} onChange={(e) => handleEquipmentChange(e)}>
+          <Select value={character.equipment[slot]} onChange={(e) => handleEquipmentChange(e)} variant="standard">
             {getSlotOptions(character, slot).map((option) => (
               <MenuItem key={option.id} value={option.id} selected={option.id === character.equipment[slot]}>
                 {option.name}
@@ -84,19 +88,12 @@ const EquipmentSlot = ({ character, setCharacter, slot, itemId }) => {
 
 const CharacterViewEquipment = ({ character, setCharacter }) => {
   return (
-    <>
-      <Grid container spacing={2}>
-        <EquipmentSlot character={character} setCharacter={setCharacter} slot="mainHand" itemId={character.equipment.mainHand} />
-        <EquipmentSlot character={character} setCharacter={setCharacter} slot="offHand" itemId={character.equipment.offHand} />
-        <EquipmentSlot character={character} setCharacter={setCharacter} slot="body" itemId={character.equipment.body} />
-        <EquipmentSlot character={character} setCharacter={setCharacter} slot="head" itemId={character.equipment.head} />
-        {/* <EquipmentSlot character={character} slot="head" itemId={character.equipment.head} />
-        <EquipmentSlot character={character} slot="chest" itemId={character.equipment.chest} />
-        <EquipmentSlot character={character} slot="legs" itemId={character.equipment.legs} />
-        <EquipmentSlot character={character} slot="feet" itemId={character.equipment.feet} /> */}
-      </Grid>
-      <pre>{JSON.stringify(character.equipment, null, 2)}</pre>
-    </>
+    <Grid container spacing={2}>
+      <EquipmentSlot character={character} setCharacter={setCharacter} slot="mainHand" itemId={character.equipment.mainHand} />
+      <EquipmentSlot character={character} setCharacter={setCharacter} slot="offHand" itemId={character.equipment.offHand} />
+      <EquipmentSlot character={character} setCharacter={setCharacter} slot="body" itemId={character.equipment.body} />
+      <EquipmentSlot character={character} setCharacter={setCharacter} slot="head" itemId={character.equipment.head} />
+    </Grid>
   );
 };
 
