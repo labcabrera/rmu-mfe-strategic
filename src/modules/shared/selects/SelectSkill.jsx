@@ -34,7 +34,7 @@ const SelectSkill = ({ value, onChange, readonly = false, required = true }) => 
       select
       label={t('skill')}
       value={value === undefined || value === null || skills.length === 0 ? '' : value}
-      variant="outlined"
+      variant="standard"
       readOnly={readonly}
       required={required}
       fullWidth

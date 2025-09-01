@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Avatar from '@mui/material/Avatar';
+import ShieldIcon from '@mui/icons-material/Shield';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 
@@ -14,7 +14,7 @@ const DefenseTextField = ({ value, onChange, i18nLabel = 'defensive-bonus', disa
       value={value}
       disabled={disabled}
       fullWidth
-      variant="outlined"
+      variant="standard"
       onChange={onChange}
       sx={{
         '& .MuiInputBase-input': {
@@ -25,7 +25,7 @@ const DefenseTextField = ({ value, onChange, i18nLabel = 'defensive-bonus', disa
         input: {
           startAdornment: (
             <InputAdornment position="start">
-              <Avatar src="/static/images/generic/shield.png" sx={{ width: 25, height: 25 }} />
+              <ShieldIcon />
             </InputAdornment>
           ),
         },

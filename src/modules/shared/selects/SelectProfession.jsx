@@ -28,14 +28,14 @@ const SelectProfession = ({ value, onChange }) => {
       select
       label={t('profession')}
       value={value === undefined || value === null || professions.length === 0 ? '' : value}
-      variant="outlined"
+      variant="standard"
       required
       fullWidth
       onChange={handleProfessionChange}
     >
       {professions.map((option) => (
         <MenuItem key={option.id} value={option.id}>
-          {option.id}
+          {t(option.id)}
         </MenuItem>
       ))}
     </TextField>

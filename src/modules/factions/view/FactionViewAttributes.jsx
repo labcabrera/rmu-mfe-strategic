@@ -66,14 +66,16 @@ const FactionViewAttributes = ({ faction, setFaction, strategicGame }) => {
           variant="standard"
           fullWidth
           value={strategicGame?.name || ''}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton edge="end" onClick={() => handleOpenGame()}>
-                  <ArrowForwardIcon />
-                </IconButton>
-              </InputAdornment>
-            ),
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton edge="end" onClick={handleOpenGame}>
+                    <ArrowForwardIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
           }}
         />
       </Grid>

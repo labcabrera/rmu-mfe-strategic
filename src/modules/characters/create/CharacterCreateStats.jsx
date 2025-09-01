@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React, { useState } from 'react';
-import Button from '@mui/material/Button';
+import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
-import { getStatBonus } from '../../services/stat-service';
+import Typography from '@mui/material/Typography';
 import CharacterCreateStatsActions from './CharacterCreateStatsActions';
 
 const CharacterStats = ({ statKey, statName, formData, setFormData, statBonusFormData }) => {
@@ -52,9 +52,8 @@ const CharacterStats = ({ statKey, statName, formData, setFormData, statBonusFor
       <Grid item size={2}>
         <TextField
           label="Potential"
-          variant="outlined"
+          variant="standard"
           name={statKey}
-          type="number"
           value={formData.statistics[statKey].potential}
           fullWidth
           onChange={onChangePotential}
@@ -63,28 +62,65 @@ const CharacterStats = ({ statKey, statName, formData, setFormData, statBonusFor
       <Grid item size={2}>
         <TextField
           label="Temporary"
-          variant="outlined"
+          variant="standard"
           name={statKey}
-          type="number"
           value={formData.statistics[statKey].temporary}
           fullWidth
           onChange={onChangeTemporary}
         />
       </Grid>
       <Grid item size={2}>
-        <TextField label="Racial Bonus" variant="outlined" name={statKey} value={formData.statistics[statKey].racial} fullWidth />
+        <TextField
+          label="Racial Bonus"
+          variant="standard"
+          name={statKey}
+          value={formData.statistics[statKey].racial}
+          fullWidth
+          sx={{
+            '& .MuiInputBase-input': {
+              color: formData.statistics[statKey].racial < 0 ? '#ffab91' : formData.statistics[statKey].racial > 0 ? '#a5d6a7' : 'white',
+              textAlign: 'right',
+            },
+          }}
+        />
       </Grid>
       <Grid item size={2}>
-        <TextField label="Potential Bonus" variant="outlined" name={statKey} value={statBonusFormData[statKey].potential} fullWidth />
+        <TextField
+          label="Potential Bonus"
+          variant="standard"
+          name={statKey}
+          value={statBonusFormData[statKey].potential}
+          fullWidth
+          sx={{
+            '& .MuiInputBase-input': {
+              color: statBonusFormData[statKey].potential < 0 ? '#ffab91' : statBonusFormData[statKey].potential > 0 ? '#a5d6a7' : 'white',
+              textAlign: 'right',
+            },
+          }}
+        />
       </Grid>
       <Grid item size={2}>
-        <TextField label="Temporary Bonus" variant="outlined" name="ag" value={statBonusFormData[statKey].temporary} readonly />
+        <TextField
+          label="Temporary Bonus"
+          variant="standard"
+          name="ag"
+          value={statBonusFormData[statKey].temporary}
+          readonly
+          sx={{
+            '& .MuiInputBase-input': {
+              color: statBonusFormData[statKey].temporary < 0 ? '#ffab91' : statBonusFormData[statKey].temporary > 0 ? '#a5d6a7' : 'white',
+              textAlign: 'right',
+            },
+          }}
+        />
       </Grid>
     </>
   );
 };
 
 const CharacterCreateStats = ({ strategicGame, formData, setFormData }) => {
+  const { t } = useTranslation();
+
   const [statBonusFormData, setStatBonusFormData] = useState({
     ag: { potential: 0, temporary: 0 },
     co: { potential: 0, temporary: 0 },
@@ -102,7 +138,9 @@ const CharacterCreateStats = ({ strategicGame, formData, setFormData }) => {
     <>
       <Grid container spacing={2} sx={{ marginTop: 2 }}>
         <Grid size={12}>
-          <h3>Stats</h3>
+          <Typography variant="h6" color="primary">
+            {t('statistics')}
+          </Typography>
         </Grid>
         <Grid size={6}>
           <Grid container spacing={2} sx={{ marginTop: 2 }}>

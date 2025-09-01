@@ -7,13 +7,15 @@ import CharacterViewInfo from './CharacterViewInfo';
 import CharacterViewSkills from './CharacterViewSkills';
 import CharacterViewStats from './CharacterViewStats';
 
-const CharacterViewAttributes = ({ character, setCharacter, faction, profession }) => {
+const CharacterViewAttributes = ({ character, setCharacter, faction, profession, strategicGame }) => {
   const { t } = useTranslation();
   return (
     <>
-      <CharacterViewInfo character={character} faction={faction} />
-      <Grid container spacing={2}>
-        <Grid item size={4}>
+      <Grid container spacing={10}>
+        <Grid item size={6}>
+          <CharacterViewInfo character={character} faction={faction} strategicGame={strategicGame} />
+        </Grid>
+        <Grid item size={6}>
           <CharacterViewStats character={character} />
         </Grid>
       </Grid>

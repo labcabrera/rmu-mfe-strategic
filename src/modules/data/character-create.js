@@ -3,7 +3,7 @@ export const characterCreateTemplate = {
   gameId: '',
   factionId: '',
   info: {
-    level: 0,
+    level: 1,
     race: '',
     professionId: '',
     height: 7,
@@ -47,7 +47,7 @@ export const characterCreateTemplate = {
     qu: {
       potential: 50,
       temporary: 50,
-      racial: 1,
+      racial: 0,
     },
     re: {
       potential: 50,

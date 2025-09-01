@@ -15,7 +15,7 @@ const MovementTextField = ({ value, onChange, i18nLabel = 'movement', disabled =
       onChange={onChange}
       disabled={disabled}
       required={required}
-      variant="outlined"
+      variant="standard"
       fullWidth
       sx={{
         '& .MuiInputBase-input': {

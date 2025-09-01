@@ -63,7 +63,13 @@ const CharacterView = () => {
   return (
     <>
       <CharacterViewActions character={character} />
-      <CharacterViewAttributes character={character} setCharacter={setCharacter} faction={faction} profession={profession} />
+      <CharacterViewAttributes
+        character={character}
+        setCharacter={setCharacter}
+        faction={faction}
+        profession={profession}
+        strategicGame={strategicGame}
+      />
       <SnackbarError errorMessage={errorMessage} displayError={displayError} setDisplayError={setDisplayError} />
       <pre>Character: {JSON.stringify(character, null, 2)}</pre>
       <pre>Profession: {JSON.stringify(profession, null, 2)}</pre>

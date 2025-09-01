@@ -19,7 +19,7 @@ const SelectLevel = ({ value, onChange, required = false }) => {
       id="select-level"
       value={value === undefined || value === null || levels.length === 0 ? '' : value}
       required={required}
-      variant="outlined"
+      variant="standard"
       fullWidth
       onChange={handleLevelChange}
       slotProps={{

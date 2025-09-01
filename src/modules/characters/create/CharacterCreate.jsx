@@ -37,7 +37,6 @@ const CharacterCreate = () => {
 
   useEffect(() => {
     if (factionId) {
-      // bindStrategicGame();
       setFormData((prevState) => ({
         ...prevState,
         factionId: factionId,

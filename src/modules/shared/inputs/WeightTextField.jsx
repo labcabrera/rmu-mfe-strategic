@@ -11,7 +11,7 @@ const WeightTextField = ({ value, onChange, readOnly = false }) => {
   return (
     <TextField
       label={t('weight')}
-      variant="outlined"
+      variant="standard"
       fullWidth
       value={value}
       onChange={onChange}
