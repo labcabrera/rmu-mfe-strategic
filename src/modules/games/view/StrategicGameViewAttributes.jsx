@@ -5,17 +5,10 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
-const InfoSection = ({ label, value, labelSize = 2, valueSize = 1 }) => (
+const InfoSection = ({ label, value, size = 2 }) => (
   <>
-    <Grid item size={labelSize}>
-      <Typography variant="body1" color="textSecondary">
-        {label}:
-      </Typography>
-    </Grid>
-    <Grid item size={valueSize}>
-      <Typography variant="body1" color="textPrimary">
-        {value}
-      </Typography>
+    <Grid item size={size}>
+      <TextField label={label} variant="standard" value={value} fullWidth />
     </Grid>
   </>
 );
@@ -34,9 +27,9 @@ const StrategicGameViewAttributes = ({ strategicGame, realm }) => {
           </Typography>
         </Grid>
 
-        <InfoSection label={t('name')} value={strategicGame.name} valueSize={10} />
-        <InfoSection label={t('realm')} value={realm?.name || ''} valueSize={10} />
-        <InfoSection label={t('status')} value={t(`status-${strategicGame.status}`)} valueSize={10} />
+        <InfoSection label={t('name')} value={strategicGame.name} />
+        <InfoSection label={t('realm')} value={realm?.name || ''} />
+        <InfoSection label={t('status')} value={t(`status-${strategicGame.status}`)} />
 
         <Grid size={12}>
           <Typography variant="h6" color="primary">
@@ -44,10 +37,10 @@ const StrategicGameViewAttributes = ({ strategicGame, realm }) => {
           </Typography>
         </Grid>
 
-        <InfoSection label={t('experience-multiplier')} value={strategicGame.options.experienceMultiplier} valueSize={10} />
-        <InfoSection label={t('fatigue-multiplier')} value={strategicGame.options.fatigueMultiplier} valueSize={10} />
-        <InfoSection label={t('board-scale-multiplier')} value={strategicGame.options.boardScaleMultiplier} valueSize={10} />
-        <InfoSection label={t('letality')} value={strategicGame.options.letality} valueSize={10} />
+        <InfoSection label={t('experience-multiplier')} value={strategicGame.options.experienceMultiplier} size={1} />
+        <InfoSection label={t('fatigue-multiplier')} value={strategicGame.options.fatigueMultiplier} size={1} />
+        <InfoSection label={t('board-scale-multiplier')} value={strategicGame.options.boardScaleMultiplier} size={1} />
+        <InfoSection label={t('letality')} value={strategicGame.options.letality} size={1} />
 
         <Grid size={12}>
           <Typography variant="h6" color="primary">
@@ -55,13 +48,13 @@ const StrategicGameViewAttributes = ({ strategicGame, realm }) => {
           </Typography>
         </Grid>
 
-        <InfoSection label={t('stat-random-min')} value={strategicGame.powerLevel.statRandomMin} valueSize={10} />
-        <InfoSection label={t('stat-boost-potential')} value={strategicGame.powerLevel.statBoostPotential} valueSize={10} />
-        <InfoSection label={t('stat-boost-temporary')} value={strategicGame.powerLevel.statBoostTemporary} valueSize={10} />
-        <InfoSection label={t('stat-creation-boosts')} value={strategicGame.powerLevel.statCreationBoost} valueSize={10} />
-        <InfoSection label={t('stat-creation-swaps')} value={strategicGame.powerLevel.statCreationSwap} valueSize={10} />
+        <InfoSection label={t('stat-random-min')} value={strategicGame.powerLevel.statRandomMin} size={1} />
+        <InfoSection label={t('stat-boost-potential')} value={strategicGame.powerLevel.statBoostPotential} size={1} />
+        <InfoSection label={t('stat-boost-temporary')} value={strategicGame.powerLevel.statBoostTemporary} size={1} />
+        <InfoSection label={t('stat-creation-boosts')} value={strategicGame.powerLevel.statCreationBoost} size={1} />
+        <InfoSection label={t('stat-creation-swaps')} value={strategicGame.powerLevel.statCreationSwap} size={1} />
 
-        {strategicGame && strategicGame.description && <InfoSection label={t('description')} value={strategicGame.description} valueSize={10} />}
+        {strategicGame && strategicGame.description && <InfoSection label={t('description')} value={strategicGame.description} size={12} />}
       </Grid>
     </>
   );

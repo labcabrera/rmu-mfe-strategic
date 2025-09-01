@@ -1,5 +1,6 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
+import Box from '@mui/material/Box';
 import './i18n';
 import './index.css';
 import CharacterCreate from './modules/characters/create/CharacterCreate';
@@ -24,21 +25,23 @@ const NotFound = () => (
 
 const App = () => {
   return (
-    <Routes>
-      <Route path="/" element={<StrategicGameList />} />
-      <Route path="/games" element={<StrategicGameList />} />
-      <Route path="/games/view/:gameId" element={<StrategicGameView />} />
-      <Route path="/games/edit/:gameId" element={<StrategicGameEdit />} />
-      <Route path="/games/create" element={<StrategicGameCreate />} />
-      <Route path="/factions" element={<FactionList />} />
-      <Route path="/factions/view/:factionId" element={<FactionView />} />
-      <Route path="/factions/create" element={<FactionCreate />} />
-      <Route path="/characters" element={<CharacterList />} />
-      <Route path="/characters/view/:characterId" element={<CharacterView />} />
-      <Route path="/characters/create" element={<CharacterCreate />} />
-      <Route path="/characters/edit/:characterId" element={<CharacterUpdate />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <Box sx={{ p: 5 }}>
+      <Routes>
+        <Route path="/" element={<StrategicGameList />} />
+        <Route path="/games" element={<StrategicGameList />} />
+        <Route path="/games/view/:gameId" element={<StrategicGameView />} />
+        <Route path="/games/edit/:gameId" element={<StrategicGameEdit />} />
+        <Route path="/games/create" element={<StrategicGameCreate />} />
+        <Route path="/factions" element={<FactionList />} />
+        <Route path="/factions/view/:factionId" element={<FactionView />} />
+        <Route path="/factions/create" element={<FactionCreate />} />
+        <Route path="/characters" element={<CharacterList />} />
+        <Route path="/characters/view/:characterId" element={<CharacterView />} />
+        <Route path="/characters/create" element={<CharacterCreate />} />
+        <Route path="/characters/edit/:characterId" element={<CharacterUpdate />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Box>
   );
 };
 
