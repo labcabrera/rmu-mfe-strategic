@@ -11,12 +11,17 @@ const StrideTextField = ({ value, onChange, i18nLabel = 'stride', disabled = fal
   return (
     <TextField
       label={t(i18nLabel)}
-      variant="outlined"
+      variant="standard"
       fullWidth
       value={value}
       onChange={onChange}
       required={required}
       disabled={disabled}
+      sx={{
+        '& .MuiInputBase-input': {
+          textAlign: 'right',
+        },
+      }}
       slotProps={{
         input: {
           startAdornment: (

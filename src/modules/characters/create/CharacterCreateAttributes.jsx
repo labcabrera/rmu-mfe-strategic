@@ -4,11 +4,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import HeightTextField from '../../shared/input/HeightTextField';
-import InitiativeTextField from '../../shared/input/InitiativeTextField';
-import MovementTextField from '../../shared/input/MovementTextField';
-import NameTextField from '../../shared/input/NameTextField';
-import WeightTextField from '../../shared/input/WeightTextField';
+import Typography from '@mui/material/Typography';
+import HeightTextField from '../../shared/inputs/HeightTextField';
+import NameTextField from '../../shared/inputs/NameTextField';
+import WeightTextField from '../../shared/inputs/WeightTextField';
 import SelectFaction from '../../shared/selects/SelectFaction';
 import SelectGame from '../../shared/selects/SelectGame';
 import SelectLevel from '../../shared/selects/SelectLevel';
@@ -17,17 +16,16 @@ import SelectRace from '../../shared/selects/SelectRace';
 import GameCreateStats from './CharacterCreateStats';
 
 const CharacterCreateAttributes = ({ strategicGame, formData, setFormData }) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const onRaceChange = (raceId, raceInfo) => {
     if (raceInfo) {
       console.log('Race changed:', raceId, raceInfo);
-      //TODO
-      // const stats = { ...formData.statistics };
-      // const keys = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
-      // keys.forEach((key) => {
-      //   stats[key].racial = raceInfo.defaultStatBonus[key];
-      // });
+      const stats = { ...formData.statistics };
+      const keys = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
+      keys.forEach((key) => {
+        stats[key].racial = raceInfo.defaultStatBonus[key];
+      });
       setFormData((prevState) => ({
         ...prevState,
         info: {
@@ -41,7 +39,7 @@ const CharacterCreateAttributes = ({ strategicGame, formData, setFormData }) => 
           ...prevState.movement,
           strideRacialBonus: raceInfo.strideBonus,
         },
-        // statistics: stats,
+        statistics: stats,
       }));
     }
   };
@@ -74,8 +72,6 @@ const CharacterCreateAttributes = ({ strategicGame, formData, setFormData }) => 
     }
   };
 
-  const handleInitiativeCustomBonusChange = (e) => updateFormData('initiative', 'customBonus', e.target.value ? parseInt(e.target.value) : 0);
-  const handleStrideBonusChange = (e) => updateFormData('movement', 'strideBonus', e.target.value ? parseInt(e.target.value) : 0);
   const handleHeightChange = (e) => updateFormData('info', 'height', e.target.value ? parseInt(e.target.value) : 0);
   const handleWeightChange = (e) => updateFormData('info', 'weight', e.target.value ? parseInt(e.target.value) : 0);
 
@@ -100,45 +96,48 @@ const CharacterCreateAttributes = ({ strategicGame, formData, setFormData }) => 
   return (
     <>
       <Grid container spacing={2}>
-        {/* {!formData.gameId ? ( */}
-        <Grid item size={4}>
+        <Grid size={12}>
+          <Typography variant="h6" color="primary">
+            {t('information')}
+          </Typography>
+        </Grid>
+
+        <Grid item size={3}>
           <SelectGame value={formData.gameId} onChange={onGameChange} />
         </Grid>
-        {/* ) : null} */}
-        <Grid item size={4}>
-          <NameTextField value={formData.name} onChange={onNameChange} generateRandom={true} generateRandomRaceValue={formData.info.race} />
-        </Grid>
-        <Grid item size={4}>
-          <SelectRace value={formData.info.race} onChange={onRaceChange} />
-        </Grid>
-        <Grid item size={4}>
-          <SelectProfession value={formData.info.professionId} onChange={onProfessionChange} />
-        </Grid>
-        <Grid item size={4}>
+        <Grid item size={3}>
           <SelectFaction value={formData.factionId} onChange={onFactionChange} />
         </Grid>
-        <Grid item size={4}>
+        <Grid item size={6}></Grid>
+
+        <Grid item size={3}>
+          <SelectRace value={formData.info.race} onChange={onRaceChange} />
+        </Grid>
+        <Grid item size={3}>
+          <SelectProfession value={formData.info.professionId} onChange={onProfessionChange} />
+        </Grid>
+        <Grid item size={6}></Grid>
+
+        <Grid item size={3}>
+          <NameTextField value={formData.name} onChange={onNameChange} generateRandom={true} generateRandomRaceValue={formData.info.race} />
+        </Grid>
+        <Grid item size={3}>
           <SelectLevel value={formData.info.level} onChange={onLevelChange} />
         </Grid>
-        <Grid item size={4}>
+        <Grid item size={6}></Grid>
+
+        <Grid item size={3}>
           <HeightTextField value={formData.info.height} onChange={handleHeightChange} />
         </Grid>
-        <Grid item size={4}>
+        <Grid item size={3}>
           <WeightTextField value={formData.info.weight} onChange={handleWeightChange} />
         </Grid>
-        <Grid item size={4}>
-          <MovementTextField i18nLabel="stride-custom-bonus" value={formData.movement.strideCustomBonus} onChange={handleStrideBonusChange} />
-        </Grid>
-        <Grid item size={4}>
-          <MovementTextField i18nLabel="stride-racial-bonus" value={formData.movement.strideRacialBonus} disabled />
-        </Grid>
-        <Grid item size={4}>
-          <InitiativeTextField value={formData.initiative.customBonus} onChange={handleInitiativeCustomBonusChange} />
-        </Grid>
-        <Grid item size={12}>
+        <Grid item size={6}></Grid>
+
+        <Grid item size={6}>
           <TextField
             label="Description"
-            variant="outlined"
+            variant="standard"
             name="description"
             value={formData.description}
             onChange={handleChange}

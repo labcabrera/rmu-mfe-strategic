@@ -28,7 +28,7 @@ const SelectFaction = ({ value, onChange }) => {
       select
       label={t('faction')}
       value={value === undefined || value === null || factions.length === 0 ? '' : value}
-      variant="outlined"
+      variant="standard"
       required
       fullWidth
       onChange={handleFactionChange}

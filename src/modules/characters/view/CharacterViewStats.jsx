@@ -12,16 +12,67 @@ const CharacterViewStatsEntry = ({ statKey, statName, character: character }) =>
         {statName}
       </Grid>
       <Grid item size={2}>
-        <TextField label="Potential" variant="outlined" name={statKey} readonly value={character.statistics[statKey].potential} fullWidth />
+        <TextField
+          label="Potential"
+          variant="standard"
+          name={statKey}
+          value={character.statistics[statKey].potential}
+          readonly
+          fullWidth
+          sx={{
+            '& .MuiInputBase-input': {
+              textAlign: 'right',
+            },
+          }}
+        />
       </Grid>
       <Grid item size={2}>
-        <TextField label="Temporary" variant="outlined" name={statKey} readonly value={character.statistics[statKey].temporary} fullWidth />
+        <TextField
+          label="Temporary"
+          variant="standard"
+          name={statKey}
+          value={character.statistics[statKey].temporary}
+          readonly
+          fullWidth
+          sx={{
+            '& .MuiInputBase-input': {
+              textAlign: 'right',
+            },
+          }}
+        />
       </Grid>
       <Grid item size={2}>
-        <TextField label="Racial Bonus" variant="outlined" name={statKey} readonly value={character.statistics[statKey].racial} fullWidth />
+        <TextField
+          label="Racial Bonus"
+          variant="standard"
+          name={statKey}
+          value={character.statistics[statKey].racial}
+          readonly
+          fullWidth
+          sx={{
+            '& .MuiInputBase-input': {
+              color: character.statistics[statKey].racial < 0 ? '#ffab91' : character.statistics[statKey].racial > 0 ? '#a5d6a7' : 'white',
+              textAlign: 'right',
+            },
+          }}
+        />
       </Grid>
       <Grid item size={2}>
-        <TextField label="Bonus" variant="outlined" name={statKey} readonly value={character.statistics[statKey].bonus} fullWidth />
+        <TextField
+          label="Bonus"
+          variant="standard"
+          name={statKey}
+          readonly
+          value={character.statistics[statKey].bonus}
+          fullWidth
+          sx={{
+            '& .MuiInputBase-input': {
+              color: character.statistics[statKey].bonus < 0 ? '#ffab91' : character.statistics[statKey].bonus > 0 ? '#a5d6a7' : 'white',
+              fontWeight: 'bold',
+              textAlign: 'right',
+            },
+          }}
+        />
       </Grid>
       <Grid item size={2}></Grid>
     </>
@@ -34,7 +85,7 @@ const CharacterViewStats = ({ character }) => {
     <>
       <Grid container spacing={2} sx={{ marginTop: 2 }}>
         <Grid size={12}>
-          <Typography color="secondary" variant="h5">
+          <Typography color="secondary" variant="h6">
             {t('stats')}
           </Typography>
         </Grid>

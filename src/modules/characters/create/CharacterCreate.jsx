@@ -9,6 +9,7 @@ import CharacterCreateAttributes from './CharacterCreateAttributes';
 const CharacterCreate = () => {
   const [searchParams] = useSearchParams();
   const gameId = searchParams.get('gameId');
+  const factionId = searchParams.get('factionId');
   const [strategicGame, setStrategicGame] = useState(null);
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -33,6 +34,15 @@ const CharacterCreate = () => {
       }));
     }
   }, [gameId]);
+
+  useEffect(() => {
+    if (factionId) {
+      setFormData((prevState) => ({
+        ...prevState,
+        factionId: factionId,
+      }));
+    }
+  }, [factionId]);
 
   return (
     <>

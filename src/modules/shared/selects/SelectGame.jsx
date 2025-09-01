@@ -32,7 +32,7 @@ const SelectGame = ({ value, onChange, readonly = false, required = true }) => {
       select
       label={t('game')}
       value={value === undefined || value === null || games.length === 0 ? '' : value}
-      variant="outlined"
+      variant="standard"
       readOnly={readonly}
       required={required}
       fullWidth

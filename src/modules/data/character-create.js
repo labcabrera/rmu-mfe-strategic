@@ -3,7 +3,7 @@ export const characterCreateTemplate = {
   gameId: '',
   factionId: '',
   info: {
-    level: 0,
+    level: 1,
     race: '',
     professionId: '',
     height: 7,
@@ -47,7 +47,7 @@ export const characterCreateTemplate = {
     qu: {
       potential: 50,
       temporary: 50,
-      racial: 1,
+      racial: 0,
     },
     re: {
       potential: 50,
@@ -80,31 +80,49 @@ export const characterCreateTemplate = {
   },
   skills: [
     {
+      skillId: 'body-development',
+      ranks: 0,
+    },
+    {
+      skillId: 'melee-weapon@blade',
+      ranks: 0,
+    },
+    {
+      skillId: 'armor-maneuver',
+      ranks: 0,
+    },
+    {
       skillId: 'perception',
       ranks: 0,
-      customBonus: 5,
+    },
+    {
+      skillId: 'jumping',
+      ranks: 0,
+    },
+    {
+      skillId: 'running',
+      ranks: 0,
+    },
+    {
+      skillId: 'leadership',
+      ranks: 0,
+    },
+    {
+      skillId: 'multiple-attacks',
+      ranks: 0,
+    },
+    {
+      skillId: 'medicine',
+      ranks: 0,
     },
   ],
   items: [
     {
-      name: 'Ork scimitar',
-      itemTypeId: 'scimitar',
-      info: {
-        bonus: 5,
-      },
-    },
-    {
-      name: 'Ork dagger',
+      name: 'Basic dagger',
       itemTypeId: 'dagger',
-      info: {
-        bonus: 0,
-      },
     },
     {
-      itemTypeId: 'target-shield',
-    },
-    {
-      itemTypeId: 'rigid-leather-full-suit',
+      itemTypeId: 'heavy-cloth-full-suit',
     },
   ],
   description: 'Lorem ipsum',

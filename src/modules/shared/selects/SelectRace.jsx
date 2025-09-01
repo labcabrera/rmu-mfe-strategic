@@ -34,7 +34,7 @@ const SelectRace = ({ value, onChange, readonly = false, required = true }) => {
       select
       label={t('race')}
       value={value === undefined || value === null || races.length === 0 ? '' : value}
-      variant="outlined"
+      variant="standard"
       readOnly={readonly}
       required={required}
       fullWidth

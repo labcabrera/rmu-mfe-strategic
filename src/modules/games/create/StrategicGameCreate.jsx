@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Autocomplete from '@mui/material/Autocomplete';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import { fetchRealms } from '../../api/realms';
 import { gameCreateTemplate } from '../../data/game-create';
 import SnackbarError from '../../shared/errors/SnackbarError';
@@ -9,6 +11,7 @@ import StrategicGameCreateActions from './StrategicGameCreateActions';
 
 const StrategicGameCreate = () => {
   const [realms, setRealms] = useState([]);
+  const { t } = useTranslation();
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [formData, setFormData] = useState(gameCreateTemplate);
@@ -35,13 +38,22 @@ const StrategicGameCreate = () => {
     };
   };
 
-  const handleExperienceMultiplierChange = (e) => {
-    const { value } = e.target;
+  const handleOptionsChange = (e) => {
+    const { name, value } = e.target;
+    console.log(name, value);
+    let data = value;
+    if (value.includes('-') || value.includes('.')) {
+      const parsed = Number(value);
+      data = !isNaN(parsed) && value.match(/^[-+]?\d*\.?\d+$/) ? parsed : value;
+    } else {
+      const parsed = Number(value);
+      data = !isNaN(parsed) ? parsed : value;
+    }
     setFormData((prevData) => ({
       ...prevData,
       options: {
         ...prevData.options,
-        experienceMultiplier: parseInt(value),
+        [name]: data,
       },
     }));
   };
@@ -66,7 +78,7 @@ const StrategicGameCreate = () => {
       <StrategicGameCreateActions formData={formData} />
       <Grid container spacing={2}>
         <Grid item size={4}>
-          <TextField label="Name" variant="outlined" fullWidth name="name" value={formData.name} onChange={handleChange} margin="normal" required />
+          <TextField label="Name" fullWidth name="name" value={formData.name} onChange={handleChange} required />
         </Grid>
         <Grid size={8}></Grid>
 
@@ -82,30 +94,50 @@ const StrategicGameCreate = () => {
         </Grid>
         <Grid size={8}></Grid>
 
-        <Grid item size={4}>
-          <TextField
-            label="Description"
-            variant="outlined"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            fullWidth
-            multiline
-            maxRows={4}
-            margin="normal"
-          />
+        <Grid size={12}>
+          <Typography component="h6" color="primary">
+            Options
+          </Typography>
         </Grid>
-        <Grid size={8}></Grid>
-
-        <Grid size={12}>Options</Grid>
         <Grid size={4}>
           <TextField
-            label="Experience multiplier"
+            label={t('experience-multiplier')}
             name="experienceMultiplier"
-            type="number"
-            variant="outlined"
             value={formData.options.experienceMultiplier}
-            onChange={handleExperienceMultiplierChange}
+            onChange={handleOptionsChange}
+            required
+            fullWidth
+          />
+        </Grid>
+        <Grid size={4}>
+          <TextField
+            label={t('fatigue-multiplier')}
+            name="fatigueMultiplier"
+            value={formData.options.fatigueMultiplier}
+            onChange={handleOptionsChange}
+            required
+            fullWidth
+          />
+        </Grid>
+        <Grid size={4}></Grid>
+        <Grid size={4}>
+          <TextField
+            label={t('board-scale')}
+            name="boardScaleMultiplier"
+            variant="outlined"
+            value={formData.options.boardScaleMultiplier}
+            onChange={handleOptionsChange}
+            required
+            fullWidth
+          />
+        </Grid>
+        <Grid size={4}>
+          <TextField
+            label={t('letality')}
+            name="letality"
+            variant="outlined"
+            value={formData.options.letality}
+            onChange={handleOptionsChange}
             required
             fullWidth
           />
@@ -176,6 +208,12 @@ const StrategicGameCreate = () => {
             required
           />
         </Grid>
+
+        <Grid size={4}></Grid>
+        <Grid item size={8}>
+          <TextField label="Description" name="description" value={formData.description} onChange={handleChange} fullWidth multiline maxRows={4} />
+        </Grid>
+        <Grid size={8}></Grid>
       </Grid>
       <SnackbarError displayError={displayError} errorMessage={errorMessage} setDisplayError={setDisplayError} />
       <pre>{JSON.stringify(formData, null, 2)}</pre>

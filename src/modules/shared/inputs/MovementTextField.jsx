@@ -5,22 +5,28 @@ import Avatar from '@mui/material/Avatar';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 
-const HeightTextField = ({ value, onChange }) => {
+const MovementTextField = ({ value, onChange, i18nLabel = 'movement', disabled = false, required = false }) => {
   const { t } = useTranslation();
 
   return (
     <TextField
-      label={t('height')}
-      variant="outlined"
-      fullWidth
+      label={t(i18nLabel)}
       value={value}
       onChange={onChange}
-      required
+      disabled={disabled}
+      required={required}
+      variant="standard"
+      fullWidth
+      sx={{
+        '& .MuiInputBase-input': {
+          textAlign: 'right',
+        },
+      }}
       slotProps={{
         input: {
           startAdornment: (
             <InputAdornment position="start">
-              <Avatar src="/static/images/generic/height.png" sx={{ width: 25, height: 25 }} />
+              <Avatar src="/static/images/generic/movement.png" sx={{ width: 25, height: 25 }} />
             </InputAdornment>
           ),
         },
@@ -29,4 +35,4 @@ const HeightTextField = ({ value, onChange }) => {
   );
 };
 
-export default HeightTextField;
+export default MovementTextField;

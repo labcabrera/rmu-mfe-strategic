@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
 import StrategicGameUpdateActions from './StrategicGameUpdateActions';
+import StrategicGameUpdateAttributes from './StrategicGameUpdateAttributes';
 
 const StrategicGameUpdate = () => {
   const location = useLocation();
@@ -10,24 +9,16 @@ const StrategicGameUpdate = () => {
   const [formData, setFormData] = useState({
     name: strategicGame.name,
     description: strategicGame.description,
+    options: strategicGame.options,
+    powerLevel: strategicGame.powerLevel,
   });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
 
   return (
     <>
       <StrategicGameUpdateActions formData={formData} />
-      <Grid container spacing={2}>
-        <Grid size={12}>
-          <TextField label="Name" fullWidth name="name" value={formData.name} onChange={handleChange} />
-        </Grid>
-        <Grid size={12}>
-          <TextField label="Description" fullWidth name="description" value={formData.description} onChange={handleChange} multiline maxRows={4} />
-        </Grid>
-      </Grid>
+      <StrategicGameUpdateAttributes formData={formData} setFormData={setFormData} />
+      <pre>{JSON.stringify(formData, null, 2)}</pre>
+      <pre>{JSON.stringify(strategicGame, null, 2)}</pre>
     </>
   );
 };

@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
@@ -11,8 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill } from '../../api/characters';
-import { fetchProfession } from '../../api/professions';
+import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../api/characters';
 import SnackbarError from '../../shared/errors/SnackbarError';
 import SelectSkill from '../../shared/selects/SelectSkill';
 
@@ -24,16 +23,23 @@ const addSkillFormDataTemplate = {
 };
 
 const CharacterViewSkillsAdd = ({ character, setCharacter }) => {
+  const { t } = useTranslation();
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [skill, setSkill] = useState(null);
   const [formData, setFormData] = useState(addSkillFormDataTemplate);
 
   const handleSkillChange = (value, skill) => {
     setFormData({ ...formData, skillId: value, specialization: skill?.specialization });
+    setSkill(skill);
   };
 
   const handleSpecializationChange = (e) => {
     setFormData({ ...formData, specialization: e.target.value });
+  };
+
+  const isSpecializationAllowed = () => {
+    return skill && skill.specializations && skill.specializations.length > 0;
   };
 
   const handleAddSkill = async () => {
@@ -56,9 +62,20 @@ const CharacterViewSkillsAdd = ({ character, setCharacter }) => {
           <SelectSkill value={formData.skillId} onChange={handleSkillChange} />
         </Grid>
         <Grid item size={2}>
-          <TextField label="Specialization" value={formData.specialization} onChange={handleSpecializationChange} />
+          {isSpecializationAllowed() ? (
+            <TextField label="Specialization" value={formData.specialization} onChange={handleSpecializationChange} />
+          ) : null}
         </Grid>
-        <Grid item size={6}></Grid>
+        <Grid item size={5}></Grid>
+        <Grid item size={1}>
+          <TextField
+            label={t('dev')}
+            name="availableDevelopmentPoints"
+            value={`${character.experience.availableDevelopmentPoints} / ${character.experience.developmentPoints}`}
+            readOnly
+            fullWidth
+          />
+        </Grid>
         <Grid item size={2}>
           <IconButton aria-label="delete" onClick={() => handleAddSkill()}>
             <AddCircleOutlineIcon />
@@ -70,9 +87,8 @@ const CharacterViewSkillsAdd = ({ character, setCharacter }) => {
   );
 };
 
-const CharacterViewSkillsEntry = ({ character, setCharacter, skill }) => {
+const CharacterViewSkillsEntry = ({ character, setCharacter, skill, profession }) => {
   const { t } = useTranslation();
-  const [profession, setProfession] = useState(null);
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -106,11 +122,13 @@ const CharacterViewSkillsEntry = ({ character, setCharacter, skill }) => {
     }
   };
 
-  const bindProfession = () => {
-    if (character) {
-      fetchProfession(character.info.professionId).then((profession) => {
-        setProfession(profession);
-      });
+  const handleDeleteSkill = async (skill) => {
+    try {
+      const updated = await deleteSkill(character.id, skill.skillId);
+      setCharacter(updated);
+    } catch (error) {
+      setErrorMessage(error.message);
+      setDisplayError(true);
     }
   };
 
@@ -126,12 +144,6 @@ const CharacterViewSkillsEntry = ({ character, setCharacter, skill }) => {
   const isProfessionalSkill = (skill) => {
     return skill.professional && skill.professional.includes('professional');
   };
-
-  useEffect(() => {
-    if (character) {
-      bindProfession();
-    }
-  }, [character]);
 
   return (
     <>
@@ -149,22 +161,91 @@ const CharacterViewSkillsEntry = ({ character, setCharacter, skill }) => {
           {skill.statistics.join('/')}
         </Grid>
         <Grid item size={1}>
-          <TextField label={t('ranks')} name="ranks" value={skill.ranks} readOnly fullWidth />
+          <TextField
+            label={t('ranks')}
+            name="ranks"
+            value={skill.ranks}
+            readOnly
+            fullWidth
+            sx={{
+              '& .MuiInputBase-input': {
+                textAlign: 'right',
+              },
+            }}
+          />
         </Grid>
         <Grid item size={1}>
-          <TextField label={t('stats')} name="statBonus" value={skill.statBonus} readOnly fullWidth />
+          <TextField
+            label={t('stats')}
+            name="statBonus"
+            value={skill.statBonus}
+            readOnly
+            fullWidth
+            sx={{
+              '& .MuiInputBase-input': {
+                color: skill.statBonus < 0 ? '#ffab91' : skill.statBonus > 0 ? '#a5d6a7' : 'white',
+                textAlign: 'right',
+              },
+            }}
+          />
         </Grid>
         <Grid item size={1}>
-          <TextField label={t('prof')} name="professionalBonus" value={skill.professionalBonus} readOnly fullWidth />
+          <TextField
+            label={t('prof')}
+            name="professionalBonus"
+            value={skill.professionalBonus}
+            readOnly
+            fullWidth
+            sx={{
+              '& .MuiInputBase-input': {
+                textAlign: 'right',
+              },
+            }}
+          />
         </Grid>
         <Grid item size={1}>
-          <TextField label={t('dev')} name="developmentBonus" value={skill.developmentBonus} readOnly fullWidth />
+          <TextField
+            label={t('dev')}
+            name="developmentBonus"
+            value={skill.developmentBonus}
+            readOnly
+            fullWidth
+            sx={{
+              '& .MuiInputBase-input': {
+                textAlign: 'right',
+              },
+            }}
+          />
         </Grid>
         <Grid item size={1}>
-          <TextField label={t('custom')} name="customBonus" value={skill.customBonus} readOnly fullWidth />
+          <TextField
+            label={t('custom')}
+            name="customBonus"
+            value={skill.customBonus}
+            readOnly
+            fullWidth
+            sx={{
+              '& .MuiInputBase-input': {
+                textAlign: 'right',
+              },
+            }}
+          />
         </Grid>
         <Grid item size={1}>
-          <TextField label={t('total')} name="totalBonus" value={skill.totalBonus} readOnly fullWidth />
+          <TextField
+            label={t('total')}
+            name="totalBonus"
+            value={skill.totalBonus}
+            readOnly
+            fullWidth
+            sx={{
+              '& .MuiInputBase-input': {
+                color: skill.totalBonus < 0 ? '#ffab91' : skill.totalBonus > 0 ? '#a5d6a7' : 'white',
+                fontWeight: 'bold',
+                textAlign: 'right',
+              },
+            }}
+          />
         </Grid>
         <Grid item size={2}>
           <IconButton onClick={() => handleLevelUp()}>
@@ -173,7 +254,7 @@ const CharacterViewSkillsEntry = ({ character, setCharacter, skill }) => {
           <IconButton onClick={() => handleLevelDown()}>
             <ArrowCircleDownIcon />
           </IconButton>
-          <IconButton onClick={() => handleLevelDown()}>
+          <IconButton onClick={() => handleDeleteSkill(skill)}>
             <DeleteForeverIcon />
           </IconButton>
           {isAvailableProfessionSkill(skill) && (
@@ -188,7 +269,7 @@ const CharacterViewSkillsEntry = ({ character, setCharacter, skill }) => {
   );
 };
 
-const CharacterViewSkills = ({ character, setCharacter }) => {
+const CharacterViewSkills = ({ character, setCharacter, profession }) => {
   const { t } = useTranslation();
   return (
     <Grid container spacing={2} sx={{ marginTop: 2 }}>
@@ -199,7 +280,7 @@ const CharacterViewSkills = ({ character, setCharacter }) => {
       </Grid>
       <List>
         {character?.skills.map((item) => (
-          <CharacterViewSkillsEntry key={item.skillId} skill={item} character={character} setCharacter={setCharacter} />
+          <CharacterViewSkillsEntry key={item.skillId} skill={item} character={character} setCharacter={setCharacter} profession={profession} />
         ))}
         <CharacterViewSkillsAdd character={character} setCharacter={setCharacter} />
       </List>

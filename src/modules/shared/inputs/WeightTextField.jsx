@@ -5,17 +5,23 @@ import Avatar from '@mui/material/Avatar';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 
-const WeightTextField = ({ value, onChange }) => {
+const WeightTextField = ({ value, onChange, readOnly = false }) => {
   const { t } = useTranslation();
 
   return (
     <TextField
       label={t('weight')}
-      variant="outlined"
+      variant="standard"
       fullWidth
       value={value}
       onChange={onChange}
-      required
+      required={!readOnly}
+      readOnly={readOnly}
+      sx={{
+        '& .MuiInputBase-input': {
+          textAlign: 'right',
+        },
+      }}
       slotProps={{
         input: {
           startAdornment: (

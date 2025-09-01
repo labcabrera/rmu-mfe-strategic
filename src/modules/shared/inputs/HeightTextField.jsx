@@ -1,27 +1,32 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Avatar from '@mui/material/Avatar';
+import HeightIcon from '@mui/icons-material/Height';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 
-const HpTextField = ({ value, onChange, i18nLabel = 'hit-points', disabled = false, required = false }) => {
+const HeightTextField = ({ value, onChange, readOnly = false }) => {
   const { t } = useTranslation();
 
   return (
     <TextField
-      label={t(i18nLabel)}
-      variant="outlined"
+      label={t('height')}
+      variant="standard"
       fullWidth
       value={value}
       onChange={onChange}
-      required={required}
-      disabled={disabled}
+      required={!readOnly}
+      readOnly={readOnly}
+      sx={{
+        '& .MuiInputBase-input': {
+          textAlign: 'right',
+        },
+      }}
       slotProps={{
         input: {
           startAdornment: (
             <InputAdornment position="start">
-              <Avatar src="/static/images/generic/hp.png" sx={{ width: 25, height: 25 }} />
+              <HeightIcon />
             </InputAdornment>
           ),
         },
@@ -30,4 +35,4 @@ const HpTextField = ({ value, onChange, i18nLabel = 'hit-points', disabled = fal
   );
 };
 
-export default HpTextField;
+export default HeightTextField;

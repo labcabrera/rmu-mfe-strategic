@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import CachedIcon from '@mui/icons-material/Cached';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -27,7 +28,7 @@ const NameTextField = ({ value, onChange, required = true, generateRandomRaceVal
   return (
     <TextField
       label={t('name')}
-      variant="outlined"
+      variant="standard"
       value={value}
       onChange={onChange}
       required={required}
@@ -44,7 +45,7 @@ const NameTextField = ({ value, onChange, required = true, generateRandomRaceVal
           endAdornment: (
             <InputAdornment position="start">
               <IconButton onClick={handleRandomNameClick}>
-                <Avatar src="/static/images/generic/refresh.png" sx={{ width: 25, height: 25 }} />
+                <CachedIcon />
               </IconButton>
             </InputAdornment>
           ),

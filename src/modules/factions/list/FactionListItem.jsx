@@ -1,11 +1,10 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Avatar from '@mui/material/Avatar';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import witchKing from '../../../assets/witch-king.jpg';
+import FactionAvatar from '../../shared/avatars/FactionAvatar';
 
 const FactionListItem = ({ strategicGame: faction }) => {
   const navigate = useNavigate();
@@ -17,7 +16,7 @@ const FactionListItem = ({ strategicGame: faction }) => {
   return (
     <ListItemButton onClick={handleGameClick}>
       <ListItemAvatar>
-        <Avatar src={witchKing}></Avatar>
+        <FactionAvatar faction={faction} />
       </ListItemAvatar>
       <ListItemText primary={faction.name} secondary={faction.user} />
     </ListItemButton>

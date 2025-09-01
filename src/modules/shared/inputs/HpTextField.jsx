@@ -1,27 +1,32 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Avatar from '@mui/material/Avatar';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 
-const MovementTextField = ({ value, onChange, i18nLabel = 'movement', disabled = false, required = false }) => {
+const HpTextField = ({ value, onChange, i18nLabel = 'hit-points', disabled = false, required = false }) => {
   const { t } = useTranslation();
 
   return (
     <TextField
       label={t(i18nLabel)}
+      variant="standard"
+      fullWidth
       value={value}
       onChange={onChange}
-      disabled={disabled}
       required={required}
-      variant="outlined"
-      fullWidth
+      disabled={disabled}
+      sx={{
+        '& .MuiInputBase-input': {
+          textAlign: 'right',
+        },
+      }}
       slotProps={{
         input: {
           startAdornment: (
             <InputAdornment position="start">
-              <Avatar src="/static/images/generic/movement.png" sx={{ width: 25, height: 25 }} />
+              <FavoriteIcon />
             </InputAdornment>
           ),
         },
@@ -30,4 +35,4 @@ const MovementTextField = ({ value, onChange, i18nLabel = 'movement', disabled =
   );
 };
 
-export default MovementTextField;
+export default HpTextField;
