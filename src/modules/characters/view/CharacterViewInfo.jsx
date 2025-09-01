@@ -36,10 +36,10 @@ const CharacterViewInfo = ({ character, strategicGame, faction }) => {
           </Typography>
         </Grid>
 
-        <Grid item size={3}>
+        <Grid item size={6}>
           <TextField label={t('name')} name="name" variant="standard" value={character.name} readOnly fullWidth />
         </Grid>
-        <Grid size={9}></Grid>
+        <Grid size={6}></Grid>
 
         <Grid size={3}>
           <TextField

@@ -14,7 +14,7 @@ const CharacterViewStatsEntry = ({ statKey, statName, character: character }) =>
       <Grid item size={2}>
         <TextField
           label="Potential"
-          variant="outlined"
+          variant="standard"
           name={statKey}
           value={character.statistics[statKey].potential}
           readonly
@@ -29,7 +29,7 @@ const CharacterViewStatsEntry = ({ statKey, statName, character: character }) =>
       <Grid item size={2}>
         <TextField
           label="Temporary"
-          variant="outlined"
+          variant="standard"
           name={statKey}
           value={character.statistics[statKey].temporary}
           readonly
@@ -44,7 +44,7 @@ const CharacterViewStatsEntry = ({ statKey, statName, character: character }) =>
       <Grid item size={2}>
         <TextField
           label="Racial Bonus"
-          variant="outlined"
+          variant="standard"
           name={statKey}
           value={character.statistics[statKey].racial}
           readonly
@@ -60,7 +60,7 @@ const CharacterViewStatsEntry = ({ statKey, statName, character: character }) =>
       <Grid item size={2}>
         <TextField
           label="Bonus"
-          variant="outlined"
+          variant="standard"
           name={statKey}
           readonly
           value={character.statistics[statKey].bonus}
