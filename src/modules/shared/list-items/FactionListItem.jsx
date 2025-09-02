@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import FactionAvatar from '../../shared/avatars/FactionAvatar';
+import FactionAvatar from '../avatars/FactionAvatar';
 
-const StrategicGameViewFactionItem = ({ faction }) => {
+const FactionListItem = ({ faction }) => {
   const navigate = useNavigate();
 
   const handleFactionClick = () => {
@@ -25,4 +25,4 @@ const StrategicGameViewFactionItem = ({ faction }) => {
   );
 };
 
-export default StrategicGameViewFactionItem;
+export default FactionListItem;

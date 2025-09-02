@@ -10,6 +10,7 @@ const FactionAvatar = ({ faction }) => {
     if (check.includes('mordor')) return defaultImage;
     if (check.includes('gondor')) return '/static/images/races/lotr-gondor.jpg';
     if (check.includes('moria')) return '/static/images/races/lotr-troll.jpg';
+    if (check.includes('elf')) return '/static/images/races/lotr-elf.jpg';
     return defaultImage;
   };
 

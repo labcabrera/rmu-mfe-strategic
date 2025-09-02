@@ -5,7 +5,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
-import StrategicGameViewFactionItem from './StrategicGameViewFactionItem';
+import FactionListItem from '../../shared/list-items/FactionListItem';
 
 const StrategicGameViewFactions = ({ strategicGame, factions, setFactions }) => {
   const navigate = useNavigate();
@@ -21,13 +21,7 @@ const StrategicGameViewFactions = ({ strategicGame, factions, setFactions }) => 
       </Typography>
       <List>
         {factions?.map((item) => (
-          <StrategicGameViewFactionItem
-            key={item.id}
-            faction={item}
-            strategicGameId={strategicGame.id}
-            factions={factions}
-            setFactions={setFactions}
-          />
+          <FactionListItem key={item.id} faction={item} strategicGameId={strategicGame.id} factions={factions} setFactions={setFactions} />
         ))}
       </List>
       <IconButton variant="outlined" onClick={handleCreateFaction}>

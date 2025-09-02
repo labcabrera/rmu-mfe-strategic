@@ -6,7 +6,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import CharacterListItem from '../list/CharacterListItem';
+import CharacterListItem from '../../shared/list-items/CharacterListItem';
 
 const FactionViewCharacters = ({ faction, characters }) => {
   const navigate = useNavigate();
