@@ -6,3 +6,12 @@ export async function fetchRealms() {
   }
   return await response.json();
 }
+
+export async function fetchRealm(realmId) {
+  const url = `${process.env.RMU_API_CORE_URL}/realms/${realmId}`;
+  const response = await fetch(url, { method: 'GET' });
+  if (response.status != 200) {
+    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+  }
+  return await response.json();
+}

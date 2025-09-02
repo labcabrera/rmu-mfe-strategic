@@ -87,22 +87,24 @@ const FactionViewAttributes = ({ faction, setFaction, strategicGame }) => {
           label={t('available-xp')}
           variant="standard"
           fullWidth
-          value={faction.factionManagement.availableXP}
-          InputProps={{
-            endAdornment: (
-              <>
-                <InputAdornment position="end">
-                  <IconButton edge="end" onClick={() => handleAddXP(10000)}>
-                    <AddCircleOutlineIcon />
-                  </IconButton>
-                </InputAdornment>
-                <InputAdornment position="end">
-                  <IconButton edge="end" onClick={() => handleAddXP(-10000)}>
-                    <RemoveCircleOutlineIcon />
-                  </IconButton>
-                </InputAdornment>
-              </>
-            ),
+          value={new Intl.NumberFormat('en-EN').format(faction.factionManagement.availableXP)}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <>
+                  <InputAdornment position="end">
+                    <IconButton edge="end" onClick={() => handleAddXP(10000)}>
+                      <AddCircleOutlineIcon />
+                    </IconButton>
+                  </InputAdornment>
+                  <InputAdornment position="end">
+                    <IconButton edge="end" onClick={() => handleAddXP(-10000)}>
+                      <RemoveCircleOutlineIcon />
+                    </IconButton>
+                  </InputAdornment>
+                </>
+              ),
+            },
           }}
         />
       </Grid>
@@ -113,21 +115,23 @@ const FactionViewAttributes = ({ faction, setFaction, strategicGame }) => {
           variant="standard"
           fullWidth
           value={faction.factionManagement.availableGold}
-          InputProps={{
-            endAdornment: (
-              <>
-                <InputAdornment position="end">
-                  <IconButton edge="end" onClick={() => handleAddGold(1)}>
-                    <AddCircleOutlineIcon />
-                  </IconButton>
-                </InputAdornment>
-                <InputAdornment position="end">
-                  <IconButton edge="end" onClick={() => handleAddGold(-1)}>
-                    <RemoveCircleOutlineIcon />
-                  </IconButton>
-                </InputAdornment>
-              </>
-            ),
+          slotProps={{
+            input: {
+              endAdornment: (
+                <>
+                  <InputAdornment position="end">
+                    <IconButton edge="end" onClick={() => handleAddGold(1)}>
+                      <AddCircleOutlineIcon />
+                    </IconButton>
+                  </InputAdornment>
+                  <InputAdornment position="end">
+                    <IconButton edge="end" onClick={() => handleAddGold(-1)}>
+                      <RemoveCircleOutlineIcon />
+                    </IconButton>
+                  </InputAdornment>
+                </>
+              ),
+            },
           }}
         />
       </Grid>

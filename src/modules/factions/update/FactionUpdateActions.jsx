@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Link as RouterLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
@@ -11,21 +10,19 @@ import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import Snackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
-import { updateStrategicGame } from '../../api/strategic-games';
+import { updateFaction } from '../../api/factions';
 
-const StrategicGameUpdateActions = ({ formData }) => {
-  const location = useLocation();
+const FactionUpdateActions = ({ formData, faction }) => {
   const navigate = useNavigate();
-  const strategicGame = location.state?.strategicGame;
   const [displayError, setDisplayError] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
 
-  const updateGame = async () => {
-    updateStrategicGame(strategicGame.id, formData)
-      .then((data) => navigate(`/strategic/games/view/${data.id}`, { state: { strategicGame: data } }))
+  const handleFactionUpdate = async () => {
+    updateFaction(faction.id, formData)
+      .then((data) => navigate(`/strategic/factions/view/${data.id}`, { state: { faction: data } }))
       .catch((error) => {
         setDisplayError(true);
-        setErrorMessage(`Error updating strategic game: ${error.message}`);
+        setErrorMessage(`Error updating faction: ${error.message}`);
       });
   };
 
@@ -34,7 +31,7 @@ const StrategicGameUpdateActions = ({ formData }) => {
   };
 
   const handleCancelClick = () => {
-    navigate(`/strategic/games/view/${strategicGame.id}`, { state: { strategicGame: strategicGame } });
+    navigate(`/strategic/factions/view/${faction.id}`, { state: { faction: faction } });
   };
 
   return (
@@ -45,11 +42,11 @@ const StrategicGameUpdateActions = ({ formData }) => {
             <Link underline="hover" color="inherit" href="/">
               Home
             </Link>
-            <Link component={RouterLink} color="inherit" to="/strategic">
+            <Link underline="hover" color="inherit" href="/strategic">
               Strategic
             </Link>
-            <span>Games</span>
-            <span>{strategicGame.name}</span>
+            <span>Factions</span>
+            <span>{faction.name}</span>
             <span>Edit</span>
           </Breadcrumbs>
         </Box>
@@ -57,7 +54,7 @@ const StrategicGameUpdateActions = ({ formData }) => {
           <IconButton variant="outlined" onClick={handleCancelClick}>
             <CancelIcon />
           </IconButton>
-          <IconButton variant="outlined" onClick={updateGame}>
+          <IconButton variant="outlined" onClick={handleFactionUpdate}>
             <SaveIcon />
           </IconButton>
         </Stack>
@@ -79,4 +76,4 @@ const StrategicGameUpdateActions = ({ formData }) => {
   );
 };
 
-export default StrategicGameUpdateActions;
+export default FactionUpdateActions;

@@ -69,7 +69,6 @@ const FactionView = () => {
         </Grid>
       </Grid>
       <SnackbarError open={displayError} message={errorMessage} onClose={() => setDisplayError(false)} />
-      <pre>{JSON.stringify(faction, null, 2)}</pre>
     </>
   );
 };

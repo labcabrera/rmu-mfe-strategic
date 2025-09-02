@@ -1,45 +1,18 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import CloseIcon from '@mui/icons-material/Close';
-import Button from '@mui/material/Button';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
-import Snackbar from '@mui/material/Snackbar';
 import Typography from '@mui/material/Typography';
 import StrategicGameViewFactionItem from './StrategicGameViewFactionItem';
 
-const StrategicGameViewFactions = ({ strategicGame }) => {
+const StrategicGameViewFactions = ({ strategicGame, factions, setFactions }) => {
   const navigate = useNavigate();
-  const [factions, setFactions] = useState([]);
-  const [displayError, setDisplayError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
 
-  const createFaction = () => {
+  const handleCreateFaction = () => {
     navigate(`/strategic/factions/create?gameId=${strategicGame.id}`, { state: { strategicGame: strategicGame } });
   };
-
-  const fetchFactions = () => {
-    const url = `${process.env.RMU_API_STRATEGIC_URL}/factions?q=gameId==${strategicGame.id}`;
-    fetch(url, { method: 'GET' })
-      .then((response) => {
-        if (response.status != 200) throw new Error(`Faction fetch error response: ${response.statusText}`);
-        return response.json();
-      })
-      .then((data) => setFactions(data.content))
-      .catch((error) => {
-        setDisplayError(true);
-        setErrorMessage(`Error fetching factions from ${url}. ${error.message}`);
-      });
-  };
-
-  const handleSnackbarClose = () => {
-    setDisplayError(false);
-  };
-
-  useEffect(() => {
-    fetchFactions();
-  }, []);
 
   return (
     <>
@@ -57,22 +30,9 @@ const StrategicGameViewFactions = ({ strategicGame }) => {
           />
         ))}
       </List>
-      <Button variant="outlined" onClick={() => createFaction()}>
-        Add faction
-      </Button>
-      <Snackbar
-        open={displayError}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        onClose={handleSnackbarClose}
-        message={errorMessage}
-        action={
-          <React.Fragment>
-            <IconButton aria-label="close" color="inherit" sx={{ p: 0.5 }} onClick={handleSnackbarClose}>
-              <CloseIcon />
-            </IconButton>
-          </React.Fragment>
-        }
-      />
+      <IconButton variant="outlined" onClick={handleCreateFaction}>
+        <AddCircleIcon />
+      </IconButton>
     </>
   );
 };
