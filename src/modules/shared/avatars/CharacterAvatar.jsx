@@ -10,6 +10,7 @@ const CharacterAvatar = ({ character }) => {
     if (check.includes('orc')) return '/static/images/races/lotr-orc-lesser.jpg';
     if (check.includes('human')) return '/static/images/races/lotr-gondor.jpg';
     if (check.includes('troll')) return '/static/images/races/lotr-troll.jpg';
+    if (check.includes('elf')) return '/static/images/races/lotr-elf.jpg';
     return defaultImage;
   };
 
