@@ -64,15 +64,63 @@
   "plate-full-suit": "Plate",
   "rigid-leather-full-suit": "Rigid leather",
 
-  "heavy-cloth-torso-armor": "Heavy cloth torso (2)",
-  "heavy-cloth-helmet": "Heavy cloth helmet (2)",
-  "heavy-cloth-greaves": "Heavy cloth greaves (2)",
-  "heavy-cloth-vambraces": "Heavy cloth vambraces (2)",
+  "heavy-cloth-torso-armor": "Heavy cloth torso",
+  "heavy-cloth-helmet": "Heavy cloth helmet",
+  "heavy-cloth-greaves": "Heavy cloth greaves",
+  "heavy-cloth-vambraces": "Heavy cloth vambraces",
 
-  "plate-torso-armor": "Plate torso (10)",
-  "plate-helmet": "Plate helmet (10)",
-  "plate-greaves": "Plate greaves (10)",
-  "plate-vambraces": "Plate vambraces (10)",
+  "soft-leather-torso-armor": "Soft leather torso",
+  "soft-leather-helmet": "Soft leather helmet",
+  "soft-leather-greaves": "Soft leather greaves",
+  "soft-leather-vambraces": "Soft leather vambraces",
 
-  "boots": "Boots"
+  "plate-torso-armor": "Plate torso",
+  "plate-helmet": "Plate helmet",
+  "plate-greaves": "Plate greaves",
+  "plate-vambraces": "Plate vambraces",
+
+  "hide-scale-torso-armor": "Hide scale torso",
+  "hide-scale-helmet": "Hide scale helmet",
+  "hide-scale-greaves": "Hide scale greaves",
+  "hide-scale-vambraces": "Hide scale vambraces",
+
+  "mail-torso-armor": "Mail torso armor",
+  "mail-helmet": "Mail helmet",
+  "mail-greaves": "Mail greaves",
+  "mail-vambraces": "Mail vambraces",
+
+  "laminar-torso-armor": "Laminar torso armor",
+  "laminar-helmet": "Laminar helmet",
+  "laminar-greaves": "Laminar greaves",
+  "laminar-vambraces": "Laminar vambraces",
+
+  "brigandine-torso-armor": "Brigandine torso armor",
+  "brigandine-helmet": "Brigandine helmet",
+  "brigandine-greaves": "Brigandine greaves",
+  "brigandine-vambraces": "Brigandine vambraces",
+
+  "metal-scale-torso-armor": "Metal scale torso armor",
+  "metal-scale-helmet": "Metal scale helmet",
+  "metal-scale-greaves": "Metal scale greaves",
+  "metal-scale-vambraces": "Metal scale vambraces",
+
+  "rigid-leather-torso-armor": "Rigid leather torso armor",
+  "rigid-leather-helmet": "Rigid leather helmet",
+  "rigid-leather-greaves": "Rigid leather greaves",
+  "rigid-leather-vambraces": "Rigid leather vambraces",
+
+  "boots": "Boots",
+  "cloak": "Cloak",
+  "belt-leather": "Leather belt",
+  "quiver": "Quiver",
+  "scabbard-belt": "Scabbard belt",
+  "weapon-belt": "Weapon belt",
+  "hood": "Hood",
+
+  "lantern": "Lantern",
+  "pole": "Pole",
+  "waterskin": "Waterskin",
+
+  "ration": "Ration",
+  "ration-trail": "Ration trail"
 }

@@ -105,15 +105,18 @@ const CharacterViewItems = ({ character, setCharacter }) => {
         <Grid item size={5}>
           <CharacterViewEquipmentInfo character={character} />
         </Grid>
+        <Grid item size={12}>
+          <ItemCardList items={character.items} character={character} setCharacter={setCharacter} />
+        </Grid>
         <Grid item size={12}></Grid>
-
+        <Grid item size={12}>
+          <CharacterViewAddItem character={character} setCharacter={setCharacter} />
+        </Grid>
+        {/* 
         <Grid item size={12}>
           <Typography variant="h6" color="primary">
             {t('add-item')}
           </Typography>
-        </Grid>
-        <Grid item size={12}>
-          <CharacterViewAddItem character={character} setCharacter={setCharacter} />
         </Grid>
 
         <Grid item size={12}>
@@ -121,43 +124,11 @@ const CharacterViewItems = ({ character, setCharacter }) => {
             {t('items')}
           </Typography>
         </Grid>
-        <Grid item size={12}>
-          <ItemCardList items={character.items} character={character} setCharacter={setCharacter} />
-        </Grid>
 
-        <Table aria-label="item table">
-          <TableHead>
-            <TableRow>
-              <TableCell>{t('name')}</TableCell>
-              <TableCell align="left">{t('item-type')}</TableCell>
-              <TableCell align="left">{t('category')}</TableCell>
-              <TableCell align="left">{t('weight')}</TableCell>
-              <TableCell align="left">{t('strength')}</TableCell>
-              <TableCell align="left">{t('options')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {character.items.map((row) => (
-              <TableRow key={row.name}>
-                <TableCell component="th" scope="row">
-                  {row.name}
-                </TableCell>
-                <TableCell align="left">{t(row.itemTypeId)}</TableCell>
-                <TableCell align="left">{t(row.category)}</TableCell>
-                <TableCell align="right">{row.info.weight}</TableCell>
-                <TableCell align="right">{row.info.strength}</TableCell>
-                <TableCell align="right">
-                  <IconButton aria-label="delete" onClick={() => handleDelete(row.id)}>
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+       
+
+      <CharacterViewAddItem character={character} setCharacter={setCharacter} /> */}
       </Grid>
-
-      <CharacterViewAddItem character={character} setCharacter={setCharacter} />
 
       <pre>{JSON.stringify(character.items, null, 2)}</pre>
     </>

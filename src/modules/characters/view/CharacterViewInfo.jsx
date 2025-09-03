@@ -35,7 +35,7 @@ const CharacterViewInfo = ({ character, strategicGame, faction }) => {
           <CharacterAvatar character={character} size={120} />
           <Typography variant="h6">{character.name}</Typography>
         </Grid>
-        <Grid s ize={12}>
+        <Grid size={12}>
           <Typography color="secondary" variant="h6">
             {t('information')}
           </Typography>

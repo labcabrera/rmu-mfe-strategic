@@ -4,17 +4,16 @@ import { useTranslation } from 'react-i18next';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 
-const SelectItemCategory = ({ value, onChange }) => {
+const SelectArmorSlot = ({ value, onChange }) => {
   const { t } = useTranslation();
-  const categories = ['weapon', 'armor', 'shield', 'clothes', 'tools', 'food'];
+  const categories = ['body', 'head', 'arms', 'legs'];
 
   const handleFactionChange = (e) => {
-    console.log('Selected item category:', e.target.value);
     onChange(e.target.value);
   };
 
   return (
-    <TextField select label={t('item-category')} value={value} variant="standard" required fullWidth onChange={handleFactionChange}>
+    <TextField select label={t('armor-slot')} value={value} variant="standard" required fullWidth onChange={handleFactionChange}>
       {categories.map((c) => (
         <MenuItem key={c} value={c}>
           {t(c)}
@@ -24,4 +23,4 @@ const SelectItemCategory = ({ value, onChange }) => {
   );
 };
 
-export default SelectItemCategory;
+export default SelectArmorSlot;
