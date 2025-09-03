@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField';
 
 const SelectItemCategory = ({ value, onChange }) => {
   const { t } = useTranslation();
-  const categories = ['weapon', 'armor', 'shield', 'clothes', 'tools', 'food'];
+  const categories = ['weapon', 'armor', 'shield', 'clothes', 'ammunition', 'tools', 'food'];
 
   const handleFactionChange = (e) => {
     console.log('Selected item category:', e.target.value);
