@@ -44,7 +44,7 @@ const CharacterViewAddItem = ({ character, setCharacter, faction }) => {
           <TextField label={t('gold-amount')} value={goldAmount} variant="standard" fullWidth readOnly />
         </Grid>
         <Grid size={4}>
-          <TextField label={t('faction-amount')} value={faction.factionManagement.availableGold} variant="standard" fullWidth readOnly />
+          <TextField label={t('faction-gold-amount')} value={faction.factionManagement.availableGold} variant="standard" fullWidth readOnly />
         </Grid>
         <Grid size={4}>
           <Button onClick={() => handleTransfer(1)}>+1G</Button>
