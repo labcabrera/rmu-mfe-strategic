@@ -170,6 +170,18 @@ export async function equipItem(characterId, slot, itemId) {
   return await response.json();
 }
 
+export async function unequipItem(characterId, slot) {
+  const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/equipment/${slot}`;
+  const response = await fetch(url, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (response.status != 200) {
+    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+  }
+  return await response.json();
+}
+
 //TODO move
 export async function fetchCharacterSizes() {
   const url = `${process.env.RMU_API_CORE_URL}/character-sizes`;

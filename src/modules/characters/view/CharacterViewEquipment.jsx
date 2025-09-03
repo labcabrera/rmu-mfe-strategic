@@ -1,16 +1,38 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Button from '@mui/material/Button';
+import ClearIcon from '@mui/icons-material/Clear';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
+import CardHeader from '@mui/material/CardHeader';
 import CardMedia from '@mui/material/CardMedia';
 import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
-import { equipItem } from '../../api/characters';
+import { equipItem, unequipItem } from '../../api/characters';
+
+const EquipmentSlotDescription = ({ item }) => {
+  if (!item) return null;
+
+  if (item.weapon) {
+    return (
+      <>
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          Fumble: {item.weapon.fumble}
+        </Typography>
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          Size adjustment: {item.weapon.sizeAdjustment}
+        </Typography>
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          Required hands: {item.weapon.requiredHands}
+        </Typography>
+      </>
+    );
+  }
+};
 
 const EquipmentSlot = ({ character, setCharacter, slot, itemId }) => {
   const { t } = useTranslation();
@@ -22,7 +44,7 @@ const EquipmentSlot = ({ character, setCharacter, slot, itemId }) => {
     } else if (slot === 'offHand') {
       return character.items.filter((e) => e.category === 'shield' || (e.category === 'weapon' && e.weapon && e.weapon.requiredHands < 2));
     } else if (slot === 'body') {
-      return character.items.filter((e) => isArmorSlot(e, 'chest'));
+      return character.items.filter((e) => isArmorSlot(e, 'body'));
     } else if (slot === 'head') {
       return character.items.filter((e) => isArmorSlot(e, 'head'));
     } else if (slot === 'arms') {
@@ -44,21 +66,25 @@ const EquipmentSlot = ({ character, setCharacter, slot, itemId }) => {
       .catch((err) => console.error(err));
   };
 
+  const handleUnequip = () => {
+    unequipItem(character.id, slot)
+      .then((data) => setCharacter(data))
+      .catch((err) => console.error(err));
+  };
+
   if (!item) {
     return (
-      <Card sx={{ maxWidth: 280, minWidth: 280 }}>
-        <CardMedia sx={{ height: 200 }} image={`/static/images/items/placeholder.png`} title={`No item equipped`} />
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            {t(slot)}
-          </Typography>
+      <Card sx={{ maxWidth: 220, minWidth: 220, minHeight: 500, maxHeight: 500 }}>
+        <CardHeader title={t(slot)} />
+        <CardMedia sx={{ height: 200 }} image={'/static/images/items/empty.png'} alt="No item equipped" title="No item equipped" />
+        <CardContent sx={{ minHeight: 160, overflowY: 'auto' }}>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             No item equipped
           </Typography>
         </CardContent>
         <CardActions>
           {getSlotOptions(character, slot).length > 0 && (
-            <Select onChange={(e) => handleEquipmentChange(e)} variant="standard">
+            <Select onChange={(e) => handleEquipmentChange(e)} variant="standard" fullWidth>
               {getSlotOptions(character, slot).map((option) => (
                 <MenuItem key={option.id} value={option.id}>
                   {option.name}
@@ -71,30 +97,31 @@ const EquipmentSlot = ({ character, setCharacter, slot, itemId }) => {
     );
   }
   return (
-    <Card sx={{ maxWidth: 280, minWidth: 280 }}>
-      <CardMedia sx={{ height: 200 }} image={`/static/images/items/${item.itemTypeId}.png`} title={item.name} />
-      <CardContent>
-        <Typography gutterBottom variant="h5" component="div">
-          {t(slot)}
+    <Card sx={{ maxWidth: 220, minWidth: 220, minHeight: 500, maxHeight: 500 }}>
+      <CardHeader
+        action={
+          <IconButton aria-label="settings" onClick={handleUnequip}>
+            <ClearIcon />
+          </IconButton>
+        }
+        title={t(slot)}
+      />
+      <CardMedia sx={{ height: 200 }} image={`/static/images/items/${item.itemTypeId}.png`} alt={item.name} title={item.name} />
+      <CardContent sx={{ minHeight: 160, overflowY: 'auto' }}>
+        <Typography gutterBottom variant="body2">
+          {item.name}
+        </Typography>
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          {t(item.itemTypeId)}
         </Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           {item.itemTypeId}
-          {item.weapon && (
-            <>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                {item.weapon.skillId}
-              </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                Fumble: {item.weapon.fumble}
-              </Typography>
-            </>
-          )}
         </Typography>
+        <EquipmentSlotDescription item={item} />
       </CardContent>
       <CardActions>
-        <Button size="small">Unequip</Button>
         {getSlotOptions(character, slot).length > 0 && (
-          <Select value={character.equipment[slot]} onChange={(e) => handleEquipmentChange(e)} variant="standard">
+          <Select value={character.equipment[slot]} onChange={(e) => handleEquipmentChange(e)} variant="standard" fullWidth>
             {getSlotOptions(character, slot).map((option) => (
               <MenuItem key={option.id} value={option.id} selected={option.id === character.equipment[slot]}>
                 {option.name}
