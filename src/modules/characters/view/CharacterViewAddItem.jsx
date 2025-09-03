@@ -7,6 +7,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { addItem } from '../../api/characters';
 import { fetchItems } from '../../api/items';
+import { characterItemCreateTemplate } from '../../data/item-create';
 import SelectItemCategory from '../../shared/selects/SelectItemCategory';
 import SelectItemType from '../../shared/selects/SelectItemType';
 
@@ -14,10 +15,9 @@ const CharacterViewAddItem = ({ character, setCharacter }) => {
   const { t } = useTranslation();
   const [itemCategory, setItemCategory] = useState(null);
   const [items, setItems] = useState([]);
-  const [formData, setFormData] = useState({ name: '', itemTypeId: '' });
+  const [formData, setFormData] = useState(characterItemCreateTemplate);
 
   const handleItemCategoryChange = (category) => {
-    console.log('Selected item category xxx:', category);
     setItemCategory(category);
   };
 
@@ -27,15 +27,21 @@ const CharacterViewAddItem = ({ character, setCharacter }) => {
       .catch((err) => console.error(err));
   };
 
+  const capitalize = (string) => {
+    if (!string) return '';
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
   const handleAdd = () => {
     addItem(character.id, formData)
       .then((data) => setCharacter(data))
+      .then(() => setFormData(characterItemCreateTemplate))
       .catch((err) => console.error(err));
   };
 
   const handleItemTypeChange = (itemId) => {
-    console.log('Selected item type:', itemId);
-    setFormData({ ...formData, itemTypeId: itemId });
+    const name = capitalize(itemId.replaceAll('-', ' '));
+    setFormData({ ...formData, itemTypeId: itemId, name });
   };
 
   useEffect(() => {

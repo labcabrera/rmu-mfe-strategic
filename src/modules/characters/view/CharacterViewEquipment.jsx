@@ -22,9 +22,19 @@ const EquipmentSlot = ({ character, setCharacter, slot, itemId }) => {
     } else if (slot === 'offHand') {
       return character.items.filter((e) => e.category === 'shield' || (e.category === 'weapon' && e.weapon && e.weapon.requiredHands < 2));
     } else if (slot === 'body') {
-      return character.items.filter((e) => e.category === 'armor');
+      return character.items.filter((e) => isArmorSlot(e, 'chest'));
+    } else if (slot === 'head') {
+      return character.items.filter((e) => isArmorSlot(e, 'head'));
+    } else if (slot === 'arms') {
+      return character.items.filter((e) => isArmorSlot(e, 'arms'));
+    } else if (slot === 'legs') {
+      return character.items.filter((e) => isArmorSlot(e, 'legs'));
     }
     return [];
+  };
+
+  const isArmorSlot = (item, slot) => {
+    return item.armor && item.armor.slot === slot;
   };
 
   const handleEquipmentChange = (event) => {
@@ -36,7 +46,7 @@ const EquipmentSlot = ({ character, setCharacter, slot, itemId }) => {
 
   if (!item) {
     return (
-      <Card sx={{ maxWidth: 300, minWidth: 300 }}>
+      <Card sx={{ maxWidth: 280, minWidth: 280 }}>
         <CardMedia sx={{ height: 200 }} image={`/static/images/items/placeholder.png`} title={`No item equipped`} />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
@@ -61,7 +71,7 @@ const EquipmentSlot = ({ character, setCharacter, slot, itemId }) => {
     );
   }
   return (
-    <Card sx={{ maxWidth: 300, minWidth: 300 }}>
+    <Card sx={{ maxWidth: 280, minWidth: 280 }}>
       <CardMedia sx={{ height: 200 }} image={`/static/images/items/${item.itemTypeId}.png`} title={item.name} />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
@@ -106,6 +116,8 @@ const CharacterViewEquipment = ({ character, setCharacter }) => {
       <EquipmentSlot character={character} setCharacter={setCharacter} slot="head" itemId={character.equipment.head} />
       <EquipmentSlot character={character} setCharacter={setCharacter} slot="arms" itemId={character.equipment.arms} />
       <EquipmentSlot character={character} setCharacter={setCharacter} slot="legs" itemId={character.equipment.legs} />
+      <pre>Equipment:{JSON.stringify(character.equipment, null, 2)}</pre>
+      <pre>Defense:{JSON.stringify(character.defense, null, 2)}</pre>
     </Grid>
   );
 };

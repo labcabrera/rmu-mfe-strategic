@@ -35,7 +35,7 @@ const CharacterViewItems = ({ character, setCharacter }) => {
           <TableHead>
             <TableRow>
               <TableCell>{t('name')}</TableCell>
-              <TableCell align="left">{t('type')}</TableCell>
+              <TableCell align="left">{t('item-type')}</TableCell>
               <TableCell align="left">{t('category')}</TableCell>
               <TableCell align="left">{t('weight')}</TableCell>
               <TableCell align="left">{t('strength')}</TableCell>
@@ -48,8 +48,8 @@ const CharacterViewItems = ({ character, setCharacter }) => {
                 <TableCell component="th" scope="row">
                   {row.name}
                 </TableCell>
-                <TableCell align="left">{row.itemTypeId}</TableCell>
-                <TableCell align="left">{row.category}</TableCell>
+                <TableCell align="left">{t(row.itemTypeId)}</TableCell>
+                <TableCell align="left">{t(row.category)}</TableCell>
                 <TableCell align="right">{row.info.weight}</TableCell>
                 <TableCell align="right">{row.info.strength}</TableCell>
                 <TableCell align="right">
