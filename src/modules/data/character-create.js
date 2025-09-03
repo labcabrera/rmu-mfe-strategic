@@ -121,9 +121,6 @@ export const characterCreateTemplate = {
       name: 'Basic dagger',
       itemTypeId: 'dagger',
     },
-    {
-      itemTypeId: 'heavy-cloth-full-suit',
-    },
   ],
   description: 'Lorem ipsum',
 };

@@ -104,6 +104,8 @@ const CharacterViewEquipment = ({ character, setCharacter }) => {
       <EquipmentSlot character={character} setCharacter={setCharacter} slot="offHand" itemId={character.equipment.offHand} />
       <EquipmentSlot character={character} setCharacter={setCharacter} slot="body" itemId={character.equipment.body} />
       <EquipmentSlot character={character} setCharacter={setCharacter} slot="head" itemId={character.equipment.head} />
+      <EquipmentSlot character={character} setCharacter={setCharacter} slot="arms" itemId={character.equipment.arms} />
+      <EquipmentSlot character={character} setCharacter={setCharacter} slot="legs" itemId={character.equipment.legs} />
     </Grid>
   );
 };

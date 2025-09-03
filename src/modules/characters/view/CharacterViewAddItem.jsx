@@ -7,12 +7,25 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { addItem } from '../../api/characters';
 import { fetchItems } from '../../api/items';
+import SelectItemCategory from '../../shared/selects/SelectItemCategory';
 import SelectItemType from '../../shared/selects/SelectItemType';
 
 const CharacterViewAddItem = ({ character, setCharacter }) => {
   const { t } = useTranslation();
+  const [itemCategory, setItemCategory] = useState(null);
   const [items, setItems] = useState([]);
   const [formData, setFormData] = useState({ name: '', itemTypeId: '' });
+
+  const handleItemCategoryChange = (category) => {
+    console.log('Selected item category xxx:', category);
+    setItemCategory(category);
+  };
+
+  const bindItems = (category) => {
+    fetchItems(`category==${category}`, 0, 100)
+      .then((data) => setItems(data))
+      .catch((err) => console.error(err));
+  };
 
   const handleAdd = () => {
     addItem(character.id, formData)
@@ -26,10 +39,17 @@ const CharacterViewAddItem = ({ character, setCharacter }) => {
   };
 
   useEffect(() => {
-    fetchItems()
-      .then((data) => setItems(data))
-      .catch((err) => console.error(err));
-  }, []);
+    if (itemCategory) {
+      console.log('Selected item category use effect:', itemCategory);
+      bindItems(itemCategory);
+    }
+  }, [itemCategory]);
+
+  // useEffect(() => {
+  //   fetchItems()
+  //     .then((data) => setItems(data))
+  //     .catch((err) => console.error(err));
+  // }, []);
 
   return (
     <Grid container spacing={2}>
@@ -38,10 +58,13 @@ const CharacterViewAddItem = ({ character, setCharacter }) => {
           {t('add-item')}
         </Typography>
       </Grid>
-      <Grid size={6}>
+      <Grid size={3}>
+        <SelectItemCategory value={itemCategory} onChange={(e) => handleItemCategoryChange(e)} />
+      </Grid>
+      <Grid size={3}>
         <SelectItemType items={items} value={formData.itemTypeId} onChange={(itemId) => handleItemTypeChange(itemId)} />
       </Grid>
-      <Grid size={6}>
+      <Grid size={3}>
         <TextField
           label={t('item-name')}
           variant="standard"
