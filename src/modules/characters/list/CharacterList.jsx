@@ -4,8 +4,8 @@ import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import Snackbar from '@mui/material/Snackbar';
 import { fetchCharacters } from '../../api/characters';
+import CharacterListItem from '../../shared/list-items/CharacterListItem';
 import CharacterListActions from './CharacterListActions';
-import CharacterListItem from './CharacterListItem';
 
 const CharacterList = () => {
   const [characters, setCharacters] = useState([]);

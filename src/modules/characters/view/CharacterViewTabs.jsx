@@ -57,7 +57,7 @@ const CharacterViewTabs = ({ character, setCharacter, strategicGame, faction, pr
           <CharacterViewSkills character={character} setCharacter={setCharacter} profession={profession} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={2}>
-          <CharacterViewItems character={character} setCharacter={setCharacter} />
+          <CharacterViewItems character={character} setCharacter={setCharacter} faction={faction} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={3}>
           <CharacterViewAttacks character={character} />

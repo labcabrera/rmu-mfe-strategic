@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import CharacterAvatar from '../../shared/avatars/CharacterAvatar';
+import CharacterAvatar from '../avatars/CharacterAvatar';
 
 const CharacterListItem = ({ character }) => {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ const CharacterListItem = ({ character }) => {
 
   return (
     <ListItemButton onClick={handleGameClick}>
-      <ListItemAvatar>
+      <ListItemAvatar sx={{ mr: 2 }}>
         <CharacterAvatar character={character} />
       </ListItemAvatar>
       <ListItemText primary={character.name} secondary={getDetail()} />

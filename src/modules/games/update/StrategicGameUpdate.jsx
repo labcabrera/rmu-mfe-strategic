@@ -17,8 +17,6 @@ const StrategicGameUpdate = () => {
     <>
       <StrategicGameUpdateActions formData={formData} />
       <StrategicGameUpdateAttributes formData={formData} setFormData={setFormData} />
-      <pre>{JSON.stringify(formData, null, 2)}</pre>
-      <pre>{JSON.stringify(strategicGame, null, 2)}</pre>
     </>
   );
 };

@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import CloseIcon from '@mui/icons-material/Close';
-import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
-import Snackbar from '@mui/material/Snackbar';
 import { fetchStrategicGames } from '../../api/strategic-games';
+import SnackbarError from '../../shared/errors/SnackbarError';
 import StrategicGameListActions from './StrategicGameListActions';
 import StrategicGameListItem from './StrategicGameListItem';
 
@@ -12,15 +10,18 @@ const StrategicGameList = () => {
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const bindStrategicGames = async () => {
-    try {
-      const games = await fetchStrategicGames('', 0, 10);
-      setStrategicGames(games);
-    } catch (error) {
-      setStrategicGames([]);
-      setDisplayError(true);
-      setErrorMessage(`Error loading strategic games. ${error.message}`);
-    }
+  const bindStrategicGames = () => {
+    fetchStrategicGames('', 0, 20)
+      .then((response) => {
+        const { games } = response.data;
+        setStrategicGames(games);
+      })
+      .catch((error) => {
+        console.error(error);
+        setStrategicGames([]);
+        setDisplayError(true);
+        setErrorMessage(`Error loading strategic games. ${error.message}`);
+      });
   };
 
   const handleSnackbarClose = () => {
@@ -39,19 +40,7 @@ const StrategicGameList = () => {
           <StrategicGameListItem key={item.id} strategicGame={item} />
         ))}
       </List>
-      <Snackbar
-        open={displayError}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        onClose={handleSnackbarClose}
-        message={errorMessage}
-        action={
-          <React.Fragment>
-            <IconButton aria-label="close" color="inherit" sx={{ p: 0.5 }} onClick={handleSnackbarClose}>
-              <CloseIcon />
-            </IconButton>
-          </React.Fragment>
-        }
-      />
+      <SnackbarError open={displayError} onClose={handleSnackbarClose} message={errorMessage} />
     </>
   );
 };
