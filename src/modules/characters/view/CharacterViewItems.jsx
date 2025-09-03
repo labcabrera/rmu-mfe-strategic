@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import DeleteIcon from '@mui/icons-material/Delete';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
@@ -11,18 +10,16 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { deleteItem, updateCarriedStatus } from '../../api/characters';
 import CharacterViewAddItem from './CharacterViewAddItem';
 import CharacterViewEquipment from './CharacterViewEquipment';
 import CharacterViewEquipmentInfo from './CharacterViewEquipmentInfo';
+import CharacterViewTransferGold from './CharacterViewTransferGold';
 
 const ItemCardList = ({ items, character, setCharacter }) => {
+  const { t } = useTranslation();
+
   const handleDelete = (itemId) => {
     deleteItem(character.id, itemId)
       .then((data) => {
@@ -66,15 +63,17 @@ const ItemCardList = ({ items, character, setCharacter }) => {
               )}
             </CardActions>
             <CardContent sx={{ flexGrow: 1 }}>
-              <Typography variant="body2" component="div">
-                {item.name}
-              </Typography>
+              <Typography variant="body2">{item.name}</Typography>
               <Typography variant="body2" color="text.secondary">
-                Weight: {item.info?.weight}
+                {t('weight')}: {item.info?.weight}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                C: {item.carried}
-              </Typography>
+              {item.amount && (
+                <>
+                  <Typography variant="body2" color="text.secondary">
+                    {t('amount')}: {item.amount}
+                  </Typography>
+                </>
+              )}
             </CardContent>
           </Card>
         </Grid>
@@ -83,55 +82,26 @@ const ItemCardList = ({ items, character, setCharacter }) => {
   );
 };
 
-const CharacterViewItems = ({ character, setCharacter }) => {
-  const { t } = useTranslation();
-
-  const handleDelete = (itemId) => {
-    deleteItem(character.id, itemId)
-      .then((data) => {
-        setCharacter(data);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  // TODO Stash / Carried
-
+const CharacterViewItems = ({ character, setCharacter, faction }) => {
   return (
-    <>
-      <Grid container spacing={2}>
-        <Grid item size={7}>
-          <CharacterViewEquipment character={character} setCharacter={setCharacter} />
-        </Grid>
-        <Grid item size={5}>
-          <CharacterViewEquipmentInfo character={character} />
-        </Grid>
-        <Grid item size={12}>
-          <ItemCardList items={character.items} character={character} setCharacter={setCharacter} />
-        </Grid>
-        <Grid item size={12}></Grid>
-        <Grid item size={12}>
-          <CharacterViewAddItem character={character} setCharacter={setCharacter} />
-        </Grid>
-        {/* 
-        <Grid item size={12}>
-          <Typography variant="h6" color="primary">
-            {t('add-item')}
-          </Typography>
-        </Grid>
-
-        <Grid item size={12}>
-          <Typography variant="h6" color="primary">
-            {t('items')}
-          </Typography>
-        </Grid>
-
-       
-
-      <CharacterViewAddItem character={character} setCharacter={setCharacter} /> */}
+    <Grid container spacing={2}>
+      <Grid item size={7}>
+        <CharacterViewEquipment character={character} setCharacter={setCharacter} />
       </Grid>
-
-      <pre>{JSON.stringify(character.items, null, 2)}</pre>
-    </>
+      <Grid item size={5}>
+        <CharacterViewEquipmentInfo character={character} />
+      </Grid>
+      <Grid item size={12}>
+        <ItemCardList items={character.items} character={character} setCharacter={setCharacter} />
+      </Grid>
+      <Grid item size={12}></Grid>
+      <Grid item size={12}>
+        <CharacterViewAddItem character={character} setCharacter={setCharacter} />
+      </Grid>
+      <Grid item size={12}>
+        <CharacterViewTransferGold character={character} setCharacter={setCharacter} faction={faction} />
+      </Grid>
+    </Grid>
   );
 };
 

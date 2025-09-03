@@ -170,7 +170,7 @@ const CharacterViewAddItem = ({ character, setCharacter }) => {
     <Grid container spacing={2}>
       <Grid size={12}>
         <Typography variant="h6" color="primary">
-          {t('equipment')}
+          {t('add-equipment')}
         </Typography>
       </Grid>
       <Grid size={4}>

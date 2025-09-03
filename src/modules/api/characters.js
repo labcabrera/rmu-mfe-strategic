@@ -194,6 +194,19 @@ export async function updateCarriedStatus(characterId, itemId, carried) {
   return await response.json();
 }
 
+export async function transferFactionGold(characterId, amount) {
+  const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/transfer-faction-gold`;
+  const response = await fetch(url, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ amount }),
+  });
+  if (response.status != 200) {
+    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+  }
+  return await response.json();
+}
+
 //TODO move
 export async function fetchCharacterSizes() {
   const url = `${process.env.RMU_API_CORE_URL}/character-sizes`;
