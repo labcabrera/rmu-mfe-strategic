@@ -20,6 +20,7 @@ import Typography from '@mui/material/Typography';
 import { deleteItem, updateCarriedStatus } from '../../api/characters';
 import CharacterViewAddItem from './CharacterViewAddItem';
 import CharacterViewEquipment from './CharacterViewEquipment';
+import CharacterViewEquipmentInfo from './CharacterViewEquipmentInfo';
 
 const ItemCardList = ({ items, character, setCharacter }) => {
   const handleDelete = (itemId) => {
@@ -41,7 +42,7 @@ const ItemCardList = ({ items, character, setCharacter }) => {
   return (
     <Grid container spacing={2}>
       {items.map((item) => (
-        <Grid item key={item.id} xs={12} sm={6} md={3}>
+        <Grid item key={item.id} xs={8} sm={4} md={2}>
           <Card sx={{ width: 150, height: 290, display: 'flex', flexDirection: 'column' }}>
             <CardMedia
               component="img"
@@ -98,14 +99,13 @@ const CharacterViewItems = ({ character, setCharacter }) => {
   return (
     <>
       <Grid container spacing={2}>
-        <Grid item size={12}>
-          <Typography variant="h6" color="primary">
-            {t('equipment')}
-          </Typography>
-        </Grid>
-        <Grid item size={12}>
+        <Grid item size={7}>
           <CharacterViewEquipment character={character} setCharacter={setCharacter} />
         </Grid>
+        <Grid item size={5}>
+          <CharacterViewEquipmentInfo character={character} />
+        </Grid>
+        <Grid item size={12}></Grid>
 
         <Grid item size={12}>
           <Typography variant="h6" color="primary">

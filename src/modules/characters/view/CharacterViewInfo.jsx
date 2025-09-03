@@ -8,6 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import CharacterAvatar from '../../shared/avatars/CharacterAvatar';
 import DefenseTextField from '../../shared/inputs/DefenseTextField';
 import HeightTextField from '../../shared/inputs/HeightTextField';
 import HpTextField from '../../shared/inputs/HpTextField';
@@ -31,16 +32,14 @@ const CharacterViewInfo = ({ character, strategicGame, faction }) => {
     <>
       <Grid container spacing={2}>
         <Grid size={12}>
+          <CharacterAvatar character={character} size={120} />
+          <Typography variant="h6">{character.name}</Typography>
+        </Grid>
+        <Grid s ize={12}>
           <Typography color="secondary" variant="h6">
             {t('information')}
           </Typography>
         </Grid>
-
-        <Grid item size={6}>
-          <TextField label={t('name')} name="name" variant="standard" value={character.name} readOnly fullWidth />
-        </Grid>
-        <Grid size={6}></Grid>
-
         <Grid size={3}>
           <TextField
             label={t('game')}

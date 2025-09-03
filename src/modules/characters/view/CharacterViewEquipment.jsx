@@ -135,17 +135,24 @@ const EquipmentSlot = ({ character, setCharacter, slot, itemId }) => {
 };
 
 const CharacterViewEquipment = ({ character, setCharacter }) => {
+  const { t } = useTranslation();
+
   return (
-    <Grid container spacing={2}>
-      <EquipmentSlot character={character} setCharacter={setCharacter} slot="mainHand" itemId={character.equipment.mainHand} />
-      <EquipmentSlot character={character} setCharacter={setCharacter} slot="offHand" itemId={character.equipment.offHand} />
-      <EquipmentSlot character={character} setCharacter={setCharacter} slot="body" itemId={character.equipment.body} />
-      <EquipmentSlot character={character} setCharacter={setCharacter} slot="head" itemId={character.equipment.head} />
-      <EquipmentSlot character={character} setCharacter={setCharacter} slot="arms" itemId={character.equipment.arms} />
-      <EquipmentSlot character={character} setCharacter={setCharacter} slot="legs" itemId={character.equipment.legs} />
-      {/* <pre>Equipment:{JSON.stringify(character.equipment, null, 2)}</pre>
+    <>
+      <Typography variant="h6" color="primary">
+        {t('equipment')}
+      </Typography>
+      <Grid container spacing={2}>
+        <EquipmentSlot character={character} setCharacter={setCharacter} slot="mainHand" itemId={character.equipment.mainHand} />
+        <EquipmentSlot character={character} setCharacter={setCharacter} slot="offHand" itemId={character.equipment.offHand} />
+        <EquipmentSlot character={character} setCharacter={setCharacter} slot="body" itemId={character.equipment.body} />
+        <EquipmentSlot character={character} setCharacter={setCharacter} slot="head" itemId={character.equipment.head} />
+        <EquipmentSlot character={character} setCharacter={setCharacter} slot="arms" itemId={character.equipment.arms} />
+        <EquipmentSlot character={character} setCharacter={setCharacter} slot="legs" itemId={character.equipment.legs} />
+        {/* <pre>Equipment:{JSON.stringify(character.equipment, null, 2)}</pre>
       <pre>Defense:{JSON.stringify(character.defense, null, 2)}</pre> */}
-    </Grid>
+      </Grid>
+    </>
   );
 };
 
