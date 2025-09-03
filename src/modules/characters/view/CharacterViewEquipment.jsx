@@ -143,8 +143,8 @@ const CharacterViewEquipment = ({ character, setCharacter }) => {
       <EquipmentSlot character={character} setCharacter={setCharacter} slot="head" itemId={character.equipment.head} />
       <EquipmentSlot character={character} setCharacter={setCharacter} slot="arms" itemId={character.equipment.arms} />
       <EquipmentSlot character={character} setCharacter={setCharacter} slot="legs" itemId={character.equipment.legs} />
-      <pre>Equipment:{JSON.stringify(character.equipment, null, 2)}</pre>
-      <pre>Defense:{JSON.stringify(character.defense, null, 2)}</pre>
+      {/* <pre>Equipment:{JSON.stringify(character.equipment, null, 2)}</pre>
+      <pre>Defense:{JSON.stringify(character.defense, null, 2)}</pre> */}
     </Grid>
   );
 };

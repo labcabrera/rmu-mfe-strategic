@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
 import { addItem } from '../../api/characters';
 import { fetchItems } from '../../api/items';
 import { characterItemCreateTemplate } from '../../data/item-create';
@@ -51,19 +50,8 @@ const CharacterViewAddItem = ({ character, setCharacter }) => {
     }
   }, [itemCategory]);
 
-  // useEffect(() => {
-  //   fetchItems()
-  //     .then((data) => setItems(data))
-  //     .catch((err) => console.error(err));
-  // }, []);
-
   return (
     <Grid container spacing={2}>
-      <Grid size={12}>
-        <Typography variant="h6" color="primary">
-          {t('add-item')}
-        </Typography>
-      </Grid>
       <Grid size={3}>
         <SelectItemCategory value={itemCategory} onChange={(e) => handleItemCategoryChange(e)} />
       </Grid>
@@ -85,7 +73,7 @@ const CharacterViewAddItem = ({ character, setCharacter }) => {
           Add Item
         </Button>
       </Grid>
-      <pre>{JSON.stringify(formData, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
     </Grid>
   );
 };

@@ -21,7 +21,7 @@ const CharacterListItem = ({ character }) => {
 
   return (
     <ListItemButton onClick={handleGameClick}>
-      <ListItemAvatar>
+      <ListItemAvatar sx={{ mr: 2 }}>
         <CharacterAvatar character={character} />
       </ListItemAvatar>
       <ListItemText primary={character.name} secondary={getDetail()} />

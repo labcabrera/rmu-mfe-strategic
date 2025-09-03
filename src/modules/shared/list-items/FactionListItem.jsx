@@ -16,7 +16,7 @@ const FactionListItem = ({ faction }) => {
   return (
     <>
       <ListItemButton onClick={handleFactionClick}>
-        <ListItemAvatar>
+        <ListItemAvatar sx={{ mr: 5 }}>
           <FactionAvatar faction={faction} />
         </ListItemAvatar>
         <ListItemText primary={faction.name} secondary={faction.description} />
