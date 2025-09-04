@@ -18,9 +18,9 @@ const CharacterViewAttributes = ({ character, faction, strategicGame }) => {
         <Grid item size={6}>
           <CharacterViewStats character={character} />
         </Grid>
-      </Grid>
-      <Grid item size={6}>
-        <TextField label={t('description')} variant="standard" name="description" value={character.description} fullWidth multiline maxRows={4} />
+        <Grid item size={6}>
+          <TextField label={t('description')} variant="standard" name="description" value={character.description} fullWidth multiline maxRows={4} />
+        </Grid>
       </Grid>
     </>
   );
