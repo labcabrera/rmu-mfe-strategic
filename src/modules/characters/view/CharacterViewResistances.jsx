@@ -24,6 +24,7 @@ const CharacterViewResistances = ({ character }) => {
             <TableCell align="left">{t('resistance')}</TableCell>
             <TableCell align="right">{t('stat')}</TableCell>
             <TableCell align="right">{t('racial')}</TableCell>
+            <TableCell align="right">{t('realm')}</TableCell>
             <TableCell align="right">{t('custom')}</TableCell>
             <TableCell align="right">{t('total')}</TableCell>
           </TableRow>
@@ -44,6 +45,7 @@ const CharacterViewResistances = ({ character }) => {
                 {resistance.statBonus}
               </TableCell>
               <TableCell align="right">{resistance.racialBonus}</TableCell>
+              <TableCell align="right">{resistance.realmBonus}</TableCell>
               <TableCell align="right">{resistance.customBonus}</TableCell>
               <TableCell
                 align="right"
