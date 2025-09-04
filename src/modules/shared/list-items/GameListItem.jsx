@@ -13,16 +13,12 @@ const GameListItem = ({ game }) => {
     navigate(`/strategic/games/view/${game.id}`, { state: { game: game } });
   };
 
-  const getDetail = () => {
-    return 'Game info todo';
-  };
-
   return (
     <ListItemButton onClick={handleGameClick}>
       <ListItemAvatar sx={{ mr: 2 }}>
         <GameAvatar game={game} />
       </ListItemAvatar>
-      <ListItemText primary={game.name} secondary={getDetail()} />
+      <ListItemText primary={game.name} secondary={game.description} />
     </ListItemButton>
   );
 };
