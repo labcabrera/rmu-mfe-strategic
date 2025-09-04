@@ -32,6 +32,10 @@ const CharacterViewAddItem = ({ character, setCharacter, faction }) => {
     }
   }, [character]);
 
+  if (!character || !faction) {
+    return null;
+  }
+
   return (
     <>
       <Grid container spacing={2}>

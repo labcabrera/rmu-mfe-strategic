@@ -49,9 +49,14 @@ const ItemCardList = ({ items, character, setCharacter }) => {
               sx={{ filter: `grayscale(${item.carried ? 0 : 1})` }}
             />
             <CardActions disableSpacing>
-              <IconButton aria-label="delete" onClick={() => handleDelete(item.id)}>
-                <DeleteOutlineIcon />
-              </IconButton>
+              <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1, marginLeft: 1 }}>
+                {item.info?.type}
+              </Typography>
+              {item.itemTypeId !== 'gold-coin' && (
+                <IconButton aria-label="delete" onClick={() => handleDelete(item.id)}>
+                  <DeleteOutlineIcon />
+                </IconButton>
+              )}
               {item.carried ? (
                 <IconButton aria-label="archive" onClick={() => handleCarried(item.id, false)}>
                   <RadioButtonCheckedIcon />

@@ -6,19 +6,13 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
 
 const red = '#ffab91';
 const green = '#a5d6a7';
 
 const CharacterViewStatsEntry = ({ statKey, statName, character: character }) => {
   const { t } = useTranslation();
-
-  // "potential": 68,
-  // "temporary": 35,
-  // "bonus": -3,
-  // "racial": 0,
-  // "custom": 0,
-  // "totalBonus": -3
 
   return (
     <>
@@ -67,73 +61,6 @@ const CharacterViewStatsEntry = ({ statKey, statName, character: character }) =>
           {character.statistics[statKey].totalBonus}
         </TableCell>
       </TableRow>
-      {/* <Grid item size={2}>
-        {statName}
-      </Grid>
-      <Grid item size={2}>
-        <TextField
-          label="Potential"
-          variant="standard"
-          name={statKey}
-          value={character.statistics[statKey].potential}
-          readonly
-          fullWidth
-          sx={{
-            '& .MuiInputBase-input': {
-              textAlign: 'right',
-            },
-          }}
-        />
-      </Grid>
-      <Grid item size={2}>
-        <TextField
-          label="Temporary"
-          variant="standard"
-          name={statKey}
-          value={character.statistics[statKey].temporary}
-          readonly
-          fullWidth
-          sx={{
-            '& .MuiInputBase-input': {
-              textAlign: 'right',
-            },
-          }}
-        />
-      </Grid>
-      <Grid item size={2}>
-        <TextField
-          label="Racial Bonus"
-          variant="standard"
-          name={statKey}
-          value={character.statistics[statKey].racial}
-          readonly
-          fullWidth
-          sx={{
-            '& .MuiInputBase-input': {
-              color: character.statistics[statKey].racial < 0 ? '#ffab91' : character.statistics[statKey].racial > 0 ? '#a5d6a7' : 'white',
-              textAlign: 'right',
-            },
-          }}
-        />
-      </Grid>
-      <Grid item size={2}>
-        <TextField
-          label="Bonus"
-          variant="standard"
-          name={statKey}
-          readonly
-          value={character.statistics[statKey].bonus}
-          fullWidth
-          sx={{
-            '& .MuiInputBase-input': {
-              color: character.statistics[statKey].bonus < 0 ? '#ffab91' : character.statistics[statKey].bonus > 0 ? '#a5d6a7' : 'white',
-              fontWeight: 'bold',
-              textAlign: 'right',
-            },
-          }}
-        />
-      </Grid>
-      <Grid item size={2}></Grid> */}
     </>
   );
 };
@@ -142,6 +69,9 @@ const CharacterViewStats = ({ character }) => {
   const { t } = useTranslation();
   return (
     <>
+      <Typography variant="h6" color="primary">
+        {t('statistics')}
+      </Typography>
       <Table sx={{ minWidth: 650 }} aria-label="stats table">
         <TableHead>
           <TableRow>

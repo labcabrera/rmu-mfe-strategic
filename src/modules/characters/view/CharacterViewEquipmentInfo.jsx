@@ -18,8 +18,18 @@ const CharacterViewEquipmentInfo = ({ character }) => {
       <Grid size={6}>
         <TextField label={t('weight')} variant="standard" name="weight" value={character.equipment.weight} fullWidth />
       </Grid>
+      <Grid size={6}></Grid>
       <Grid size={6}>
         <TextField label={t('maneuver-penalty')} variant="standard" name="maneuver-penalty" value={character.equipment.maneuverPenalty} fullWidth />
+      </Grid>
+      <Grid size={6}>
+        <TextField
+          label={t('base-maneuver-penalty')}
+          variant="standard"
+          name="base-maneuver-penalty"
+          value={character.equipment.baseManeuverPenalty}
+          fullWidth
+        />
       </Grid>
       <Grid size={6}>
         <TextField label={t('ranged-penalty')} variant="standard" name="ranged-penalty" value={character.equipment.rangedPenalty} fullWidth />
