@@ -33,16 +33,6 @@ const StrategicGameViewActions = ({ strategicGame }) => {
       setDisplayError(true);
       setErrorMessage(`Error deleting game: ${error.message}`);
     }
-    // const url = `${process.env.RMU_API_STRATEGIC_URL}/strategic-games/${strategicGame.id}`;
-    // fetch(url, { method: 'DELETE' })
-    //   .then((response) => {
-    //     if (response.status !== 204) throw new Error(`Error: ${response.status} ${response.statusText}`);
-    //   })
-    //   .then(() => navigate('/strategic/'))
-    //   .catch((error) => {
-    //     setDisplayError(true);
-    //     setErrorMessage(`Error creating game from ${url}. ${error.message}`);
-    //   });
   };
 
   const handleEditClick = () => {
@@ -71,17 +61,16 @@ const StrategicGameViewActions = ({ strategicGame }) => {
       <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center" sx={{ minHeight: 80 }}>
         <Box>
           <Breadcrumbs aria-label="breadcrumb">
-            <Link underline="hover" color="inherit" href="/">
+            <Link color="inherit" href="/">
               Home
             </Link>
-            <Link component={RouterLink} underline="hover" color="inherit" to="/strategic/games">
+            <Link component={RouterLink} color="inherit" to="/strategic/games">
               Strategic
             </Link>
-            <Link component={RouterLink} underline="hover" color="inherit" to="/strategic/games">
+            <Link component={RouterLink} color="inherit" to="/strategic/games">
               Games
             </Link>
             <span>{strategicGame.name}</span>
-            <span>View</span>
           </Breadcrumbs>
         </Box>
         <Stack direction="row" spacing={2}>

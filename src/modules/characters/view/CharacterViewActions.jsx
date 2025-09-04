@@ -14,7 +14,7 @@ import { useError } from '../../../ErrorContext';
 import { deleteCharacter } from '../../api/characters';
 import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 
-const CharacterViewActions = ({ character }) => {
+const CharacterViewActions = ({ character, game, faction }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { showError } = useError();
@@ -48,17 +48,22 @@ const CharacterViewActions = ({ character }) => {
       <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center" sx={{ minHeight: 80 }}>
         <Box>
           <Breadcrumbs aria-label="breadcrumb">
-            <Link underline="hover" color="inherit" href="/">
+            <Link color="inherit" href="/">
               Home
             </Link>
-            <Link component={RouterLink} underline="hover" color="inherit" to="/strategic/games">
+            <Link component={RouterLink} color="inherit" to="/strategic/games">
               {t('strategic')}
             </Link>
-            <Link component={RouterLink} underline="hover" color="inherit" to="/strategic/characters">
-              {t('characters')}
+            <Link component={RouterLink} color="inherit" to="/strategic/games">
+              {t('games')}
+            </Link>
+            <Link component={RouterLink} color="inherit" to={`/strategic/games/view/${game.id}`}>
+              {game.name}
+            </Link>
+            <Link component={RouterLink} color="inherit" to={`/strategic/factions/view/${faction.id}`}>
+              {faction.name}
             </Link>
             <span>{character.name}</span>
-            <span>{t('view')}</span>
           </Breadcrumbs>
         </Box>
         <Stack direction="row" spacing={2}>

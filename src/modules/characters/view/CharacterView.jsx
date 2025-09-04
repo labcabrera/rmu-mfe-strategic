@@ -57,7 +57,7 @@ const CharacterView = () => {
 
   return (
     <>
-      <CharacterViewActions character={character} />
+      <CharacterViewActions character={character} faction={faction} game={strategicGame} />
       <CharacterViewTabs character={character} setCharacter={setCharacter} strategicGame={strategicGame} faction={faction} profession={profession} />
     </>
   );

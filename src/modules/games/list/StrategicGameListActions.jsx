@@ -20,10 +20,10 @@ const StrategicGameListActions = () => {
       <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center" sx={{ minHeight: 80 }}>
         <Box>
           <Breadcrumbs aria-label="breadcrumb">
-            <Link underline="hover" color="inherit" href="/">
+            <Link color="inherit" href="/">
               Home
             </Link>
-            <Link component={RouterLink} underline="hover" color="inherit" to="/strategic">
+            <Link component={RouterLink} color="inherit" to="/strategic">
               Strategic
             </Link>
             <span>Games</span>

@@ -30,7 +30,7 @@ const FactionViewActions = ({ faction, game }) => {
   };
 
   const handleEditClick = () => {
-    navigate(`/strategic/factions/edit/${faction.id}`, { state: { faction: faction } });
+    navigate(`/strategic/factions/edit/${faction.id}`, { state: { faction: faction, game: game } });
   };
 
   const handleDeleteClick = () => {
@@ -51,21 +51,19 @@ const FactionViewActions = ({ faction, game }) => {
       <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center" sx={{ minHeight: 80 }}>
         <Box>
           <Breadcrumbs aria-label="breadcrumb">
-            <Link underline="hover" color="inherit" href="/">
+            <Link color="inherit" href="/">
               Home
             </Link>
-            <Link component={RouterLink} underline="hover" color="inherit" to="/strategic/games">
+            <Link component={RouterLink} color="inherit" to="/strategic/games">
               {t('strategic')}
             </Link>
-            <Link component={RouterLink} underline="hover" color="inherit" to="/strategic/games">
+            <Link component={RouterLink} color="inherit" to="/strategic/games">
               {t('games')}
             </Link>
-            <Link component={RouterLink} underline="hover" color="inherit" to={`/strategic/games/view/${game.id}`}>
+            <Link component={RouterLink} color="inherit" to={`/strategic/games/view/${game.id}`}>
               {game.name}
             </Link>
-            <span>Faction</span>
             <span>{faction.name}</span>
-            <span>{t('view')}</span>
           </Breadcrumbs>
         </Box>
         <Stack direction="row" spacing={2}>

@@ -108,7 +108,7 @@ const StrategicGameUpdateAttributes = ({ formData, setFormData }) => {
         onChange={handlePowerLevelChange}
         size={1}
       />
-      <Grid size={6}></Grid>
+      <Grid size={4}></Grid>
       <FormField i18nLabel="description" name="description" value={formData.description} onChange={handleChange} size={6} />
     </Grid>
   );

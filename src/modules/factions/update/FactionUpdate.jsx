@@ -6,6 +6,7 @@ import FactionUpdateAttributes from './FactionUpdateAttributes';
 const FactionUpdate = () => {
   const location = useLocation();
   const faction = location.state?.faction;
+  const game = location.state?.game;
   const [formData, setFormData] = useState({
     name: faction.name,
     description: faction.description,
@@ -13,7 +14,7 @@ const FactionUpdate = () => {
 
   return (
     <>
-      <FactionUpdateActions formData={formData} faction={faction} />
+      <FactionUpdateActions formData={formData} game={game} faction={faction} />
       <FactionUpdateAttributes formData={formData} setFormData={setFormData} />
     </>
   );
