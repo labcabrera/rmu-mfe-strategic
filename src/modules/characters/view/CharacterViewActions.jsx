@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
-import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Box from '@mui/material/Box';
@@ -15,32 +14,27 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
-import Snackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
+import { useError } from '../../../ErrorContext';
 import { deleteCharacter } from '../../api/characters';
 
 const CharacterViewActions = ({ character }) => {
   const navigate = useNavigate();
-  const [displayError, setDisplayError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const { showError } = useError();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const handleDelete = () => {
-    try {
-      deleteCharacter(character.id);
-      navigate(`/strategic/games/view/${character.gameId}`);
-    } catch (err) {
-      setDisplayError(true);
-      setErrorMessage(`Error deleting character: ${err.message}`);
-    }
+    deleteCharacter(character.id)
+      .then(() => {
+        navigate(`/strategic/factions/view/${character.factionId}`);
+      })
+      .catch((err) => {
+        showError(err.message);
+      });
   };
 
   const handleEditClick = () => {
     navigate(`/strategic/characters/edit/${character.id}`, { state: { character } });
-  };
-
-  const handleSnackbarClose = () => {
-    setDisplayError(false);
   };
 
   const handleDeleteClick = () => {
@@ -83,19 +77,6 @@ const CharacterViewActions = ({ character }) => {
           </IconButton>
         </Stack>
       </Stack>
-      <Snackbar
-        open={displayError}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        onClose={handleSnackbarClose}
-        message={errorMessage}
-        action={
-          <React.Fragment>
-            <IconButton aria-label="close" color="inherit" sx={{ p: 0.5 }} onClick={handleSnackbarClose}>
-              <CloseIcon />
-            </IconButton>
-          </React.Fragment>
-        }
-      />
       <Dialog
         open={deleteDialogOpen}
         onClose={handleDialogDeleteClose}

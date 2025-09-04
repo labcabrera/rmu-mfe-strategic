@@ -11,6 +11,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
+import { useError } from '../../../ErrorContext';
 import { deleteItem, updateCarriedStatus } from '../../api/characters';
 import CharacterViewAddItem from './CharacterViewAddItem';
 import CharacterViewEquipment from './CharacterViewEquipment';
@@ -19,13 +20,16 @@ import CharacterViewTransferGold from './CharacterViewTransferGold';
 
 const ItemCardList = ({ items, character, setCharacter }) => {
   const { t } = useTranslation();
+  const { showError } = useError();
 
   const handleDelete = (itemId) => {
     deleteItem(character.id, itemId)
       .then((data) => {
         setCharacter(data);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        showError(err.message);
+      });
   };
 
   const handleCarried = (itemId, carried) => {
@@ -33,7 +37,9 @@ const ItemCardList = ({ items, character, setCharacter }) => {
       .then((data) => {
         setCharacter(data);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        showError(err.message);
+      });
   };
 
   return (
