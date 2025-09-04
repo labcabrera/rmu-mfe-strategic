@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
 import SaveIcon from '@mui/icons-material/Save';
@@ -12,6 +13,7 @@ import { useError } from '../../../ErrorContext';
 import { createCharacter } from '../../api/characters';
 
 const CharacterCreateActions = ({ formData, game }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { showError } = useError();
 
@@ -30,15 +32,15 @@ const CharacterCreateActions = ({ formData, game }) => {
       <Box>
         <Breadcrumbs aria-label="breadcrumb">
           <Link color="inherit" href="/">
-            Home
+            {t('home')}
           </Link>
           <Link component={RouterLink} color="inherit" to="/strategic/games">
-            Strategic
+            {t('strategic')}
           </Link>
           <Link component={RouterLink} color="inherit" to="/strategic/characters">
-            Characters
+            {t('characters')}
           </Link>
-          <span>Create</span>
+          <span>{t('create')}</span>
         </Breadcrumbs>
       </Box>
       <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>

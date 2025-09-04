@@ -9,7 +9,6 @@ import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import { useError } from '../../../ErrorContext';
-import SnackbarError from '../../shared/errors/SnackbarError';
 import { createStrategicGame } from './../../api/strategic-games';
 
 const StrategicGameCreateActions = ({ formData }) => {

@@ -15,8 +15,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { useError } from '../../../ErrorContext';
 import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../api/characters';
-import SnackbarError from '../../shared/errors/SnackbarError';
 import SelectSkill from '../../shared/selects/SelectSkill';
 
 const addSkillFormDataTemplate = {
@@ -87,47 +87,48 @@ const CharacterViewSkillsAdd = ({ character, setCharacter, setErrorMessage, setD
   );
 };
 
-const CharacterViewSkillsEntry = ({ character, setCharacter, skill, profession, setErrorMessage, setDisplayError }) => {
+const CharacterViewSkillsEntry = ({ character, setCharacter, skill, profession }) => {
   const { t } = useTranslation();
+  const { showError } = useError();
 
-  const handleLevelUp = async () => {
-    try {
-      const updated = await levelUpSkill(character.id, skill.skillId);
-      setCharacter(updated);
-    } catch (error) {
-      setErrorMessage(error.message);
-      setDisplayError(true);
-    }
+  const handleLevelUp = () => {
+    levelUpSkill(character.id, skill.skillId)
+      .then((updated) => {
+        setCharacter(updated);
+      })
+      .catch((error) => {
+        showError(error.message);
+      });
   };
 
-  const handleLevelDown = async () => {
-    try {
-      const updated = await levelDownSkill(character.id, skill.skillId);
-      setCharacter(updated);
-    } catch (error) {
-      setErrorMessage(error.message);
-      setDisplayError(true);
-    }
+  const handleLevelDown = () => {
+    levelDownSkill(character.id, skill.skillId)
+      .then((updated) => {
+        setCharacter(updated);
+      })
+      .catch((error) => {
+        showError(error.message);
+      });
   };
 
-  const handlesetUpProfessionalSkill = async (skill) => {
-    try {
-      const updated = await setUpProfessionalSkill(character.id, skill.skillId);
-      setCharacter(updated);
-    } catch (error) {
-      setErrorMessage(error.message);
-      setDisplayError(true);
-    }
+  const handleSetUpProfessionalSkill = (skill) => {
+    setUpProfessionalSkill(character.id, skill.skillId)
+      .then((updated) => {
+        setCharacter(updated);
+      })
+      .catch((error) => {
+        showError(error.message);
+      });
   };
 
-  const handleDeleteSkill = async (skill) => {
-    try {
-      const updated = await deleteSkill(character.id, skill.skillId);
-      setCharacter(updated);
-    } catch (error) {
-      setErrorMessage(error.message);
-      setDisplayError(true);
-    }
+  const handleDeleteSkill = (skill) => {
+    deleteSkill(character.id, skill.skillId)
+      .then((updated) => {
+        setCharacter(updated);
+      })
+      .catch((error) => {
+        showError(error.message);
+      });
   };
 
   const isAvailableProfessionSkill = (skill) => {
@@ -203,7 +204,7 @@ const CharacterViewSkillsEntry = ({ character, setCharacter, skill, profession, 
             <DeleteForeverIcon />
           </IconButton>
           {isAvailableProfessionSkill(skill) && (
-            <IconButton aria-label="delete" onClick={() => handlesetUpProfessionalSkill(skill)}>
+            <IconButton aria-label="delete" onClick={() => handleSetUpProfessionalSkill(skill)}>
               <StarBorderIcon />
             </IconButton>
           )}
@@ -215,8 +216,6 @@ const CharacterViewSkillsEntry = ({ character, setCharacter, skill, profession, 
 
 const CharacterViewSkills = ({ character, setCharacter, profession }) => {
   const { t } = useTranslation();
-  const [displayError, setDisplayError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
 
   return (
     <Grid container spacing={2} sx={{ marginTop: 2 }}>
@@ -244,25 +243,11 @@ const CharacterViewSkills = ({ character, setCharacter, profession }) => {
         </TableHead>
         <TableBody>
           {character?.skills.map((item) => (
-            <CharacterViewSkillsEntry
-              key={item.skillId}
-              skill={item}
-              character={character}
-              setCharacter={setCharacter}
-              profession={profession}
-              setErrorMessage={setErrorMessage}
-              setDisplayError={setDisplayError}
-            />
+            <CharacterViewSkillsEntry key={item.skillId} skill={item} character={character} setCharacter={setCharacter} profession={profession} />
           ))}
-          <CharacterViewSkillsAdd
-            character={character}
-            setCharacter={setCharacter}
-            setErrorMessage={setErrorMessage}
-            setDisplayError={setDisplayError}
-          />
+          <CharacterViewSkillsAdd character={character} setCharacter={setCharacter} />
         </TableBody>
       </Table>
-      <SnackbarError errorMessage={errorMessage} displayError={displayError} setDisplayError={setDisplayError} />
     </Grid>
   );
 };

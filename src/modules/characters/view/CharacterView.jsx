@@ -44,7 +44,6 @@ const CharacterView = () => {
         });
     }
     if (character && character.info && character.info.professionId) {
-      console.log('Fetching profession for ID:', character.info.professionId);
       fetchProfession(character.info.professionId)
         .then((professionData) => setProfession(professionData))
         .catch((err) => {
