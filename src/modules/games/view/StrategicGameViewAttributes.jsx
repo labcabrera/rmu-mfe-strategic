@@ -25,7 +25,7 @@ const StrategicGameViewAttributes = ({ strategicGame, realm }) => {
       <Grid container spacing={2}>
         <Grid size={12}>
           <Typography variant="h6" color="primary">
-            {t('information')}
+            {t('strategic-game-information')}
           </Typography>
         </Grid>
 

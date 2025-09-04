@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useError } from '../../../ErrorContext';
 import { fetchStrategicGame } from '../../api/strategic-games';
 import { characterCreateTemplate } from '../../data/character-create';
-import SnackbarError from '../../shared/errors/SnackbarError';
 import CharacterCreateActions from './CharacterCreateActions';
 import CharacterCreateAttributes from './CharacterCreateAttributes';
 
@@ -10,19 +10,18 @@ const CharacterCreate = () => {
   const [searchParams] = useSearchParams();
   const gameId = searchParams.get('gameId');
   const factionId = searchParams.get('factionId');
-  const [strategicGame, setStrategicGame] = useState(null);
-  const [displayError, setDisplayError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const { showError } = useError();
+  const [game, setGame] = useState(null);
   const [formData, setFormData] = useState(characterCreateTemplate);
 
-  const bindStrategicGame = async () => {
-    try {
-      const game = await fetchStrategicGame(gameId);
-      setStrategicGame(game);
-    } catch (error) {
-      setDisplayError(true);
-      setErrorMessage(`Error loading game. ${error.message}`);
-    }
+  const bindStrategicGame = () => {
+    fetchStrategicGame(gameId)
+      .then((game) => {
+        setGame(game);
+      })
+      .catch((error) => {
+        showError(error.message);
+      });
   };
 
   useEffect(() => {
@@ -46,9 +45,8 @@ const CharacterCreate = () => {
 
   return (
     <>
-      <CharacterCreateActions formData={formData} />
-      <CharacterCreateAttributes formData={formData} strategicGame={strategicGame} setFormData={setFormData} />
-      <SnackbarError errorMessage={errorMessage} displayError={displayError} setDisplayError={setDisplayError} />
+      <CharacterCreateActions formData={formData} game={game} />
+      <CharacterCreateAttributes formData={formData} strategicGame={game} setFormData={setFormData} />
       <pre>{JSON.stringify(formData, null, 2)}</pre>
     </>
   );

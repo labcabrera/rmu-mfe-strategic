@@ -1,46 +1,35 @@
 /* eslint-disable react/prop-types */
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
-import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
-import Snackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
+import { useError } from '../../../ErrorContext';
 import { deleteStrategicGame } from '../../api/strategic-games';
+import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 
 const StrategicGameViewActions = ({ strategicGame }) => {
   const navigate = useNavigate();
-  const [displayError, setDisplayError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const { showError } = useError();
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
 
-  const handleDelete = async () => {
-    try {
-      await deleteStrategicGame(strategicGame.id);
-      navigate('/strategic/games');
-    } catch (error) {
-      setDisplayError(true);
-      setErrorMessage(`Error deleting game: ${error.message}`);
-    }
+  const handleDelete = () => {
+    deleteStrategicGame(strategicGame.id)
+      .then(() => {
+        navigate('/strategic/games');
+      })
+      .catch((error) => {
+        showError(`Error deleting game: ${error.message}`);
+      });
   };
 
   const handleEditClick = () => {
     navigate(`/strategic/games/edit/${strategicGame.id}`, { state: { strategicGame: strategicGame } });
-  };
-
-  const handleSnackbarClose = () => {
-    setDisplayError(false);
   };
 
   const handleDeleteClick = () => {
@@ -82,36 +71,12 @@ const StrategicGameViewActions = ({ strategicGame }) => {
           </IconButton>
         </Stack>
       </Stack>
-      <Snackbar
-        open={displayError}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        onClose={handleSnackbarClose}
-        message={errorMessage}
-        action={
-          <React.Fragment>
-            <IconButton aria-label="close" color="inherit" sx={{ p: 0.5 }} onClick={handleSnackbarClose}>
-              <CloseIcon />
-            </IconButton>
-          </React.Fragment>
-        }
-      />
-      <Dialog
+      <DeleteDialog
+        message={`Are you sure you want to delete ${strategicGame.name} game? All factions and characters will be eliminated. This action cannot be undone.`}
+        onDelete={() => handleDialogDelete()}
         open={deleteDialogOpen}
-        onClose={handleDialogDeleteClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{'Strategic game delete confirmation'}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure you want to remove {strategicGame.name}? This action cannot be undone
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogDeleteClose}>Cancel</Button>
-          <Button onClick={handleDialogDelete}>Delete</Button>
-        </DialogActions>
-      </Dialog>
+        onClose={() => handleDialogDeleteClose()}
+      />
     </>
   );
 };

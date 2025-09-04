@@ -31,7 +31,7 @@ const CharacterViewResistances = ({ character }) => {
         </TableHead>
         <TableBody>
           {character.resistances.map((resistance) => (
-            <TableRow key={resistance.key} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+            <TableRow key={resistance} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <TableCell component="th" scope="row">
                 {t(resistance.resistance)}
               </TableCell>
