@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import CachedIcon from '@mui/icons-material/Cached';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
@@ -37,9 +38,7 @@ const NameTextField = ({ value, onChange, required = true, generateRandomRaceVal
         input: {
           startAdornment: (
             <InputAdornment position="start">
-              <div className="dark-avatar-container">
-                <Avatar src="/static/images/generic/avatar.png" sx={{ width: 25, height: 25 }} />
-              </div>
+              <AccountCircleIcon />
             </InputAdornment>
           ),
           endAdornment: (

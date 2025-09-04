@@ -13,8 +13,7 @@ const StrategicGameList = () => {
   const bindStrategicGames = () => {
     fetchStrategicGames('', 0, 20)
       .then((response) => {
-        const { games } = response.data;
-        setStrategicGames(games);
+        setStrategicGames(response);
       })
       .catch((error) => {
         console.error(error);

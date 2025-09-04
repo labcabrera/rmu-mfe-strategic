@@ -3,11 +3,15 @@ export const characterCreateTemplate = {
   gameId: '',
   factionId: '',
   info: {
-    level: 1,
-    race: '',
+    raceId: '',
     professionId: '',
+    realmType: '',
     height: 7,
     weight: 120,
+  },
+  roleplay: {
+    gender: 'male',
+    age: 20,
   },
   experience: {
     level: 0,

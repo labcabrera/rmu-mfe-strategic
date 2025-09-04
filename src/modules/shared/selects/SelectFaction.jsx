@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import Avatar from '@mui/material/Avatar';
+import GroupIcon from '@mui/icons-material/Group';
 import InputAdornment from '@mui/material/InputAdornment';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
@@ -36,7 +36,7 @@ const SelectFaction = ({ value, onChange }) => {
         input: {
           startAdornment: (
             <InputAdornment position="start">
-              <Avatar src="/static/images/generic/faction.png" sx={{ width: 25, height: 25 }} />
+              <GroupIcon />
             </InputAdornment>
           ),
         },

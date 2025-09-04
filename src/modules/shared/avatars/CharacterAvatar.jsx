@@ -5,8 +5,8 @@ import defaultImage from '../../../assets/witch-king.jpg';
 
 const CharacterAvatar = ({ character, size = 70 }) => {
   const resolveImage = () => {
-    if (!character || !character.info || !character.info.race) return defaultImage;
-    const check = character.info.race.toLowerCase();
+    if (!character || !character.info || !character.info.raceId) return defaultImage;
+    const check = character.info.raceId.toLowerCase();
     if (check.includes('orc')) return '/static/images/races/generic-orc-01.png';
     if (check.includes('human')) return '/static/images/races/generic-human-01.png';
     if (check.includes('troll')) return '/static/images/races/generic-troll-01.png';
