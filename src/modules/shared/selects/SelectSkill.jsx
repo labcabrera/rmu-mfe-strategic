@@ -1,13 +1,11 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import Avatar from '@mui/material/Avatar';
-import InputAdornment from '@mui/material/InputAdornment';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import { fetchSkills } from '../../api/skills';
 
-const SelectSkill = ({ value, onChange, readonly = false, required = true }) => {
+const SelectSkill = ({ value, i18n = 'skill', onChange, readonly = false, required = true }) => {
   const { t } = useTranslation();
   const [skills, setSkills] = useState([]);
 
@@ -32,24 +30,13 @@ const SelectSkill = ({ value, onChange, readonly = false, required = true }) => 
   return (
     <TextField
       select
-      label={t('skill')}
+      label={t(i18n)}
       value={value === undefined || value === null || skills.length === 0 ? '' : value}
       variant="standard"
       readOnly={readonly}
       required={required}
       fullWidth
       onChange={handleChange}
-      slotProps={{
-        input: {
-          startAdornment: (
-            <InputAdornment position="start">
-              <div className="dark-avatar-container">
-                <Avatar src="/static/images/generic/races.png" sx={{ width: 25, height: 25 }} />
-              </div>
-            </InputAdornment>
-          ),
-        },
-      }}
     >
       {skills.map((option, index) => (
         <MenuItem key={index} value={option.id}>

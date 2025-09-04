@@ -11,7 +11,6 @@ import CharacterCreateStatsActions from './CharacterCreateStatsActions';
 const CharacterStats = ({ statKey, statName, formData, setFormData, statBonusFormData }) => {
   const onChangePotential = (e) => {
     const { name, value } = e.target;
-    // const intValue = Math.max(1, Math.min(100, parseInt(value)));
     const intValue = parseInt(value);
     setFormData((prevState) => ({
       ...prevState,
@@ -27,7 +26,6 @@ const CharacterStats = ({ statKey, statName, formData, setFormData, statBonusFor
 
   const onChangeTemporary = (e) => {
     const { name, value } = e.target;
-    // const intValue = Math.max(1, Math.min(100, parseInt(value)));
     const intValue = parseInt(value);
     const potential = formData.statistics[name].potential;
     const newPotential = Math.max(potential, intValue);

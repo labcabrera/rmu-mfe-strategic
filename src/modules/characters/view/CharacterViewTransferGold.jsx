@@ -5,23 +5,21 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { useError } from '../../../ErrorContext';
 import { transferFactionGold } from '../../api/characters';
-import SnackbarError from '../../shared/errors/SnackbarError';
 
 const CharacterViewAddItem = ({ character, setCharacter, faction }) => {
   const { t } = useTranslation();
   const [goldAmount, setGoldAmount] = useState(0);
-  const [displayError, setDisplayError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const { showError } = useError();
 
   const handleTransfer = (amount) => {
     transferFactionGold(character.id, amount)
       .then((updatedCharacter) => {
         setCharacter(updatedCharacter);
       })
-      .catch((error) => {
-        setErrorMessage(error.message);
-        setDisplayError(true);
+      .catch((err) => {
+        showError(err.message);
       });
   };
 
@@ -31,6 +29,10 @@ const CharacterViewAddItem = ({ character, setCharacter, faction }) => {
       setGoldAmount(item.amount || 0);
     }
   }, [character]);
+
+  if (!character || !faction) {
+    return null;
+  }
 
   return (
     <>
@@ -53,7 +55,6 @@ const CharacterViewAddItem = ({ character, setCharacter, faction }) => {
           <Button onClick={() => handleTransfer(-1)}>-1G</Button>
         </Grid>
       </Grid>
-      <SnackbarError errorMessage={errorMessage} displayError={displayError} setDisplayError={setDisplayError} />
     </>
   );
 };

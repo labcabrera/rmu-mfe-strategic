@@ -1,6 +1,8 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
@@ -12,7 +14,8 @@ import Snackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
 import { updateFaction } from '../../api/factions';
 
-const FactionUpdateActions = ({ formData, faction }) => {
+const FactionUpdateActions = ({ formData, faction, game }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [displayError, setDisplayError] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
@@ -39,11 +42,14 @@ const FactionUpdateActions = ({ formData, faction }) => {
       <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center" sx={{ minHeight: 80 }}>
         <Box>
           <Breadcrumbs aria-label="breadcrumb">
-            <Link underline="hover" color="inherit" href="/">
+            <Link color="inherit" href="/">
               Home
             </Link>
-            <Link underline="hover" color="inherit" href="/strategic">
-              Strategic
+            <Link component={RouterLink} color="inherit" to="/strategic/games">
+              {t('strategic')}
+            </Link>
+            <Link component={RouterLink} color="inherit" to={`/strategic/games/view/${game.id}`}>
+              {game.name}
             </Link>
             <span>Factions</span>
             <span>{faction.name}</span>

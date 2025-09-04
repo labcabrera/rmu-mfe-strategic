@@ -8,7 +8,7 @@ export async function fetchFaction(factionId) {
 }
 
 export async function fetchFactions(rsql, page, size) {
-  const url = `${process.env.RMU_API_STRATEGIC_URL}/factions?rsql=${rsql}&page=${page}&size=${size}`;
+  const url = `${process.env.RMU_API_STRATEGIC_URL}/factions?q=${rsql}&page=${page}&size=${size}`;
   const response = await fetch(url, { method: 'GET' });
   if (response.status != 200) {
     throw new Error(`Faction fetch error response: ${response.statusText}. (${url})`);

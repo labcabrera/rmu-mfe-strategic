@@ -80,10 +80,13 @@ const CharacterViewInfo = ({ character, strategicGame, faction }) => {
         </Grid>
 
         <Grid item size={3}>
-          <TextField label={t('race')} name="race" value={t(character.info.race)} variant="standard" readOnly fullWidth />
+          <TextField label={t('race')} name="race" value={t(character.info.raceId)} variant="standard" readOnly fullWidth />
         </Grid>
         <Grid item size={3}>
           <TextField label={t('profession')} name="profession" value={t(character.info.professionId)} variant="standard" readOnly fullWidth />
+        </Grid>
+        <Grid item size={3}>
+          <TextField label={t('realm')} name="realm" value={t(character.info.realmType)} variant="standard" readOnly fullWidth />
         </Grid>
 
         <Grid size={12}>

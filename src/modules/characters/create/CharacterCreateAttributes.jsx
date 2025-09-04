@@ -10,9 +10,11 @@ import NameTextField from '../../shared/inputs/NameTextField';
 import WeightTextField from '../../shared/inputs/WeightTextField';
 import SelectFaction from '../../shared/selects/SelectFaction';
 import SelectGame from '../../shared/selects/SelectGame';
+import SelectGender from '../../shared/selects/SelectGender';
 import SelectLevel from '../../shared/selects/SelectLevel';
 import SelectProfession from '../../shared/selects/SelectProfession';
 import SelectRace from '../../shared/selects/SelectRace';
+import SelectRealmType from '../../shared/selects/SelectRealmType';
 import GameCreateStats from './CharacterCreateStats';
 
 const CharacterCreateAttributes = ({ strategicGame, formData, setFormData }) => {
@@ -20,7 +22,6 @@ const CharacterCreateAttributes = ({ strategicGame, formData, setFormData }) => 
 
   const onRaceChange = (raceId, raceInfo) => {
     if (raceInfo) {
-      console.log('Race changed:', raceId, raceInfo);
       const stats = { ...formData.statistics };
       const keys = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
       keys.forEach((key) => {
@@ -30,7 +31,7 @@ const CharacterCreateAttributes = ({ strategicGame, formData, setFormData }) => 
         ...prevState,
         info: {
           ...prevState.info,
-          race: raceId,
+          raceId: raceId,
           sizeId: raceInfo.size,
           height: raceInfo.averageHeight.male,
           weight: raceInfo.averageWeight.male,
@@ -72,6 +73,24 @@ const CharacterCreateAttributes = ({ strategicGame, formData, setFormData }) => 
     }
   };
 
+  const handleRealmTypeChange = (realmType) => {
+    setFormData((prevState) => ({ ...prevState, info: { ...prevState.info, realmType: realmType } }));
+  };
+
+  const handleGenderChange = (gender) => {
+    setFormData((prevState) => ({ ...prevState, roleplay: { ...prevState.roleplay, gender: gender } }));
+  };
+
+  const handleAgeChange = (age) => {
+    let value;
+    try {
+      value = parseInt(age.target.value);
+    } catch (error) {
+      value = age;
+    }
+    setFormData((prevState) => ({ ...prevState, roleplay: { ...prevState.roleplay, age: value } }));
+  };
+
   const handleHeightChange = (e) => updateFormData('info', 'height', e.target.value ? parseInt(e.target.value) : 0);
   const handleWeightChange = (e) => updateFormData('info', 'weight', e.target.value ? parseInt(e.target.value) : 0);
 
@@ -108,23 +127,26 @@ const CharacterCreateAttributes = ({ strategicGame, formData, setFormData }) => 
         <Grid item size={3}>
           <SelectFaction value={formData.factionId} onChange={onFactionChange} />
         </Grid>
-        <Grid item size={6}></Grid>
-
         <Grid item size={3}>
-          <SelectRace value={formData.info.race} onChange={onRaceChange} />
+          <SelectRace value={formData.info.raceId} onChange={onRaceChange} />
         </Grid>
+        <Grid item size={3}></Grid>
+
         <Grid item size={3}>
           <SelectProfession value={formData.info.professionId} onChange={onProfessionChange} />
         </Grid>
-        <Grid item size={6}></Grid>
-
         <Grid item size={3}>
-          <NameTextField value={formData.name} onChange={onNameChange} generateRandom={true} generateRandomRaceValue={formData.info.race} />
+          <SelectRealmType value={formData.info.realmTypeId} onChange={handleRealmTypeChange} />
         </Grid>
         <Grid item size={3}>
           <SelectLevel value={formData.info.level} onChange={onLevelChange} />
         </Grid>
-        <Grid item size={6}></Grid>
+        <Grid item size={3}></Grid>
+
+        <Grid item size={3}>
+          <NameTextField value={formData.name} onChange={onNameChange} generateRandom={true} generateRandomRaceValue={formData.info.raceId} />
+        </Grid>
+        <Grid item size={9}></Grid>
 
         <Grid item size={3}>
           <HeightTextField value={formData.info.height} onChange={handleHeightChange} />
@@ -132,9 +154,14 @@ const CharacterCreateAttributes = ({ strategicGame, formData, setFormData }) => 
         <Grid item size={3}>
           <WeightTextField value={formData.info.weight} onChange={handleWeightChange} />
         </Grid>
-        <Grid item size={6}></Grid>
-
-        <Grid item size={6}>
+        <Grid item size={3}></Grid>
+        <GameCreateStats formData={formData} setFormData={setFormData} strategicGame={strategicGame} />
+        <Grid size={12}>
+          <Typography variant="h6" color="primary">
+            {t('roleplay')}
+          </Typography>
+        </Grid>
+        <Grid item size={9}>
           <TextField
             label="Description"
             variant="standard"
@@ -146,8 +173,14 @@ const CharacterCreateAttributes = ({ strategicGame, formData, setFormData }) => 
             maxRows={4}
           />
         </Grid>
+        <Grid size={3}></Grid>
+        <Grid size={3}>
+          <SelectGender value={formData.roleplay.gender} onChange={handleGenderChange} />
+        </Grid>
+        <Grid size={3}>
+          <TextField label="Gender" value={formData.roleplay.age} onChange={handleAgeChange} fullWidth />
+        </Grid>
       </Grid>
-      <GameCreateStats formData={formData} setFormData={setFormData} strategicGame={strategicGame} />
     </>
   );
 };

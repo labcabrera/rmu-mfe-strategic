@@ -58,7 +58,7 @@ const FactionViewAttributes = ({ faction, setFaction, strategicGame }) => {
 
   return (
     <Grid container spacing={2} alignItems="center">
-      <HeaderCategory i18nLabel="information" />
+      <HeaderCategory i18nLabel="faction-information" />
 
       <Grid size={10}>
         <TextField

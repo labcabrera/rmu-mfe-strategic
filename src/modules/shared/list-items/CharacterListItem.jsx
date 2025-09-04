@@ -16,7 +16,7 @@ const CharacterListItem = ({ character }) => {
   };
 
   const getDetail = () => {
-    return t(character.info.race) + ' - ' + t(character.info.professionId) + ' - Level ' + character.experience.availableLevel;
+    return t(character.info.raceId) + ' - ' + t(character.info.professionId) + ' - Level ' + character.experience.availableLevel;
   };
 
   return (

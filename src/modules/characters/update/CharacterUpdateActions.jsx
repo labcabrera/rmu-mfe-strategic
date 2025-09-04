@@ -1,6 +1,8 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
@@ -12,8 +14,9 @@ import Snackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
 import { updateCharacter } from '../../api/characters';
 
-const CharacterUpdateActions = ({ character, formData }) => {
+const CharacterUpdateActions = ({ character, game, faction, formData }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [displayError, setDisplayError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -42,12 +45,18 @@ const CharacterUpdateActions = ({ character, formData }) => {
             <Link underline="hover" color="inherit" href="/">
               Home
             </Link>
-            <Link underline="hover" color="inherit" href="/strategic">
-              Strategic
+            <Link component={RouterLink} underline="hover" color="inherit" to="/strategic/games">
+              {t('strategic')}
             </Link>
-            <span>Games</span>
+            <Link component={RouterLink} underline="hover" color="inherit" to="/strategic/games">
+              {t('games')}
+            </Link>
+            <Link component={RouterLink} underline="hover" color="inherit" to={`/strategic/games/view/${game.id}`}>
+              {game.name}
+            </Link>
+            <span>{faction.name}</span>
             <span>{character.name}</span>
-            <span>Edit</span>
+            <span>{t('edit')}</span>
           </Breadcrumbs>
         </Box>
         <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>

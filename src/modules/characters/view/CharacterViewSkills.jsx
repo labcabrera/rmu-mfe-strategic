@@ -8,11 +8,15 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
-import List from '@mui/material/List';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { useError } from '../../../ErrorContext';
 import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../api/characters';
-import SnackbarError from '../../shared/errors/SnackbarError';
 import SelectSkill from '../../shared/selects/SelectSkill';
 
 const addSkillFormDataTemplate = {
@@ -22,10 +26,10 @@ const addSkillFormDataTemplate = {
   customBonus: 0,
 };
 
-const CharacterViewSkillsAdd = ({ character, setCharacter }) => {
-  const { t } = useTranslation();
-  const [displayError, setDisplayError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+const red = '#ffab91';
+const green = '#a5d6a7';
+
+const CharacterViewSkillsAdd = ({ character, setCharacter, setErrorMessage, setDisplayError }) => {
   const [skill, setSkill] = useState(null);
   const [formData, setFormData] = useState(addSkillFormDataTemplate);
 
@@ -57,79 +61,74 @@ const CharacterViewSkillsAdd = ({ character, setCharacter }) => {
 
   return (
     <>
-      <Grid container spacing={2} sx={{ marginTop: 2 }}>
-        <Grid item size={2}>
-          <SelectSkill value={formData.skillId} onChange={handleSkillChange} />
-        </Grid>
-        <Grid item size={2}>
+      <TableRow key="newSkill" sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+        <TableCell component="th" scope="row">
+          <SelectSkill i18n="add-skill" value={formData.skillId} onChange={handleSkillChange} />
+        </TableCell>
+        <TableCell component="th" scope="row">
           {isSpecializationAllowed() ? (
             <TextField label="Specialization" value={formData.specialization} onChange={handleSpecializationChange} />
           ) : null}
-        </Grid>
-        <Grid item size={5}></Grid>
-        <Grid item size={1}>
-          <TextField
-            label={t('dev')}
-            name="availableDevelopmentPoints"
-            value={`${character.experience.availableDevelopmentPoints} / ${character.experience.developmentPoints}`}
-            readOnly
-            fullWidth
-          />
-        </Grid>
-        <Grid item size={2}>
+        </TableCell>
+        <TableCell align="right"></TableCell>
+        <TableCell align="right"></TableCell>
+        <TableCell align="right"></TableCell>
+        <TableCell align="right"></TableCell>
+        <TableCell align="right"></TableCell>
+        <TableCell align="right"></TableCell>
+        <TableCell align="right"></TableCell>
+        <TableCell align="left">
           <IconButton aria-label="delete" onClick={() => handleAddSkill()}>
             <AddCircleOutlineIcon />
           </IconButton>
-        </Grid>
-      </Grid>
-      <SnackbarError errorMessage={errorMessage} displayError={displayError} setDisplayError={setDisplayError} />
+        </TableCell>
+      </TableRow>
     </>
   );
 };
 
 const CharacterViewSkillsEntry = ({ character, setCharacter, skill, profession }) => {
   const { t } = useTranslation();
-  const [displayError, setDisplayError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const { showError } = useError();
 
-  const handleLevelUp = async () => {
-    try {
-      const updated = await levelUpSkill(character.id, skill.skillId);
-      setCharacter(updated);
-    } catch (error) {
-      setErrorMessage(error.message);
-      setDisplayError(true);
-    }
+  const handleLevelUp = () => {
+    levelUpSkill(character.id, skill.skillId)
+      .then((updated) => {
+        setCharacter(updated);
+      })
+      .catch((error) => {
+        showError(error.message);
+      });
   };
 
-  const handleLevelDown = async () => {
-    try {
-      const updated = await levelDownSkill(character.id, skill.skillId);
-      setCharacter(updated);
-    } catch (error) {
-      setErrorMessage(error.message);
-      setDisplayError(true);
-    }
+  const handleLevelDown = () => {
+    levelDownSkill(character.id, skill.skillId)
+      .then((updated) => {
+        setCharacter(updated);
+      })
+      .catch((error) => {
+        showError(error.message);
+      });
   };
 
-  const handlesetUpProfessionalSkill = async (skill) => {
-    try {
-      const updated = await setUpProfessionalSkill(character.id, skill.skillId);
-      setCharacter(updated);
-    } catch (error) {
-      setErrorMessage(error.message);
-      setDisplayError(true);
-    }
+  const handleSetUpProfessionalSkill = (skill) => {
+    setUpProfessionalSkill(character.id, skill.skillId)
+      .then((updated) => {
+        setCharacter(updated);
+      })
+      .catch((error) => {
+        showError(error.message);
+      });
   };
 
-  const handleDeleteSkill = async (skill) => {
-    try {
-      const updated = await deleteSkill(character.id, skill.skillId);
-      setCharacter(updated);
-    } catch (error) {
-      setErrorMessage(error.message);
-      setDisplayError(true);
-    }
+  const handleDeleteSkill = (skill) => {
+    deleteSkill(character.id, skill.skillId)
+      .then((updated) => {
+        setCharacter(updated);
+      })
+      .catch((error) => {
+        showError(error.message);
+      });
   };
 
   const isAvailableProfessionSkill = (skill) => {
@@ -147,107 +146,54 @@ const CharacterViewSkillsEntry = ({ character, setCharacter, skill, profession }
 
   return (
     <>
-      <Grid container spacing={2} sx={{ marginTop: 2 }}>
-        <Grid item size={2}>
-          <h4>
-            {t(skill.skillId)}
-            {isProfessionalSkill(skill) ? <StarBorderIcon /> : ''}
-          </h4>
-        </Grid>
-        <Grid item size={1}>
-          {skill.specialization ? <h4>{skill.specialization}</h4> : null}
-        </Grid>
-        <Grid item size={1}>
-          {skill.statistics.join('/')}
-        </Grid>
-        <Grid item size={1}>
-          <TextField
-            label={t('ranks')}
-            name="ranks"
-            value={skill.ranks}
-            readOnly
-            fullWidth
-            sx={{
-              '& .MuiInputBase-input': {
-                textAlign: 'right',
-              },
-            }}
-          />
-        </Grid>
-        <Grid item size={1}>
-          <TextField
-            label={t('stats')}
-            name="statBonus"
-            value={skill.statBonus}
-            readOnly
-            fullWidth
-            sx={{
-              '& .MuiInputBase-input': {
-                color: skill.statBonus < 0 ? '#ffab91' : skill.statBonus > 0 ? '#a5d6a7' : 'white',
-                textAlign: 'right',
-              },
-            }}
-          />
-        </Grid>
-        <Grid item size={1}>
-          <TextField
-            label={t('prof')}
-            name="professionalBonus"
-            value={skill.professionalBonus}
-            readOnly
-            fullWidth
-            sx={{
-              '& .MuiInputBase-input': {
-                textAlign: 'right',
-              },
-            }}
-          />
-        </Grid>
-        <Grid item size={1}>
-          <TextField
-            label={t('dev')}
-            name="developmentBonus"
-            value={skill.developmentBonus}
-            readOnly
-            fullWidth
-            sx={{
-              '& .MuiInputBase-input': {
-                textAlign: 'right',
-              },
-            }}
-          />
-        </Grid>
-        <Grid item size={1}>
-          <TextField
-            label={t('custom')}
-            name="customBonus"
-            value={skill.customBonus}
-            readOnly
-            fullWidth
-            sx={{
-              '& .MuiInputBase-input': {
-                textAlign: 'right',
-              },
-            }}
-          />
-        </Grid>
-        <Grid item size={1}>
-          <TextField
-            label={t('total')}
-            name="totalBonus"
-            value={skill.totalBonus}
-            readOnly
-            fullWidth
-            sx={{
-              '& .MuiInputBase-input': {
-                color: skill.totalBonus < 0 ? '#ffab91' : skill.totalBonus > 0 ? '#a5d6a7' : 'white',
-                fontWeight: 'bold',
-                textAlign: 'right',
-              },
-            }}
-          />
-        </Grid>
-        <Grid item size={2}>
+      <TableRow key={skill.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+        <TableCell component="th" scope="row">
+          {t(skill.skillId)}
+          {isProfessionalSkill(skill) ? ' *' : null}
+        </TableCell>
+        <TableCell component="th" scope="row">
+          {skill.category}
+        </TableCell>
+        <TableCell align="right">{skill.statistics.join('/')}</TableCell>
+        <TableCell align="right">{skill.ranks}</TableCell>
+        <TableCell
+          align="right"
+          sx={{
+            color: skill.statBonus < 0 ? red : skill.statBonus > 0 ? green : 'inherit',
+            fontWeight: 'bold',
+          }}
+        >
+          {skill.statBonus}
+        </TableCell>
+        <TableCell
+          align="right"
+          sx={{
+            color: skill.professionalBonus < 0 ? red : skill.professionalBonus > 0 ? green : 'inherit',
+            fontWeight: 'bold',
+          }}
+        >
+          {skill.professionalBonus}
+        </TableCell>
+        <TableCell
+          align="right"
+          sx={{
+            color: skill.developmentBonus < 0 ? red : skill.developmentBonus > 0 ? green : 'inherit',
+            fontWeight: 'bold',
+          }}
+        >
+          {skill.developmentBonus}
+        </TableCell>
+        <TableCell align="right">{skill.customBonus}</TableCell>
+        <TableCell
+          align="right"
+          sx={{
+            color: skill.totalBonus < 0 ? red : skill.totalBonus > 0 ? green : 'inherit',
+            fontWeight: 'bold',
+          }}
+        >
+          {skill.totalBonus}
+        </TableCell>
+        <TableCell align="left">
           <IconButton onClick={() => handleLevelUp()}>
             <ArrowCircleUpIcon />
           </IconButton>
@@ -258,19 +204,19 @@ const CharacterViewSkillsEntry = ({ character, setCharacter, skill, profession }
             <DeleteForeverIcon />
           </IconButton>
           {isAvailableProfessionSkill(skill) && (
-            <IconButton aria-label="delete" onClick={() => handlesetUpProfessionalSkill(skill)}>
+            <IconButton aria-label="delete" onClick={() => handleSetUpProfessionalSkill(skill)}>
               <StarBorderIcon />
             </IconButton>
           )}
-        </Grid>
-      </Grid>
-      <SnackbarError errorMessage={errorMessage} displayError={displayError} setDisplayError={setDisplayError} />
+        </TableCell>
+      </TableRow>
     </>
   );
 };
 
 const CharacterViewSkills = ({ character, setCharacter, profession }) => {
   const { t } = useTranslation();
+
   return (
     <Grid container spacing={2} sx={{ marginTop: 2 }}>
       <Grid item size={12}>
@@ -278,12 +224,30 @@ const CharacterViewSkills = ({ character, setCharacter, profession }) => {
           {t('skills')}
         </Typography>
       </Grid>
-      <List>
-        {character?.skills.map((item) => (
-          <CharacterViewSkillsEntry key={item.skillId} skill={item} character={character} setCharacter={setCharacter} profession={profession} />
-        ))}
-        <CharacterViewSkillsAdd character={character} setCharacter={setCharacter} />
-      </List>
+      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell align="left">Skill</TableCell>
+            <TableCell align="left">Specialization</TableCell>
+            <TableCell align="right">Stats</TableCell>
+            <TableCell align="right">Ranks</TableCell>
+            <TableCell align="right">Stat bonus</TableCell>
+            <TableCell align="right">Professional bonus</TableCell>
+            <TableCell align="right">Dev bonus</TableCell>
+            <TableCell align="right">Custom bonus</TableCell>
+            <TableCell align="right">Total bonus</TableCell>
+            <TableCell align="left">
+              Development points: {character.experience.availableDevelopmentPoints} / {character.experience.developmentPoints}
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {character?.skills.map((item) => (
+            <CharacterViewSkillsEntry key={item.skillId} skill={item} character={character} setCharacter={setCharacter} profession={profession} />
+          ))}
+          <CharacterViewSkillsAdd character={character} setCharacter={setCharacter} />
+        </TableBody>
+      </Table>
     </Grid>
   );
 };

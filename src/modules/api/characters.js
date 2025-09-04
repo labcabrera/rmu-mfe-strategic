@@ -2,7 +2,7 @@ export async function fetchCharacter(characterId) {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}`;
   const response = await fetch(url, { method: 'GET' });
   if (response.status != 200) {
-    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+    throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
@@ -11,7 +11,7 @@ export async function fetchCharacters(rsql, page, size) {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters?q=${rsql}&page=${page}&size=${size}`;
   const response = await fetch(url, { method: 'GET' });
   if (response.status != 200) {
-    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+    throw await buildErrorFromResponse(response, url);
   }
   const pageContent = await response.json();
   return pageContent.content;
@@ -27,7 +27,7 @@ export async function createCharacter(characterData) {
     body: JSON.stringify(characterData),
   });
   if (response.status != 201) {
-    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+    throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
@@ -42,7 +42,7 @@ export async function updateCharacter(characterId, character) {
     body: JSON.stringify(character),
   });
   if (response.status != 200) {
-    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+    throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
@@ -56,7 +56,7 @@ export async function deleteCharacter(characterId) {
     },
   });
   if (response.status != 204) {
-    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+    throw await buildErrorFromResponse(response, url);
   }
 }
 
@@ -70,7 +70,7 @@ export async function addSkill(characterId, data) {
     body: JSON.stringify(data),
   });
   if (response.status != 201) {
-    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+    throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
@@ -84,7 +84,7 @@ export async function deleteSkill(characterId, skillId) {
     },
   });
   if (response.status != 200) {
-    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+    throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
@@ -98,7 +98,7 @@ export async function levelUpSkill(characterId, skillId) {
     },
   });
   if (response.status != 200) {
-    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+    throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
@@ -112,7 +112,7 @@ export async function levelDownSkill(characterId, skillId) {
     },
   });
   if (response.status != 200) {
-    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+    throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
@@ -126,7 +126,7 @@ export async function setUpProfessionalSkill(characterId, skillId) {
     },
   });
   if (response.status != 200) {
-    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+    throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
@@ -139,7 +139,7 @@ export async function addItem(characterId, data) {
     body: JSON.stringify(data),
   });
   if (response.status != 201) {
-    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+    throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
@@ -151,7 +151,7 @@ export async function deleteItem(characterId, itemId) {
     headers: { 'Content-Type': 'application/json' },
   });
   if (response.status != 200) {
-    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+    throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
@@ -165,7 +165,7 @@ export async function equipItem(characterId, slot, itemId) {
     body: JSON.stringify(request),
   });
   if (response.status != 201) {
-    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+    throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
@@ -177,7 +177,7 @@ export async function unequipItem(characterId, slot) {
     headers: { 'Content-Type': 'application/json' },
   });
   if (response.status != 200) {
-    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+    throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
@@ -189,7 +189,7 @@ export async function updateCarriedStatus(characterId, itemId, carried) {
     headers: { 'Content-Type': 'application/json' },
   });
   if (response.status != 200) {
-    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+    throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
@@ -202,7 +202,7 @@ export async function transferFactionGold(characterId, amount) {
     body: JSON.stringify({ amount }),
   });
   if (response.status != 200) {
-    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+    throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
@@ -212,7 +212,19 @@ export async function fetchCharacterSizes() {
   const url = `${process.env.RMU_API_CORE_URL}/character-sizes`;
   const response = await fetch(url, { method: 'GET' });
   if (response.status != 200) {
-    throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+    throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
+}
+
+async function buildErrorFromResponse(response, url) {
+  return response
+    .json()
+    .then((errorData) => {
+      const errorMessage = errorData.message || 'Unknown error';
+      return new Error(errorMessage);
+    })
+    .catch(() => {
+      throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
+    });
 }

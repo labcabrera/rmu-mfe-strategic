@@ -4,25 +4,23 @@ import Autocomplete from '@mui/material/Autocomplete';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { useError } from '../../../ErrorContext';
 import { fetchRealms } from '../../api/realms';
 import { gameCreateTemplate } from '../../data/game-create';
-import SnackbarError from '../../shared/errors/SnackbarError';
 import StrategicGameCreateActions from './StrategicGameCreateActions';
 
 const StrategicGameCreate = () => {
   const [realms, setRealms] = useState([]);
   const { t } = useTranslation();
-  const [displayError, setDisplayError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const { showError } = useError();
   const [formData, setFormData] = useState(gameCreateTemplate);
 
   const bindRealms = async () => {
     try {
       const data = await fetchRealms();
       setRealms(data.content.map(mapRealm));
-    } catch (error) {
-      setDisplayError(true);
-      setErrorMessage(`Error loading realms. ${error.message}`);
+    } catch (err) {
+      showError(err.message);
     }
   };
 
@@ -215,8 +213,7 @@ const StrategicGameCreate = () => {
         </Grid>
         <Grid size={8}></Grid>
       </Grid>
-      <SnackbarError displayError={displayError} errorMessage={errorMessage} setDisplayError={setDisplayError} />
-      <pre>{JSON.stringify(formData, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
     </>
   );
 };
