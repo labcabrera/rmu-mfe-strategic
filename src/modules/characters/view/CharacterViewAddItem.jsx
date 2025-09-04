@@ -7,6 +7,7 @@ import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { useError } from '../../../ErrorContext';
 import { addItem } from '../../api/characters';
 import { fetchItems } from '../../api/items';
 import { characterItemCreateTemplate } from '../../data/item-create';
@@ -16,12 +17,15 @@ import SelectItemType from '../../shared/selects/SelectItemType';
 
 const ItemInfo = ({ character, setCharacter, formData, setFormData, item }) => {
   const { t } = useTranslation();
+  const { showError } = useError();
 
-  const handleAdd = () => {
+  const handleAddItem = () => {
     addItem(character.id, formData)
       .then((data) => setCharacter(data))
       .then(() => setFormData(characterItemCreateTemplate))
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        showError(err.message);
+      });
   };
 
   if (!item) return null;
@@ -117,7 +121,7 @@ const ItemInfo = ({ character, setCharacter, formData, setFormData, item }) => {
         <TextField label={t('description')} variant="standard" name="description" value={item.description} fullWidth />
       </Grid>
       <Grid size={12}>
-        <Button variant="contained" onClick={handleAdd}>
+        <Button variant="contained" onClick={handleAddItem}>
           {t('add-item')}
         </Button>
       </Grid>
