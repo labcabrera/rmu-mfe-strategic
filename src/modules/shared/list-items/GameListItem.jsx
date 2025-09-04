@@ -1,27 +1,30 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Avatar from '@mui/material/Avatar';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import witchKing from '../../../assets/witch-king.jpg';
+import GameAvatar from '../avatars/GameAvatar';
 
-const StrategicGameListItem = ({ strategicGame }) => {
+const GameListItem = ({ game }) => {
   const navigate = useNavigate();
 
   const handleGameClick = () => {
-    navigate(`/strategic/games/view/${strategicGame.id}`, { state: { strategicGame: strategicGame } });
+    navigate(`/strategic/games/view/${game.id}`, { state: { game: game } });
+  };
+
+  const getDetail = () => {
+    return 'Game info todo';
   };
 
   return (
     <ListItemButton onClick={handleGameClick}>
-      <ListItemAvatar>
-        <Avatar src={witchKing}></Avatar>
+      <ListItemAvatar sx={{ mr: 2 }}>
+        <GameAvatar game={game} />
       </ListItemAvatar>
-      <ListItemText primary={strategicGame.name} secondary={strategicGame.user} />
+      <ListItemText primary={game.name} secondary={getDetail()} />
     </ListItemButton>
   );
 };
 
-export default StrategicGameListItem;
+export default GameListItem;

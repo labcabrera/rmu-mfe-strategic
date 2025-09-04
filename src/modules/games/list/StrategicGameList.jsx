@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import List from '@mui/material/List';
 import { fetchStrategicGames } from '../../api/strategic-games';
 import SnackbarError from '../../shared/errors/SnackbarError';
+import GameListItem from '../../shared/list-items/GameListItem';
 import StrategicGameListActions from './StrategicGameListActions';
-import StrategicGameListItem from './StrategicGameListItem';
 
 const StrategicGameList = () => {
   const [strategicGames, setStrategicGames] = useState([]);
@@ -36,7 +36,7 @@ const StrategicGameList = () => {
       <StrategicGameListActions />
       <List>
         {strategicGames?.map((item) => (
-          <StrategicGameListItem key={item.id} strategicGame={item} />
+          <GameListItem key={item.id} game={item} />
         ))}
       </List>
       <SnackbarError open={displayError} onClose={handleSnackbarClose} message={errorMessage} />
