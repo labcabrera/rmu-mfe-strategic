@@ -26,7 +26,7 @@ const WeightTextField = ({ value, onChange, readOnly = false }) => {
         input: {
           startAdornment: (
             <InputAdornment position="start">
-              <Avatar src="/static/images/generic/weight.png" sx={{ width: 25, height: 25 }} />
+              <Avatar src="/static/images/icons/weight.png" sx={{ width: 25, height: 25 }} />
             </InputAdornment>
           ),
         },

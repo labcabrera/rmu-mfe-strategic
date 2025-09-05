@@ -26,7 +26,7 @@ const MovementTextField = ({ value, onChange, i18nLabel = 'movement', disabled =
         input: {
           startAdornment: (
             <InputAdornment position="start">
-              <Avatar src="/static/images/generic/movement.png" sx={{ width: 25, height: 25 }} />
+              <Avatar src="/static/images/icons/movement.png" sx={{ width: 25, height: 25 }} />
             </InputAdornment>
           ),
         },

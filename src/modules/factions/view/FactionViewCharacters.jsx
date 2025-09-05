@@ -3,6 +3,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
@@ -34,7 +35,7 @@ const FactionViewCharacters = ({ faction, characters }) => {
       </Grid>
       <Grid size={12}>
         <IconButton variant="outlined" onClick={handleCreate}>
-          <AddCircleIcon />
+          <GroupAddIcon fontSize="large" />
         </IconButton>
       </Grid>
     </Grid>
