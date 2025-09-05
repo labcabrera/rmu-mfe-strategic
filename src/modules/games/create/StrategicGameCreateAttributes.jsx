@@ -73,6 +73,7 @@ const StrategicGameCreateAttributes = ({ formData, setFormData, realms }) => {
             name="experienceMultiplier"
             value={formData.options.experienceMultiplier}
             onChange={handleOptionsChange}
+            maxDecimals={2}
             required
           />
         </Grid>
@@ -82,16 +83,18 @@ const StrategicGameCreateAttributes = ({ formData, setFormData, realms }) => {
             name="fatigueMultiplier"
             value={formData.options.fatigueMultiplier}
             onChange={handleOptionsChange}
+            maxDecimals={2}
             required
           />
         </Grid>
         <Grid size={4}></Grid>
         <Grid size={4}>
           <NumericTextField
-            label={t('board-scale')}
+            label={t('board-scale-multiplier')}
             name="boardScaleMultiplier"
             value={formData.options.boardScaleMultiplier}
             onChange={handleOptionsChange}
+            maxDecimals={2}
             required
           />
         </Grid>
@@ -103,6 +106,15 @@ const StrategicGameCreateAttributes = ({ formData, setFormData, realms }) => {
             Power level
           </Typography>
         </Grid>
+        <Grid item size={4}>
+          <NumericTextField
+            label="Base dev points"
+            name="baseDevPoints"
+            value={formData.powerLevel.baseDevPoints}
+            onChange={handlePowerLevelChange}
+            required
+          />
+        </Grid>
         <Grid size={4}>
           <NumericTextField
             label="Stat random min"
@@ -112,7 +124,7 @@ const StrategicGameCreateAttributes = ({ formData, setFormData, realms }) => {
             required
           />
         </Grid>
-        <Grid size={8}></Grid>
+        <Grid size={12}></Grid>
 
         <Grid size={4}>
           <NumericTextField
@@ -152,7 +164,6 @@ const StrategicGameCreateAttributes = ({ formData, setFormData, realms }) => {
           />
         </Grid>
 
-        <Grid size={4}></Grid>
         <Grid item size={8}>
           <TextField
             label="Description"
@@ -165,7 +176,6 @@ const StrategicGameCreateAttributes = ({ formData, setFormData, realms }) => {
             maxRows={4}
           />
         </Grid>
-        <Grid size={8}></Grid>
       </Grid>
     </>
   );

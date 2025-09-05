@@ -2,10 +2,12 @@
 import React from 'react';
 import TextField from '@mui/material/TextField';
 
-const NumericTextField = ({ value, onChange, ...props }) => {
+const NumericTextField = ({ value, onChange, maxDecimals = 0, ...props }) => {
+  const decimalPattern = maxDecimals && maxDecimals > 0 ? `^-?\\d*\\.?\\d{0,${maxDecimals}}$` : '^-?\\d*$';
+
   const handleChange = (e) => {
     const val = e.target.value;
-    if (/^-?\d*\.?\d*$/.test(val) || val === '-') {
+    if (new RegExp(decimalPattern).test(val) || val === '-') {
       onChange(e);
     }
   };
@@ -19,8 +21,8 @@ const NumericTextField = ({ value, onChange, ...props }) => {
       fullWidth
       slotProps={{
         input: {
-          inputMode: 'decimal',
-          pattern: '^-?\\d*\\.?\\d*$',
+          inputMode: maxDecimals && maxDecimals > 0 ? 'decimal' : 'numeric',
+          pattern: decimalPattern,
         },
       }}
     />
