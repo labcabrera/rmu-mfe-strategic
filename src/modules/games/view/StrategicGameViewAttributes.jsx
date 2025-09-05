@@ -50,6 +50,7 @@ const StrategicGameViewAttributes = ({ strategicGame, realm }) => {
           </Typography>
         </Grid>
 
+        <InfoField i18n="base-dev-points" value={strategicGame.powerLevel.baseDevPoints} size={2} />
         <InfoField i18n="stat-random-min" value={strategicGame.powerLevel.statRandomMin} size={2} />
         <InfoField i18n="stat-boost-potential" value={strategicGame.powerLevel.statBoostPotential} size={2} />
         <InfoField i18n="stat-boost-temporary" value={strategicGame.powerLevel.statBoostTemporary} size={2} />

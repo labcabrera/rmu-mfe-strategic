@@ -34,7 +34,6 @@ const StrategicGameCreate = () => {
     <>
       <StrategicGameCreateActions formData={formData} />
       <StrategicGameCreateAttributes formData={formData} setFormData={setFormData} realms={realms} />
-      <pre>{JSON.stringify(formData, null, 2)}</pre>
     </>
   );
 };
