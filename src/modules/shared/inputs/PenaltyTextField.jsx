@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Avatar from '@mui/material/Avatar';
+import SouthIcon from '@mui/icons-material/South';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 
@@ -15,13 +15,18 @@ const PenaltyTextField = ({ value, onChange, i18nLabel = 'armor-type', disabled 
       onChange={onChange}
       disabled={disabled}
       required={required}
-      variant="outlined"
+      variant="standard"
       fullWidth
+      sx={{
+        '& .MuiInputBase-input': {
+          textAlign: 'right',
+        },
+      }}
       slotProps={{
         input: {
           startAdornment: (
             <InputAdornment position="start">
-              <Avatar src="/static/images/generic/penalty.png" sx={{ width: 25, height: 25 }} />
+              <SouthIcon />
             </InputAdornment>
           ),
         },

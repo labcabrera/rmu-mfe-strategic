@@ -6,11 +6,11 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import GameAvatar from '../avatars/GameAvatar';
 
-const GameListItem = ({ game }) => {
+const TacticalGameListItem = ({ game }) => {
   const navigate = useNavigate();
 
   const handleGameClick = () => {
-    navigate(`/strategic/games/view/${game.id}`, { state: { game: game } });
+    navigate(`/tactical/games/view/${game.id}`, { state: { game: game } });
   };
 
   return (
@@ -23,4 +23,4 @@ const GameListItem = ({ game }) => {
   );
 };
 
-export default GameListItem;
+export default TacticalGameListItem;

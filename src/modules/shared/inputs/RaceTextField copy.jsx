@@ -5,28 +5,20 @@ import Avatar from '@mui/material/Avatar';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 
-const InitiativeTextField = ({ value, onChange, i18nLabel = 'initiative', disabled = false, required = false }) => {
+const RaceTextField = ({ value }) => {
   const { t } = useTranslation();
 
   return (
     <TextField
-      label={t(i18nLabel)}
+      label={t('race')}
       variant="standard"
       fullWidth
       value={value}
-      onChange={onChange}
-      disabled={disabled}
-      required={required}
-      sx={{
-        '& .MuiInputBase-input': {
-          textAlign: 'right',
-        },
-      }}
       slotProps={{
         input: {
           startAdornment: (
             <InputAdornment position="start">
-              <Avatar src="/static/images/icons/initiative.png" sx={{ width: 25, height: 25 }} />
+              <Avatar src="/static/images/icons/race.png" sx={{ width: 25, height: 25 }} />
             </InputAdornment>
           ),
         },
@@ -35,4 +27,4 @@ const InitiativeTextField = ({ value, onChange, i18nLabel = 'initiative', disabl
   );
 };
 
-export default InitiativeTextField;
+export default RaceTextField;

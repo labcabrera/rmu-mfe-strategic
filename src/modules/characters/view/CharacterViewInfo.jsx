@@ -13,7 +13,9 @@ import DefenseTextField from '../../shared/inputs/DefenseTextField';
 import HeightTextField from '../../shared/inputs/HeightTextField';
 import HpTextField from '../../shared/inputs/HpTextField';
 import InitiativeTextField from '../../shared/inputs/InitiativeTextField';
+import LevelTextField from '../../shared/inputs/LevelTextField';
 import MovementTextField from '../../shared/inputs/MovementTextField';
+import RaceTextField from '../../shared/inputs/RaceTextField';
 import WeightTextField from '../../shared/inputs/WeightTextField';
 
 const CharacterViewInfo = ({ character, strategicGame, faction }) => {
@@ -80,7 +82,7 @@ const CharacterViewInfo = ({ character, strategicGame, faction }) => {
         </Grid>
 
         <Grid item size={3}>
-          <TextField label={t('race')} name="race" value={t(character.info.raceId)} variant="standard" readOnly fullWidth />
+          <RaceTextField value={t(character.info.raceId)} />
         </Grid>
         <Grid item size={3}>
           <TextField label={t('profession')} name="profession" value={t(character.info.professionId)} variant="standard" readOnly fullWidth />
@@ -95,63 +97,19 @@ const CharacterViewInfo = ({ character, strategicGame, faction }) => {
           </Typography>
         </Grid>
         <Grid item size={3}>
-          <TextField
-            label={t('current-level')}
-            name="currentLevel"
-            value={character.experience.level}
-            readOnly
-            fullWidth
-            variant="standard"
-            sx={{
-              '& .MuiInputBase-input': {
-                textAlign: 'right',
-              },
-            }}
-          />
+          <LevelTextField i18nLabel="current-level" value={character.experience.level} readOnly />
         </Grid>
         <Grid item size={3}>
-          <TextField
-            label={t('available-level')}
-            name="availableLevel"
-            value={character.experience.availableLevel}
-            readOnly
-            fullWidth
-            variant="standard"
-            sx={{
-              '& .MuiInputBase-input': {
-                textAlign: 'right',
-              },
-            }}
-          />
+          <LevelTextField i18nLabel="available-level" value={character.experience.availableLevel} readOnly />
         </Grid>
         <Grid item size={3}>
-          <TextField
-            label={t('xp')}
-            name="experience"
-            value={new Intl.NumberFormat('en-EN').format(character.experience.xp)}
-            readOnly
-            fullWidth
-            variant="standard"
-            sx={{
-              '& .MuiInputBase-input': {
-                textAlign: 'right',
-              },
-            }}
-          />
+          <LevelTextField i18nLabel="experience" value={new Intl.NumberFormat('en-EN').format(character.experience.xp)} readOnly />
         </Grid>
         <Grid item size={3}>
-          <TextField
-            label={t('development-points')}
-            name="developmentPoints"
+          <LevelTextField
+            i18nLabel="development-points"
             value={`${character.experience.availableDevelopmentPoints} / ${character.experience.developmentPoints}`}
             readOnly
-            fullWidth
-            variant="standard"
-            sx={{
-              '& .MuiInputBase-input': {
-                textAlign: 'right',
-              },
-            }}
           />
         </Grid>
         <Grid size={12}>

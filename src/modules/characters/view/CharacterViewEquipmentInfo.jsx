@@ -1,9 +1,13 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import SouthIcon from '@mui/icons-material/South';
 import Grid from '@mui/material/Grid';
+import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import PenaltyTextField from '../../shared/inputs/PenaltyTextField';
+import WeightTextField from '../../shared/inputs/WeightTextField';
 
 const CharacterViewEquipmentInfo = ({ character }) => {
   const { t } = useTranslation();
@@ -16,39 +20,27 @@ const CharacterViewEquipmentInfo = ({ character }) => {
         </Typography>
       </Grid>
       <Grid size={6}>
-        <TextField label={t('weight')} variant="standard" name="weight" value={character.equipment.weight} fullWidth />
+        <WeightTextField value={character.equipment.weight} readOnly />
       </Grid>
       <Grid size={6}></Grid>
       <Grid size={6}>
-        <TextField label={t('maneuver-penalty')} variant="standard" name="maneuver-penalty" value={character.equipment.maneuverPenalty} fullWidth />
+        <PenaltyTextField value={character.equipment.maneuverPenalty} i18nLabel="maneuver-penalty" readOnly />
       </Grid>
       <Grid size={6}>
-        <TextField
-          label={t('base-maneuver-penalty')}
-          variant="standard"
-          name="base-maneuver-penalty"
-          value={character.equipment.baseManeuverPenalty}
-          fullWidth
-        />
+        <PenaltyTextField value={character.equipment.baseManeuverPenalty} i18nLabel="base-maneuver-penalty" readOnly />
       </Grid>
       <Grid size={6}>
-        <TextField label={t('ranged-penalty')} variant="standard" name="ranged-penalty" value={character.equipment.rangedPenalty} fullWidth />
+        <PenaltyTextField value={character.equipment.rangedPenalty} i18nLabel="ranged-penalty" readOnly />
       </Grid>
       <Grid size={6}>
-        <TextField
-          label={t('perception-penalty')}
-          variant="standard"
-          name="perception-penalty"
-          value={character.equipment.perceptionPenalty}
-          fullWidth
-        />
+        <PenaltyTextField value={character.equipment.perceptionPenalty} i18nLabel="perception-penalty" readOnly />
       </Grid>
       <Grid size={6}>
         <TextField
           label={t('movement-base-difficulty')}
           variant="standard"
           name="movement-base-difficulty"
-          value={character.equipment.movementBaseDifficulty || ''}
+          value={t(`difficulty-${character.equipment.movementBaseDifficulty}`)}
           fullWidth
         />
       </Grid>

@@ -9,6 +9,7 @@ export const gameCreateTemplate = {
     letality: 0,
   },
   powerLevel: {
+    baseDevPoints: 60,
     statRandomMin: 11,
     statBoostPotential: 78,
     statBoostTemporary: 56,

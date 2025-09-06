@@ -5,18 +5,18 @@ import Avatar from '@mui/material/Avatar';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 
-const InitiativeTextField = ({ value, onChange, i18nLabel = 'initiative', disabled = false, required = false }) => {
+const LevelTextField = ({ value, onChange, i18nLabel = 'level', disabled = false, required = false }) => {
   const { t } = useTranslation();
 
   return (
     <TextField
       label={t(i18nLabel)}
-      variant="standard"
-      fullWidth
       value={value}
       onChange={onChange}
       disabled={disabled}
       required={required}
+      variant="standard"
+      fullWidth
       sx={{
         '& .MuiInputBase-input': {
           textAlign: 'right',
@@ -26,7 +26,7 @@ const InitiativeTextField = ({ value, onChange, i18nLabel = 'initiative', disabl
         input: {
           startAdornment: (
             <InputAdornment position="start">
-              <Avatar src="/static/images/icons/initiative.png" sx={{ width: 25, height: 25 }} />
+              <Avatar src="/static/images/icons/level.png" sx={{ width: 25, height: 25 }} />
             </InputAdornment>
           ),
         },
@@ -35,4 +35,4 @@ const InitiativeTextField = ({ value, onChange, i18nLabel = 'initiative', disabl
   );
 };
 
-export default InitiativeTextField;
+export default LevelTextField;

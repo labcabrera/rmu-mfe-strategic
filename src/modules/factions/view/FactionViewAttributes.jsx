@@ -1,9 +1,7 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
@@ -34,13 +32,8 @@ const HeaderCategory = ({ i18nLabel }) => {
   );
 };
 
-const FactionViewAttributes = ({ faction, setFaction, strategicGame }) => {
-  const navigate = useNavigate();
+const FactionViewAttributes = ({ faction, setFaction }) => {
   const { t } = useTranslation();
-
-  const handleOpenGame = () => {
-    navigate(`/strategic/games/view/${strategicGame.id}`);
-  };
 
   const handleAddXP = async (amount) => {
     if (faction) {
@@ -59,26 +52,6 @@ const FactionViewAttributes = ({ faction, setFaction, strategicGame }) => {
   return (
     <Grid container spacing={2} alignItems="center">
       <HeaderCategory i18nLabel="faction-information" />
-
-      <Grid size={10}>
-        <TextField
-          label={t('game')}
-          variant="standard"
-          fullWidth
-          value={strategicGame?.name || ''}
-          slotProps={{
-            input: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton edge="end" onClick={handleOpenGame}>
-                    <ArrowForwardIcon />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-      </Grid>
 
       <InfoField i18n="name" value={faction.name} size={10} />
 
