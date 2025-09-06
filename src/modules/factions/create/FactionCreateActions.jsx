@@ -33,7 +33,13 @@ const FactionCreateActions = ({ strategicGame, formData }) => {
           <Link component={RouterLink} color="inherit" to="/strategic/games">
             Strategic
           </Link>
-          <span>Factions</span>
+          <Link component={RouterLink} color="inherit" to="/strategic/games">
+            Games
+          </Link>
+          <Link component={RouterLink} color="inherit" to={`/strategic/games/view/${strategicGame.id}`}>
+            {strategicGame.name}
+          </Link>
+          <span>Create faction</span>
         </Breadcrumbs>
       </Box>
       <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>

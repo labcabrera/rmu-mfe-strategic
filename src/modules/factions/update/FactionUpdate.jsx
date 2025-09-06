@@ -10,12 +10,15 @@ const FactionUpdate = () => {
   const [formData, setFormData] = useState({
     name: faction.name,
     description: faction.description,
+    availableGold: faction.factionManagement?.availableGold,
+    availableXP: faction.factionManagement?.availableXP,
   });
 
   return (
     <>
       <FactionUpdateActions formData={formData} game={game} faction={faction} />
       <FactionUpdateAttributes formData={formData} setFormData={setFormData} />
+      <pre>{JSON.stringify(formData, null, 2)}</pre>
     </>
   );
 };

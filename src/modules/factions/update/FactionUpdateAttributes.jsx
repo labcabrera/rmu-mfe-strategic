@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import NumericFormField from '../../shared/inputs/NumericTextField';
 
 const FormField = ({ i18nLabel, name, value, onChange, size }) => {
   const { t } = useTranslation();
@@ -37,7 +38,15 @@ const FactionUpdateAttributes = ({ formData, setFormData }) => {
     <Grid container spacing={2}>
       <HeaderCategory i18nLabel="information" />
       <FormField i18nLabel="name" name="name" value={formData.name} onChange={handleChange} size={6} />
-      <Grid size={6}></Grid>
+      <Grid size={12}></Grid>
+      <Grid size={6}>
+        <NumericFormField label="available-xp" name="availableXP" value={formData.availableXP} onChange={handleChange} />
+      </Grid>
+      <Grid size={12}></Grid>
+      <Grid size={6}>
+        <NumericFormField label="available-gold" name="availableGold" value={formData.availableGold} onChange={handleChange} maxDecimals={2} />
+      </Grid>
+      <Grid size={12}></Grid>
       <FormField i18nLabel="description" name="description" value={formData.description} onChange={handleChange} size={6} />
     </Grid>
   );
