@@ -17,7 +17,7 @@ const FactionCreateActions = ({ strategicGame, formData }) => {
 
   const handleCreate = () => {
     createFaction(formData)
-      .then(() => navigate('/strategic/games/view/' + strategicGame.id, { state: { strategicGame: strategicGame } }))
+      .then((data) => navigate(`/strategic/factions/view/${data.id}`, { state: { faction: data } }))
       .catch((err) => {
         showError(err.message);
       });

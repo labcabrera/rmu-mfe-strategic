@@ -48,10 +48,12 @@ const FactionUpdateActions = ({ formData, faction, game }) => {
             <Link component={RouterLink} color="inherit" to="/strategic/games">
               {t('strategic')}
             </Link>
+            <Link component={RouterLink} color="inherit" to="/strategic/games">
+              {t('games')}
+            </Link>
             <Link component={RouterLink} color="inherit" to={`/strategic/games/view/${game.id}`}>
               {game.name}
             </Link>
-            <span>Factions</span>
             <span>{faction.name}</span>
             <span>Edit</span>
           </Breadcrumbs>
