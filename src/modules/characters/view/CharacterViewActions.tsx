@@ -3,7 +3,19 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Box, Button, Stack, Link, Breadcrumbs, IconButton } from '@mui/material';
+import {
+  Box,
+  Button,
+  Stack,
+  Link,
+  Breadcrumbs,
+  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from '@mui/material';
 import { useError } from '../../../ErrorContext';
 import { deleteCharacter, Character, levelUpCharacter } from '../../api/characters';
 import { Faction } from '../../api/factions';
@@ -20,6 +32,7 @@ const CharacterViewActions: FC<{
   const navigate = useNavigate();
   const { showError } = useError();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
 
   const handleDelete = () => {
     deleteCharacter(character.id)
@@ -33,13 +46,18 @@ const CharacterViewActions: FC<{
 
   const levelUpAvailable = character.experience.level <= character.experience.availableLevel;
 
-  const onLevelUp = () => {
-    levelUpCharacter(character.id)
+  const onLevelUp = (force: boolean) => {
+    levelUpCharacter(character.id, force)
       .then((updated) => {
         setCharacter(updated);
       })
       .catch((err: Error) => {
-        showError(err.message);
+        //TODO check error code
+        if (force === false) {
+          setLevelUpDialogOpen(true);
+        } else {
+          showError(err.message);
+        }
       });
   };
 
@@ -80,7 +98,7 @@ const CharacterViewActions: FC<{
           </Breadcrumbs>
         </Box>
         <Stack direction="row" spacing={2}>
-          {levelUpAvailable && <Button onClick={onLevelUp}>Level up</Button>}
+          {levelUpAvailable && <Button onClick={() => onLevelUp(false)}>Level up</Button>}
           <IconButton onClick={handleEditClick}>
             <EditIcon />
           </IconButton>
@@ -95,6 +113,24 @@ const CharacterViewActions: FC<{
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
       />
+      <Dialog
+        open={levelUpDialogOpen}
+        onClose={() => setLevelUpDialogOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{'Level Up Confirmation'}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {character.name} has {character.experience.availableDevelopmentPoints} available development points. Are you
+            sure you want to level up {character.name}? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setLevelUpDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => onLevelUp(true)}>Level Up</Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

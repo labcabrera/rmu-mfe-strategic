@@ -247,8 +247,8 @@ export async function transferFactionGold(characterId: string, amount: number): 
   return await response.json();
 }
 
-export async function levelUpCharacter(characterId: string): Promise<Character> {
-  const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/xp/level-up`;
+export async function levelUpCharacter(characterId: string, force: boolean): Promise<Character> {
+  const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/level-up?force=${force}`;
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
