@@ -47,7 +47,7 @@ const CharacterCreate = () => {
     <>
       <CharacterCreateActions formData={formData} game={game} />
       <CharacterCreateAttributes formData={formData} strategicGame={game} setFormData={setFormData} />
-      {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
+      <pre>{JSON.stringify(formData, null, 2)}</pre>
     </>
   );
 };

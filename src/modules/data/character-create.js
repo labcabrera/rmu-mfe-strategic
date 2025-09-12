@@ -13,10 +13,7 @@ export const characterCreateTemplate = {
     gender: 'male',
     age: 20,
   },
-  experience: {
-    level: 0,
-    xp: 10100,
-  },
+  level: 1,
   statistics: {
     ag: {
       potential: 50,
