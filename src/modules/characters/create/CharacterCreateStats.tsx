@@ -1,9 +1,8 @@
-import React, { ChangeEvent, Dispatch, FC, SetStateAction, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import SyncIcon from '@mui/icons-material/Sync';
 import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { CreateCharacterDto } from '../../api/characters';
 import { stats } from '../../api/characters';
@@ -94,52 +93,37 @@ const CharacterCreateStats: FC<{
 
   return (
     <>
-      <Grid container spacing={1}>
-        <Grid size={{ xs: 6, md: 12 }}>
-          <Typography variant="h6" color="primary">
-            {t('statistics')}
-            <IconButton onClick={onRandomStats}>
-              <SyncIcon />
-            </IconButton>
-          </Typography>
-          <Table sx={{ minWidth: 650 }} aria-label="stats table">
-            <TableHead>
-              <TableRow>
-                <TableCell align="left">Stat</TableCell>
-                <TableCell align="right">{t('potential')}</TableCell>
-                <TableCell align="right">{t('potential-bonus')}</TableCell>
-                <TableCell align="right">{t('temporary')}</TableCell>
-                <TableCell align="right">{t('temporary-bonus')}</TableCell>
-                <TableCell align="right">{t('racial')}</TableCell>
-                <TableCell align="right">{t('total')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {stats.map((key) => (
-                <CharacterStats
-                  key={key}
-                  statKey={key}
-                  statName={t(key)}
-                  formData={formData}
-                  setFormData={setFormData}
-                  statBonusFormData={statBonusFormData}
-                />
-              ))}
-            </TableBody>
-          </Table>
-        </Grid>
-        <Grid size={{ xs: 6, md: 12 }}>
-          <Typography variant="h6" color="primary">
-            {t('boost')}
-          </Typography>
-          <CharacterCreateStatsActions
-            strategicGame={strategicGame}
-            formData={formData}
-            setFormData={setFormData}
-            setStatBonusFormData={setStatBonusFormData}
-          />
-        </Grid>
-      </Grid>
+      <Typography variant="h6" color="primary">
+        {t('statistics')}
+        <IconButton onClick={onRandomStats}>
+          <SyncIcon />
+        </IconButton>
+      </Typography>
+      <Table sx={{ minWidth: 650 }} aria-label="stats table">
+        <TableHead>
+          <TableRow>
+            <TableCell align="left">Stat</TableCell>
+            <TableCell align="right">{t('potential')}</TableCell>
+            <TableCell align="right">{t('potential-bonus')}</TableCell>
+            <TableCell align="right">{t('temporary')}</TableCell>
+            <TableCell align="right">{t('temporary-bonus')}</TableCell>
+            <TableCell align="right">{t('racial')}</TableCell>
+            <TableCell align="right">{t('total')}</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {stats.map((key) => (
+            <CharacterStats
+              key={key}
+              statKey={key}
+              statName={t(key)}
+              formData={formData}
+              setFormData={setFormData}
+              statBonusFormData={statBonusFormData}
+            />
+          ))}
+        </TableBody>
+      </Table>
     </>
   );
 };

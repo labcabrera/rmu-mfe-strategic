@@ -10,8 +10,9 @@ import { getStatBonus } from '../../services/stat-service';
 import CharacterCreateActions from './CharacterCreateActions';
 import CharacterCreateAttributes from './CharacterCreateAttributes';
 import CharacterCreateStats from './CharacterCreateStats';
+import CharacterCreateStatsActions from './CharacterCreateStatsActions';
 
-interface StatBonus {
+export interface StatBonus {
   potential: number;
   temporary: number;
 }
@@ -117,7 +118,7 @@ const CharacterCreate: FC = () => {
         <Grid size={{ xs: 12, md: 4 }}>
           <CharacterCreateAttributes formData={formData} strategicGame={game} setFormData={setFormData} />
         </Grid>
-        <Grid size={{ xs: 12, md: 8 }}>
+        <Grid size={{ xs: 12, md: 5 }}>
           <CharacterCreateStats
             formData={formData}
             setFormData={setFormData}
@@ -125,6 +126,19 @@ const CharacterCreate: FC = () => {
             onRandomStats={onRandomStats}
             statBonusFormData={statBonusFormData}
             setStatBonusFormData={setStatBonusFormData}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}></Grid>
+        <Grid size={{ xs: 12, md: 5 }}>
+          <CharacterCreateStatsActions
+            strategicGame={game}
+            formData={formData}
+            setFormData={setFormData}
+            setStatBonusFormData={setStatBonusFormData}
+            boosts={boosts}
+            setBoosts={setBoosts}
+            swaps={swaps}
+            setSwaps={setSwaps}
           />
         </Grid>
       </Grid>

@@ -1,46 +1,17 @@
-import React, { useState, useEffect, FC } from 'react';
+import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfoOutlineIcon from '@mui/icons-material/InfoOutline';
 import { Button, Grid, Tooltip, MenuItem, TextField, IconButton } from '@mui/material';
-import { stats } from '../../api/characters';
+import { CreateCharacterDto, stats } from '../../api/characters';
+import { StrategicGame } from '../../api/strategic-games';
 import { getStatBonus } from '../../services/stat-service';
-
-interface StatBonus {
-  potential: number;
-  temporary: number;
-}
-
-interface Statistics {
-  [key: string]: {
-    potential: number;
-    temporary: number;
-    racial: number;
-  };
-}
-
-interface FormData {
-  statistics: Statistics;
-  // ...otros campos según tu modelo
-}
-
-interface CharacterCreateStatsActionsProps {
-  strategicGame: any;
-  formData: FormData;
-  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
-  setStatBonusFormData: React.Dispatch<React.SetStateAction<{ [key: string]: StatBonus }>>;
-}
+import { StatBonus } from './CharacterCreate';
 
 const StatButton: FC<{ text: string; onClick: () => void }> = ({ text, onClick }) => {
   return <Button onClick={onClick}>{text}</Button>;
 };
 
-const randomStatValue = (): number => {
-  const min = 11;
-  const max = 100;
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-};
-
-const StatSelect: React.FC<{
+const StatSelect: FC<{
   name: string;
   value: string;
   setValue: (value: string) => void;
@@ -69,48 +40,19 @@ const StatSelect: React.FC<{
   );
 };
 
-const CharacterCreateStatsActions: FC<CharacterCreateStatsActionsProps> = ({
-  strategicGame,
-  formData,
-  setFormData,
-  setStatBonusFormData,
-}) => {
-  const [boosts, setBoosts] = useState<number>(strategicGame?.powerLevel.statBoosts || 2);
-  const [swaps, setSwaps] = useState<number>(strategicGame?.powerLevel.statSwaps || 2);
+const CharacterCreateStatsActions: FC<{
+  strategicGame: StrategicGame;
+  formData: CreateCharacterDto;
+  setFormData: React.Dispatch<React.SetStateAction<CreateCharacterDto>>;
+  setStatBonusFormData: React.Dispatch<React.SetStateAction<{ [key: string]: StatBonus }>>;
+  boosts: number;
+  setBoosts: Dispatch<SetStateAction<number>>;
+  swaps: number;
+  setSwaps: Dispatch<SetStateAction<number>>;
+}> = ({ strategicGame, formData, setFormData, setStatBonusFormData, boosts, setBoosts, swaps, setSwaps }) => {
   const [sourceBoostStat, setSourceBoostStat] = useState<string>('');
   const [targetBoostStat, setTargetBoostStat] = useState<string>('');
   const [replaceBoostStat, setReplaceBoostStat] = useState<string>('');
-
-  const handleRandomStats = () => {
-    for (const key of stats) {
-      const values = [randomStatValue(), randomStatValue(), randomStatValue()];
-      values.sort((a, b) => b - a);
-      const potentialValue = values[0];
-      const temporaryValue = values[1];
-      const potentialBonus = getStatBonus(potentialValue);
-      const temporaryBonus = getStatBonus(temporaryValue);
-      setFormData((prevState) => ({
-        ...prevState,
-        statistics: {
-          ...prevState.statistics,
-          [key]: {
-            ...prevState.statistics[key],
-            potential: potentialValue,
-            temporary: temporaryValue,
-          },
-        },
-      }));
-      setStatBonusFormData((prevState) => ({
-        ...prevState,
-        [key]: {
-          potential: potentialBonus,
-          temporary: temporaryBonus,
-        },
-      }));
-      setBoosts(strategicGame?.powerLevel.statBoosts || 2);
-      setSwaps(strategicGame?.powerLevel.statSwaps || 2);
-    }
-  };
 
   const handleSwapStats = () => {
     if (swaps > 0 && sourceBoostStat && targetBoostStat) {
@@ -232,88 +174,41 @@ const CharacterCreateStatsActions: FC<CharacterCreateStatsActionsProps> = ({
   }, [strategicGame]);
 
   return (
-    <Grid container spacing={2} sx={{ marginTop: 2 }}>
-      <Grid size={2}>
-        <StatButton text={'randomize'} onClick={handleRandomStats} />
-      </Grid>
-      <Grid size={2}>
+    <Grid container spacing={1}>
+      <Grid size={3}>
         <TextField label="Boost Amount" value={boosts} InputProps={{ readOnly: true }} variant="standard" fullWidth />
       </Grid>
-      <Grid size={2}>
+      <Grid size={3}>
         <TextField label="Swap Amount" value={swaps} InputProps={{ readOnly: true }} variant="standard" fullWidth />
       </Grid>
-      <Grid size={12}></Grid>
-
-      <Grid size={2} sx={{ display: 'flex', alignItems: 'center' }}>
-        <Tooltip title="Swap the values of two statistics" arrow placement="right">
-          <IconButton size="small">
-            <InfoOutlineIcon />
-          </IconButton>
-        </Tooltip>
-        <span>Swap</span>
+      <Grid size={3}>
+        <StatButton text="Boost 1th" onClick={handleBoostHighest} />
       </Grid>
-      <Grid size={2}>
+      <Grid size={3}>
+        <StatButton text="Boost 2th" onClick={handleBoostHighest} />
+      </Grid>
+
+      <Grid size={3}>
         <StatSelect name="Source" value={sourceBoostStat} setValue={setSourceBoostStat} />
       </Grid>
-      <Grid size={2}>
+      <Grid size={3}>
         <StatSelect name="Target" value={targetBoostStat} setValue={setTargetBoostStat} />
       </Grid>
-      <Grid size={2}>
+      <Grid size={6}>
         <StatButton text="Swap" onClick={handleSwapStats} />
       </Grid>
-      <Grid size={12}></Grid>
 
-      <Grid size={2} sx={{ display: 'flex', alignItems: 'center' }}>
-        <Tooltip title="Replace potential stat with 78 and temporary stat with 56." arrow placement="right">
-          <IconButton size="small">
-            <InfoOutlineIcon />
-          </IconButton>
-        </Tooltip>
-        <span>Replace</span>
-      </Grid>
-      <Grid size={2}>
+      <Grid size={3}>
         <StatSelect name="Target" value={replaceBoostStat} setValue={setReplaceBoostStat} />
       </Grid>
-      <Grid size={2}></Grid>
-      <Grid size={2}>
+      <Grid size={3}></Grid>
+      <Grid size={6}>
         <StatButton text="Replace" onClick={handleReplacePotential} />
       </Grid>
-      <Grid size={12}></Grid>
 
-      <Grid size={2} sx={{ display: 'flex', alignItems: 'center' }}>
-        <Tooltip
-          title="Replace your highest temporary stat with 90 and boost its potential by 10."
-          arrow
-          placement="right"
-        >
-          <IconButton size="small">
-            <InfoOutlineIcon />
-          </IconButton>
-        </Tooltip>
-        <span>Boost 1th</span>
-      </Grid>
-      <Grid size={4}></Grid>
-      <Grid size={2}>
-        <StatButton text="Boost" onClick={handleBoostHighest} />
-      </Grid>
-      <Grid size={12}></Grid>
+      <Grid size={8}></Grid>
 
-      <Grid size={2} sx={{ display: 'flex', alignItems: 'center' }}>
-        <Tooltip
-          title="Replace your second-highest temporary stat with 85 and boost its potential by 10."
-          arrow
-          placement="right"
-        >
-          <IconButton size="small">
-            <InfoOutlineIcon />
-          </IconButton>
-        </Tooltip>
-        <span>Boost 2th</span>
-      </Grid>
-      <Grid size={4}></Grid>
-      <Grid size={2}>
-        <StatButton text="Boost" onClick={handleBoostHighest} />
-      </Grid>
+      <Grid size={8}></Grid>
     </Grid>
   );
 };

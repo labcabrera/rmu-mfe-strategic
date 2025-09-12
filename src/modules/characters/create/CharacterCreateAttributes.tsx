@@ -184,10 +184,10 @@ const CharacterCreateAttributes: FC<{
           {t('roleplay')}
         </Typography>
       </Grid>
-      <Grid size={4}>
+      <Grid size={6}>
         <SelectGender value={formData.roleplay.gender} onChange={handleGenderChange} />
       </Grid>
-      <Grid size={4}>
+      <Grid size={6}>
         <NumericInput
           label={t('age')}
           name="age"
