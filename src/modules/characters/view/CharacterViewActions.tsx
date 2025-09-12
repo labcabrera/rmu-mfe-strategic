@@ -1,20 +1,21 @@
-/* eslint-disable react/prop-types */
-import React, { useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { Link as RouterLink } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import Box from '@mui/material/Box';
-import Breadcrumbs from '@mui/material/Breadcrumbs';
-import IconButton from '@mui/material/IconButton';
-import Link from '@mui/material/Link';
-import Stack from '@mui/material/Stack';
+import { Box, Button, Stack, Link, Breadcrumbs, IconButton } from '@mui/material';
 import { useError } from '../../../ErrorContext';
-import { deleteCharacter } from '../../api/characters';
+import { deleteCharacter, Character, levelUpCharacter } from '../../api/characters';
+import { Faction } from '../../api/factions';
+import { StrategicGame } from '../../api/strategic-games';
 import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 
-const CharacterViewActions = ({ character, game, faction }) => {
+const CharacterViewActions: FC<{
+  character: Character;
+  setCharacter: Dispatch<SetStateAction<Character>>;
+  game: StrategicGame;
+  faction: Faction;
+}> = ({ character, setCharacter, game, faction }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { showError } = useError();
@@ -25,7 +26,19 @@ const CharacterViewActions = ({ character, game, faction }) => {
       .then(() => {
         navigate(`/strategic/factions/view/${character.factionId}`);
       })
-      .catch((err) => {
+      .catch((err: Error) => {
+        showError(err.message);
+      });
+  };
+
+  const levelUpAvailable = character.experience.level <= character.experience.availableLevel;
+
+  const onLevelUp = () => {
+    levelUpCharacter(character.id)
+      .then((updated) => {
+        setCharacter(updated);
+      })
+      .catch((err: Error) => {
         showError(err.message);
       });
   };
@@ -67,17 +80,18 @@ const CharacterViewActions = ({ character, game, faction }) => {
           </Breadcrumbs>
         </Box>
         <Stack direction="row" spacing={2}>
-          <IconButton variant="outlined" onClick={handleEditClick}>
+          {levelUpAvailable && <Button onClick={onLevelUp}>Level up</Button>}
+          <IconButton onClick={handleEditClick}>
             <EditIcon />
           </IconButton>
-          <IconButton variant="outlined" onClick={handleDeleteClick}>
+          <IconButton onClick={handleDeleteClick}>
             <DeleteIcon />
           </IconButton>
         </Stack>
       </Stack>
       <DeleteDialog
         message={`Are you sure you want to delete ${character.name} character? This action cannot be undone.`}
-        onDelete={() => handleDialogDelete()}
+        onDelete={handleDialogDelete}
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
       />

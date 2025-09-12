@@ -1,8 +1,6 @@
-/* eslint-disable react/prop-types */
-import React from 'react';
+import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { Link as RouterLink } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import SaveIcon from '@mui/icons-material/Save';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
@@ -10,9 +8,13 @@ import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import { useError } from '../../../ErrorContext';
-import { createCharacter } from '../../api/characters';
+import { createCharacter, CreateCharacterDto } from '../../api/characters';
+import { StrategicGame } from '../../api/strategic-games';
 
-const CharacterCreateActions = ({ formData, game }) => {
+const CharacterCreateActions: FC<{
+  formData: CreateCharacterDto;
+  game?: StrategicGame;
+}> = ({ formData, game }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { showError } = useError();
@@ -22,7 +24,7 @@ const CharacterCreateActions = ({ formData, game }) => {
       .then((data) => {
         navigate('/strategic/characters/view/' + data.id, { state: { character: data, game: game } });
       })
-      .catch((err) => {
+      .catch((err: Error) => {
         showError(err.message);
       });
   };
@@ -44,7 +46,7 @@ const CharacterCreateActions = ({ formData, game }) => {
         </Breadcrumbs>
       </Box>
       <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>
-        <IconButton variant="outlined" onClick={handleCreate}>
+        <IconButton onClick={handleCreate}>
           <SaveIcon />
         </IconButton>
       </Stack>
