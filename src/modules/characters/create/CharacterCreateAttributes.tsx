@@ -1,8 +1,6 @@
 import React, { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
+import { Grid, TextField, Typography } from '@mui/material';
 import { CreateCharacterDto } from '../../api/characters';
 import { Profession } from '../../api/professions';
 import { Race } from '../../api/races';
@@ -160,17 +158,17 @@ const CharacterCreateAttributes: FC<{
       <Grid size={2}>
         <SelectRace value={formData.info.raceId} onChange={onRaceChange} />
       </Grid>
-      <Grid size={2}>
+      <Grid size={1}>
         <SelectProfession value={formData.info.professionId} onChange={onProfessionChange} />
+      </Grid>
+      <Grid size={1}>
+        <SelectRealmType value={formData.info.realmType} onChange={handleRealmTypeChange} />
       </Grid>
       <Grid size={2}>
         <NameTextField value={formData.name} onChange={onNameChange} generateRandomRaceValue={formData.info.raceId} />
       </Grid>
       <Grid size={12}></Grid>
 
-      <Grid size={2}>
-        <SelectRealmType value={formData.info.realmType} onChange={handleRealmTypeChange} />
-      </Grid>
       <Grid size={1}>
         <NumericInput
           label={t('level')}
@@ -219,6 +217,7 @@ const CharacterCreateAttributes: FC<{
           allowNegatives={false}
         />
       </Grid>
+      <Grid size={12}></Grid>
       <Grid size={6}>
         <TextField
           label="Description"

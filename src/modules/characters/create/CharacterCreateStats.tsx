@@ -82,18 +82,7 @@ const CharacterStats: FC<{
   );
 };
 
-const statKeys = [
-  { key: 'ag', name: 'Agility' },
-  { key: 'co', name: 'Constitution' },
-  { key: 'em', name: 'Empathy' },
-  { key: 'in', name: 'Intuition' },
-  { key: 'me', name: 'Memory' },
-  { key: 'pr', name: 'Perception' },
-  { key: 'qu', name: 'Quickness' },
-  { key: 're', name: 'Reasoning' },
-  { key: 'sd', name: 'Self Discipline' },
-  { key: 'st', name: 'Strength' },
-];
+const statKeys = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
 
 const CharacterCreateStats: FC<{
   strategicGame: StrategicGame;
@@ -135,11 +124,11 @@ const CharacterCreateStats: FC<{
               </TableRow>
             </TableHead>
             <TableBody>
-              {statKeys.map(({ key, name }) => (
+              {statKeys.map((key) => (
                 <CharacterStats
                   key={key}
                   statKey={key}
-                  statName={name}
+                  statName={t(key)}
                   formData={formData}
                   setFormData={setFormData}
                   statBonusFormData={statBonusFormData}
