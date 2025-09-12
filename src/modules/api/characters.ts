@@ -247,10 +247,12 @@ export async function transferFactionGold(characterId: string, amount: number): 
   return await response.json();
 }
 
-//TODO move
-export async function fetchCharacterSizes(): Promise<any> {
-  const url = `${process.env.RMU_API_CORE_URL}/character-sizes`;
-  const response = await fetch(url, { method: 'GET' });
+export async function levelUpCharacter(characterId: string, force: boolean): Promise<Character> {
+  const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/level-up?force=${force}`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }
