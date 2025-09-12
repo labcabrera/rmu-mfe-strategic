@@ -3,6 +3,7 @@ import { buildErrorFromResponse } from './api-errors';
 export interface Profession {
   id: string;
   name: string;
+  professionalSkills: string[];
   [key: string]: any;
 }
 

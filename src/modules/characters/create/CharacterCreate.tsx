@@ -4,11 +4,13 @@ import { Grid } from '@mui/material';
 import { useError } from '../../../ErrorContext';
 import { CreateCharacterDto } from '../../api/characters';
 import { stats } from '../../api/characters';
+import { Profession } from '../../api/professions';
 import { fetchStrategicGame, StrategicGame } from '../../api/strategic-games';
 import { characterCreateTemplate } from '../../data/character-create';
 import { getStatBonus } from '../../services/stat-service';
 import CharacterCreateActions from './CharacterCreateActions';
 import CharacterCreateAttributes from './CharacterCreateAttributes';
+import CharacterCreateProfessionalSkills from './CharacterCreateProfessionalSkills';
 import CharacterCreateStats from './CharacterCreateStats';
 import CharacterCreateStatsActions from './CharacterCreateStatsActions';
 
@@ -40,8 +42,10 @@ const CharacterCreate: FC = () => {
     sd: { potential: 0, temporary: 0 },
     st: { potential: 0, temporary: 0 },
   });
+  const [profession, setProfession] = useState<Profession | null>(null);
   const [boosts, setBoosts] = useState<number>(game?.powerLevel.statBoosts || 2);
   const [swaps, setSwaps] = useState<number>(game?.powerLevel.statSwaps || 2);
+  const [isValid, setIsValid] = useState<boolean>(false);
 
   const onRandomStats = () => {
     for (const key of stats) {
@@ -80,6 +84,17 @@ const CharacterCreate: FC = () => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   };
 
+  const checkValidForm = () => {
+    let valid = true;
+    if (!formData.factionId) valid = false;
+    if (!formData.gameId) valid = false;
+    if (!formData.name || formData.name.trim() === '') valid = false;
+    if (!formData.info?.raceId) valid = false;
+    if (!formData.info?.professionId) valid = false;
+    if (!formData.info?.realmType) valid = false;
+    setIsValid(valid);
+  };
+
   const bindStrategicGame = () => {
     if (!gameId) return;
     fetchStrategicGame(gameId)
@@ -90,6 +105,11 @@ const CharacterCreate: FC = () => {
         showError(error.message);
       });
   };
+
+  useEffect(() => {
+    checkValidForm();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData]);
 
   useEffect(() => {
     if (gameId) {
@@ -113,12 +133,12 @@ const CharacterCreate: FC = () => {
 
   return (
     <>
-      <CharacterCreateActions formData={formData} game={game} />
+      <CharacterCreateActions formData={formData} game={game} isValid={isValid} />
       <Grid container spacing={5}>
-        <Grid size={{ xs: 12, md: 4 }}>
-          <CharacterCreateAttributes formData={formData} strategicGame={game} setFormData={setFormData} />
+        <Grid size={5}>
+          <CharacterCreateAttributes formData={formData} setFormData={setFormData} setProfession={setProfession} />
         </Grid>
-        <Grid size={{ xs: 12, md: 5 }}>
+        <Grid size={5}>
           <CharacterCreateStats
             formData={formData}
             setFormData={setFormData}
@@ -128,8 +148,9 @@ const CharacterCreate: FC = () => {
             setStatBonusFormData={setStatBonusFormData}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 4 }}></Grid>
-        <Grid size={{ xs: 12, md: 5 }}>
+        <Grid size={2}>{profession && <CharacterCreateProfessionalSkills profession={profession} />}</Grid>
+        <Grid size={5}></Grid>
+        <Grid size={5}>
           <CharacterCreateStatsActions
             strategicGame={game}
             formData={formData}
@@ -142,7 +163,7 @@ const CharacterCreate: FC = () => {
           />
         </Grid>
       </Grid>
-      <pre>{JSON.stringify(formData, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
     </>
   );
 };

@@ -4,7 +4,6 @@ import { Grid, TextField, Typography } from '@mui/material';
 import { CreateCharacterDto } from '../../api/characters';
 import { Profession } from '../../api/professions';
 import { Race } from '../../api/races';
-import { StrategicGame } from '../../api/strategic-games';
 import CharacterAvatar from '../../shared/avatars/CharacterAvatar';
 import NameTextField from '../../shared/inputs/NameTextField';
 import { NumericInput } from '../../shared/inputs/NumericInput';
@@ -17,10 +16,10 @@ import SelectRealmType from '../../shared/selects/SelectRealmType';
 import GameCreateStats from './CharacterCreateStats';
 
 const CharacterCreateAttributes: FC<{
-  strategicGame: StrategicGame;
   formData: CreateCharacterDto;
   setFormData: Dispatch<SetStateAction<CreateCharacterDto>>;
-}> = ({ strategicGame, formData, setFormData }) => {
+  setProfession: Dispatch<SetStateAction<Profession | null>>;
+}> = ({ formData, setFormData, setProfession }) => {
   const { t } = useTranslation();
 
   const onRaceChange = (raceId: string, raceInfo: Race) => {
@@ -61,6 +60,7 @@ const CharacterCreateAttributes: FC<{
         realmType: realmType,
       },
     }));
+    setProfession(profession);
   };
 
   const onFactionChange = (faction: string) => {
@@ -120,14 +120,6 @@ const CharacterCreateAttributes: FC<{
       <Grid size={6}>
         <CharacterAvatar character={formData} size={120} />
       </Grid>
-      <Grid size={6}>
-        <Grid size={12}>
-          <SelectGame value={formData.gameId} onChange={onGameChange} />
-        </Grid>
-        <Grid size={12}>
-          <SelectFaction value={formData.factionId} onChange={onFactionChange} />
-        </Grid>
-      </Grid>
       <Grid size={12}>
         <NameTextField value={formData.name} onChange={onNameChange} generateRandomRaceValue={formData.info.raceId} />
       </Grid>
@@ -139,6 +131,12 @@ const CharacterCreateAttributes: FC<{
         </Typography>
       </Grid>
 
+      <Grid size={6}>
+        <SelectGame value={formData.gameId} onChange={onGameChange} />
+      </Grid>
+      <Grid size={6}>
+        <SelectFaction value={formData.factionId} onChange={onFactionChange} />
+      </Grid>
       <Grid size={6}>
         <SelectRace value={formData.info.raceId} onChange={onRaceChange} />
       </Grid>

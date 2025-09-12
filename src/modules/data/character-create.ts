@@ -1,7 +1,7 @@
 import { CreateCharacterDto } from '../api/characters';
 
 export const characterCreateTemplate: CreateCharacterDto = {
-  name: 'Generic character',
+  name: '',
   gameId: '',
   factionId: '',
   info: {
