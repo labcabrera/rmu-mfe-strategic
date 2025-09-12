@@ -1,10 +1,12 @@
-import React, { ChangeEvent, FC } from 'react';
+import React, { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { CreateCharacterDto } from '../../api/characters';
 import { Profession } from '../../api/professions';
 import { Race } from '../../api/races';
+import { StrategicGame } from '../../api/strategic-games';
 import NameTextField from '../../shared/inputs/NameTextField';
 import { NumericInput } from '../../shared/inputs/NumericInput';
 import SelectFaction from '../../shared/selects/SelectFaction';
@@ -15,45 +17,10 @@ import SelectRace from '../../shared/selects/SelectRace';
 import SelectRealmType from '../../shared/selects/SelectRealmType';
 import GameCreateStats from './CharacterCreateStats';
 
-type Statistics = Record<string, { racial: number }>;
-
-interface Roleplay {
-  gender: string;
-  age: number;
-}
-
-interface Info {
-  raceId: string;
-  sizeId: string;
-  height: number;
-  weight: number;
-  professionId: string;
-  realmType: string;
-  realmTypeId: string;
-  level: number;
-}
-
-interface Movement {
-  strideRacialBonus: number;
-}
-
-interface FormData {
-  gameId: string;
-  factionId: string;
-  info: Info;
-  movement: Movement;
-  statistics: Statistics;
-  name: string;
-  description: string;
-  roleplay: Roleplay;
-  level: number;
-  [key: string]: any;
-}
-
 const CharacterCreateAttributes: FC<{
-  strategicGame: any;
-  formData: FormData;
-  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
+  strategicGame: StrategicGame;
+  formData: CreateCharacterDto;
+  setFormData: Dispatch<SetStateAction<CreateCharacterDto>>;
 }> = ({ strategicGame, formData, setFormData }) => {
   const { t } = useTranslation();
 
@@ -83,11 +50,16 @@ const CharacterCreateAttributes: FC<{
   };
 
   const onProfessionChange = (professionId: string, profession: Profession) => {
+    let realmType = formData.info.realmType;
+    if (profession && profession.realmType) {
+      realmType = profession.realmType;
+    }
     setFormData((prevState) => ({
       ...prevState,
       info: {
         ...prevState.info,
         professionId: professionId,
+        realmType: realmType,
       },
     }));
   };

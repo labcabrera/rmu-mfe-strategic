@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import { ErrorProvider } from './ErrorContext';
@@ -18,14 +18,14 @@ import StrategicGameEdit from './modules/games/update/StrategicGameUpdate';
 import StrategicGameView from './modules/games/view/StrategicGameView';
 
 //TODO provisional component
-const NotFound = () => (
+const NotFound: FC = () => (
   <div>
     <h2>Not found</h2>
     <p>The requested route does not exist.</p>
   </div>
 );
 
-const App = () => {
+const App: FC = () => {
   return (
     <ErrorProvider>
       <Box sx={{ p: 5 }}>

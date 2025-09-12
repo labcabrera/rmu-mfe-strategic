@@ -1,4 +1,6 @@
 import { buildErrorFromResponse } from './api-errors';
+import { Item } from './items';
+import { Skill } from './skills';
 
 export interface Character {
   id: string;
@@ -6,14 +8,34 @@ export interface Character {
   [key: string]: any;
 }
 
-export interface Skill {
-  skillId: string;
-  // ...otros campos...
+export interface Roleplay {
+  gender: string;
+  age: number;
 }
 
-export interface Item {
-  id: string;
-  // ...otros campos...
+export interface Info {
+  raceId: string;
+  sizeId: string;
+  height: number;
+  weight: number;
+  professionId: string;
+  realmType: string;
+  realmTypeId: string;
+  level: number;
+}
+
+export type Statistics = Record<string, { racial: number }>;
+
+export interface CreateCharacterDto {
+  gameId: string;
+  factionId: string;
+  info: Info;
+  statistics: Statistics;
+  name: string;
+  description: string;
+  roleplay: Roleplay;
+  level: number;
+  [key: string]: any;
 }
 
 export async function fetchCharacter(characterId: string): Promise<Character> {
@@ -149,7 +171,7 @@ export async function setUpProfessionalSkill(characterId: string, skillId: strin
   return await response.json();
 }
 
-export async function addItem(characterId: string, data: any): Promise<Item> {
+export async function addItem(characterId: string, data: Item): Promise<Item> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/items`;
   const response = await fetch(url, {
     method: 'POST',
