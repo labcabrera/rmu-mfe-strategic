@@ -135,10 +135,10 @@ const CharacterCreate: FC = () => {
     <>
       <CharacterCreateActions formData={formData} game={game} isValid={isValid} />
       <Grid container spacing={5}>
-        <Grid size={5}>
+        <Grid size={4}>
           <CharacterCreateAttributes formData={formData} setFormData={setFormData} setProfession={setProfession} />
         </Grid>
-        <Grid size={5}>
+        <Grid size={6}>
           <CharacterCreateStats
             formData={formData}
             setFormData={setFormData}
@@ -149,8 +149,8 @@ const CharacterCreate: FC = () => {
           />
         </Grid>
         <Grid size={2}>{profession && <CharacterCreateProfessionalSkills profession={profession} />}</Grid>
-        <Grid size={5}></Grid>
-        <Grid size={5}>
+        <Grid size={4}></Grid>
+        <Grid size={6}>
           <CharacterCreateStatsActions
             strategicGame={game}
             formData={formData}

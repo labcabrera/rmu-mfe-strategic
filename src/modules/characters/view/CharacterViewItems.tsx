@@ -1,5 +1,4 @@
-/* eslint-disable react/prop-types */
-import React, { useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
@@ -12,14 +11,20 @@ import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { useError } from '../../../ErrorContext';
-import { deleteItem, updateCarriedStatus } from '../../api/characters';
+import { Character, deleteItem, updateCarriedStatus } from '../../api/characters';
+import { Faction } from '../../api/factions';
+import { Item } from '../../api/items';
 import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 import CharacterViewAddItem from './CharacterViewAddItem';
 import CharacterViewEquipment from './CharacterViewEquipment';
 import CharacterViewEquipmentInfo from './CharacterViewEquipmentInfo';
 import CharacterViewTransferGold from './CharacterViewTransferGold';
 
-const ItemCardListItem = ({ item, character, setCharacter }) => {
+const ItemCardListItem: FC<{
+  item: Item;
+  character: Character;
+  setCharacter: Dispatch<SetStateAction<Character>>;
+}> = ({ item, character, setCharacter }) => {
   const { t } = useTranslation();
   const { showError } = useError();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -33,24 +38,24 @@ const ItemCardListItem = ({ item, character, setCharacter }) => {
       .then((data) => {
         setCharacter(data);
       })
-      .catch((err) => {
+      .catch((err: Error) => {
         showError(err.message);
       });
   };
 
-  const handleCarried = (itemId, carried) => {
+  const handleCarried = (itemId: string, carried: boolean) => {
     updateCarriedStatus(character.id, itemId, carried)
       .then((data) => {
         setCharacter(data);
       })
-      .catch((err) => {
+      .catch((err: Error) => {
         showError(err.message);
       });
   };
 
   return (
     <>
-      <Grid item key={item.id} xs={8} sm={4} md={2}>
+      <Grid key={item.id}>
         <Card sx={{ width: 150, height: 290, display: 'flex', flexDirection: 'column' }}>
           <CardMedia
             component="img"
@@ -64,7 +69,7 @@ const ItemCardListItem = ({ item, character, setCharacter }) => {
               {item.info?.type}
             </Typography>
             {item.itemTypeId !== 'gold-coin' && (
-              <IconButton aria-label="delete" onClick={() => handleOpenDeleteDialog(item.id)}>
+              <IconButton aria-label="delete" onClick={handleOpenDeleteDialog}>
                 <DeleteOutlineIcon />
               </IconButton>
             )}
@@ -84,18 +89,16 @@ const ItemCardListItem = ({ item, character, setCharacter }) => {
               {t('weight')}: {item.info?.weight}
             </Typography>
             {item.amount && (
-              <>
-                <Typography variant="body2" color="text.secondary">
-                  {t('amount')}: {item.amount}
-                </Typography>
-              </>
+              <Typography variant="body2" color="text.secondary">
+                {t('amount')}: {item.amount}
+              </Typography>
             )}
           </CardContent>
         </Card>
       </Grid>
       <DeleteDialog
         message={`Are you sure you want to delete ${item.name} item? This action cannot be undone and the amount used will not be refunded.`}
-        onDelete={() => handleDelete()}
+        onDelete={handleDelete}
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
       />
@@ -103,35 +106,41 @@ const ItemCardListItem = ({ item, character, setCharacter }) => {
   );
 };
 
-const ItemCardList = ({ items, character, setCharacter }) => {
+const ItemCardList: FC<{
+  items: Item[];
+  character: Character;
+  setCharacter: React.Dispatch<React.SetStateAction<Character>>;
+}> = ({ items, character, setCharacter }) => {
   return (
-    <>
-      <Grid container spacing={2}>
-        {items.map((item) => (
-          <ItemCardListItem key={item.id} item={item} character={character} setCharacter={setCharacter} />
-        ))}
-      </Grid>
-    </>
+    <Grid container spacing={2}>
+      {items.map((item) => (
+        <ItemCardListItem key={item.id} item={item} character={character} setCharacter={setCharacter} />
+      ))}
+    </Grid>
   );
 };
 
-const CharacterViewItems = ({ character, setCharacter, faction }) => {
+const CharacterViewItems: FC<{
+  character: Character;
+  setCharacter: React.Dispatch<React.SetStateAction<Character>>;
+  faction: Faction;
+}> = ({ character, setCharacter, faction }) => {
   return (
     <Grid container spacing={2}>
-      <Grid item size={7}>
+      <Grid size={7}>
         <CharacterViewEquipment character={character} setCharacter={setCharacter} />
       </Grid>
-      <Grid item size={5}>
+      <Grid size={5}>
         <CharacterViewEquipmentInfo character={character} />
       </Grid>
-      <Grid item size={12}>
+      <Grid size={12}>
         <ItemCardList items={character.items} character={character} setCharacter={setCharacter} />
       </Grid>
-      <Grid item size={12}></Grid>
-      <Grid item size={12}>
+      <Grid size={12}></Grid>
+      <Grid size={12}>
         <CharacterViewAddItem character={character} setCharacter={setCharacter} />
       </Grid>
-      <Grid item size={12}>
+      <Grid size={12}>
         <CharacterViewTransferGold character={character} setCharacter={setCharacter} faction={faction} />
       </Grid>
     </Grid>

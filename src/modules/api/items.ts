@@ -3,7 +3,17 @@ import { buildErrorFromResponse } from './api-errors';
 export interface Item {
   id: string;
   name: string;
+  imageUrl?: string;
+  itemTypeId: string;
+  carried?: boolean;
+  info?: ItemInfo;
+  amount?: number;
   [key: string]: any;
+}
+
+export interface ItemInfo {
+  type?: string;
+  weight?: number;
 }
 
 export async function fetchItems(rsql: string, page: number, size: number): Promise<Item[]> {

@@ -1,15 +1,12 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import {
   Box,
   Button,
   Stack,
   Link,
   Breadcrumbs,
-  IconButton,
   Dialog,
   DialogActions,
   DialogContent,
@@ -20,6 +17,8 @@ import { useError } from '../../../ErrorContext';
 import { deleteCharacter, Character, levelUpCharacter } from '../../api/characters';
 import { Faction } from '../../api/factions';
 import { StrategicGame } from '../../api/strategic-games';
+import DeleteButton from '../../shared/buttons/DeleteButton';
+import EditButton from '../../shared/buttons/EditButton';
 import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 
 const CharacterViewActions: FC<{
@@ -100,12 +99,8 @@ const CharacterViewActions: FC<{
         </Box>
         <Stack direction="row" spacing={2}>
           {levelUpAvailable && <Button onClick={() => onLevelUp(false)}>Level up</Button>}
-          <IconButton onClick={handleEditClick}>
-            <EditIcon />
-          </IconButton>
-          <IconButton onClick={handleDeleteClick}>
-            <DeleteIcon />
-          </IconButton>
+          <EditButton onClick={handleEditClick} />
+          <DeleteButton onClick={handleDeleteClick} />
         </Stack>
       </Stack>
       <DeleteDialog
