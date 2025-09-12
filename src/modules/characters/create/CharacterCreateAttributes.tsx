@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { Profession } from '../../api/professions';
+import { Race } from '../../api/races';
 import NameTextField from '../../shared/inputs/NameTextField';
 import { NumericInput } from '../../shared/inputs/NumericInput';
 import SelectFaction from '../../shared/selects/SelectFaction';
@@ -14,18 +16,6 @@ import SelectRealmType from '../../shared/selects/SelectRealmType';
 import GameCreateStats from './CharacterCreateStats';
 
 type Statistics = Record<string, { racial: number }>;
-
-interface RaceInfo {
-  size: string;
-  averageHeight: { male: number };
-  averageWeight: { male: number };
-  defaultStatBonus: Record<string, number>;
-  strideBonus: number;
-}
-
-interface ProfessionInfo {
-  // Define fields as needed
-}
 
 interface Roleplay {
   gender: string;
@@ -67,7 +57,7 @@ const CharacterCreateAttributes: FC<{
 }> = ({ strategicGame, formData, setFormData }) => {
   const { t } = useTranslation();
 
-  const onRaceChange = (raceId: string, raceInfo: RaceInfo) => {
+  const onRaceChange = (raceId: string, raceInfo: Race) => {
     if (raceInfo) {
       const stats = { ...formData.statistics };
       const keys = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
@@ -92,7 +82,7 @@ const CharacterCreateAttributes: FC<{
     }
   };
 
-  const onProfessionChange = (professionId: string, professionInfo: ProfessionInfo) => {
+  const onProfessionChange = (professionId: string, profession: Profession) => {
     setFormData((prevState) => ({
       ...prevState,
       info: {

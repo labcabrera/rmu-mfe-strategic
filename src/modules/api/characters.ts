@@ -1,23 +1,41 @@
-export async function fetchCharacter(characterId) {
+import { buildErrorFromResponse } from './api-errors';
+
+export interface Character {
+  id: string;
+  name: string;
+  [key: string]: any;
+}
+
+export interface Skill {
+  skillId: string;
+  // ...otros campos...
+}
+
+export interface Item {
+  id: string;
+  // ...otros campos...
+}
+
+export async function fetchCharacter(characterId: string): Promise<Character> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}`;
   const response = await fetch(url, { method: 'GET' });
-  if (response.status != 200) {
+  if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
 
-export async function fetchCharacters(rsql, page, size) {
+export async function fetchCharacters(rsql: string, page: number, size: number): Promise<Character[]> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters?q=${rsql}&page=${page}&size=${size}`;
   const response = await fetch(url, { method: 'GET' });
-  if (response.status != 200) {
+  if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }
   const pageContent = await response.json();
-  return pageContent.content;
+  return pageContent.content as Character[];
 }
 
-export async function createCharacter(characterData) {
+export async function createCharacter(characterData: Partial<Character>): Promise<Character> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters`;
   const response = await fetch(url, {
     method: 'POST',
@@ -26,13 +44,13 @@ export async function createCharacter(characterData) {
     },
     body: JSON.stringify(characterData),
   });
-  if (response.status != 201) {
+  if (response.status !== 201) {
     throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
 
-export async function updateCharacter(characterId, character) {
+export async function updateCharacter(characterId: string, character: Partial<Character>): Promise<Character> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}`;
   const response = await fetch(url, {
     method: 'PATCH',
@@ -41,13 +59,13 @@ export async function updateCharacter(characterId, character) {
     },
     body: JSON.stringify(character),
   });
-  if (response.status != 200) {
+  if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
 
-export async function deleteCharacter(characterId) {
+export async function deleteCharacter(characterId: string): Promise<void> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}`;
   const response = await fetch(url, {
     method: 'DELETE',
@@ -55,12 +73,12 @@ export async function deleteCharacter(characterId) {
       'Content-Type': 'application/json',
     },
   });
-  if (response.status != 204) {
+  if (response.status !== 204) {
     throw await buildErrorFromResponse(response, url);
   }
 }
 
-export async function addSkill(characterId, data) {
+export async function addSkill(characterId: string, data: any): Promise<Skill> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/skills`;
   const response = await fetch(url, {
     method: 'POST',
@@ -69,13 +87,13 @@ export async function addSkill(characterId, data) {
     },
     body: JSON.stringify(data),
   });
-  if (response.status != 201) {
+  if (response.status !== 201) {
     throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
 
-export async function deleteSkill(characterId, skillId) {
+export async function deleteSkill(characterId: string, skillId: string): Promise<any> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/skills/${skillId}`;
   const response = await fetch(url, {
     method: 'DELETE',
@@ -83,13 +101,13 @@ export async function deleteSkill(characterId, skillId) {
       'Content-Type': 'application/json',
     },
   });
-  if (response.status != 200) {
+  if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
 
-export async function levelUpSkill(characterId, skillId) {
+export async function levelUpSkill(characterId: string, skillId: string): Promise<any> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/skills/${skillId}/level-up`;
   const response = await fetch(url, {
     method: 'PATCH',
@@ -97,13 +115,13 @@ export async function levelUpSkill(characterId, skillId) {
       'Content-Type': 'application/json',
     },
   });
-  if (response.status != 200) {
+  if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
 
-export async function levelDownSkill(characterId, skillId) {
+export async function levelDownSkill(characterId: string, skillId: string): Promise<any> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/skills/${skillId}/level-down`;
   const response = await fetch(url, {
     method: 'PATCH',
@@ -111,13 +129,13 @@ export async function levelDownSkill(characterId, skillId) {
       'Content-Type': 'application/json',
     },
   });
-  if (response.status != 200) {
+  if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
 
-export async function setUpProfessionalSkill(characterId, skillId) {
+export async function setUpProfessionalSkill(characterId: string, skillId: string): Promise<any> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/skills/${skillId}/professional`;
   const response = await fetch(url, {
     method: 'PATCH',
@@ -125,38 +143,38 @@ export async function setUpProfessionalSkill(characterId, skillId) {
       'Content-Type': 'application/json',
     },
   });
-  if (response.status != 200) {
+  if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
 
-export async function addItem(characterId, data) {
+export async function addItem(characterId: string, data: any): Promise<Item> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/items`;
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  if (response.status != 201) {
+  if (response.status !== 201) {
     throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
 
-export async function deleteItem(characterId, itemId) {
+export async function deleteItem(characterId: string, itemId: string): Promise<any> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/items/${itemId}`;
   const response = await fetch(url, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
   });
-  if (response.status != 200) {
+  if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
 
-export async function equipItem(characterId, slot, itemId) {
+export async function equipItem(characterId: string, slot: string, itemId: string): Promise<any> {
   const request = { slot: slot, itemId: itemId };
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/equipment`;
   const response = await fetch(url, {
@@ -164,67 +182,55 @@ export async function equipItem(characterId, slot, itemId) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(request),
   });
-  if (response.status != 201) {
+  if (response.status !== 201) {
     throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
 
-export async function unequipItem(characterId, slot) {
+export async function unequipItem(characterId: string, slot: string): Promise<any> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/equipment/${slot}`;
   const response = await fetch(url, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
   });
-  if (response.status != 200) {
+  if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
 
-export async function updateCarriedStatus(characterId, itemId, carried) {
+export async function updateCarriedStatus(characterId: string, itemId: string, carried: boolean): Promise<any> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/items/${itemId}/carried/${carried}`;
   const response = await fetch(url, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
   });
-  if (response.status != 200) {
+  if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
 
-export async function transferFactionGold(characterId, amount) {
+export async function transferFactionGold(characterId: string, amount: number): Promise<any> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/transfer-faction-gold`;
   const response = await fetch(url, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ amount }),
   });
-  if (response.status != 200) {
+  if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
 }
 
 //TODO move
-export async function fetchCharacterSizes() {
+export async function fetchCharacterSizes(): Promise<any> {
   const url = `${process.env.RMU_API_CORE_URL}/character-sizes`;
   const response = await fetch(url, { method: 'GET' });
-  if (response.status != 200) {
+  if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }
   return await response.json();
-}
-
-async function buildErrorFromResponse(response, url) {
-  return response
-    .json()
-    .then((errorData) => {
-      const errorMessage = errorData.message || 'Unknown error';
-      return new Error(errorMessage);
-    })
-    .catch(() => {
-      throw new Error(`Error: ${response.status} ${response.statusText}. (${url})`);
-    });
 }
