@@ -169,7 +169,7 @@ const CharacterCreateAttributes: FC<{
       <Grid size={12}></Grid>
 
       <Grid size={2}>
-        <SelectRealmType value={formData.info.realmTypeId} onChange={handleRealmTypeChange} />
+        <SelectRealmType value={formData.info.realmType} onChange={handleRealmTypeChange} />
       </Grid>
       <Grid size={1}>
         <NumericInput

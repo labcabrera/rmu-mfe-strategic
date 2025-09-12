@@ -1,25 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, FC } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useError } from '../../../ErrorContext';
-import { fetchStrategicGame } from '../../api/strategic-games';
+import { CreateCharacterDto } from '../../api/characters';
+import { fetchStrategicGame, StrategicGame } from '../../api/strategic-games';
 import { characterCreateTemplate } from '../../data/character-create';
 import CharacterCreateActions from './CharacterCreateActions';
 import CharacterCreateAttributes from './CharacterCreateAttributes';
 
-const CharacterCreate = () => {
+const CharacterCreate: FC = () => {
   const [searchParams] = useSearchParams();
   const gameId = searchParams.get('gameId');
   const factionId = searchParams.get('factionId');
   const { showError } = useError();
-  const [game, setGame] = useState(null);
-  const [formData, setFormData] = useState(characterCreateTemplate);
+  const [game, setGame] = useState<StrategicGame | null>(null);
+  const [formData, setFormData] = useState<CreateCharacterDto>(characterCreateTemplate);
 
   const bindStrategicGame = () => {
+    if (!gameId) return;
     fetchStrategicGame(gameId)
       .then((game) => {
         setGame(game);
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         showError(error.message);
       });
   };
@@ -32,6 +34,7 @@ const CharacterCreate = () => {
         gameId: gameId,
       }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameId]);
 
   useEffect(() => {

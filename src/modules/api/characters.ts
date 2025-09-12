@@ -15,16 +15,19 @@ export interface Roleplay {
 
 export interface Info {
   raceId: string;
-  sizeId: string;
-  height: number;
-  weight: number;
   professionId: string;
   realmType: string;
-  realmTypeId: string;
-  level: number;
+  height: number;
+  weight: number;
 }
 
-export type Statistics = Record<string, { racial: number }>;
+export interface Stat {
+  potential: number;
+  temporary: number;
+  racial: number | undefined;
+}
+
+export type Statistics = Record<string, Stat>;
 
 export interface CreateCharacterDto {
   gameId: string;

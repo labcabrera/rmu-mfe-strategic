@@ -1,4 +1,6 @@
-export const characterCreateTemplate = {
+import { CreateCharacterDto } from '../api/characters';
+
+export const characterCreateTemplate: CreateCharacterDto = {
   name: 'Generic character',
   gameId: '',
   factionId: '',

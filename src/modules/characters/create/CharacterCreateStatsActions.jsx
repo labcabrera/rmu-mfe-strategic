@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import MenuItem from '@mui/material/MenuItem';
@@ -9,11 +10,7 @@ import { getStatBonus } from '../../services/stat-service';
 const stats = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
 
 const StatButton = ({ text, onClick }) => {
-  return (
-    <Button variant="outlined" onClick={onClick}>
-      {text}
-    </Button>
-  );
+  return <Button onClick={onClick}>{text}</Button>;
 };
 
 const randomStatValue = () => {
@@ -23,16 +20,25 @@ const randomStatValue = () => {
 };
 
 const StatSelect = ({ name, value, setValue }) => {
+  const { t } = useTranslation();
   const handleChange = (e) => {
     const { value } = e.target;
     setValue(value);
   };
 
   return (
-    <TextField select label={name} id={`select-${name}`} value={value} variant="outlined" fullWidth onChange={handleChange}>
+    <TextField
+      select
+      label={name}
+      id={`select-${name}`}
+      value={value}
+      variant="standard"
+      fullWidth
+      onChange={handleChange}
+    >
       {stats.map((option) => (
         <MenuItem key={option} value={option}>
-          {option}
+          {t(option)}
         </MenuItem>
       ))}
     </TextField>
@@ -205,10 +211,10 @@ const CharacterCreateStatsActions = ({ strategicGame, formData, setFormData, set
         <StatButton text="Random" onClick={handleRandomStats} />
       </Grid>
       <Grid size={2}>
-        <TextField label="Boost Amount" value={boosts} readOnly fullWidth />
+        <TextField label="Boost Amount" value={boosts} readOnly variant="standard" fullWidth />
       </Grid>
       <Grid size={2}>
-        <TextField label="Swap Amount" value={swaps} readOnly fullWidth />
+        <TextField label="Swap Amount" value={swaps} readOnly variant="standard" fullWidth />
       </Grid>
       <Grid size={6}></Grid>
       <Grid size={2}>
