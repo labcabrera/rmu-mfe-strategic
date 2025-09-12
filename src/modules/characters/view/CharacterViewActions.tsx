@@ -50,6 +50,7 @@ const CharacterViewActions: FC<{
     levelUpCharacter(character.id, force)
       .then((updated) => {
         setCharacter(updated);
+        setLevelUpDialogOpen(false);
       })
       .catch((err: Error) => {
         //TODO check error code
