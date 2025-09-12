@@ -93,7 +93,7 @@ module.exports = (_, argv) => ({
       filename: 'strategic-app.js',
       remotes: {},
       exposes: {
-        './StrategicApp': './src/App.jsx',
+        './StrategicApp': './src/App.tsx',
       },
       shared: {
         // react: { singleton: true, strictVersion: true, requiredVersion: deps.react },

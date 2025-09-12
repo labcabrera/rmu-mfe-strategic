@@ -1,14 +1,21 @@
-/* eslint-disable react/prop-types */
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Snackbar, Alert } from '@mui/material';
 
-const ErrorContext = createContext();
+type ErrorContextType = {
+  showError: (msg: string) => void;
+};
 
-export const ErrorProvider = ({ children }) => {
+const ErrorContext = createContext<ErrorContextType | undefined>(undefined);
+
+type ErrorProviderProps = {
+  children: ReactNode;
+};
+
+export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
 
-  const showError = (msg) => {
+  const showError = (msg: string) => {
     setMessage(msg);
     setOpen(true);
   };
@@ -30,7 +37,7 @@ export const ErrorProvider = ({ children }) => {
   );
 };
 
-export const useError = () => {
+export const useError = (): ErrorContextType => {
   const ctx = useContext(ErrorContext);
   if (!ctx) {
     throw new Error('useError must be used within an ErrorProvider');
