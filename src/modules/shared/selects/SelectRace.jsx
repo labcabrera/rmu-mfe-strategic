@@ -5,7 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import { fetchRaces } from '../../api/races';
 
-const SelectRace = ({ value, onChange, readonly = false, required = true }) => {
+const SelectRace = ({ value, onChange, readonly = false, required = false }) => {
   const { t } = useTranslation();
   const [races, setRaces] = useState([]);
 

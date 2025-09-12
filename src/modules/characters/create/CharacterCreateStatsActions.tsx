@@ -30,7 +30,7 @@ interface CharacterCreateStatsActionsProps {
   setStatBonusFormData: React.Dispatch<React.SetStateAction<{ [key: string]: StatBonus }>>;
 }
 
-const StatButton: React.FC<{ text: string; onClick: () => void }> = ({ text, onClick }) => {
+const StatButton: FC<{ text: string; onClick: () => void }> = ({ text, onClick }) => {
   return <Button onClick={onClick}>{text}</Button>;
 };
 

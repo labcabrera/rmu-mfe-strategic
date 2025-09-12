@@ -7,7 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import { fetchFactions } from '../../api/factions';
 
-const SelectFaction = ({ value, onChange }) => {
+const SelectFaction = ({ value, onChange, required = false }) => {
   const { t } = useTranslation();
   const [factions, setFactions] = useState([]);
 
@@ -29,7 +29,7 @@ const SelectFaction = ({ value, onChange }) => {
       label={t('faction')}
       value={value === undefined || value === null || factions.length === 0 ? '' : value}
       variant="standard"
-      required
+      required={required}
       fullWidth
       onChange={handleFactionChange}
       slotProps={{

@@ -8,7 +8,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import { fetchRandomName } from '../../api/npc-random-names';
 
-const NameTextField = ({ value, onChange, required = true, generateRandomRaceValue }) => {
+const NameTextField = ({ value, onChange, required = false, generateRandomRaceValue }) => {
   const { t } = useTranslation();
 
   const handleRandomNameClick = async () => {

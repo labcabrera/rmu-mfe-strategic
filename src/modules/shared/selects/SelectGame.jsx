@@ -5,7 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import { fetchStrategicGames } from '../../api/strategic-games';
 
-const SelectGame = ({ value, onChange, readonly = false, required = true }) => {
+const SelectGame = ({ value, onChange, readonly = false, required = false }) => {
   const { t } = useTranslation();
   const [games, setGames] = useState([]);
 

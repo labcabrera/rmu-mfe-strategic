@@ -1,11 +1,21 @@
-/* eslint-disable react/prop-types */
-import React from 'react';
+import React, { FC } from 'react';
 import Avatar from '@mui/material/Avatar';
 
-const CharacterAvatar = ({ character, size = 70 }) => {
+interface CharacterInfo {
+  raceId?: string;
+}
+
+interface Character {
+  info?: CharacterInfo;
+}
+
+const CharacterAvatar: FC<{
+  character?: Character;
+  size?: number;
+}> = ({ character, size = 70 }) => {
   const defaultImage = '/static/images/races/unknown.png';
 
-  const resolveImage = () => {
+  const resolveImage = (): string => {
     if (!character || !character.info || !character.info.raceId) {
       return defaultImage;
     }
@@ -18,7 +28,7 @@ const CharacterAvatar = ({ character, size = 70 }) => {
     return defaultImage;
   };
 
-  return <Avatar src={resolveImage()} sx={{ width: size, height: size }}></Avatar>;
+  return <Avatar src={resolveImage()} sx={{ width: size, height: size }} />;
 };
 
 export default CharacterAvatar;

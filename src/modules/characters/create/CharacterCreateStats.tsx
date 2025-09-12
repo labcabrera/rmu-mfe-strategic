@@ -1,24 +1,18 @@
 import React, { ChangeEvent, Dispatch, FC, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import SyncIcon from '@mui/icons-material/Sync';
+import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { CreateCharacterDto } from '../../api/characters';
+import { stats } from '../../api/characters';
 import { StrategicGame } from '../../api/strategic-games';
+import { StatBonusFormData } from './CharacterCreate';
 import CharacterCreateStatsActions from './CharacterCreateStatsActions';
 
 const red = '#ffab91';
 const green = '#a5d6a7';
-
-interface StatBonus {
-  potential: number;
-  temporary: number;
-}
-
-interface StatBonusFormData {
-  [key: string]: StatBonus;
-}
 
 const CharacterStats: FC<{
   key: string;
@@ -46,16 +40,20 @@ const CharacterStats: FC<{
         <TableCell component="th" scope="row">
           {t(statName)}
         </TableCell>
-        <TableCell sx={{ fontWeight: 'bold' }}>{formData.statistics[statKey].potential}</TableCell>
+        <TableCell align="right" sx={{ fontWeight: 'bold' }}>
+          {formData.statistics[statKey].potential}
+        </TableCell>
         <TableCell
+          align="right"
           sx={{
             color: getColor(statBonusFormData[statKey].potential),
           }}
         >
           {statBonusFormData[statKey].potential}
         </TableCell>
-        <TableCell>{formData.statistics[statKey].temporary}</TableCell>
+        <TableCell align="right">{formData.statistics[statKey].temporary}</TableCell>
         <TableCell
+          align="right"
           sx={{
             color: getColor(statBonusFormData[statKey].temporary),
           }}
@@ -63,6 +61,7 @@ const CharacterStats: FC<{
           {statBonusFormData[statKey].temporary}
         </TableCell>
         <TableCell
+          align="right"
           sx={{
             color: getColor(formData.statistics[statKey].racial),
           }}
@@ -70,6 +69,7 @@ const CharacterStats: FC<{
           {formData.statistics[statKey].racial}
         </TableCell>
         <TableCell
+          align="right"
           sx={{
             color: getColor(getTotal()),
             fontWeight: 'bold',
@@ -82,49 +82,40 @@ const CharacterStats: FC<{
   );
 };
 
-const statKeys = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
-
 const CharacterCreateStats: FC<{
   strategicGame: StrategicGame;
   formData: CreateCharacterDto;
+  onRandomStats?: () => void;
   setFormData: Dispatch<SetStateAction<CreateCharacterDto>>;
-}> = ({ strategicGame, formData, setFormData }) => {
+  statBonusFormData: StatBonusFormData;
+  setStatBonusFormData: Dispatch<SetStateAction<StatBonusFormData>>;
+}> = ({ strategicGame, formData, setFormData, onRandomStats, statBonusFormData, setStatBonusFormData }) => {
   const { t } = useTranslation();
-
-  const [statBonusFormData, setStatBonusFormData] = useState<StatBonusFormData>({
-    ag: { potential: 0, temporary: 0 },
-    co: { potential: 0, temporary: 0 },
-    em: { potential: 0, temporary: 0 },
-    in: { potential: 0, temporary: 0 },
-    me: { potential: 0, temporary: 0 },
-    pr: { potential: 0, temporary: 0 },
-    qu: { potential: 0, temporary: 0 },
-    re: { potential: 0, temporary: 0 },
-    sd: { potential: 0, temporary: 0 },
-    st: { potential: 0, temporary: 0 },
-  });
 
   return (
     <>
-      <Grid container spacing={2} sx={{ marginTop: 2 }}>
-        <Grid size={6}>
+      <Grid container spacing={1}>
+        <Grid size={{ xs: 6, md: 12 }}>
           <Typography variant="h6" color="primary">
             {t('statistics')}
+            <IconButton onClick={onRandomStats}>
+              <SyncIcon />
+            </IconButton>
           </Typography>
           <Table sx={{ minWidth: 650 }} aria-label="stats table">
             <TableHead>
               <TableRow>
                 <TableCell align="left">Stat</TableCell>
-                <TableCell align="left">{t('potential')}</TableCell>
-                <TableCell align="left">{t('potential-bonus')}</TableCell>
-                <TableCell align="left">{t('temporary')}</TableCell>
-                <TableCell align="left">{t('temporary-bonus')}</TableCell>
-                <TableCell align="left">{t('racial')}</TableCell>
-                <TableCell align="left">{t('total')}</TableCell>
+                <TableCell align="right">{t('potential')}</TableCell>
+                <TableCell align="right">{t('potential-bonus')}</TableCell>
+                <TableCell align="right">{t('temporary')}</TableCell>
+                <TableCell align="right">{t('temporary-bonus')}</TableCell>
+                <TableCell align="right">{t('racial')}</TableCell>
+                <TableCell align="right">{t('total')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {statKeys.map((key) => (
+              {stats.map((key) => (
                 <CharacterStats
                   key={key}
                   statKey={key}
@@ -137,7 +128,7 @@ const CharacterCreateStats: FC<{
             </TableBody>
           </Table>
         </Grid>
-        <Grid size={6}>
+        <Grid size={{ xs: 6, md: 12 }}>
           <Typography variant="h6" color="primary">
             {t('boost')}
           </Typography>

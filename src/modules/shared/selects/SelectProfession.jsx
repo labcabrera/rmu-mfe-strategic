@@ -5,7 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import { fetchProfessions } from '../../api/professions';
 
-const SelectProfession = ({ value, onChange }) => {
+const SelectProfession = ({ value, onChange, required = false }) => {
   const { t } = useTranslation();
   const [professions, setProfessions] = useState([]);
 
@@ -29,7 +29,7 @@ const SelectProfession = ({ value, onChange }) => {
       label={t('profession')}
       value={value === undefined || value === null || professions.length === 0 ? '' : value}
       variant="standard"
-      required
+      required={required}
       fullWidth
       onChange={handleProfessionChange}
     >

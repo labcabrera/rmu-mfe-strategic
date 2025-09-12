@@ -5,6 +5,7 @@ import { CreateCharacterDto } from '../../api/characters';
 import { Profession } from '../../api/professions';
 import { Race } from '../../api/races';
 import { StrategicGame } from '../../api/strategic-games';
+import CharacterAvatar from '../../shared/avatars/CharacterAvatar';
 import NameTextField from '../../shared/inputs/NameTextField';
 import { NumericInput } from '../../shared/inputs/NumericInput';
 import SelectFaction from '../../shared/selects/SelectFaction';
@@ -62,10 +63,6 @@ const CharacterCreateAttributes: FC<{
     }));
   };
 
-  const onLevelChange = (level: number) => {
-    updateFormData('info', 'level', level);
-  };
-
   const onFactionChange = (faction: string) => {
     setFormData({ ...formData, factionId: faction });
   };
@@ -92,29 +89,6 @@ const CharacterCreateAttributes: FC<{
       roleplay: { ...prevState.roleplay, gender: gender },
     }));
   };
-
-  const handleAgeChange = (age: React.ChangeEvent<HTMLInputElement> | number) => {
-    let value: number;
-    try {
-      if (typeof age === 'number') {
-        value = age;
-      } else {
-        value = parseInt(age.target.value);
-      }
-    } catch (error) {
-      value = typeof age === 'number' ? age : 0;
-    }
-    setFormData((prevState) => ({
-      ...prevState,
-      roleplay: { ...prevState.roleplay, age: value },
-    }));
-  };
-
-  const handleHeightChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    updateFormData('info', 'height', e.target.value ? parseInt(e.target.value) : 0);
-
-  const handleWeightChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    updateFormData('info', 'weight', e.target.value ? parseInt(e.target.value) : 0);
 
   const onNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prevState) => ({ ...prevState, name: e.target.value }));
@@ -143,33 +117,38 @@ const CharacterCreateAttributes: FC<{
 
   return (
     <Grid container spacing={2}>
+      <Grid size={6}>
+        <CharacterAvatar character={formData} size={120} />
+      </Grid>
+      <Grid size={6}>
+        <Grid size={12}>
+          <SelectGame value={formData.gameId} onChange={onGameChange} />
+        </Grid>
+        <Grid size={12}>
+          <SelectFaction value={formData.factionId} onChange={onFactionChange} />
+        </Grid>
+      </Grid>
+      <Grid size={12}>
+        <NameTextField value={formData.name} onChange={onNameChange} generateRandomRaceValue={formData.info.raceId} />
+      </Grid>
+      <Grid size={12}></Grid>
+
       <Grid size={12}>
         <Typography variant="h6" color="primary">
           {t('information')}
         </Typography>
       </Grid>
 
-      <Grid size={2}>
-        <SelectGame value={formData.gameId} onChange={onGameChange} />
-      </Grid>
-      <Grid size={2}>
-        <SelectFaction value={formData.factionId} onChange={onFactionChange} />
-      </Grid>
-      <Grid size={2}>
+      <Grid size={6}>
         <SelectRace value={formData.info.raceId} onChange={onRaceChange} />
       </Grid>
-      <Grid size={1}>
+      <Grid size={6}>
         <SelectProfession value={formData.info.professionId} onChange={onProfessionChange} />
       </Grid>
-      <Grid size={1}>
+      <Grid size={6}>
         <SelectRealmType value={formData.info.realmType} onChange={handleRealmTypeChange} />
       </Grid>
-      <Grid size={2}>
-        <NameTextField value={formData.name} onChange={onNameChange} generateRandomRaceValue={formData.info.raceId} />
-      </Grid>
-      <Grid size={12}></Grid>
-
-      <Grid size={1}>
+      <Grid size={6}>
         <NumericInput
           label={t('level')}
           name="level"
@@ -179,7 +158,9 @@ const CharacterCreateAttributes: FC<{
           allowNegatives={false}
         />
       </Grid>
-      <Grid size={1}>
+      <Grid size={12}></Grid>
+
+      <Grid size={6}>
         <NumericInput
           label={t('height')}
           name="height"
@@ -188,7 +169,7 @@ const CharacterCreateAttributes: FC<{
           allowNegatives={false}
         />
       </Grid>
-      <Grid size={1}>
+      <Grid size={6}>
         <NumericInput
           label={t('weight')}
           name="weight"
@@ -198,16 +179,15 @@ const CharacterCreateAttributes: FC<{
         />
       </Grid>
       <Grid size={12}></Grid>
-      <GameCreateStats formData={formData} setFormData={setFormData} strategicGame={strategicGame} />
       <Grid size={12}>
         <Typography variant="h6" color="primary">
           {t('roleplay')}
         </Typography>
       </Grid>
-      <Grid size={1}>
+      <Grid size={4}>
         <SelectGender value={formData.roleplay.gender} onChange={handleGenderChange} />
       </Grid>
-      <Grid size={1}>
+      <Grid size={4}>
         <NumericInput
           label={t('age')}
           name="age"
@@ -217,8 +197,7 @@ const CharacterCreateAttributes: FC<{
           allowNegatives={false}
         />
       </Grid>
-      <Grid size={12}></Grid>
-      <Grid size={6}>
+      <Grid size={12}>
         <TextField
           label="Description"
           variant="standard"
