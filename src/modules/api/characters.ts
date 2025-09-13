@@ -7,6 +7,7 @@ export const stats = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'
 export interface Character {
   id: string;
   name: string;
+  skills: CharacterSkill[];
   [key: string]: any;
 }
 
@@ -21,6 +22,24 @@ export interface Info {
   realmType: string;
   height: number;
   weight: number;
+}
+
+export interface CharacterSkill {
+  id: string;
+  skillId: string;
+  specialization?: string;
+  development: number[];
+  category?: string;
+  statistics: string[];
+  ranks: number;
+  ranksDeveloped: number;
+  statBonus: number;
+  racialBonus: number;
+  professionalBonus: number;
+  developmentBonus: number;
+  customBonus: number;
+  totalBonus: number;
+  professional?: string[];
 }
 
 export interface Stat {
@@ -106,7 +125,7 @@ export async function deleteCharacter(characterId: string): Promise<void> {
   }
 }
 
-export async function addSkill(characterId: string, data: any): Promise<Skill> {
+export async function addSkill(characterId: string, data: any): Promise<Character> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/skills`;
   const response = await fetch(url, {
     method: 'POST',
