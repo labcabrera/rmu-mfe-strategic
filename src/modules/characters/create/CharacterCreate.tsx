@@ -11,6 +11,8 @@ import { getStatBonus } from '../../services/stat-service';
 import CharacterCreateActions from './CharacterCreateActions';
 import CharacterCreateAttributes from './CharacterCreateAttributes';
 import CharacterCreateProfessionalSkills from './CharacterCreateProfessionalSkills';
+import CharacterCreateSkillCosts from './CharacterCreateSkillCosts';
+import { CharacterCreateSortCombat } from './CharacterCreateSortCombat';
 import CharacterCreateStats from './CharacterCreateStats';
 import CharacterCreateStatsActions from './CharacterCreateStatsActions';
 
@@ -106,6 +108,13 @@ const CharacterCreate: FC = () => {
       });
   };
 
+  const handleWeaponOrderChange = (newOrder: string[]) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      weaponDevelopment: newOrder,
+    }));
+  };
+
   useEffect(() => {
     checkValidForm();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -138,7 +147,7 @@ const CharacterCreate: FC = () => {
         <Grid size={4}>
           <CharacterCreateAttributes formData={formData} setFormData={setFormData} setProfession={setProfession} />
         </Grid>
-        <Grid size={6}>
+        <Grid size={5}>
           <CharacterCreateStats
             formData={formData}
             setFormData={setFormData}
@@ -147,10 +156,6 @@ const CharacterCreate: FC = () => {
             statBonusFormData={statBonusFormData}
             setStatBonusFormData={setStatBonusFormData}
           />
-        </Grid>
-        <Grid size={2}>{profession && <CharacterCreateProfessionalSkills profession={profession} />}</Grid>
-        <Grid size={4}></Grid>
-        <Grid size={6}>
           <CharacterCreateStatsActions
             strategicGame={game}
             formData={formData}
@@ -162,8 +167,17 @@ const CharacterCreate: FC = () => {
             setSwaps={setSwaps}
           />
         </Grid>
+        <Grid size={3}>
+          <CharacterCreateSortCombat items={formData.weaponDevelopment || []} onChange={handleWeaponOrderChange} />
+          {profession && (
+            <>
+              <CharacterCreateSkillCosts profession={profession} />
+              <CharacterCreateProfessionalSkills profession={profession} />
+            </>
+          )}
+        </Grid>
       </Grid>
-      {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
+      <pre>{JSON.stringify(formData, null, 2)}</pre>
     </>
   );
 };

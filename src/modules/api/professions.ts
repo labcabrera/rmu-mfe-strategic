@@ -4,6 +4,7 @@ export interface Profession {
   id: string;
   name: string;
   professionalSkills: string[];
+  skillCosts: Record<string, number[]>;
   [key: string]: any;
 }
 

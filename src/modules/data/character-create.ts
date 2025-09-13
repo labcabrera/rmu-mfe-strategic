@@ -16,6 +16,7 @@ export const characterCreateTemplate: CreateCharacterDto = {
     age: 20,
   },
   level: 1,
+  weaponDevelopment: ['melee', 'ranged', 'shield', 'unarmed'],
   statistics: {
     ag: {
       potential: 50,

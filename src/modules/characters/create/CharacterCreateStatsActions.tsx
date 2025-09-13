@@ -1,7 +1,8 @@
 import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfoOutlineIcon from '@mui/icons-material/InfoOutline';
-import { Button, Grid, Tooltip, MenuItem, TextField, IconButton } from '@mui/material';
+import { Button, Grid, Tooltip, MenuItem, TextField, IconButton, Typography } from '@mui/material';
+import { t } from 'i18next';
 import { CreateCharacterDto, stats } from '../../api/characters';
 import { StrategicGame } from '../../api/strategic-games';
 import { getStatBonus } from '../../services/stat-service';
@@ -174,42 +175,43 @@ const CharacterCreateStatsActions: FC<{
   }, [strategicGame]);
 
   return (
-    <Grid container spacing={1}>
-      <Grid size={3}>
-        <TextField label="Boost Amount" value={boosts} InputProps={{ readOnly: true }} variant="standard" fullWidth />
-      </Grid>
-      <Grid size={3}>
-        <TextField label="Swap Amount" value={swaps} InputProps={{ readOnly: true }} variant="standard" fullWidth />
-      </Grid>
-      <Grid size={3}>
-        <StatButton text="Boost 1th" onClick={handleBoostHighest} />
-      </Grid>
-      <Grid size={3}>
-        <StatButton text="Boost 2th" onClick={handleBoostHighest} />
-      </Grid>
+    <>
+      <Typography variant="h6" color="primary" gutterBottom sx={{ mt: 2 }}>
+        {t('statistics-boosts')}
+      </Typography>
+      <Grid container spacing={1}>
+        <Grid size={3}>
+          <TextField label="Boosts" value={boosts} InputProps={{ readOnly: true }} variant="standard" fullWidth />
+        </Grid>
+        <Grid size={3}>
+          <TextField label="Swaps" value={swaps} InputProps={{ readOnly: true }} variant="standard" fullWidth />
+        </Grid>
+        <Grid size={3}>
+          <StatButton text="Boost 1th" onClick={handleBoostHighest} />
+        </Grid>
+        <Grid size={3}>
+          <StatButton text="Boost 2th" onClick={handleBoostHighest} />
+        </Grid>
 
-      <Grid size={3}>
-        <StatSelect name="Source" value={sourceBoostStat} setValue={setSourceBoostStat} />
-      </Grid>
-      <Grid size={3}>
-        <StatSelect name="Target" value={targetBoostStat} setValue={setTargetBoostStat} />
-      </Grid>
-      <Grid size={6}>
-        <StatButton text="Swap" onClick={handleSwapStats} />
-      </Grid>
+        <Grid size={3}>
+          <StatSelect name="Source" value={sourceBoostStat} setValue={setSourceBoostStat} />
+        </Grid>
+        <Grid size={3}>
+          <StatSelect name="Target" value={targetBoostStat} setValue={setTargetBoostStat} />
+        </Grid>
+        <Grid size={6}>
+          <StatButton text="Swap" onClick={handleSwapStats} />
+        </Grid>
 
-      <Grid size={3}>
-        <StatSelect name="Target" value={replaceBoostStat} setValue={setReplaceBoostStat} />
+        <Grid size={3}>
+          <StatSelect name="Target" value={replaceBoostStat} setValue={setReplaceBoostStat} />
+        </Grid>
+        <Grid size={3}></Grid>
+        <Grid size={6}>
+          <StatButton text="Replace" onClick={handleReplacePotential} />
+        </Grid>
       </Grid>
-      <Grid size={3}></Grid>
-      <Grid size={6}>
-        <StatButton text="Replace" onClick={handleReplacePotential} />
-      </Grid>
-
-      <Grid size={8}></Grid>
-
-      <Grid size={8}></Grid>
-    </Grid>
+    </>
   );
 };
 

@@ -11,7 +11,7 @@ const CharacterCreateProfessionalSkills: FC<{
 
   return (
     <>
-      <Typography variant="h6" color="primary" gutterBottom>
+      <Typography variant="h6" color="primary" gutterBottom sx={{ mt: 2 }}>
         {t('professional-skills')}
       </Typography>
       <Grid container spacing={1}>

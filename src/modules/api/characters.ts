@@ -40,6 +40,7 @@ export interface CreateCharacterDto {
   description: string;
   roleplay: Roleplay;
   level: number;
+  weaponDevelopment: string[];
   [key: string]: any;
 }
 
