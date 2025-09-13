@@ -9,6 +9,7 @@ interface MovementTextFieldProps extends Omit<TextFieldProps, 'onChange' | 'valu
   imageName: string;
   disabled?: boolean;
   required?: boolean;
+  textAlign?: 'right' | 'left' | 'center';
 }
 
 const ImageTextField: FC<MovementTextFieldProps> = ({
@@ -18,6 +19,7 @@ const ImageTextField: FC<MovementTextFieldProps> = ({
   onChange,
   disabled = false,
   required = false,
+  textAlign = 'right',
   ...props
 }) => {
   return (
@@ -31,15 +33,17 @@ const ImageTextField: FC<MovementTextFieldProps> = ({
       fullWidth
       sx={{
         '& .MuiInputBase-input': {
-          textAlign: 'right',
+          textAlign: textAlign,
         },
       }}
-      InputProps={{
-        startAdornment: (
-          <InputAdornment position="start">
-            <Avatar src={`/static/images/icons/${imageName}.png`} sx={{ width: 25, height: 25 }} />
-          </InputAdornment>
-        ),
+      slotProps={{
+        input: {
+          startAdornment: (
+            <InputAdornment position="start">
+              <Avatar src={`/static/images/icons/${imageName}.png`} sx={{ width: 25, height: 25 }} />
+            </InputAdornment>
+          ),
+        },
       }}
       {...props}
     />

@@ -32,7 +32,7 @@ const CharacterViewInfo: FC<{
 
   return (
     <>
-      <Grid container spacing={2}>
+      <Grid container spacing={3}>
         <Grid size={12}>
           <CharacterAvatar character={character} size={120} />
           <Typography variant="h6">{character.name}</Typography>
@@ -107,10 +107,10 @@ const CharacterViewInfo: FC<{
           </Typography>
         </Grid>
         <Grid size={3}>
-          <LevelTextField i18nLabel="current-level" value={character.experience.level} readOnly />
+          <ImageTextField label={t('current-level')} value={character.experience.level} imageName="level" />
         </Grid>
         <Grid size={3}>
-          <LevelTextField i18nLabel="available-level" value={character.experience.availableLevel} readOnly />
+          <ImageTextField label={t('available-level')} value={character.experience.availableLevel} imageName="level" />
         </Grid>
         <Grid size={3}>
           <ImageTextField
