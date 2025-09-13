@@ -20,6 +20,9 @@ import CharacterViewEquipment from './CharacterViewEquipment';
 import CharacterViewEquipmentInfo from './CharacterViewEquipmentInfo';
 import CharacterViewTransferGold from './CharacterViewTransferGold';
 
+const itemCardWidth = 120;
+const itemCardHeight = 260;
+
 const ItemCardListItem: FC<{
   item: Item;
   character: Character;
@@ -56,7 +59,7 @@ const ItemCardListItem: FC<{
   return (
     <>
       <Grid key={item.id}>
-        <Card sx={{ width: 150, height: 290, display: 'flex', flexDirection: 'column' }}>
+        <Card sx={{ width: itemCardWidth, height: itemCardHeight, display: 'flex', flexDirection: 'column' }}>
           <CardMedia
             component="img"
             height="120"

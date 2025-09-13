@@ -49,7 +49,7 @@ const CharacterViewAddItem = ({ character, setCharacter, faction }) => {
           <GoldTextField value={goldAmount} i18nLabel="gold-amount" />
         </Grid>
         <Grid size={2}>
-          <Stack direction="row" spacing={2}>
+          <Stack direction="row" spacing={1}>
             <Button onClick={() => handleTransfer(1)} variant="outlined" startIcon={<ChevronLeftIcon />}>
               +1G
             </Button>

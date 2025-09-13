@@ -8,6 +8,8 @@ export interface Character {
   id: string;
   name: string;
   skills: CharacterSkill[];
+  items: CharacterItem[];
+  equipment: CharacterEquipment;
   [key: string]: any;
 }
 
@@ -40,6 +42,35 @@ export interface CharacterSkill {
   customBonus: number;
   totalBonus: number;
   professional?: string[];
+}
+
+export interface CharacterEquipment {
+  mainHand?: string;
+  offHand?: string;
+  body?: string;
+  head?: string;
+  arms?: string;
+  legs?: string;
+  [key: string]: string | undefined;
+}
+
+export interface CharacterItem {
+  id: string;
+  name: string;
+  itemTypeId: string;
+  category?: string;
+  weapon?: WeaponInfo;
+  armor?: ArmorInfo;
+}
+
+export interface WeaponInfo {
+  fumble: string;
+  sizeAdjustment: string;
+  requiredHands: number;
+}
+
+export interface ArmorInfo {
+  slot: string;
 }
 
 export interface Stat {
