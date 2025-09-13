@@ -14,7 +14,8 @@ import {
   DialogTitle,
 } from '@mui/material';
 import { useError } from '../../../ErrorContext';
-import { deleteCharacter, Character, levelUpCharacter } from '../../api/characters';
+import { Character } from '../../api/character.dto';
+import { deleteCharacter, levelUpCharacter } from '../../api/characters';
 import { Faction } from '../../api/factions';
 import { StrategicGame } from '../../api/strategic-games';
 import DeleteButton from '../../shared/buttons/DeleteButton';

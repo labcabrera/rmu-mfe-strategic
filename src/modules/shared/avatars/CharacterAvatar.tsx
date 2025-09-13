@@ -1,13 +1,6 @@
 import React, { FC } from 'react';
 import Avatar from '@mui/material/Avatar';
-
-interface CharacterInfo {
-  raceId?: string;
-}
-
-interface Character {
-  info?: CharacterInfo;
-}
+import { Character } from '../../api/character.dto';
 
 const CharacterAvatar: FC<{
   character?: Character;

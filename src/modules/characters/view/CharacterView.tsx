@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useError } from '../../../ErrorContext';
-import { fetchCharacter, Character } from '../../api/characters';
+import { Character } from '../../api/character.dto';
+import { fetchCharacter } from '../../api/characters';
 import { fetchFaction, Faction } from '../../api/factions';
 import { fetchProfession, Profession } from '../../api/professions';
 import { fetchStrategicGame, StrategicGame } from '../../api/strategic-games';
@@ -57,7 +58,13 @@ const CharacterView: React.FC = () => {
   return (
     <>
       <CharacterViewActions character={character} setCharacter={setCharacter} faction={faction} game={strategicGame} />
-      <CharacterViewTabs character={character} setCharacter={setCharacter} strategicGame={strategicGame} faction={faction} profession={profession} />
+      <CharacterViewTabs
+        character={character}
+        setCharacter={setCharacter}
+        strategicGame={strategicGame}
+        faction={faction}
+        profession={profession}
+      />
     </>
   );
 };

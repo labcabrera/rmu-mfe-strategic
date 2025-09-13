@@ -1,18 +1,22 @@
-/* eslint-disable react/prop-types */
-import React from 'react';
+import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Typography from '@mui/material/Typography';
+import { Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Character } from '../../api/character.dto';
 
 const red = '#ffab91';
 const green = '#a5d6a7';
 
-const CharacterViewResistances = ({ character }) => {
+const CharacterViewResistances: FC<{
+  character: Character;
+}> = ({ character }) => {
   const { t } = useTranslation();
+
+  const getColor = (value: number) => {
+    if (value < 0) return red;
+    if (value > 0) return green;
+    return 'inherit';
+  };
+
   return (
     <>
       <Typography variant="h6" color="primary">
@@ -35,25 +39,19 @@ const CharacterViewResistances = ({ character }) => {
               <TableCell component="th" scope="row">
                 {t(resistance.resistance)}
               </TableCell>
-              <TableCell
-                align="right"
-                sx={{
-                  color: resistance.statBonus < 0 ? red : resistance.statBonus > 0 ? green : 'inherit',
-                  fontWeight: 'bold',
-                }}
-              >
+              <TableCell align="right" sx={{ color: getColor(resistance.statBonus) }}>
                 {resistance.statBonus}
               </TableCell>
-              <TableCell align="right">{resistance.racialBonus}</TableCell>
-              <TableCell align="right">{resistance.realmBonus}</TableCell>
-              <TableCell align="right">{resistance.customBonus}</TableCell>
-              <TableCell
-                align="right"
-                sx={{
-                  color: resistance.totalBonus < 0 ? red : resistance.totalBonus > 0 ? green : 'inherit',
-                  fontWeight: 'bold',
-                }}
-              >
+              <TableCell align="right" sx={{ color: getColor(resistance.racialBonus) }}>
+                {resistance.racialBonus}
+              </TableCell>
+              <TableCell align="right" sx={{ color: getColor(resistance.realmBonus) }}>
+                {resistance.realmBonus}
+              </TableCell>
+              <TableCell align="right" sx={{ color: getColor(resistance.customBonus) }}>
+                {resistance.customBonus}
+              </TableCell>
+              <TableCell align="right" sx={{ color: getColor(resistance.totalBonus), fontWeight: 'bold' }}>
                 {resistance.totalBonus}
               </TableCell>
             </TableRow>

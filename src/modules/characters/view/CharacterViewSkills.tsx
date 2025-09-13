@@ -5,25 +5,20 @@ import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-import Grid from '@mui/material/Grid';
-import IconButton from '@mui/material/IconButton';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import { useError } from '../../../ErrorContext';
 import {
-  addSkill,
-  levelUpSkill,
-  levelDownSkill,
-  setUpProfessionalSkill,
-  deleteSkill,
-  Character,
-  CharacterSkill,
-} from '../../api/characters';
+  Grid,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { useError } from '../../../ErrorContext';
+import { Character, CharacterSkill } from '../../api/character.dto';
+import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../api/characters';
 import SelectSkill from '../../shared/selects/SelectSkill';
 
 const addSkillFormDataTemplate = {
@@ -102,19 +97,12 @@ const CharacterViewSkillsAdd: FC<{
   );
 };
 
-interface CharacterViewSkillsEntryProps {
+const CharacterViewSkillsEntry: FC<{
   character: Character;
   setCharacter: React.Dispatch<React.SetStateAction<Character>>;
   skill: CharacterSkill;
   profession?: Profession;
-}
-
-const CharacterViewSkillsEntry: React.FC<CharacterViewSkillsEntryProps> = ({
-  character,
-  setCharacter,
-  skill,
-  profession,
-}) => {
+}> = ({ character, setCharacter, skill, profession }) => {
   const { t } = useTranslation();
   const { showError } = useError();
 

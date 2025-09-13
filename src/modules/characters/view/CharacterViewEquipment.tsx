@@ -1,17 +1,20 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import ClearIcon from '@mui/icons-material/Clear';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
-import CardMedia from '@mui/material/CardMedia';
-import Grid from '@mui/material/Grid';
-import IconButton from '@mui/material/IconButton';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import Typography from '@mui/material/Typography';
-import { Character, CharacterItem, equipItem, unequipItem } from '../../api/characters';
+import {
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  CardMedia,
+  Grid,
+  IconButton,
+  MenuItem,
+  Select,
+  Typography,
+} from '@mui/material';
+import { Character, CharacterItem } from '../../api/character.dto';
+import { equipItem, unequipItem } from '../../api/characters';
 
 const slots = ['mainHand', 'offHand', 'body', 'head', 'arms', 'legs'];
 

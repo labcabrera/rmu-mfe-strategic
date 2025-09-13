@@ -1,12 +1,8 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Typography from '@mui/material/Typography';
-import { Character } from '../../api/characters';
+import { Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Character } from '../../api/character.dto';
+import { stats } from '../../api/characters';
 
 const red = '#ffab91';
 const green = '#a5d6a7';
@@ -22,74 +18,34 @@ export interface CharacterStatistics {
   };
 }
 
-interface CharacterViewStatsEntryProps {
+const CharacterViewStatsEntry: FC<{
   statKey: string;
   statName: string;
   character: Character;
-}
-
-const CharacterViewStatsEntry: React.FC<CharacterViewStatsEntryProps> = ({ statKey, statName, character }) => {
+}> = ({ statKey, statName, character }) => {
   const { t } = useTranslation();
+
+  const getColor = (value: number) => {
+    if (value < 0) return red;
+    if (value > 0) return green;
+    return 'inherit';
+  };
 
   return (
     <TableRow key={statKey} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-      <TableCell component="th" scope="row">
-        {t(statName)}
-      </TableCell>
-      <TableCell align="right" component="th" scope="row">
-        {character.statistics[statKey].potential}
-      </TableCell>
+      <TableCell>{t(statName)}</TableCell>
+      <TableCell align="right">{character.statistics[statKey].potential}</TableCell>
       <TableCell align="right">{character.statistics[statKey].temporary}</TableCell>
-      <TableCell
-        align="right"
-        sx={{
-          color:
-            character.statistics[statKey].bonus < 0 ? red : character.statistics[statKey].bonus > 0 ? green : 'inherit',
-          fontWeight: 'bold',
-        }}
-      >
+      <TableCell align="right" sx={{ color: getColor(character.statistics[statKey].bonus) }}>
         {character.statistics[statKey].bonus}
       </TableCell>
-      <TableCell
-        align="right"
-        sx={{
-          color:
-            character.statistics[statKey].racial < 0
-              ? red
-              : character.statistics[statKey].racial > 0
-                ? green
-                : 'inherit',
-          fontWeight: 'bold',
-        }}
-      >
+      <TableCell align="right" sx={{ color: getColor(character.statistics[statKey].racial) }}>
         {character.statistics[statKey].racial}
       </TableCell>
-      <TableCell
-        align="right"
-        sx={{
-          color:
-            character.statistics[statKey].custom < 0
-              ? red
-              : character.statistics[statKey].custom > 0
-                ? green
-                : 'inherit',
-          fontWeight: 'bold',
-        }}
-      >
+      <TableCell align="right" sx={{ color: getColor(character.statistics[statKey].custom) }}>
         {character.statistics[statKey].custom}
       </TableCell>
-      <TableCell
-        align="right"
-        sx={{
-          color:
-            character.statistics[statKey].totalBonus < 0
-              ? red
-              : character.statistics[statKey].totalBonus > 0
-                ? green
-                : 'inherit',
-          fontWeight: 'bold',
-        }}
-      >
+      <TableCell align="right" sx={{ color: getColor(character.statistics[statKey].totalBonus), fontWeight: 'bold' }}>
         {character.statistics[statKey].totalBonus}
       </TableCell>
     </TableRow>
@@ -100,9 +56,7 @@ interface CharacterViewStatsProps {
   character: Character;
 }
 
-const statKeys = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
-
-const CharacterViewStats: React.FC<CharacterViewStatsProps> = ({ character }) => {
+const CharacterViewStats: FC<CharacterViewStatsProps> = ({ character }) => {
   const { t } = useTranslation();
   return (
     <>
@@ -122,7 +76,7 @@ const CharacterViewStats: React.FC<CharacterViewStatsProps> = ({ character }) =>
           </TableRow>
         </TableHead>
         <TableBody>
-          {statKeys.map((key) => (
+          {stats.map((key) => (
             <CharacterViewStatsEntry statKey={key} statName={key} character={character} />
           ))}
         </TableBody>
