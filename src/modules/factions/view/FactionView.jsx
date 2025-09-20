@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import Grid from '@mui/material/Grid';
+import { Grid } from '@mui/material';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacters } from '../../api/character';
 import { fetchFaction } from '../../api/faction';

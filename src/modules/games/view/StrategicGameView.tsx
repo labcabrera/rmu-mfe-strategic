@@ -79,16 +79,14 @@ const StrategicGameView: React.FC = () => {
           <Typography variant="h6" color="primary">
             {t(game.name)}
           </Typography>
+          <Typography variant="h6">{t(game.realmName)}</Typography>
           <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
             {game.description}
           </Typography>
         </Grid>
         <Grid size={7}>
-          <Typography variant="h6" color="primary">
-            {t('statistics')}
-          </Typography>
           <StrategicGameViewAttributes strategicGame={game} />
-          <StrategicGameViewFactions strategicGame={game} factions={factions} setFactions={setFactions} />
+          <StrategicGameViewFactions strategicGame={game} factions={factions} />
           <StrategicGameViewTacticalGames strategicGame={game} tacticalGames={tacticalGames} />
         </Grid>
         <Grid size={4}></Grid>

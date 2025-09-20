@@ -1,10 +1,8 @@
 import React, { FC } from 'react';
-import { useTranslation } from 'react-i18next';
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
+import { Box, Grid, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { StrategicGame } from '../../api/strategic-game.dto';
+import NumericCard from '../../shared/cards/NumericCard';
 
 const StrategicGameViewAttributes: FC<{
   strategicGame: StrategicGame;
@@ -15,50 +13,80 @@ const StrategicGameViewAttributes: FC<{
     <>
       <Grid container spacing={2}>
         <Grid size={12}>
-          <Typography variant="h6" color="primary">
-            {strategicGame.name}
+          <Typography variant="h6" color="primary" sx={{ mb: 2 }}>
+            {t('strategic-game-options')}
           </Typography>
+          <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+            <NumericCard
+              value={strategicGame.options.experienceMultiplier}
+              subtitle={t('experience-multiplier')}
+              image={`/static/images/generic/experience.png`}
+              applyColor={false}
+            />
+            <NumericCard
+              value={strategicGame.options.fatigueMultiplier}
+              subtitle={t('fatigue-multiplier')}
+              image={`/static/images/generic/stat-co.png`}
+              applyColor={false}
+            />
+            <NumericCard
+              value={strategicGame.options.boardScaleMultiplier}
+              subtitle={t('board-scale-multiplier')}
+              image={`/static/images/generic/realm.png`}
+              applyColor={false}
+            />
+            <NumericCard
+              value={strategicGame.options.letality}
+              subtitle={t('letality')}
+              image={`/static/images/generic/physical.png`}
+            />
+          </Box>
         </Grid>
-        <InfoField i18n="name" value={strategicGame.name} />
-        <InfoField i18n="realm" value={strategicGame.realmName || ''} />
-        <InfoField i18n="status" value={t(`status-${strategicGame.status}`)} />
         <Grid size={12}>
-          <Typography variant="h6" color="primary">
-            {t('options')}
-          </Typography>
-        </Grid>
-        <InfoField i18n="experience-multiplier" value={strategicGame.options.experienceMultiplier} size={2} />
-        <InfoField i18n="fatigue-multiplier" value={strategicGame.options.fatigueMultiplier} size={2} />
-        <InfoField i18n="board-scale-multiplier" value={strategicGame.options.boardScaleMultiplier} size={2} />
-        <InfoField i18n="letality" value={strategicGame.options.letality} size={2} />
-        <Grid size={12}>
-          <Typography variant="h6" color="primary">
+          <Typography variant="h6" color="primary" sx={{ mb: 2 }}>
             {t('power-level')}
           </Typography>
+          <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+            <NumericCard
+              value={strategicGame.powerLevel.baseDevPoints}
+              subtitle={t('base-dev-points')}
+              image={`/static/images/generic/trait-physical.png`}
+              applyColor={false}
+            />
+            <NumericCard
+              value={strategicGame.powerLevel.statRandomMin}
+              subtitle={t('stat-random-min')}
+              image={`/static/images/generic/trait-physical.png`}
+              applyColor={false}
+            />
+            <NumericCard
+              value={strategicGame.powerLevel.statBoostPotential}
+              subtitle={t('stat-boost-potential')}
+              image={`/static/images/generic/trait-physical.png`}
+              applyColor={false}
+            />
+            <NumericCard
+              value={strategicGame.powerLevel.statBoostTemporary}
+              subtitle={t('stat-boost-temporary')}
+              image={`/static/images/generic/trait-physical.png`}
+              applyColor={false}
+            />
+            <NumericCard
+              value={strategicGame.powerLevel.statCreationBoost}
+              subtitle={t('stat-creation-boosts')}
+              image={`/static/images/generic/trait-physical.png`}
+              applyColor={false}
+            />
+            <NumericCard
+              value={strategicGame.powerLevel.statCreationSwap}
+              subtitle={t('stat-creation-swaps')}
+              image={`/static/images/generic/trait-physical.png`}
+              applyColor={false}
+            />
+          </Box>
         </Grid>
-        <InfoField i18n="base-dev-points" value={strategicGame.powerLevel.baseDevPoints} size={2} />
-        <InfoField i18n="stat-random-min" value={strategicGame.powerLevel.statRandomMin} size={2} />
-        <InfoField i18n="stat-boost-potential" value={strategicGame.powerLevel.statBoostPotential} size={2} />
-        <InfoField i18n="stat-boost-temporary" value={strategicGame.powerLevel.statBoostTemporary} size={2} />
-        <InfoField i18n="stat-creation-boosts" value={strategicGame.powerLevel.statCreationBoost} size={2} />
-        <InfoField i18n="stat-creation-swaps" value={strategicGame.powerLevel.statCreationSwap} size={2} />
-        {strategicGame.description && <InfoField i18n="description" value={strategicGame.description} size={12} />}
       </Grid>
     </>
-  );
-};
-
-const InfoField: FC<{
-  i18n: string;
-  value: string | number | undefined;
-  size?: number;
-}> = ({ i18n, value, size = 4 }) => {
-  const { t } = useTranslation();
-
-  return (
-    <Grid size={size}>
-      <TextField label={t(i18n)} variant="standard" value={value} fullWidth />
-    </Grid>
   );
 };
 

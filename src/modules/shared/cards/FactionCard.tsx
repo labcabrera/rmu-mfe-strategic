@@ -9,7 +9,7 @@ const FactionCard: FC<{
   const navigate = useNavigate();
 
   const handleFactionClick = () => {
-    navigate(`/core/factions/view/${faction.id}`, { state: { faction } });
+    navigate(`/strategic/factions/view/${faction.id}`, { state: { faction } });
   };
 
   if (!faction) return <p>Loading...</p>;

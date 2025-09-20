@@ -60,7 +60,7 @@ const FactionViewAttributes = ({ faction, setFaction }) => {
           label={t('available-xp')}
           variant="standard"
           fullWidth
-          value={new Intl.NumberFormat('en-EN').format(faction.factionManagement.availableXP)}
+          value={new Intl.NumberFormat('en-EN').format(faction.management.availableXP)}
           slotProps={{
             input: {
               endAdornment: (
@@ -87,7 +87,7 @@ const FactionViewAttributes = ({ faction, setFaction }) => {
           label={t('available-gold')}
           variant="standard"
           fullWidth
-          value={faction.factionManagement.availableGold}
+          value={faction.management.availableGold}
           slotProps={{
             input: {
               endAdornment: (

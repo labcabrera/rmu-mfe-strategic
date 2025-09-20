@@ -2,9 +2,15 @@ export interface Faction {
   id: string;
   gameId: string;
   name: string;
-  availableGold: number | undefined;
-  availableXP: number | undefined;
+  management: FactionManagement;
+  shortDescription?: string;
   description?: string;
+  owner?: string;
+}
+
+export interface FactionManagement {
+  availableGold: number;
+  availableXP: number;
 }
 
 export interface CreateFactionDto extends Omit<Faction, 'id'> {}

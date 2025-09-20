@@ -1,29 +1,27 @@
-/* eslint-disable react/prop-types */
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { Link as RouterLink } from 'react-router-dom';
+import React, { FC, useState } from 'react';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
-import Box from '@mui/material/Box';
-import Breadcrumbs from '@mui/material/Breadcrumbs';
-import IconButton from '@mui/material/IconButton';
-import Link from '@mui/material/Link';
-import Snackbar from '@mui/material/Snackbar';
-import Stack from '@mui/material/Stack';
+import { Box, Breadcrumbs, IconButton, Link, Snackbar, Stack } from '@mui/material';
+import { t } from 'i18next';
 import { updateFaction } from '../../api/faction';
+import { Faction, UpdateFactionDto } from '../../api/faction.dto';
+import { StrategicGame } from '../../api/strategic-game.dto';
 
-const FactionUpdateActions = ({ formData, faction, game }) => {
-  const { t } = useTranslation();
+const FactionUpdateActions: FC<{
+  formData: UpdateFactionDto;
+  faction: Faction;
+  game: StrategicGame;
+}> = ({ formData, faction, game }) => {
   const navigate = useNavigate();
-  const [displayError, setDisplayError] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState('');
+  const [displayError, setDisplayError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleFactionUpdate = async () => {
     updateFaction(faction.id, formData)
-      .then((data) => navigate(`/strategic/factions/view/${data.id}`, { state: { faction: data } }))
-      .catch((error) => {
+      .then((data: Faction) => navigate(`/strategic/factions/view/${data.id}`, { state: { faction: data } }))
+      .catch((error: Error) => {
         setDisplayError(true);
         setErrorMessage(`Error updating faction: ${error.message}`);
       });
@@ -55,14 +53,14 @@ const FactionUpdateActions = ({ formData, faction, game }) => {
               {game.name}
             </Link>
             <span>{faction.name}</span>
-            <span>Edit</span>
+            <span>{t('edit')}</span>
           </Breadcrumbs>
         </Box>
         <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>
-          <IconButton variant="outlined" onClick={handleCancelClick}>
+          <IconButton onClick={handleCancelClick}>
             <CancelIcon />
           </IconButton>
-          <IconButton variant="outlined" onClick={handleFactionUpdate}>
+          <IconButton onClick={handleFactionUpdate}>
             <SaveIcon />
           </IconButton>
         </Stack>
@@ -73,11 +71,11 @@ const FactionUpdateActions = ({ formData, faction, game }) => {
         onClose={handleSnackbarClose}
         message={errorMessage}
         action={
-          <React.Fragment>
+          <>
             <IconButton aria-label="close" color="inherit" sx={{ p: 0.5 }} onClick={handleSnackbarClose}>
               <CloseIcon />
             </IconButton>
-          </React.Fragment>
+          </>
         }
       />
     </>
