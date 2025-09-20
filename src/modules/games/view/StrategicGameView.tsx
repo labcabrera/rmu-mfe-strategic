@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { Grid } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
+import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchFactions } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { fetchTacticalGames, TacticalGame } from '../../api/tactical-games';
+import StrategicGameAvatar from '../../shared/avatars/StrategicGameAvatar';
 import StrategicGameViewActions from './StrategicGameViewActions';
 import StrategicGameViewAttributes from './StrategicGameViewAttributes';
 import StrategicGameViewFactions from './StrategicGameViewFactions';
@@ -71,16 +73,25 @@ const StrategicGameView: React.FC = () => {
   return (
     <>
       <StrategicGameViewActions strategicGame={game} />
-      <Grid container spacing={2}>
-        <Grid size={12}>
+      <Grid container spacing={12}>
+        <Grid size={2}>
+          <StrategicGameAvatar strategicGame={game} size={200} />
+          <Typography variant="h6" color="primary">
+            {t(game.name)}
+          </Typography>
+          <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
+            {game.description}
+          </Typography>
+        </Grid>
+        <Grid size={7}>
+          <Typography variant="h6" color="primary">
+            {t('statistics')}
+          </Typography>
           <StrategicGameViewAttributes strategicGame={game} />
-        </Grid>
-        <Grid size={12}>
           <StrategicGameViewFactions strategicGame={game} factions={factions} setFactions={setFactions} />
-        </Grid>
-        <Grid size={12}>
           <StrategicGameViewTacticalGames strategicGame={game} tacticalGames={tacticalGames} />
         </Grid>
+        <Grid size={4}></Grid>
       </Grid>
     </>
   );

@@ -19,7 +19,7 @@ const StrategicGameCard: FC<{
     <CardListItem
       title={strategicGame.name}
       subtitle={t(strategicGame.realmName)}
-      image="/static/images/generic/realm.png"
+      image="/static/images/generic/strategic.png"
       onClick={handleRealmClick}
     />
   );
