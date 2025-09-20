@@ -11,9 +11,21 @@ const NumericCard: FC<{
   imageSize?: number;
   grayscale?: number;
   applyColor?: boolean;
-}> = ({ value, subtitle, image, maxWidth = 250, minWidth = 250, height = 70, imageSize = 70, grayscale = 0.5, applyColor = true }) => {
+}> = ({
+  value,
+  subtitle,
+  image,
+  maxWidth = 250,
+  minWidth = 250,
+  height = 70,
+  imageSize = 70,
+  grayscale = 0.5,
+  applyColor = true,
+}) => {
   const red = '#ffab91';
   const green = '#a5d6a7';
+
+  const formattedValue = value ? new Intl.NumberFormat('en-EN').format(value) : '';
 
   const getColor = (): string => {
     if (!applyColor) return 'inherit';
@@ -65,7 +77,7 @@ const NumericCard: FC<{
             display: 'block',
           }}
         >
-          {value}
+          {formattedValue}
         </Typography>
         <Typography
           variant="subtitle1"

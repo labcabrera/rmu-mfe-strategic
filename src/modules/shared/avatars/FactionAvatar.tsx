@@ -1,12 +1,14 @@
-/* eslint-disable react/prop-types */
-import React from 'react';
+import React, { FC } from 'react';
 import Avatar from '@mui/material/Avatar';
+import { Faction } from '../../api/faction.dto';
 
-const FactionAvatar = ({ faction, size = 70 }) => {
+const FactionAvatar: FC<{
+  faction?: Faction;
+  size?: number;
+}> = ({ faction, size = 70 }) => {
   const defaultImage = '/static/images/avatars/generic-faction-01.png';
 
-  //TODO add as entity attribute
-  const resolveImage = () => {
+  const resolveImage = (): string => {
     if (!faction || !faction.name) {
       return defaultImage;
     }
@@ -18,7 +20,7 @@ const FactionAvatar = ({ faction, size = 70 }) => {
     return defaultImage;
   };
 
-  return <Avatar src={resolveImage()} sx={{ width: size, height: size }}></Avatar>;
+  return <Avatar src={resolveImage()} sx={{ width: size, height: size }} />;
 };
 
 export default FactionAvatar;

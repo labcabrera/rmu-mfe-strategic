@@ -1,36 +1,34 @@
-/* eslint-disable react/prop-types */
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { Link as RouterLink } from 'react-router-dom';
+import React, { FC, useState } from 'react';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import Box from '@mui/material/Box';
-import Breadcrumbs from '@mui/material/Breadcrumbs';
-import IconButton from '@mui/material/IconButton';
-import Link from '@mui/material/Link';
-import Stack from '@mui/material/Stack';
+import { Box, Breadcrumbs, IconButton, Link, Stack } from '@mui/material';
+import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { deleteFaction } from '../../api/faction';
+import { Faction } from '../../api/faction.dto';
+import { StrategicGame } from '../../api/strategic-game.dto';
 import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 
-const FactionViewActions = ({ faction, game }) => {
+const FactionViewActions: FC<{
+  faction: Faction;
+  game: StrategicGame;
+}> = ({ faction, game }) => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
-  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { showError } = useError();
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     try {
-      deleteFaction(faction.id);
+      await deleteFaction(faction.id);
       navigate(`/strategic/games/view/${faction.gameId}`);
-    } catch (err) {
+    } catch (err: any) {
       showError(err.message);
     }
   };
 
   const handleEditClick = () => {
-    navigate(`/strategic/factions/edit/${faction.id}`, { state: { faction: faction, game: game } });
+    navigate(`/strategic/factions/edit/${faction.id}`, { state: { faction, game } });
   };
 
   const handleDeleteClick = () => {
@@ -41,8 +39,8 @@ const FactionViewActions = ({ faction, game }) => {
     setDeleteDialogOpen(false);
   };
 
-  const handleDialogDelete = () => {
-    handleDelete();
+  const handleDialogDelete = async () => {
+    await handleDelete();
     setDeleteDialogOpen(false);
   };
 
@@ -52,7 +50,7 @@ const FactionViewActions = ({ faction, game }) => {
         <Box>
           <Breadcrumbs aria-label="breadcrumb">
             <Link color="inherit" href="/">
-              Home
+              {t('home')}
             </Link>
             <Link component={RouterLink} color="inherit" to="/strategic/games">
               {t('strategic')}
@@ -67,19 +65,19 @@ const FactionViewActions = ({ faction, game }) => {
           </Breadcrumbs>
         </Box>
         <Stack direction="row" spacing={2}>
-          <IconButton variant="outlined" onClick={handleEditClick}>
+          <IconButton onClick={handleEditClick}>
             <EditIcon />
           </IconButton>
-          <IconButton variant="outlined" onClick={handleDeleteClick}>
+          <IconButton onClick={handleDeleteClick}>
             <DeleteIcon />
           </IconButton>
         </Stack>
       </Stack>
       <DeleteDialog
         message={`Are you sure you want to delete ${faction.name} character? All characters in the faction will be eliminated. This action cannot be undone.`}
-        onDelete={() => handleDialogDelete()}
+        onDelete={handleDialogDelete}
         open={deleteDialogOpen}
-        onClose={() => handleDialogDeleteClose()}
+        onClose={handleDialogDeleteClose}
       />
     </>
   );
