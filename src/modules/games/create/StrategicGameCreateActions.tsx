@@ -1,11 +1,7 @@
 import React from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import SaveIcon from '@mui/icons-material/Save';
-import Box from '@mui/material/Box';
-import Breadcrumbs from '@mui/material/Breadcrumbs';
-import IconButton from '@mui/material/IconButton';
-import Link from '@mui/material/Link';
-import Stack from '@mui/material/Stack';
+import { Box, Breadcrumbs, IconButton, Link, Stack } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { createStrategicGame } from '../../api/strategic-game';

@@ -1,13 +1,9 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
-import { useTranslation } from 'react-i18next';
-import Autocomplete from '@mui/material/Autocomplete';
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
+import { Grid, TextField, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { Realm } from '../../api/realm.dto';
 import { CreateStrategicGameDto } from '../../api/strategic-game.dto';
-import NumericTextField from '../../shared/inputs/NumericTextField';
+import NumericInput from '../../shared/inputs/NumericInput';
 import SelectRealm from '../../shared/selects/SelectRealm';
 
 const StrategicGameCreateAttributes: FC<{
@@ -20,24 +16,22 @@ const StrategicGameCreateAttributes: FC<{
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleOptionsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+  const handleOptionsChange = (field: string, value: number) => {
     setFormData((prevData) => ({
       ...prevData,
       options: {
         ...prevData.options,
-        [name]: value,
+        [field]: value,
       },
     }));
   };
 
-  const handlePowerLevelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+  const handlePowerLevelChange = (field: string, value: number) => {
     setFormData((prevData) => ({
       ...prevData,
       powerLevel: {
         ...prevData.powerLevel,
-        [name]: parseInt(value),
+        [field]: value,
       },
     }));
   };
@@ -62,8 +56,7 @@ const StrategicGameCreateAttributes: FC<{
             fullWidth
           />
         </Grid>
-        <Grid size={8}></Grid>
-
+        <Grid size={12}></Grid>
         <Grid size={4}>
           <SelectRealm
             realms={realms}
@@ -72,119 +65,122 @@ const StrategicGameCreateAttributes: FC<{
             required
           />
         </Grid>
-        <Grid size={8}></Grid>
-
         <Grid size={12}>
           <Typography component="h6" color="primary">
-            Options
+            {t('options')}
           </Typography>
         </Grid>
         <Grid size={4}>
-          <NumericTextField
+          <NumericInput
             label={t('experience-multiplier')}
             name="experienceMultiplier"
             value={formData.options.experienceMultiplier}
-            onChange={handleOptionsChange}
-            maxDecimals={2}
-            required
+            onChange={(e) => handleOptionsChange('experienceMultiplier', e)}
+            maxFractionDigits={2}
+            allowNegatives={false}
           />
         </Grid>
         <Grid size={4}>
-          <NumericTextField
+          <NumericInput
             label={t('fatigue-multiplier')}
             name="fatigueMultiplier"
             value={formData.options.fatigueMultiplier}
-            onChange={handleOptionsChange}
-            maxDecimals={2}
-            required
+            onChange={(e) => handleOptionsChange('fatigueMultiplier', e)}
+            maxFractionDigits={2}
+            allowNegatives={false}
           />
         </Grid>
         <Grid size={4}></Grid>
         <Grid size={4}>
-          <NumericTextField
+          <NumericInput
             label={t('board-scale-multiplier')}
             name="boardScaleMultiplier"
             value={formData.options.boardScaleMultiplier}
-            onChange={handleOptionsChange}
-            maxDecimals={2}
-            required
+            onChange={(e) => handleOptionsChange('boardScaleMultiplier', e)}
+            maxFractionDigits={2}
+            allowNegatives={false}
           />
         </Grid>
         <Grid size={4}>
-          <NumericTextField
+          <NumericInput
             label={t('letality')}
             name="letality"
             value={formData.options.letality}
-            onChange={handleOptionsChange}
-            required
+            onChange={(e) => handleOptionsChange('letality', e)}
+            integer
           />
         </Grid>
         <Grid size={12}>
           <Typography component="h6" color="primary">
-            Power level
+            {t('power-level')}
           </Typography>
         </Grid>
         <Grid size={4}>
-          <NumericTextField
-            label="Base dev points"
+          <NumericInput
+            label={t('base-dev-points')}
             name="baseDevPoints"
             value={formData.powerLevel.baseDevPoints}
-            onChange={handlePowerLevelChange}
-            required
+            onChange={(e) => handlePowerLevelChange('baseDevPoints', e)}
+            integer
+            allowNegatives={false}
           />
         </Grid>
         <Grid size={4}>
-          <NumericTextField
-            label="Stat random min"
+          <NumericInput
+            label={t('stat-random-min')}
             name="statRandomMin"
             value={formData.powerLevel.statRandomMin}
-            onChange={handlePowerLevelChange}
-            required
+            onChange={(e) => handlePowerLevelChange('statRandomMin', e)}
+            integer
+            allowNegatives={false}
           />
         </Grid>
         <Grid size={12}></Grid>
 
         <Grid size={4}>
-          <NumericTextField
-            label="Stat Boost Potential"
+          <NumericInput
+            label={t('stat-boost-potential')}
             name="statBoostPotential"
             value={formData.powerLevel.statBoostPotential}
-            onChange={handlePowerLevelChange}
-            required
+            onChange={(e) => handlePowerLevelChange('statBoostPotential', e)}
+            integer
+            allowNegatives={false}
           />
         </Grid>
         <Grid size={4}>
-          <NumericTextField
-            label="Stat Boost Temporary"
+          <NumericInput
+            label={t('stat-boost-temporary')}
             name="statBoostTemporary"
             value={formData.powerLevel.statBoostTemporary}
-            onChange={handlePowerLevelChange}
-            required
+            onChange={(e) => handlePowerLevelChange('statBoostTemporary', e)}
+            integer
+            allowNegatives={false}
           />
         </Grid>
         <Grid size={4}></Grid>
         <Grid size={4}>
-          <NumericTextField
-            label="Stat Creation Boost"
+          <NumericInput
+            label={t('stat-creation-boost')}
             name="statCreationBoost"
             value={formData.powerLevel.statCreationBoost}
-            onChange={handlePowerLevelChange}
-            required
+            onChange={(e) => handlePowerLevelChange('statCreationBoost', e)}
+            integer
+            allowNegatives={false}
           />
         </Grid>
         <Grid size={4}>
-          <NumericTextField
-            label="Stat Creation Swap"
+          <NumericInput
+            label={t('stat-creation-swap')}
             name="statCreationSwap"
             value={formData.powerLevel.statCreationSwap}
-            onChange={handlePowerLevelChange}
-            required
+            onChange={(e) => handlePowerLevelChange('statCreationSwap', e)}
+            integer
+            allowNegatives={false}
           />
         </Grid>
-
         <Grid size={8}>
           <TextField
-            label="Description"
+            label={t('description')}
             name="description"
             variant="standard"
             value={formData.description}
