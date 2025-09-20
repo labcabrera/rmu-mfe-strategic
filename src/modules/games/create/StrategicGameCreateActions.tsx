@@ -1,27 +1,31 @@
-/* eslint-disable react/prop-types */
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Link as RouterLink } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import SaveIcon from '@mui/icons-material/Save';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
+import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { createStrategicGame } from './../../api/strategic-games';
+import { createStrategicGame } from '../../api/strategic-game';
+import { CreateStrategicGameDto } from '../../api/strategic-game.dto';
 
-const StrategicGameCreateActions = ({ formData }) => {
+const StrategicGameCreateActions: React.FC<{
+  formData: CreateStrategicGameDto;
+  isValid: boolean;
+}> = ({ formData, isValid }) => {
   const navigate = useNavigate();
   const { showError } = useError();
 
   const createGame = () => {
     createStrategicGame(formData)
-      .then((data) => {
+      .then((data: { id: string }) => {
         navigate('/strategic/games/view/' + data.id, { state: { strategicGame: data } });
       })
-      .catch((err) => {
-        showError(err.message);
+      .catch((err: unknown) => {
+        if (err instanceof Error) showError(err.message);
+        else showError('Unknown error');
       });
   };
 
@@ -30,16 +34,16 @@ const StrategicGameCreateActions = ({ formData }) => {
       <Box>
         <Breadcrumbs aria-label="breadcrumb">
           <Link color="inherit" href="/">
-            Home
+            {t('home')}
           </Link>
           <Link component={RouterLink} color="inherit" to="/strategic">
-            Strategic
+            {t('strategic')}
           </Link>
-          <span>Games</span>
+          <span>{t('games')}</span>
         </Breadcrumbs>
       </Box>
       <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>
-        <IconButton variant="outlined" onClick={createGame}>
+        <IconButton onClick={createGame} disabled={!isValid}>
           <SaveIcon />
         </IconButton>
       </Stack>

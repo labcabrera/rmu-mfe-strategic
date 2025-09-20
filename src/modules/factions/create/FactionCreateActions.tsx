@@ -9,7 +9,7 @@ import Stack from '@mui/material/Stack';
 import { useError } from '../../../ErrorContext';
 import { createFaction } from '../../api/faction';
 import { CreateFactionDto } from '../../api/faction.dto';
-import { StrategicGame } from '../../api/strategic-games';
+import { StrategicGame } from '../../api/strategic-game';
 
 const FactionCreateActions: FC<{
   strategicGame: StrategicGame;

@@ -6,7 +6,7 @@ import { stats } from '../../api/character';
 import { CreateCharacterDto } from '../../api/character.dto';
 import { Faction, fetchFactions } from '../../api/faction';
 import { Profession } from '../../api/professions';
-import { fetchStrategicGame, StrategicGame } from '../../api/strategic-games';
+import { fetchStrategicGame, StrategicGame } from '../../api/strategic-game';
 import { characterCreateTemplate } from '../../data/character-create';
 import { getStatBonus } from '../../services/stat-service';
 import CharacterCreateActions from './CharacterCreateActions';

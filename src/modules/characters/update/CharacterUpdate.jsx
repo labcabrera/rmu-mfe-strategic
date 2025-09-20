@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import { fetchFaction } from '../../api/faction';
-import { fetchStrategicGame } from '../../api/strategic-games';
+import { fetchStrategicGame } from '../../api/strategic-game';
 import CharacterUpdateActions from './CharacterUpdateActions';
 
 const CharacterUpdate = () => {

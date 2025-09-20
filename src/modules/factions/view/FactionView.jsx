@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacters } from '../../api/character';
 import { fetchFaction } from '../../api/faction';
-import { fetchStrategicGame } from '../../api/strategic-games';
+import { fetchStrategicGame } from '../../api/strategic-game';
 import FactionViewActions from './FactionViewActions';
 import FactionViewAttributes from './FactionViewAttributes';
 import FactionViewCharacters from './FactionViewCharacters';

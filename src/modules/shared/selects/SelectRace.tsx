@@ -4,7 +4,8 @@ import GroupIcon from '@mui/icons-material/Group';
 import InputAdornment from '@mui/material/InputAdornment';
 import MenuItem from '@mui/material/MenuItem';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
-import { Faction, fetchFactions } from '../../api/faction';
+import { fetchFactions } from '../../api/faction';
+import { Faction } from '../../api/faction.dto';
 
 interface SelectFactionProps {
   value: string | null | undefined;

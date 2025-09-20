@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Link, Grid, List, Box } from '@mui/material';
 import { useError } from '../../../ErrorContext';
-import { fetchStrategicGames } from '../../api/strategic-games';
+import { fetchStrategicGames } from '../../api/strategic-game';
 import StrategicGameCard from '../../shared/cards/StrategicGameCard';
 import GameListItem from '../../shared/list-items/GameListItem';
 import StrategicGameListActions from './StrategicGameListActions';

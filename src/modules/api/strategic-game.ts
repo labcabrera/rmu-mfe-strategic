@@ -1,10 +1,5 @@
 import { buildErrorFromResponse } from './api-errors';
-
-export interface StrategicGame {
-  id: string;
-  name: string;
-  [key: string]: any;
-}
+import { CreateStrategicGameDto, StrategicGame, UpdateStrategicGameDto } from './strategic-game.dto';
 
 export async function fetchStrategicGames(rsql: string, page: number, size: number): Promise<StrategicGame[]> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/strategic-games?q=${rsql}&page=${page}&size=${size}`;
@@ -25,7 +20,7 @@ export async function fetchStrategicGame(gameId: string): Promise<StrategicGame>
   return (await response.json()) as StrategicGame;
 }
 
-export async function createStrategicGame(gameData: Partial<StrategicGame>): Promise<StrategicGame> {
+export async function createStrategicGame(gameData: CreateStrategicGameDto): Promise<StrategicGame> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/strategic-games`;
   const response = await fetch(url, {
     method: 'POST',
@@ -38,7 +33,7 @@ export async function createStrategicGame(gameData: Partial<StrategicGame>): Pro
   return (await response.json()) as StrategicGame;
 }
 
-export async function updateStrategicGame(gameId: string, gameData: Partial<StrategicGame>): Promise<StrategicGame> {
+export async function updateStrategicGame(gameId: string, gameData: UpdateStrategicGameDto): Promise<StrategicGame> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/strategic-games/${gameId}`;
   const response = await fetch(url, {
     method: 'PATCH',

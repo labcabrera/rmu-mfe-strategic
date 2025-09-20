@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 import { useSearchParams, useLocation } from 'react-router-dom';
 import { CreateFactionDto } from '../../api/faction.dto';
-import { StrategicGame } from '../../api/strategic-games';
+import { StrategicGame } from '../../api/strategic-game';
 import FactionCreateActions from './FactionCreateActions';
 import FactionCreateAttributes from './FactionCreateAttributes';
 

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
-import { fetchStrategicGames } from '../../api/strategic-games';
+import { fetchStrategicGames } from '../../api/strategic-game';
 
 const SelectGame = ({ value, onChange, readonly = false, required = false }) => {
   const { t } = useTranslation();

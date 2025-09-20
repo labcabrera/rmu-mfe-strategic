@@ -6,7 +6,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { CreateCharacterDto } from '../../api/character';
 import { stats } from '../../api/character';
-import { StrategicGame } from '../../api/strategic-games';
+import { StrategicGame } from '../../api/strategic-game';
 import { StatBonusFormData } from './CharacterCreate';
 import CharacterCreateStatsActions from './CharacterCreateStatsActions';
 

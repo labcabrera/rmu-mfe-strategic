@@ -5,7 +5,7 @@ import { fetchCharacter } from '../../api/character';
 import { Character } from '../../api/character.dto';
 import { fetchFaction, Faction } from '../../api/faction';
 import { fetchProfession, Profession } from '../../api/professions';
-import { fetchStrategicGame, StrategicGame } from '../../api/strategic-games';
+import { fetchStrategicGame, StrategicGame } from '../../api/strategic-game';
 import CharacterViewActions from './CharacterViewActions';
 import CharacterViewTabs from './CharacterViewTabs';
 

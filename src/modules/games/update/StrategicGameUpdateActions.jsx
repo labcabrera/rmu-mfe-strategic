@@ -10,7 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import { useError } from '../../../ErrorContext';
-import { updateStrategicGame } from '../../api/strategic-games';
+import { updateStrategicGame } from '../../api/strategic-game';
 
 const StrategicGameUpdateActions = ({ formData }) => {
   const location = useLocation();

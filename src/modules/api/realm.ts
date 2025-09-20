@@ -1,10 +1,5 @@
 import { buildErrorFromResponse } from './api-errors';
-
-export interface Realm {
-  id: string;
-  name: string;
-  [key: string]: any;
-}
+import { Realm } from './realm.dto';
 
 export async function fetchRealms(): Promise<Realm[]> {
   const url = `${process.env.RMU_API_CORE_URL}/realms`;
@@ -12,7 +7,8 @@ export async function fetchRealms(): Promise<Realm[]> {
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }
-  return (await response.json()) as Realm[];
+  const json = await response.json();
+  return json.content as Realm[];
 }
 
 export async function fetchRealm(realmId: string): Promise<Realm> {

@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { t } from 'i18next';
-import { StrategicGame } from '../../api/strategic-games';
+import { StrategicGame } from '../../api/strategic-game';
 import CardListItem from './CardListItem';
 
 const RealmCard: FC<{

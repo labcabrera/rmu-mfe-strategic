@@ -10,7 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import { useError } from '../../../ErrorContext';
-import { deleteStrategicGame } from '../../api/strategic-games';
+import { deleteStrategicGame } from '../../api/strategic-game';
 import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 
 const StrategicGameViewActions = ({ strategicGame }) => {
