@@ -1,29 +1,22 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import { Box } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
+import { Character } from '../../api/character.dto';
+import { Faction } from '../../api/faction.dto';
 import CharacterListItem from '../../shared/list-items/CharacterListItem';
-
-interface Faction {
-  id: string;
-  gameId: string;
-  // otros campos si es necesario
-}
-
-interface Character {
-  id: string;
-  // otros campos si es necesario
-}
 
 interface FactionViewCharactersProps {
   faction: Faction;
   characters: Character[];
 }
 
-const FactionViewCharacters: React.FC<FactionViewCharactersProps> = ({ faction, characters }) => {
+const FactionViewCharacters: FC<FactionViewCharactersProps> = ({ faction, characters }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -31,26 +24,23 @@ const FactionViewCharacters: React.FC<FactionViewCharactersProps> = ({ faction, 
     navigate(`/strategic/characters/create?gameId=${faction.gameId}&factionId=${faction.id}`, { state: { faction } });
   };
 
-  if (!faction || !characters) {
-    return <>Loading...</>;
-  }
+  if (!faction || !characters) return <>Loading...</>;
 
   return (
     <Grid container spacing={2}>
-      <Grid size={12}>
-        <Typography variant="h6" color="primary">
+      <Box display="flex" alignItems="center">
+        <Typography variant="h6" color="primary" display="inline">
           {t('characters')}
         </Typography>
-      </Grid>
+        <IconButton onClick={handleCreate} sx={{ ml: 1 }}>
+          <AddCircleIcon />
+        </IconButton>
+      </Box>
       <Grid size={12}>
         {characters.map((character) => (
           <CharacterListItem key={character.id} character={character} />
         ))}
-      </Grid>
-      <Grid size={12}>
-        <IconButton onClick={handleCreate}>
-          <GroupAddIcon fontSize="large" />
-        </IconButton>
+        {characters.length === 0 && <Typography variant="body1">{t('not-found-characters')}</Typography>}
       </Grid>
     </Grid>
   );

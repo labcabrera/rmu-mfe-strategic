@@ -6,10 +6,11 @@ import Breadcrumbs from '@mui/material/Breadcrumbs';
 import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
+import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { createFaction } from '../../api/faction';
 import { CreateFactionDto } from '../../api/faction.dto';
-import { StrategicGame } from '../../api/strategic-game';
+import { StrategicGame } from '../../api/strategic-game.dto';
 
 const FactionCreateActions: FC<{
   strategicGame: StrategicGame;
@@ -31,18 +32,18 @@ const FactionCreateActions: FC<{
       <Box>
         <Breadcrumbs aria-label="breadcrumb">
           <Link underline="hover" color="inherit" href="/">
-            Home
+            {t('home')}
           </Link>
           <Link component={RouterLink} color="inherit" to="/strategic/games">
-            Strategic
+            {t('strategic')}
           </Link>
           <Link component={RouterLink} color="inherit" to="/strategic/games">
-            Games
+            {t('games')}
           </Link>
           <Link component={RouterLink} color="inherit" to={`/strategic/games/view/${strategicGame.id}`}>
             {strategicGame.name}
           </Link>
-          <span>Create faction</span>
+          <span>{t('create-faction')}</span>
         </Breadcrumbs>
       </Box>
       <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>

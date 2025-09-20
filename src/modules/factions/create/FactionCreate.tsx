@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 import { useSearchParams, useLocation } from 'react-router-dom';
 import { CreateFactionDto } from '../../api/faction.dto';
-import { StrategicGame } from '../../api/strategic-game';
+import { StrategicGame } from '../../api/strategic-game.dto';
 import FactionCreateActions from './FactionCreateActions';
 import FactionCreateAttributes from './FactionCreateAttributes';
 
@@ -13,8 +13,11 @@ const FactionCreate: FC = () => {
   const [formData, setFormData] = useState<CreateFactionDto>({
     gameId: gameId,
     name: '',
-    availableGold: 100,
-    availableXP: 200000,
+    management: {
+      availableGold: 100,
+      availableXP: 200000,
+    },
+    shortDescription: '',
     description: '',
   });
 

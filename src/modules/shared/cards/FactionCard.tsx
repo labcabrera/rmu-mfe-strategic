@@ -17,7 +17,7 @@ const FactionCard: FC<{
   return (
     <CardListItem
       title={faction.name}
-      subtitle={faction.description}
+      subtitle={faction.shortDescription}
       image="/static/images/avatars/generic-faction-01.png"
       onClick={handleFactionClick}
     />
