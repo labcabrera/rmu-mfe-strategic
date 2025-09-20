@@ -1,17 +1,22 @@
-/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import GroupIcon from '@mui/icons-material/Group';
 import InputAdornment from '@mui/material/InputAdornment';
 import MenuItem from '@mui/material/MenuItem';
-import TextField from '@mui/material/TextField';
-import { fetchFactions } from '../../api/factions';
+import TextField, { TextFieldProps } from '@mui/material/TextField';
+import { Faction, fetchFactions } from '../../api/faction';
 
-const SelectFaction = ({ value, onChange, required = false }) => {
+interface SelectFactionProps {
+  value: string | null | undefined;
+  onChange: (value: string) => void;
+  required?: boolean;
+}
+
+const SelectFaction: React.FC<SelectFactionProps> = ({ value, onChange, required = false }) => {
   const { t } = useTranslation();
-  const [factions, setFactions] = useState([]);
+  const [factions, setFactions] = useState<Faction[]>([]);
 
-  const handleFactionChange = (e) => {
+  const handleFactionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.value);
   };
 
@@ -32,14 +37,12 @@ const SelectFaction = ({ value, onChange, required = false }) => {
       required={required}
       fullWidth
       onChange={handleFactionChange}
-      slotProps={{
-        input: {
-          startAdornment: (
-            <InputAdornment position="start">
-              <GroupIcon />
-            </InputAdornment>
-          ),
-        },
+      InputProps={{
+        startAdornment: (
+          <InputAdornment position="start">
+            <GroupIcon />
+          </InputAdornment>
+        ),
       }}
     >
       {factions.map((option) => (

@@ -13,8 +13,8 @@ import {
   Select,
   Typography,
 } from '@mui/material';
+import { equipItem, unequipItem } from '../../api/character';
 import { Character, CharacterItem } from '../../api/character.dto';
-import { equipItem, unequipItem } from '../../api/characters';
 
 const slots = ['mainHand', 'offHand', 'body', 'head', 'arms', 'legs'];
 

@@ -1,9 +1,10 @@
 import React, { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Grid, TextField, Typography } from '@mui/material';
-import { CreateCharacterDto } from '../../api/characters';
+import { CreateCharacterDto } from '../../api/character.dto';
+import { Faction } from '../../api/faction';
 import { Profession } from '../../api/professions';
-import { Race } from '../../api/races';
+import { Race } from '../../api/race.dto';
 import CharacterAvatar from '../../shared/avatars/CharacterAvatar';
 import NameTextField from '../../shared/inputs/NameTextField';
 import { NumericInput } from '../../shared/inputs/NumericInput';
@@ -13,13 +14,13 @@ import SelectGender from '../../shared/selects/SelectGender';
 import SelectProfession from '../../shared/selects/SelectProfession';
 import SelectRace from '../../shared/selects/SelectRace';
 import SelectRealmType from '../../shared/selects/SelectRealmType';
-import GameCreateStats from './CharacterCreateStats';
 
 const CharacterCreateAttributes: FC<{
   formData: CreateCharacterDto;
   setFormData: Dispatch<SetStateAction<CreateCharacterDto>>;
   setProfession: Dispatch<SetStateAction<Profession | null>>;
-}> = ({ formData, setFormData, setProfession }) => {
+  factions: Faction[];
+}> = ({ formData, setFormData, setProfession, factions }) => {
   const { t } = useTranslation();
 
   const onRaceChange = (raceId: string, raceInfo: Race) => {
@@ -27,14 +28,14 @@ const CharacterCreateAttributes: FC<{
       const stats = { ...formData.statistics };
       const keys = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
       keys.forEach((key) => {
-        stats[key].racial = raceInfo.defaultStatBonus[key];
+        stats[key].racial = raceInfo.stats[key];
       });
       setFormData((prevState) => ({
         ...prevState,
         info: {
           ...prevState.info,
           raceId: raceId,
-          sizeId: raceInfo.size,
+          sizeId: raceInfo.sizeId,
           height: raceInfo.averageHeight.male,
           weight: raceInfo.averageWeight.male,
         },
@@ -135,7 +136,7 @@ const CharacterCreateAttributes: FC<{
         <SelectGame value={formData.gameId} onChange={onGameChange} />
       </Grid>
       <Grid size={6}>
-        <SelectFaction value={formData.factionId} onChange={onFactionChange} />
+        <SelectFaction value={formData.factionId} onChange={onFactionChange} factions={factions} />
       </Grid>
       <Grid size={6}>
         <SelectRace value={formData.info.raceId} onChange={onRaceChange} />

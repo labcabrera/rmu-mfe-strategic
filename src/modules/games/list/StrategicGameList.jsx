@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import Link from '@mui/material/Link';
-import List from '@mui/material/List';
+import { Link, Grid, List, Box } from '@mui/material';
 import { useError } from '../../../ErrorContext';
 import { fetchStrategicGames } from '../../api/strategic-games';
+import StrategicGameCard from '../../shared/cards/StrategicGameCard';
 import GameListItem from '../../shared/list-items/GameListItem';
 import StrategicGameListActions from './StrategicGameListActions';
 
@@ -35,11 +35,15 @@ const StrategicGameList = () => {
   return (
     <>
       <StrategicGameListActions />
-      <List>
-        {strategicGames?.map((item) => (
-          <GameListItem key={item.id} game={item} />
-        ))}
-      </List>
+      <Grid container spacing={2} mb={2} alignItems="center">
+        <Grid size={8}>
+          <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+            {strategicGames.map((game) => (
+              <StrategicGameCard key={game.id} strategicGame={game} />
+            ))}
+          </Box>
+        </Grid>
+      </Grid>
       {strategicGames.length === 0 ? (
         <>
           <p>

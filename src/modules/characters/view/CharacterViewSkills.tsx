@@ -17,8 +17,8 @@ import {
   Typography,
 } from '@mui/material';
 import { useError } from '../../../ErrorContext';
+import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../api/character';
 import { Character, CharacterSkill } from '../../api/character.dto';
-import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../api/characters';
 import SelectSkill from '../../shared/selects/SelectSkill';
 
 const addSkillFormDataTemplate = {

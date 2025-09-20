@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import List from '@mui/material/List';
 import { useError } from '../../../ErrorContext';
-import { fetchCharacters } from '../../api/characters';
+import { fetchCharacters } from '../../api/character';
 import CharacterListItem from '../../shared/list-items/CharacterListItem';
 import CharacterListActions from './CharacterListActions';
 

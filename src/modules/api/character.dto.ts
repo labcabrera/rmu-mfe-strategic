@@ -1,6 +1,8 @@
 export interface Character {
   id: string;
   name: string;
+  raceId: string;
+  sizeId: string;
   resistances: CharacterResistance[];
   skills: CharacterSkill[];
   items: CharacterItem[];

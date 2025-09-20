@@ -1,15 +1,5 @@
 import { buildErrorFromResponse } from './api-errors';
-
-export interface Race {
-  id: string;
-  name: string;
-  size: string;
-  averageHeight: { male: number; female: number };
-  averageWeight: { male: number; female: number };
-  defaultStatBonus: Record<string, number>;
-  strideBonus: number;
-  [key: string]: any;
-}
+import { Race } from './race.dto';
 
 export async function fetchRaces(rsql: string, page: number, size: number): Promise<Race[]> {
   const url = `${process.env.RMU_API_CORE_URL}/races?q=${rsql}&page=${page}&size=${size}`;

@@ -25,7 +25,7 @@ const StrategicGameViewAttributes = ({ strategicGame, realm }) => {
       <Grid container spacing={2}>
         <Grid size={12}>
           <Typography variant="h6" color="primary">
-            {t('strategic-game-information')}
+            {strategicGame.name}
           </Typography>
         </Grid>
 
@@ -57,7 +57,9 @@ const StrategicGameViewAttributes = ({ strategicGame, realm }) => {
         <InfoField i18n="stat-creation-boosts" value={strategicGame.powerLevel.statCreationBoost} size={2} />
         <InfoField i18n="stat-creation-swaps" value={strategicGame.powerLevel.statCreationSwap} size={2} />
 
-        {strategicGame && strategicGame.description && <InfoField i18n="description" value={strategicGame.description} size={12} />}
+        {strategicGame && strategicGame.description && (
+          <InfoField i18n="description" value={strategicGame.description} size={12} />
+        )}
       </Grid>
     </>
   );

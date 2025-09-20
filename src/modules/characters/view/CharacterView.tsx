@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useError } from '../../../ErrorContext';
+import { fetchCharacter } from '../../api/character';
 import { Character } from '../../api/character.dto';
-import { fetchCharacter } from '../../api/characters';
-import { fetchFaction, Faction } from '../../api/factions';
+import { fetchFaction, Faction } from '../../api/faction';
 import { fetchProfession, Profession } from '../../api/professions';
 import { fetchStrategicGame, StrategicGame } from '../../api/strategic-games';
 import CharacterViewActions from './CharacterViewActions';

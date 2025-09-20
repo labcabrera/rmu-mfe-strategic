@@ -6,7 +6,7 @@ import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import { useError } from '../../../ErrorContext';
-import { createCharacter, CreateCharacterDto } from '../../api/characters';
+import { createCharacter, CreateCharacterDto } from '../../api/character';
 import { StrategicGame } from '../../api/strategic-games';
 import SaveButton from '../../shared/buttons/SaveButton';
 

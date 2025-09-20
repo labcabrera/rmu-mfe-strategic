@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import { fetchFaction } from '../../api/factions';
+import { fetchFaction } from '../../api/faction';
 import { fetchStrategicGame } from '../../api/strategic-games';
 import CharacterUpdateActions from './CharacterUpdateActions';
 
@@ -46,7 +46,15 @@ const CharacterUpdate = () => {
           <TextField label="Name" fullWidth name="name" value={formData.name} onChange={handleChange} />
         </Grid>
         <Grid size={12}>
-          <TextField label="Description" fullWidth name="description" value={formData.description} onChange={handleChange} multiline maxRows={4} />
+          <TextField
+            label="Description"
+            fullWidth
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            multiline
+            maxRows={4}
+          />
         </Grid>
       </Grid>
       <pre>{JSON.stringify(formData, null, 2)}</pre>

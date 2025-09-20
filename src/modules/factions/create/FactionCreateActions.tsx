@@ -1,7 +1,5 @@
-/* eslint-disable react/prop-types */
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Link as RouterLink } from 'react-router-dom';
+import React, { FC } from 'react';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import SaveIcon from '@mui/icons-material/Save';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
@@ -9,16 +7,21 @@ import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import { useError } from '../../../ErrorContext';
-import { createFaction } from '../../api/factions';
+import { createFaction } from '../../api/faction';
+import { CreateFactionDto } from '../../api/faction.dto';
+import { StrategicGame } from '../../api/strategic-games';
 
-const FactionCreateActions = ({ strategicGame, formData }) => {
+const FactionCreateActions: FC<{
+  strategicGame: StrategicGame;
+  formData: CreateFactionDto;
+}> = ({ strategicGame, formData }) => {
   const navigate = useNavigate();
   const { showError } = useError();
 
   const handleCreate = () => {
     createFaction(formData)
-      .then((data) => navigate(`/strategic/factions/view/${data.id}`, { state: { faction: data } }))
-      .catch((err) => {
+      .then((data: { id: string }) => navigate(`/strategic/factions/view/${data.id}`, { state: { faction: data } }))
+      .catch((err: Error) => {
         showError(err.message);
       });
   };
@@ -43,7 +46,7 @@ const FactionCreateActions = ({ strategicGame, formData }) => {
         </Breadcrumbs>
       </Box>
       <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>
-        <IconButton variant="outlined" onClick={handleCreate}>
+        <IconButton onClick={handleCreate}>
           <SaveIcon />
         </IconButton>
       </Stack>

@@ -12,7 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import Snackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
-import { updateFaction } from '../../api/factions';
+import { updateFaction } from '../../api/faction';
 
 const FactionUpdateActions = ({ formData, faction, game }) => {
   const { t } = useTranslation();

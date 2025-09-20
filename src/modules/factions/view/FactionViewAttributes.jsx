@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { addFactionXP, addFactionGold } from '../../api/factions';
+import { addFactionXP, addFactionGold } from '../../api/faction';
 
 const InfoField = ({ i18n, value, size = 2 }) => {
   const { t } = useTranslation();

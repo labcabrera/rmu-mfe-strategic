@@ -8,7 +8,7 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useError } from '../../../ErrorContext';
-import { addItem } from '../../api/characters';
+import { addItem } from '../../api/character';
 import { fetchItems } from '../../api/items';
 import { characterItemCreateTemplate } from '../../data/item-create';
 import SelectArmorSlot from '../../shared/selects/SelectArmorSlot';
@@ -44,7 +44,13 @@ const ItemInfo = ({ character, setCharacter, formData, setFormData, item }) => {
       )}
       {item.info.weightPercent && (
         <Grid size={2}>
-          <TextField label={t('weight-percent')} variant="standard" name="weight-percent" value={item.info.weightPercent} fullWidth />
+          <TextField
+            label={t('weight-percent')}
+            variant="standard"
+            name="weight-percent"
+            value={item.info.weightPercent}
+            fullWidth
+          />
         </Grid>
       )}
       {item.info.length && (
@@ -62,33 +68,69 @@ const ItemInfo = ({ character, setCharacter, formData, setFormData, item }) => {
         <TextField label={t('cost-min')} variant="standard" name="min-cost" value={item.info.cost.min} fullWidth />
       </Grid>
       <Grid size={2}>
-        <TextField label={t('cost-average')} variant="standard" name="avg-cost" value={item.info.cost.average} fullWidth />
+        <TextField
+          label={t('cost-average')}
+          variant="standard"
+          name="avg-cost"
+          value={item.info.cost.average}
+          fullWidth
+        />
       </Grid>
       <Grid size={2}>
         <TextField label={t('cost-max')} variant="standard" name="max-cost" value={item.info.cost.max} fullWidth />
       </Grid>
       {item.info.productionHours && (
         <Grid size={2}>
-          <TextField label={t('production-hours')} variant="standard" name="production-hours" value={item.info.productionHours} fullWidth />
+          <TextField
+            label={t('production-hours')}
+            variant="standard"
+            name="production-hours"
+            value={item.info.productionHours}
+            fullWidth
+          />
         </Grid>
       )}
       <Grid size={12}></Grid>
       {item.weapon && (
         <>
           <Grid size={2}>
-            <TextField label={t('attack-table')} variant="standard" name="damage" value={item.weapon.attackTable} fullWidth />
+            <TextField
+              label={t('attack-table')}
+              variant="standard"
+              name="damage"
+              value={item.weapon.attackTable}
+              fullWidth
+            />
           </Grid>
           <Grid size={2}>
-            <TextField label={t('fumble-table')} variant="standard" name="damage" value={item.weapon.fumbleTable} fullWidth />
+            <TextField
+              label={t('fumble-table')}
+              variant="standard"
+              name="damage"
+              value={item.weapon.fumbleTable}
+              fullWidth
+            />
           </Grid>
           <Grid size={2}>
             <TextField label={t('fumble')} variant="standard" name="damage" value={item.weapon.fumble} fullWidth />
           </Grid>
           <Grid size={2}>
-            <TextField label={t('size-adjustment')} variant="standard" name="size-adjustment" value={item.weapon.sizeAdjustment} fullWidth />
+            <TextField
+              label={t('size-adjustment')}
+              variant="standard"
+              name="size-adjustment"
+              value={item.weapon.sizeAdjustment}
+              fullWidth
+            />
           </Grid>
           <Grid size={2}>
-            <TextField label={t('required-hands')} variant="standard" name="required-hands" value={item.weapon.requiredHands} fullWidth />
+            <TextField
+              label={t('required-hands')}
+              variant="standard"
+              name="required-hands"
+              value={item.weapon.requiredHands}
+              fullWidth
+            />
           </Grid>
           <Grid size={2}> </Grid>
           {item.weapon.ranges &&
@@ -106,13 +148,31 @@ const ItemInfo = ({ character, setCharacter, formData, setFormData, item }) => {
             <TextField label={t('maneuver')} variant="standard" name="maneuver" value={item.armor.maneuver} fullWidth />
           </Grid>
           <Grid size={2}>
-            <TextField label={t('ranged-penalty')} variant="standard" name="ranged-penalty" value={item.armor.rangedPenalty} fullWidth />
+            <TextField
+              label={t('ranged-penalty')}
+              variant="standard"
+              name="ranged-penalty"
+              value={item.armor.rangedPenalty}
+              fullWidth
+            />
           </Grid>
           <Grid size={2}>
-            <TextField label={t('perception')} variant="standard" name="perception" value={item.armor.perception} fullWidth />
+            <TextField
+              label={t('perception')}
+              variant="standard"
+              name="perception"
+              value={item.armor.perception}
+              fullWidth
+            />
           </Grid>
           <Grid size={2}>
-            <TextField label={t('base-difficulty')} variant="standard" name="base-difficulty" value={item.armor.baseDifficulty} fullWidth />
+            <TextField
+              label={t('base-difficulty')}
+              variant="standard"
+              name="base-difficulty"
+              value={item.armor.baseDifficulty}
+              fullWidth
+            />
           </Grid>
         </>
       )}
@@ -187,7 +247,11 @@ const CharacterViewAddItem = ({ character, setCharacter }) => {
       )}
       {itemCategory && (
         <Grid size={4}>
-          <SelectItemType items={items} value={formData.itemTypeId} onChange={(itemId) => handleItemTypeChange(itemId)} />
+          <SelectItemType
+            items={items}
+            value={formData.itemTypeId}
+            onChange={(itemId) => handleItemTypeChange(itemId)}
+          />
         </Grid>
       )}
       <Grid size={12}></Grid>
@@ -212,7 +276,13 @@ const CharacterViewAddItem = ({ character, setCharacter }) => {
         />
       </Grid>
       {selectedItem && (
-        <ItemInfo character={character} setCharacter={setCharacter} formData={formData} setFormData={setFormData} item={selectedItem} />
+        <ItemInfo
+          character={character}
+          setCharacter={setCharacter}
+          formData={formData}
+          setFormData={setFormData}
+          item={selectedItem}
+        />
       )}
     </Grid>
   );

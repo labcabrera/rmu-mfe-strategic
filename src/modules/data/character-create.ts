@@ -1,4 +1,4 @@
-import { CreateCharacterDto } from '../api/characters';
+import { CreateCharacterDto } from '../api/character';
 
 export const characterCreateTemplate: CreateCharacterDto = {
   name: '',

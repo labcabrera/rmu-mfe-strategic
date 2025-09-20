@@ -1,11 +1,5 @@
 import { buildErrorFromResponse } from './api-errors';
-
-export interface Faction {
-  id: string;
-  name: string;
-  description?: string;
-  [key: string]: any;
-}
+import { CreateFactionDto, Faction, UpdateFactionDto } from './faction.dto';
 
 export async function fetchFaction(factionId: string): Promise<Faction> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/factions/${factionId}`;
@@ -26,7 +20,7 @@ export async function fetchFactions(rsql: string, page: number, size: number): P
   return pageContent.content as Faction[];
 }
 
-export async function createFaction(data: Partial<Faction>): Promise<Faction> {
+export async function createFaction(data: CreateFactionDto): Promise<Faction> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/factions`;
   const response = await fetch(url, {
     method: 'POST',
@@ -39,7 +33,7 @@ export async function createFaction(data: Partial<Faction>): Promise<Faction> {
   return await response.json();
 }
 
-export async function updateFaction(factionId: string, data: Partial<Faction>): Promise<Faction> {
+export async function updateFaction(factionId: string, data: UpdateFactionDto): Promise<Faction> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/factions/${factionId}`;
   const response = await fetch(url, {
     method: 'PATCH',

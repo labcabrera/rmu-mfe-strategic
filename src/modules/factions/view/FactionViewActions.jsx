@@ -11,7 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import { useError } from '../../../ErrorContext';
-import { deleteFaction } from '../../api/factions';
+import { deleteFaction } from '../../api/faction';
 import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 
 const FactionViewActions = ({ faction, game }) => {

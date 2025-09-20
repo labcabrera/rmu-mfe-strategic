@@ -12,7 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import Snackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
-import { updateCharacter } from '../../api/characters';
+import { updateCharacter } from '../../api/character';
 
 const CharacterUpdateActions = ({ character, game, faction, formData }) => {
   const navigate = useNavigate();

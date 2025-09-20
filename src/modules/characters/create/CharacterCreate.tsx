@@ -2,8 +2,9 @@ import React, { useState, useEffect, FC } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
 import { useError } from '../../../ErrorContext';
-import { CreateCharacterDto } from '../../api/characters';
-import { stats } from '../../api/characters';
+import { stats } from '../../api/character';
+import { CreateCharacterDto } from '../../api/character.dto';
+import { Faction, fetchFactions } from '../../api/faction';
 import { Profession } from '../../api/professions';
 import { fetchStrategicGame, StrategicGame } from '../../api/strategic-games';
 import { characterCreateTemplate } from '../../data/character-create';
@@ -31,6 +32,7 @@ const CharacterCreate: FC = () => {
   const factionId = searchParams.get('factionId');
   const { showError } = useError();
   const [game, setGame] = useState<StrategicGame | null>(null);
+  const [factions, setFactions] = useState<Faction[]>([]);
   const [formData, setFormData] = useState<CreateCharacterDto>(characterCreateTemplate);
   const [statBonusFormData, setStatBonusFormData] = useState<StatBonusFormData>({
     ag: { potential: 0, temporary: 0 },
@@ -57,6 +59,7 @@ const CharacterCreate: FC = () => {
       const temporaryValue = values[1];
       const potentialBonus = getStatBonus(potentialValue);
       const temporaryBonus = getStatBonus(temporaryValue);
+
       setFormData((prevState) => ({
         ...prevState,
         statistics: {
@@ -68,6 +71,7 @@ const CharacterCreate: FC = () => {
           },
         },
       }));
+
       setStatBonusFormData((prevState) => ({
         ...prevState,
         [key]: {
@@ -88,7 +92,6 @@ const CharacterCreate: FC = () => {
 
   const checkValidForm = () => {
     let valid = true;
-    if (!formData.factionId) valid = false;
     if (!formData.gameId) valid = false;
     if (!formData.name || formData.name.trim() === '') valid = false;
     if (!formData.info?.raceId) valid = false;
@@ -102,6 +105,13 @@ const CharacterCreate: FC = () => {
     fetchStrategicGame(gameId)
       .then((game) => {
         setGame(game);
+      })
+      .catch((error: Error) => {
+        showError(error.message);
+      });
+    fetchFactions(`gameId==${gameId}`, 0, 20)
+      .then((factions) => {
+        setFactions(factions);
       })
       .catch((error: Error) => {
         showError(error.message);
@@ -145,7 +155,12 @@ const CharacterCreate: FC = () => {
       <CharacterCreateActions formData={formData} game={game} isValid={isValid} />
       <Grid container spacing={5}>
         <Grid size={4}>
-          <CharacterCreateAttributes formData={formData} setFormData={setFormData} setProfession={setProfession} />
+          <CharacterCreateAttributes
+            formData={formData}
+            setFormData={setFormData}
+            setProfession={setProfession}
+            factions={factions}
+          />
         </Grid>
         <Grid size={5}>
           <CharacterCreateStats

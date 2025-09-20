@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { Grid, IconButton, InputAdornment, TextField, Typography } from '@mui/material';
 import { Character } from '../../api/character.dto';
-import { Faction } from '../../api/factions';
+import { Faction } from '../../api/faction';
 import { StrategicGame } from '../../api/strategic-games';
 import CharacterAvatar from '../../shared/avatars/CharacterAvatar';
 import DefenseTextField from '../../shared/inputs/DefenseTextField';

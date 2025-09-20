@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import { useError } from '../../../ErrorContext';
-import { fetchFactions } from '../../api/factions';
+import { fetchFactions } from '../../api/faction';
 import { fetchRealm } from '../../api/realms';
 import { fetchStrategicGame } from '../../api/strategic-games';
 import { fetchTacticalGames } from '../../api/tactical-games';

@@ -8,7 +8,7 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { useError } from '../../../ErrorContext';
-import { transferFactionGold } from '../../api/characters';
+import { transferFactionGold } from '../../api/character';
 import GoldTextField from '../../shared/inputs/GoldTextField';
 
 const CharacterViewAddItem = ({ character, setCharacter, faction }) => {
