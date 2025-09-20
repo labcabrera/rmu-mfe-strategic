@@ -2,7 +2,7 @@ import React, { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Grid, TextField, Typography } from '@mui/material';
 import { CreateCharacterDto } from '../../api/character.dto';
-import { Faction } from '../../api/faction';
+import { Faction } from '../../api/faction.dto';
 import { Profession } from '../../api/professions';
 import { Race } from '../../api/race.dto';
 import CharacterAvatar from '../../shared/avatars/CharacterAvatar';
@@ -118,47 +118,11 @@ const CharacterCreateAttributes: FC<{
 
   return (
     <Grid container spacing={2}>
-      <Grid size={6}>
-        <CharacterAvatar character={formData} size={120} />
-      </Grid>
-      <Grid size={12}>
-        <NameTextField value={formData.name} onChange={onNameChange} generateRandomRaceValue={formData.info.raceId} />
-      </Grid>
-      <Grid size={12}></Grid>
-
       <Grid size={12}>
         <Typography variant="h6" color="primary">
           {t('information')}
         </Typography>
       </Grid>
-
-      <Grid size={6}>
-        <SelectGame value={formData.gameId} onChange={onGameChange} />
-      </Grid>
-      <Grid size={6}>
-        <SelectFaction value={formData.factionId} onChange={onFactionChange} factions={factions} />
-      </Grid>
-      <Grid size={6}>
-        <SelectRace value={formData.info.raceId} onChange={onRaceChange} />
-      </Grid>
-      <Grid size={6}>
-        <SelectProfession value={formData.info.professionId} onChange={onProfessionChange} />
-      </Grid>
-      <Grid size={6}>
-        <SelectRealmType value={formData.info.realmType} onChange={handleRealmTypeChange} />
-      </Grid>
-      <Grid size={6}>
-        <NumericInput
-          label={t('level')}
-          name="level"
-          value={formData.level}
-          onChange={(e: any) => updateField('level', e)}
-          integer
-          allowNegatives={false}
-        />
-      </Grid>
-      <Grid size={12}></Grid>
-
       <Grid size={6}>
         <NumericInput
           label={t('height')}

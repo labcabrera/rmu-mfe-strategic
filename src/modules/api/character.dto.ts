@@ -15,8 +15,9 @@ export interface Roleplay {
   age: number;
 }
 
-export interface Info {
+export interface RaceInfo {
   raceId: string;
+  raceName?: string;
   professionId: string;
   realmType: string;
   height: number;
@@ -90,7 +91,7 @@ export interface CharacterResistance {
 export interface CreateCharacterDto {
   gameId: string;
   factionId: string;
-  info: Info;
+  info: RaceInfo;
   statistics: Statistics;
   name: string;
   description: string;

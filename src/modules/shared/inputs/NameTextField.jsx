@@ -14,7 +14,7 @@ const NameTextField = ({ value, onChange, required = false, generateRandomRaceVa
   const handleRandomNameClick = async () => {
     var race = 'generic';
     if (generateRandomRaceValue) {
-      race = generateRandomRaceValue;
+      race = generateRandomRaceValue.toLowerCase();
     }
     const name = await fetchRandomName(race);
     onChange({

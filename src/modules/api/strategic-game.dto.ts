@@ -14,13 +14,6 @@ export interface StrategicGameOptions {
   experienceMultiplier: number;
   fatigueMultiplier: number;
   boardScaleMultiplier: number;
-  statCreationSwap: number;
-}
-
-export interface StrategicGameOptions {
-  experienceMultiplier: number;
-  fatigueMultiplier: number;
-  boardScaleMultiplier: number;
   letality: number;
 }
 

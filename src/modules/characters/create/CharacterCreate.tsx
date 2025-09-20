@@ -4,13 +4,19 @@ import { Grid } from '@mui/material';
 import { useError } from '../../../ErrorContext';
 import { stats } from '../../api/character';
 import { CreateCharacterDto } from '../../api/character.dto';
-import { Faction, fetchFactions } from '../../api/faction';
+import { fetchFactions } from '../../api/faction';
+import { Faction } from '../../api/faction.dto';
 import { Profession } from '../../api/professions';
-import { fetchStrategicGame, StrategicGame } from '../../api/strategic-game';
+import { fetchRaces } from '../../api/race';
+import { Race } from '../../api/race.dto';
+import { fetchStrategicGame } from '../../api/strategic-game';
+import { StrategicGame } from '../../api/strategic-game.dto';
 import { characterCreateTemplate } from '../../data/character-create';
 import { getStatBonus } from '../../services/stat-service';
+import RaceAvatar from '../../shared/avatars/RaceAvatar';
 import CharacterCreateActions from './CharacterCreateActions';
 import CharacterCreateAttributes from './CharacterCreateAttributes';
+import CharacterCreateAttributesBasic from './CharacterCreateAttributesBasic';
 import CharacterCreateProfessionalSkills from './CharacterCreateProfessionalSkills';
 import CharacterCreateSkillCosts from './CharacterCreateSkillCosts';
 import { CharacterCreateSortCombat } from './CharacterCreateSortCombat';
@@ -32,6 +38,7 @@ const CharacterCreate: FC = () => {
   const factionId = searchParams.get('factionId');
   const { showError } = useError();
   const [game, setGame] = useState<StrategicGame | null>(null);
+  const [races, setRaces] = useState<Race[]>([]);
   const [factions, setFactions] = useState<Faction[]>([]);
   const [formData, setFormData] = useState<CreateCharacterDto>(characterCreateTemplate);
   const [statBonusFormData, setStatBonusFormData] = useState<StatBonusFormData>({
@@ -47,8 +54,8 @@ const CharacterCreate: FC = () => {
     st: { potential: 0, temporary: 0 },
   });
   const [profession, setProfession] = useState<Profession | null>(null);
-  const [boosts, setBoosts] = useState<number>(game?.powerLevel.statBoosts || 2);
-  const [swaps, setSwaps] = useState<number>(game?.powerLevel.statSwaps || 2);
+  const [boosts, setBoosts] = useState<number>(game?.powerLevel.statCreationBoost || 2);
+  const [swaps, setSwaps] = useState<number>(game?.powerLevel.statCreationSwap || 2);
   const [isValid, setIsValid] = useState<boolean>(false);
 
   const onRandomStats = () => {
@@ -79,8 +86,8 @@ const CharacterCreate: FC = () => {
           temporary: temporaryBonus,
         },
       }));
-      setBoosts(game?.powerLevel.statBoosts || 2);
-      setSwaps(game?.powerLevel.statSwaps || 2);
+      setBoosts(game?.powerLevel.statCreationBoost || 2);
+      setSwaps(game?.powerLevel.statCreationSwap || 2);
     }
   };
 
@@ -118,6 +125,16 @@ const CharacterCreate: FC = () => {
       });
   };
 
+  const bindRaces = (realmId) => {
+    fetchRaces(`realmId==${realmId}`, 0, 100)
+      .then((data) => {
+        setRaces(data);
+      })
+      .catch((error: Error) => {
+        showError(error.message);
+      });
+  };
+
   const handleWeaponOrderChange = (newOrder: string[]) => {
     setFormData((prevState) => ({
       ...prevState,
@@ -129,6 +146,12 @@ const CharacterCreate: FC = () => {
     checkValidForm();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData]);
+
+  useEffect(() => {
+    if (game) {
+      bindRaces(game.realmId);
+    }
+  }, [game]);
 
   useEffect(() => {
     if (gameId) {
@@ -150,19 +173,23 @@ const CharacterCreate: FC = () => {
     }
   }, [factionId]);
 
+  if (!game || !formData) return <div>Loading...</div>;
+
   return (
     <>
       <CharacterCreateActions formData={formData} game={game} isValid={isValid} />
       <Grid container spacing={5}>
-        <Grid size={4}>
-          <CharacterCreateAttributes
+        <Grid size={2}>
+          <RaceAvatar raceName={formData.info.raceName} size={200} />
+          <CharacterCreateAttributesBasic
             formData={formData}
             setFormData={setFormData}
             setProfession={setProfession}
             factions={factions}
+            races={races}
           />
         </Grid>
-        <Grid size={5}>
+        <Grid size={7}>
           <CharacterCreateStats
             formData={formData}
             setFormData={setFormData}
@@ -180,6 +207,12 @@ const CharacterCreate: FC = () => {
             setBoosts={setBoosts}
             swaps={swaps}
             setSwaps={setSwaps}
+          />
+          <CharacterCreateAttributes
+            formData={formData}
+            setFormData={setFormData}
+            setProfession={setProfession}
+            factions={factions}
           />
         </Grid>
         <Grid size={3}>

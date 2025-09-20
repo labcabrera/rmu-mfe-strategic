@@ -73,7 +73,7 @@ const StrategicGameView: React.FC = () => {
   return (
     <>
       <StrategicGameViewActions strategicGame={game} />
-      <Grid container spacing={12}>
+      <Grid container spacing={5}>
         <Grid size={2}>
           <StrategicGameAvatar strategicGame={game} size={200} />
           <Typography variant="h6" color="primary">
