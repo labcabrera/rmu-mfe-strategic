@@ -12,10 +12,10 @@ const CharacterViewAttributes = ({ character, faction, strategicGame }) => {
 
   return (
     <Grid container spacing={10}>
-      <Grid item size={6}>
+      <Grid item size={12}>
         <CharacterViewInfo character={character} faction={faction} strategicGame={strategicGame} />
       </Grid>
-      <Grid item size={6}>
+      <Grid item size={12}>
         <CharacterViewStats character={character} />
         <CharacterViewResistances character={character} />
       </Grid>

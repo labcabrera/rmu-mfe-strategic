@@ -1,3 +1,5 @@
+export const stats = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
+
 export interface Character {
   id: string;
   name: string;

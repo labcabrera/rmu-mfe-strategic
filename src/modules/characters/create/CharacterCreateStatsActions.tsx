@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import InfoOutlineIcon from '@mui/icons-material/InfoOutline';
 import { Button, Grid, Tooltip, MenuItem, TextField, IconButton, Typography } from '@mui/material';
 import { t } from 'i18next';
-import { CreateCharacterDto, stats } from '../../api/character';
-import { StrategicGame } from '../../api/strategic-game';
+import { CreateCharacterDto, stats } from '../../api/character.dto';
+import { StrategicGame } from '../../api/strategic-game.dto';
 import { getStatBonus } from '../../services/stat-service';
 import { StatBonus } from './CharacterCreate';
 

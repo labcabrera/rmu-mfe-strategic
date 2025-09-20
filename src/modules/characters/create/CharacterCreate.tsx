@@ -2,8 +2,7 @@ import React, { useState, useEffect, FC } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
 import { useError } from '../../../ErrorContext';
-import { stats } from '../../api/character';
-import { CreateCharacterDto } from '../../api/character.dto';
+import { CreateCharacterDto, stats } from '../../api/character.dto';
 import { fetchFactions } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
 import { Profession } from '../../api/professions';
@@ -192,11 +191,8 @@ const CharacterCreate: FC = () => {
         <Grid size={7}>
           <CharacterCreateStats
             formData={formData}
-            setFormData={setFormData}
-            strategicGame={game}
             onRandomStats={onRandomStats}
             statBonusFormData={statBonusFormData}
-            setStatBonusFormData={setStatBonusFormData}
           />
           <CharacterCreateStatsActions
             strategicGame={game}

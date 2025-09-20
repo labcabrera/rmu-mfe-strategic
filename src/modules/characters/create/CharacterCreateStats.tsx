@@ -1,14 +1,10 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import SyncIcon from '@mui/icons-material/Sync';
 import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import { CreateCharacterDto } from '../../api/character';
-import { stats } from '../../api/character';
-import { StrategicGame } from '../../api/strategic-game';
+import { CreateCharacterDto, stats } from '../../api/character.dto';
 import { StatBonusFormData } from './CharacterCreate';
-import CharacterCreateStatsActions from './CharacterCreateStatsActions';
 
 const red = '#ffab91';
 const green = '#a5d6a7';
@@ -18,9 +14,8 @@ const CharacterStats: FC<{
   statKey: string;
   statName: string;
   formData: CreateCharacterDto;
-  setFormData: Dispatch<SetStateAction<CreateCharacterDto>>;
   statBonusFormData: StatBonusFormData;
-}> = ({ statKey, statName, formData, setFormData, statBonusFormData }) => {
+}> = ({ statKey, statName, formData, statBonusFormData }) => {
   const { t } = useTranslation();
 
   const getColor = (value: number): string => {
@@ -82,13 +77,10 @@ const CharacterStats: FC<{
 };
 
 const CharacterCreateStats: FC<{
-  strategicGame: StrategicGame;
   formData: CreateCharacterDto;
   onRandomStats?: () => void;
-  setFormData: Dispatch<SetStateAction<CreateCharacterDto>>;
   statBonusFormData: StatBonusFormData;
-  setStatBonusFormData: Dispatch<SetStateAction<StatBonusFormData>>;
-}> = ({ strategicGame, formData, setFormData, onRandomStats, statBonusFormData, setStatBonusFormData }) => {
+}> = ({ formData, onRandomStats, statBonusFormData }) => {
   const { t } = useTranslation();
 
   return (
@@ -118,7 +110,6 @@ const CharacterCreateStats: FC<{
               statKey={key}
               statName={t(key)}
               formData={formData}
-              setFormData={setFormData}
               statBonusFormData={statBonusFormData}
             />
           ))}

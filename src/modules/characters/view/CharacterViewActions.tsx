@@ -16,8 +16,8 @@ import {
 import { useError } from '../../../ErrorContext';
 import { deleteCharacter, levelUpCharacter } from '../../api/character';
 import { Character } from '../../api/character.dto';
-import { Faction } from '../../api/faction';
-import { StrategicGame } from '../../api/strategic-game';
+import { Faction } from '../../api/faction.dto';
+import { StrategicGame } from '../../api/strategic-game.dto';
 import DeleteButton from '../../shared/buttons/DeleteButton';
 import EditButton from '../../shared/buttons/EditButton';
 import DeleteDialog from '../../shared/dialogs/DeleteDialog';

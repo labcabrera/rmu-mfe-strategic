@@ -1,8 +1,7 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
-import { stats } from '../../api/character';
-import { Character } from '../../api/character.dto';
+import { Character, stats } from '../../api/character.dto';
 
 const red = '#ffab91';
 const green = '#a5d6a7';

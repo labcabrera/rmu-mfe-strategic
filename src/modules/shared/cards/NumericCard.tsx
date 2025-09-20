@@ -11,6 +11,7 @@ const NumericCard: FC<{
   imageSize?: number;
   grayscale?: number;
   applyColor?: boolean;
+  applyFormat?: boolean;
 }> = ({
   value,
   subtitle,
@@ -21,6 +22,7 @@ const NumericCard: FC<{
   imageSize = 70,
   grayscale = 0.5,
   applyColor = true,
+  applyFormat = false,
 }) => {
   const red = '#ffab91';
   const green = '#a5d6a7';
@@ -77,7 +79,7 @@ const NumericCard: FC<{
             display: 'block',
           }}
         >
-          {formattedValue}
+          {applyFormat ? formattedValue : value}
         </Typography>
         <Typography
           variant="subtitle1"

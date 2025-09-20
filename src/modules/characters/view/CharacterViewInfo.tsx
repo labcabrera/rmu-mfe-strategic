@@ -1,221 +1,178 @@
 import React, { FC } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { Grid, IconButton, InputAdornment, TextField, Typography } from '@mui/material';
-import { Character } from '../../api/character.dto';
-import { Faction } from '../../api/faction';
-import { StrategicGame } from '../../api/strategic-game';
-import CharacterAvatar from '../../shared/avatars/CharacterAvatar';
-import DefenseTextField from '../../shared/inputs/DefenseTextField';
-import HeightTextField from '../../shared/inputs/HeightTextField';
-import HpTextField from '../../shared/inputs/HpTextField';
-import ImageTextField from '../../shared/inputs/ImageTextField';
-import LevelTextField from '../../shared/inputs/LevelTextField';
-import RaceTextField from '../../shared/inputs/RaceTextField';
+import { Box, Grid, TextField, Typography } from '@mui/material';
+import { t } from 'i18next';
+import { Character, stats } from '../../api/character.dto';
+import NumericCard from '../../shared/cards/NumericCard';
+import TextCard from '../../shared/cards/TextCard';
 
 const CharacterViewInfo: FC<{
   character: Character;
-  strategicGame: StrategicGame;
-  faction: Faction;
-}> = ({ character, strategicGame, faction }) => {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-
-  const handleOpenGame = () => {
-    navigate(`/strategic/games/view/${strategicGame.id}`);
+}> = ({ character }) => {
+  const getArmorType = () => {
+    const armor = character.defense.armor;
+    if (!armor) return null;
+    if (armor.at) return t(armor.at);
+    return `${armor.headAt} / ${armor.bodyAt} / ${armor.armsAt} / ${armor.legsAt}`;
   };
 
-  const handleOpenFaction = () => {
-    navigate(`/strategic/factions/view/${faction.id}`);
+  const getResistanceImage = (resistance: string) => {
+    switch (resistance) {
+      case 'disease':
+      case 'poison':
+      case 'fear':
+        return `/static/images/generic/${resistance}.png`;
+      default:
+        return `/static/images/generic/trait.png`;
+    }
   };
+
+  if (!character) return <div>Loading...</div>;
 
   return (
     <>
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
         <Grid size={12}>
-          <CharacterAvatar character={character} size={120} />
-          <Typography variant="h6">{character.name}</Typography>
-        </Grid>
-        <Grid size={12}>
-          <Typography color="secondary" variant="h6">
-            {t('information')}
+          <Typography variant="h6" color="secondary">
+            {t('general')}
           </Typography>
+          <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+            <TextCard
+              value={t(character.info.realmType)}
+              subtitle={t('realm')}
+              image={`/static/images/generic/realm.png`}
+            />
+            <TextCard
+              value={t(character.info.sizeId)}
+              subtitle={t('size')}
+              image={`/static/images/generic/race-size.png`}
+            />
+            <NumericCard
+              value={character.info.height}
+              subtitle={t('height')}
+              image={`/static/images/generic/character-height.png`}
+            />
+            <NumericCard
+              value={character.info.weight}
+              subtitle={t('weight')}
+              image={`/static/images/generic/character-weight.png`}
+            />
+            <TextCard
+              value={`${character.hp.current} / ${character.hp.max}`}
+              subtitle={t('hit-points')}
+              image={`/static/images/generic/hp.png`}
+            />
+          </Box>
         </Grid>
-        <Grid size={3}>
-          <TextField
-            label={t('game')}
-            variant="standard"
-            fullWidth
-            value={strategicGame?.name || ''}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton edge="end" onClick={handleOpenGame}>
-                    <ArrowForwardIcon />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Grid>
-        <Grid size={3}>
-          <TextField
-            label={t('faction')}
-            variant="standard"
-            fullWidth
-            value={faction?.name || ''}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton edge="end" onClick={handleOpenFaction}>
-                    <ArrowForwardIcon />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Grid>
-
-        <Grid size={3}>
-          <RaceTextField value={t(character.info.raceId)} />
-        </Grid>
-        <Grid size={3}>
-          <TextField
-            label={t('profession')}
-            name="profession"
-            value={t(character.info.professionId)}
-            variant="standard"
-            InputProps={{ readOnly: true }}
-            fullWidth
-          />
-        </Grid>
-        <Grid size={3}>
-          <TextField
-            label={t('realm')}
-            name="realm"
-            value={t(character.info.realmType)}
-            variant="standard"
-            InputProps={{ readOnly: true }}
-            fullWidth
-          />
-        </Grid>
-
         <Grid size={12}>
           <Typography color="secondary" variant="h6">
             {t('experience')}
           </Typography>
-        </Grid>
-        <Grid size={3}>
-          <ImageTextField label={t('current-level')} value={character.experience.level} imageName="level" />
-        </Grid>
-        <Grid size={3}>
-          <ImageTextField label={t('available-level')} value={character.experience.availableLevel} imageName="level" />
-        </Grid>
-        <Grid size={3}>
-          <ImageTextField
-            label={t('xp')}
-            value={new Intl.NumberFormat('en-EN').format(character.experience.xp)}
-            imageName="level"
-          />
-        </Grid>
-        <Grid size={3}>
-          <ImageTextField
-            label={t('development-points')}
-            value={character.experience.developmentPoints / character.experience.availableDevelopmentPoints}
-            imageName="level"
-          />
-        </Grid>
-        <Grid size={12}>
-          <Typography color="secondary" variant="h6">
-            {t('general-info')}
-          </Typography>
-        </Grid>
-        <Grid size={3}>
-          <TextField
-            label={t('size')}
-            name="size"
-            value={t(`size-${character.info.sizeId}`)}
-            InputProps={{ readOnly: true }}
-            variant="standard"
-            fullWidth
-          />
-        </Grid>
-        <Grid size={3}>
-          <HeightTextField value={character.info.height} readOnly />
-        </Grid>
-        <Grid size={3}>
-          <ImageTextField
-            label={t('weight')}
-            value={new Intl.NumberFormat('en-EN').format(character.info.weight)}
-            imageName="weight"
-          />
-        </Grid>
-        <Grid size={3}>
-          <HpTextField value={character.hp.current} />
+          <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+            <NumericCard
+              value={character.experience.level}
+              subtitle={t('current-level')}
+              image={`/static/images/generic/experience.png`}
+            />
+            <NumericCard
+              value={character.experience.xp}
+              subtitle={t('xp')}
+              image={`/static/images/generic/experience.png`}
+              applyColor={false}
+              applyFormat={true}
+            />
+            <TextCard
+              value={`${character.experience.developmentPoints} / ${character.experience.availableDevelopmentPoints}`}
+              subtitle={t('development-points')}
+              image={`/static/images/generic/trait-combat.png`}
+            />
+          </Box>
         </Grid>
         <Grid size={12}>
           <Typography color="secondary" variant="h6">
             {t('defense')}
           </Typography>
-        </Grid>
-        <Grid size={3}>
-          <DefenseTextField i18nLabel={'armor-type'} value={character.defense.armorType} />
-        </Grid>
-        <Grid size={3}>
-          <DefenseTextField i18nLabel={'defensive-bonus'} value={character.defense.defensiveBonus} />
+          <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+            <NumericCard
+              value={character.defense.defensiveBonus}
+              subtitle={t('defensive-bonus')}
+              image={`/static/images/generic/defensive-bonus.png`}
+            />
+            <TextCard value={getArmorType()} subtitle={t('armor-type')} image={`/static/images/generic/armor.png`} />
+          </Box>
         </Grid>
         <Grid size={12}>
           <Typography color="secondary" variant="h6">
             {t('movement')}
           </Typography>
-        </Grid>
-        <Grid size={3}>
-          <ImageTextField
-            label={t('stride-racial-bonus')}
-            value={character.movement.strideRacialBonus}
-            imageName="movement"
-          />
-        </Grid>
-        <Grid size={3}>
-          <ImageTextField
-            label={t('stride-stat-bonus')}
-            value={character.movement.strideQuBonus}
-            imageName="movement"
-          />
-        </Grid>
-        <Grid size={3}>
-          <ImageTextField
-            label={t('base-movement-rate')}
-            value={character.movement.baseMovementRate}
-            imageName="movement"
-          />
+          <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+            <NumericCard
+              value={character.movement.baseMovementRate}
+              subtitle={t('base-movement-rate')}
+              image={`/static/images/generic/stride-bonus.png`}
+              applyColor={false}
+            />
+            <NumericCard
+              value={character.movement.strideRacialBonus}
+              subtitle={t('stride-racial-bonus')}
+              image={`/static/images/generic/stride-bonus.png`}
+              applyColor={false}
+            />
+            <NumericCard
+              value={character.movement.strideQuBonus}
+              subtitle={t('stride-stat-bonus')}
+              image={`/static/images/generic/stride-bonus.png`}
+              applyColor={false}
+            />
+          </Box>
         </Grid>
         <Grid size={12}>
           <Typography color="secondary" variant="h6">
             {t('initiative')}
           </Typography>
+          <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+            <NumericCard
+              value={character.initiative.totalBonus}
+              subtitle={t('initiative-total-bonus')}
+              image={`/static/images/generic/stride-bonus.png`}
+              applyColor={false}
+            />
+            <NumericCard
+              value={character.initiative.baseBonus}
+              subtitle={t('initiative-base-bonus')}
+              image={`/static/images/generic/stride-bonus.png`}
+              applyColor={false}
+            />
+          </Box>
         </Grid>
-        <Grid size={3}>
-          <ImageTextField
-            label={t('initiative-base-bonus')}
-            value={character.initiative.baseBonus}
-            imageName="initiative"
-          />
+        <Grid size={12}>
+          <Typography color="secondary" variant="h6">
+            {t('stats')}
+          </Typography>
+          <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+            {stats.map((stat) => (
+              <NumericCard
+                key={stat}
+                value={character.statistics[stat].totalBonus}
+                subtitle={t(stat)}
+                image={`/static/images/generic/stat-${stat}.png`}
+              />
+            ))}
+          </Box>
         </Grid>
-        <Grid size={3}>
-          <ImageTextField
-            label={t('initiative-custom-bonus')}
-            value={character.initiative.customBonus}
-            imageName="initiative"
-          />
-        </Grid>
-        <Grid size={3}>
-          <ImageTextField
-            label={t('initiative-total-bonus')}
-            value={character.initiative.totalBonus}
-            imageName="initiative"
-          />
+        <Grid size={12}>
+          <Typography color="secondary" variant="h6">
+            {t('resistances')}
+          </Typography>
+          <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+            {character.resistances.map((resistance) => (
+              <NumericCard
+                key={resistance.resistance}
+                value={resistance.totalBonus}
+                subtitle={t(resistance.resistance)}
+                image={getResistanceImage(resistance.resistance)}
+              />
+            ))}
+          </Box>
         </Grid>
       </Grid>
     </>

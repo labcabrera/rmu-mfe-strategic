@@ -2,8 +2,6 @@ import { buildErrorFromResponse } from './api-errors';
 import { Character } from './character.dto';
 import { Item } from './items';
 
-export const stats = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
-
 export async function fetchCharacter(characterId: string): Promise<Character> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}`;
   const response = await fetch(url, { method: 'GET' });
