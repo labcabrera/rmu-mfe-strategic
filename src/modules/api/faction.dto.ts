@@ -5,6 +5,7 @@ export interface Faction {
   management: FactionManagement;
   shortDescription?: string;
   description?: string;
+  imageUrl?: string;
   owner?: string;
 }
 

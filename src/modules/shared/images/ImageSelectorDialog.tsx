@@ -7,6 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import { t } from 'i18next';
 
 const ImageSelectorDialog: FC<{
   open: boolean;
@@ -29,19 +30,30 @@ const ImageSelectorDialog: FC<{
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="xl"
+      fullWidth
+      sx={{
+        '& .MuiDialog-paper': {
+          minHeight: 600,
+          minWidth: 1200,
+        },
+      }}
+    >
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
-        <Grid container spacing={2}>
+        <Grid container spacing={1}>
           {images.map((img) => (
             <Grid key={img}>
               <Avatar
                 src={img}
                 variant="square"
                 sx={{
-                  width: 80,
-                  height: 80,
-                  border: selectedImage === img ? '3px solid #1976d2' : '2px solid #ccc',
+                  width: 150,
+                  height: 150,
+                  border: selectedImage === img ? '3px solid #d99714ff' : '2px solid #cccccc',
                   cursor: 'pointer',
                   transition: 'border 0.2s',
                 }}
@@ -57,9 +69,9 @@ const ImageSelectorDialog: FC<{
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>{t('cancel')}</Button>
         <Button onClick={handleSave} disabled={!selectedImage} variant="contained" color="primary">
-          Save
+          {t('save')}
         </Button>
       </DialogActions>
     </Dialog>

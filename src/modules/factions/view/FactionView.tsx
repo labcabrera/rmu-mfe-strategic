@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
-import { Link as RouterLink, useLocation, useParams } from 'react-router-dom';
-import { Grid, Link, Typography } from '@mui/material';
+import { useLocation, useParams } from 'react-router-dom';
+import { Grid } from '@mui/material';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacters } from '../../api/character';
 import { Character } from '../../api/character.dto';
@@ -8,10 +8,10 @@ import { fetchFaction } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import FactionAvatar from '../../shared/avatars/FactionAvatar';
 import FactionViewActions from './FactionViewActions';
 import FactionViewAttributes from './FactionViewAttributes';
 import FactionViewCharacters from './FactionViewCharacters';
+import FactionViewResume from './FactionViewResume';
 
 const FactionView: FC = () => {
   const location = useLocation();
@@ -69,18 +69,7 @@ const FactionView: FC = () => {
       <FactionViewActions faction={faction} game={game} />
       <Grid container spacing={12}>
         <Grid size={2}>
-          <FactionAvatar faction={faction} size={200} />
-          <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
-            {faction.name}
-          </Typography>
-          <Typography variant="h6" sx={{ mt: 2 }}>
-            <Link component={RouterLink} color="inherit" to={`/strategic/games/view/${game.id}`}>
-              {game.name}
-            </Link>
-          </Typography>
-          <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
-            {faction.description}
-          </Typography>
+          <FactionViewResume faction={faction} setFaction={setFaction} game={game} />
         </Grid>
         <Grid size={7}>
           <FactionViewAttributes faction={faction} setFaction={setFaction} />

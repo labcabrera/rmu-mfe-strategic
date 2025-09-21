@@ -25,7 +25,7 @@ const FactionCreate: FC = () => {
     <>
       <FactionCreateActions formData={formData} strategicGame={strategicGame} />
       <FactionCreateAttributes formData={formData} setFormData={setFormData} />
-      <pre>{JSON.stringify(formData, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
     </>
   );
 };
