@@ -8,7 +8,9 @@ import { Faction } from '../../api/faction.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { fetchTacticalGames, TacticalGame } from '../../api/tactical-games';
+import { getGenericImages } from '../../services/image-service';
 import StrategicGameAvatar from '../../shared/avatars/StrategicGameAvatar';
+import ImageSelectorDialog from '../../shared/images/ImageSelectorDialog';
 import StrategicGameViewActions from './StrategicGameViewActions';
 import StrategicGameViewAttributes from './StrategicGameViewAttributes';
 import StrategicGameViewFactions from './StrategicGameViewFactions';
@@ -16,11 +18,12 @@ import StrategicGameViewTacticalGames from './StrategicGameViewTacticalGames';
 
 const StrategicGameView: React.FC = () => {
   const location = useLocation();
+  const { showError } = useError();
   const params = useParams<{ gameId: string }>();
   const [game, setGame] = useState<StrategicGame | null>(location.state?.strategicGame || null);
   const [factions, setFactions] = useState<Faction[]>([]);
   const [tacticalGames, setTacticalGames] = useState<TacticalGame[]>([]);
-  const { showError } = useError();
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
 
   const bindStrategicGame = (gameId: string) => {
     fetchStrategicGame(gameId)
@@ -75,22 +78,29 @@ const StrategicGameView: React.FC = () => {
       <StrategicGameViewActions strategicGame={game} />
       <Grid container spacing={5}>
         <Grid size={2}>
-          <StrategicGameAvatar strategicGame={game} size={200} />
-          <Typography variant="h6" color="primary">
+          <StrategicGameAvatar strategicGame={game} size={200} onClick={() => setImageDialogOpen(true)} />
+          <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
             {t(game.name)}
           </Typography>
-          <Typography variant="h6">{t(game.realmName)}</Typography>
+          <Typography variant="h6" sx={{ mt: 2 }}>
+            {t(game.realmName)}
+          </Typography>
           <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
             {game.description}
           </Typography>
         </Grid>
-        <Grid size={7}>
+        <Grid size={9}>
           <StrategicGameViewAttributes strategicGame={game} />
           <StrategicGameViewFactions strategicGame={game} factions={factions} />
           <StrategicGameViewTacticalGames strategicGame={game} tacticalGames={tacticalGames} />
         </Grid>
-        <Grid size={4}></Grid>
       </Grid>
+      <ImageSelectorDialog
+        open={imageDialogOpen}
+        images={getGenericImages()}
+        onClose={() => setImageDialogOpen(false)}
+        onSelect={() => {}}
+      />
     </>
   );
 };
