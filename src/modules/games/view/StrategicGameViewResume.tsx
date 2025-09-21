@@ -32,7 +32,7 @@ const StrategicGameViewResume: FC<{ game: StrategicGame; setGame: Dispatch<SetSt
 
   return (
     <>
-      <StrategicGameAvatar strategicGame={game} size={200} onClick={() => setImageDialogOpen(true)} />
+      <StrategicGameAvatar strategicGame={game} size={300} onClick={() => setImageDialogOpen(true)} />
       <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
         {t(game.name)}
       </Typography>

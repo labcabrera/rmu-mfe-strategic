@@ -1,7 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Link as RouterLink } from 'react-router-dom';
-import { Grid, Link, Typography } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacter } from '../../api/character';
@@ -11,7 +10,6 @@ import { Faction } from '../../api/faction.dto';
 import { fetchProfession, Profession } from '../../api/professions';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import RaceAvatar from '../../shared/avatars/RaceAvatar';
 import CharacterViewActions from './CharacterViewActions';
 import CharacterViewResume from './CharacterViewResume';
 import CharacterViewTabs from './CharacterViewTabs';

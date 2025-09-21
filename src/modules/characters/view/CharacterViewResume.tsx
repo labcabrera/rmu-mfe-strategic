@@ -16,7 +16,7 @@ const CharacterViewResume: FC<{ character: Character; strategicGame: StrategicGa
 
   return (
     <>
-      <RaceAvatar raceName={character.info.raceName} size={200} />
+      <RaceAvatar raceName={character.info.raceName} size={300} />
       <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
         {character.name}
       </Typography>

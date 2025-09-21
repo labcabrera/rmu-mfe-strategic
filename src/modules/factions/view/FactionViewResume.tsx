@@ -32,7 +32,7 @@ const FactionViewResume: FC<{
 
   return (
     <>
-      <FactionAvatar faction={faction} size={200} onClick={() => setImageDialogOpen(true)} />
+      <FactionAvatar faction={faction} size={300} onClick={() => setImageDialogOpen(true)} />
       <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
         {faction.name}
       </Typography>
