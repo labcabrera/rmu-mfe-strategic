@@ -110,6 +110,22 @@ export function NumericInput({
     onFocus?.(e);
   }
 
+  function formatValue(value: number | null, formatter: Intl.NumberFormat): string {
+    if (value === null || Number.isNaN(value)) return '';
+    return formatter.format(value);
+  }
+
+  function toEnglishRaw(value: number): string {
+    return String(value);
+  }
+
+  function parseEnglishNumber(raw: string): number | null {
+    const s = raw.replace(/\s+/g, '').replace(/,/g, '');
+    if (s === '' || s === '-' || s === '+' || s === '.' || s === '-.' || s === '+.') return null;
+    const n = Number(s);
+    return Number.isFinite(n) ? n : null;
+  }
+
   return (
     <TextField
       inputRef={inputRef}
@@ -137,18 +153,4 @@ export function NumericInput({
   );
 }
 
-function formatValue(value: number | null, formatter: Intl.NumberFormat): string {
-  if (value === null || Number.isNaN(value)) return '';
-  return formatter.format(value);
-}
-
-function toEnglishRaw(value: number): string {
-  return String(value);
-}
-
-function parseEnglishNumber(raw: string): number | null {
-  const s = raw.replace(/\s+/g, '').replace(/,/g, '');
-  if (s === '' || s === '-' || s === '+' || s === '.' || s === '-.' || s === '+.') return null;
-  const n = Number(s);
-  return Number.isFinite(n) ? n : null;
-}
+export default NumericInput;

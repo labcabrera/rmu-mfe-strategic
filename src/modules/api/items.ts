@@ -3,7 +3,34 @@ import { buildErrorFromResponse } from './api-errors';
 export interface Item {
   id: string;
   name: string;
+  imageUrl?: string;
+  itemTypeId: string;
+  carried?: boolean;
+  info?: ItemInfo;
+  amount?: number;
   [key: string]: any;
+}
+
+export interface Equipment {
+  weight: number;
+  maneuverPenalty: number;
+  baseManeuverPenalty: number;
+  rangedPenalty: number;
+  perceptionPenalty: number;
+  movementBaseDifficulty: string;
+}
+
+export interface Armor {
+  at?: string;
+  bodyAt?: string;
+  headAt?: string;
+  armsAt?: string;
+  legsAt?: string;
+}
+
+export interface ItemInfo {
+  type?: string;
+  weight?: number;
 }
 
 export async function fetchItems(rsql: string, page: number, size: number): Promise<Item[]> {

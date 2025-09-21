@@ -1,12 +1,11 @@
 import React, { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import { CreateCharacterDto } from '../../api/characters';
+import { Grid, TextField, Typography } from '@mui/material';
+import { CreateCharacterDto } from '../../api/character.dto';
+import { Faction } from '../../api/faction.dto';
 import { Profession } from '../../api/professions';
-import { Race } from '../../api/races';
-import { StrategicGame } from '../../api/strategic-games';
+import { Race } from '../../api/race.dto';
+import CharacterAvatar from '../../shared/avatars/CharacterAvatar';
 import NameTextField from '../../shared/inputs/NameTextField';
 import { NumericInput } from '../../shared/inputs/NumericInput';
 import SelectFaction from '../../shared/selects/SelectFaction';
@@ -15,13 +14,13 @@ import SelectGender from '../../shared/selects/SelectGender';
 import SelectProfession from '../../shared/selects/SelectProfession';
 import SelectRace from '../../shared/selects/SelectRace';
 import SelectRealmType from '../../shared/selects/SelectRealmType';
-import GameCreateStats from './CharacterCreateStats';
 
 const CharacterCreateAttributes: FC<{
-  strategicGame: StrategicGame;
   formData: CreateCharacterDto;
   setFormData: Dispatch<SetStateAction<CreateCharacterDto>>;
-}> = ({ strategicGame, formData, setFormData }) => {
+  setProfession: Dispatch<SetStateAction<Profession | null>>;
+  factions: Faction[];
+}> = ({ formData, setFormData, setProfession, factions }) => {
   const { t } = useTranslation();
 
   const onRaceChange = (raceId: string, raceInfo: Race) => {
@@ -29,14 +28,14 @@ const CharacterCreateAttributes: FC<{
       const stats = { ...formData.statistics };
       const keys = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
       keys.forEach((key) => {
-        stats[key].racial = raceInfo.defaultStatBonus[key];
+        stats[key].racial = raceInfo.stats[key];
       });
       setFormData((prevState) => ({
         ...prevState,
         info: {
           ...prevState.info,
           raceId: raceId,
-          sizeId: raceInfo.size,
+          sizeId: raceInfo.sizeId,
           height: raceInfo.averageHeight.male,
           weight: raceInfo.averageWeight.male,
         },
@@ -62,10 +61,7 @@ const CharacterCreateAttributes: FC<{
         realmType: realmType,
       },
     }));
-  };
-
-  const onLevelChange = (level: number) => {
-    updateFormData('info', 'level', level);
+    setProfession(profession);
   };
 
   const onFactionChange = (faction: string) => {
@@ -94,29 +90,6 @@ const CharacterCreateAttributes: FC<{
       roleplay: { ...prevState.roleplay, gender: gender },
     }));
   };
-
-  const handleAgeChange = (age: React.ChangeEvent<HTMLInputElement> | number) => {
-    let value: number;
-    try {
-      if (typeof age === 'number') {
-        value = age;
-      } else {
-        value = parseInt(age.target.value);
-      }
-    } catch (error) {
-      value = typeof age === 'number' ? age : 0;
-    }
-    setFormData((prevState) => ({
-      ...prevState,
-      roleplay: { ...prevState.roleplay, age: value },
-    }));
-  };
-
-  const handleHeightChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    updateFormData('info', 'height', e.target.value ? parseInt(e.target.value) : 0);
-
-  const handleWeightChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    updateFormData('info', 'weight', e.target.value ? parseInt(e.target.value) : 0);
 
   const onNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prevState) => ({ ...prevState, name: e.target.value }));
@@ -150,38 +123,7 @@ const CharacterCreateAttributes: FC<{
           {t('information')}
         </Typography>
       </Grid>
-
-      <Grid size={2}>
-        <SelectGame value={formData.gameId} onChange={onGameChange} />
-      </Grid>
-      <Grid size={2}>
-        <SelectFaction value={formData.factionId} onChange={onFactionChange} />
-      </Grid>
-      <Grid size={2}>
-        <SelectRace value={formData.info.raceId} onChange={onRaceChange} />
-      </Grid>
-      <Grid size={2}>
-        <SelectProfession value={formData.info.professionId} onChange={onProfessionChange} />
-      </Grid>
-      <Grid size={2}>
-        <NameTextField value={formData.name} onChange={onNameChange} generateRandomRaceValue={formData.info.raceId} />
-      </Grid>
-      <Grid size={12}></Grid>
-
-      <Grid size={2}>
-        <SelectRealmType value={formData.info.realmTypeId} onChange={handleRealmTypeChange} />
-      </Grid>
-      <Grid size={1}>
-        <NumericInput
-          label={t('level')}
-          name="level"
-          value={formData.level}
-          onChange={(e: any) => updateField('level', e)}
-          integer
-          allowNegatives={false}
-        />
-      </Grid>
-      <Grid size={1}>
+      <Grid size={6}>
         <NumericInput
           label={t('height')}
           name="height"
@@ -190,7 +132,7 @@ const CharacterCreateAttributes: FC<{
           allowNegatives={false}
         />
       </Grid>
-      <Grid size={1}>
+      <Grid size={6}>
         <NumericInput
           label={t('weight')}
           name="weight"
@@ -200,16 +142,15 @@ const CharacterCreateAttributes: FC<{
         />
       </Grid>
       <Grid size={12}></Grid>
-      <GameCreateStats formData={formData} setFormData={setFormData} strategicGame={strategicGame} />
       <Grid size={12}>
         <Typography variant="h6" color="primary">
           {t('roleplay')}
         </Typography>
       </Grid>
-      <Grid size={1}>
+      <Grid size={6}>
         <SelectGender value={formData.roleplay.gender} onChange={handleGenderChange} />
       </Grid>
-      <Grid size={1}>
+      <Grid size={6}>
         <NumericInput
           label={t('age')}
           name="age"
@@ -219,7 +160,7 @@ const CharacterCreateAttributes: FC<{
           allowNegatives={false}
         />
       </Grid>
-      <Grid size={6}>
+      <Grid size={12}>
         <TextField
           label="Description"
           variant="standard"

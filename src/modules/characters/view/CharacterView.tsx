@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
+import { Grid, Link, Typography } from '@mui/material';
+import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { fetchCharacter, Character } from '../../api/characters';
-import { fetchFaction, Faction } from '../../api/factions';
+import { fetchCharacter } from '../../api/character';
+import { Character } from '../../api/character.dto';
+import { fetchFaction } from '../../api/faction';
+import { Faction } from '../../api/faction.dto';
 import { fetchProfession, Profession } from '../../api/professions';
-import { fetchStrategicGame, StrategicGame } from '../../api/strategic-games';
+import { fetchStrategicGame } from '../../api/strategic-game';
+import { StrategicGame } from '../../api/strategic-game.dto';
+import RaceAvatar from '../../shared/avatars/RaceAvatar';
 import CharacterViewActions from './CharacterViewActions';
 import CharacterViewTabs from './CharacterViewTabs';
 
@@ -57,7 +64,47 @@ const CharacterView: React.FC = () => {
   return (
     <>
       <CharacterViewActions character={character} setCharacter={setCharacter} faction={faction} game={strategicGame} />
-      <CharacterViewTabs character={character} setCharacter={setCharacter} strategicGame={strategicGame} faction={faction} profession={profession} />
+      <Grid container spacing={5}>
+        <Grid size={2}>
+          <RaceAvatar raceName={character.info.raceName} size={200} />
+          <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
+            {character.name}
+          </Typography>
+          <Typography variant="h6" sx={{ mt: 2 }}>
+            {character.info.raceName} - {t(character.info.professionId)} - {character.experience.availableLevel}
+          </Typography>
+          <Typography variant="h6" sx={{ mt: 2 }}>
+            <Link component={RouterLink} color="inherit" to={`/strategic/factions/view/${faction.id}`}>
+              {strategicGame.name}
+            </Link>
+          </Typography>
+          <Typography variant="h6" sx={{ mt: 2 }}>
+            <Link component={RouterLink} color="inherit" to={`/strategic/factions/view/${faction.id}`}>
+              {faction.name}
+            </Link>
+          </Typography>
+          <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
+            {character.description}
+          </Typography>
+        </Grid>
+        <Grid size={7}>
+          <CharacterViewTabs
+            character={character}
+            setCharacter={setCharacter}
+            strategicGame={strategicGame}
+            faction={faction}
+            profession={profession}
+          />
+        </Grid>
+        <Grid size={3}>
+          <Typography variant="h6" color="primary">
+            {t('description')}
+          </Typography>
+          <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
+            {character.description}
+          </Typography>
+        </Grid>
+      </Grid>
     </>
   );
 };
