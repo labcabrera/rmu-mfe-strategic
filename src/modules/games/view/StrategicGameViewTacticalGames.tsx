@@ -1,8 +1,8 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { Box, Grid, IconButton, Typography } from '@mui/material';
+import { t } from 'i18next';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { TacticalGame } from '../../api/tactical-games';
 import TacticalGameCard from '../../shared/cards/TacticalGameCard';
@@ -17,7 +17,6 @@ const StrategicGameViewTacticalGames: React.FC<StrategicGameViewTacticalGamesPro
   tacticalGames,
 }) => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
 
   const handleNewTacticalGame = () => {
     navigate(`/tactical/games/create?strategicGame=${strategicGame.id}`);
@@ -28,7 +27,7 @@ const StrategicGameViewTacticalGames: React.FC<StrategicGameViewTacticalGamesPro
   }
 
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} sx={{ mt: 5 }}>
       <Grid size={12}>
         <Box display="flex" alignItems="center">
           <Typography variant="h6" color="primary" display="inline">

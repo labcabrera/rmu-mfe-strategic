@@ -49,37 +49,37 @@ const StrategicGameViewAttributes: FC<{
           <NumericCard
             value={strategicGame.powerLevel.baseDevPoints}
             subtitle={t('base-dev-points')}
-            image={`/static/images/generic/trait-physical.png`}
+            image={`/static/images/generic/trait-combat.png`}
             applyColor={false}
           />
           <NumericCard
             value={strategicGame.powerLevel.statRandomMin}
             subtitle={t('stat-random-min')}
-            image={`/static/images/generic/trait-physical.png`}
+            image={`/static/images/generic/stat-st.png`}
             applyColor={false}
           />
           <NumericCard
             value={strategicGame.powerLevel.statBoostPotential}
             subtitle={t('stat-boost-potential')}
-            image={`/static/images/generic/trait-physical.png`}
+            image={`/static/images/generic/stat-st.png`}
             applyColor={false}
           />
           <NumericCard
             value={strategicGame.powerLevel.statBoostTemporary}
             subtitle={t('stat-boost-temporary')}
-            image={`/static/images/generic/trait-physical.png`}
+            image={`/static/images/generic/stat-st.png`}
             applyColor={false}
           />
           <NumericCard
             value={strategicGame.powerLevel.statCreationBoost}
             subtitle={t('stat-creation-boosts')}
-            image={`/static/images/generic/trait-physical.png`}
+            image={`/static/images/generic/stat-st.png`}
             applyColor={false}
           />
           <NumericCard
             value={strategicGame.powerLevel.statCreationSwap}
             subtitle={t('stat-creation-swaps')}
-            image={`/static/images/generic/trait-physical.png`}
+            image={`/static/images/generic/stat-st.png`}
             applyColor={false}
           />
         </Box>

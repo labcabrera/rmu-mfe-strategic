@@ -1,99 +1,84 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
-import { Grid, Typography } from '@mui/material';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
 import { t } from 'i18next';
-import { Realm } from '../../api/realm.dto';
-import { CreateStrategicGameDto } from '../../api/strategic-game.dto';
+import { UpdateStrategicGameDto } from '../../api/strategic-game.dto';
 import NumericInput from '../../shared/inputs/NumericInput';
 
-const StrategicGameCreateAttributes: FC<{
-  formData: CreateStrategicGameDto;
-  setFormData: Dispatch<SetStateAction<CreateStrategicGameDto>>;
+const StrategicGameUpdateAttributes: FC<{
+  formData: UpdateStrategicGameDto;
+  setFormData: Dispatch<SetStateAction<UpdateStrategicGameDto>>;
 }> = ({ formData, setFormData }) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
   const handleOptionsChange = (field: string, value: number) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      options: {
-        ...prevData.options,
-        [field]: value,
-      },
-    }));
+    setFormData({ ...formData, options: { ...formData.options, [field]: value } });
   };
 
   const handlePowerLevelChange = (field: string, value: number) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      powerLevel: {
-        ...prevData.powerLevel,
-        [field]: value,
-      },
-    }));
+    setFormData({ ...formData, powerLevel: { ...formData.powerLevel, [field]: value } });
   };
-
-  if (!formData) return <div>Loading...</div>;
 
   return (
     <Grid container spacing={2}>
       <Grid size={12}>
-        <Typography component="h6" color="primary">
+        <Typography variant="h6" color="primary">
           {t('options')}
         </Typography>
       </Grid>
-      <Grid size={4}>
+      <Grid size={3}>
         <NumericInput
           label={t('experience-multiplier')}
           name="experienceMultiplier"
           value={formData.options.experienceMultiplier}
           onChange={(e) => handleOptionsChange('experienceMultiplier', e)}
-          maxFractionDigits={2}
           allowNegatives={false}
+          min={0}
+          max={100}
         />
       </Grid>
-      <Grid size={4}>
+      <Grid size={3}>
         <NumericInput
           label={t('fatigue-multiplier')}
           name="fatigueMultiplier"
           value={formData.options.fatigueMultiplier}
           onChange={(e) => handleOptionsChange('fatigueMultiplier', e)}
-          maxFractionDigits={2}
           allowNegatives={false}
+          min={0}
+          max={10}
         />
       </Grid>
-      <Grid size={4}></Grid>
-      <Grid size={4}>
+      <Grid size={3}>
         <NumericInput
           label={t('board-scale-multiplier')}
           name="boardScaleMultiplier"
           value={formData.options.boardScaleMultiplier}
           onChange={(e) => handleOptionsChange('boardScaleMultiplier', e)}
-          maxFractionDigits={2}
           allowNegatives={false}
+          min={0}
+          max={100}
         />
       </Grid>
-      <Grid size={4}>
+      <Grid size={3}>
         <NumericInput
           label={t('letality')}
           name="letality"
           value={formData.options.letality}
           onChange={(e) => handleOptionsChange('letality', e)}
           integer
+          min={-100}
+          max={100}
         />
       </Grid>
       <Grid size={12}>
-        <Typography component="h6" color="primary">
+        <Typography variant="h6" color="primary">
           {t('power-level')}
         </Typography>
       </Grid>
-      <Grid size={4}>
-        <NumericInput
-          label={t('base-dev-points')}
-          name="baseDevPoints"
-          value={formData.powerLevel.baseDevPoints}
-          onChange={(e) => handlePowerLevelChange('baseDevPoints', e)}
-          integer
-          allowNegatives={false}
-        />
-      </Grid>
-      <Grid size={4}>
+      <Grid size={3}>
         <NumericInput
           label={t('stat-random-min')}
           name="statRandomMin"
@@ -101,10 +86,11 @@ const StrategicGameCreateAttributes: FC<{
           onChange={(e) => handlePowerLevelChange('statRandomMin', e)}
           integer
           allowNegatives={false}
+          min={1}
+          max={100}
         />
       </Grid>
-      <Grid size={12}></Grid>
-      <Grid size={4}>
+      <Grid size={3}>
         <NumericInput
           label={t('stat-boost-potential')}
           name="statBoostPotential"
@@ -112,9 +98,11 @@ const StrategicGameCreateAttributes: FC<{
           onChange={(e) => handlePowerLevelChange('statBoostPotential', e)}
           integer
           allowNegatives={false}
+          min={1}
+          max={100}
         />
       </Grid>
-      <Grid size={4}>
+      <Grid size={3}>
         <NumericInput
           label={t('stat-boost-temporary')}
           name="statBoostTemporary"
@@ -122,31 +110,37 @@ const StrategicGameCreateAttributes: FC<{
           onChange={(e) => handlePowerLevelChange('statBoostTemporary', e)}
           integer
           allowNegatives={false}
+          min={1}
+          max={100}
         />
       </Grid>
-      <Grid size={4}></Grid>
-      <Grid size={4}>
+      <Grid size={12}></Grid>
+      <Grid size={3}>
         <NumericInput
-          label={t('stat-creation-boost')}
+          label={t('stat-creation-boosts')}
           name="statCreationBoost"
           value={formData.powerLevel.statCreationBoost}
           onChange={(e) => handlePowerLevelChange('statCreationBoost', e)}
           integer
           allowNegatives={false}
+          min={0}
+          max={10}
         />
       </Grid>
-      <Grid size={4}>
+      <Grid size={3}>
         <NumericInput
-          label={t('stat-creation-swap')}
-          name="statCreationSwap"
+          label={t('stat-creation-swaps')}
+          name="statCreationSwaps"
           value={formData.powerLevel.statCreationSwap}
           onChange={(e) => handlePowerLevelChange('statCreationSwap', e)}
           integer
           allowNegatives={false}
+          min={0}
+          max={10}
         />
       </Grid>
     </Grid>
   );
 };
 
-export default StrategicGameCreateAttributes;
+export default StrategicGameUpdateAttributes;

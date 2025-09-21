@@ -1,20 +1,26 @@
 import React, { FC } from 'react';
 import Avatar from '@mui/material/Avatar';
 import { StrategicGame } from '../../api/strategic-game.dto';
+import { defaultStrategicGameImage } from '../../services/image-service';
 
 const GameAvatar: FC<{
   strategicGame: StrategicGame;
   size?: number;
-}> = ({ strategicGame, size = 70 }) => {
-  const defaultImage = '/static/images/generic/strategic.png';
-
+  onClick?: () => void;
+}> = ({ strategicGame, size = 70, onClick }) => {
   if (!strategicGame) return <p>Loading...</p>;
 
   const resolveImage = (): string => {
-    return defaultImage;
+    return strategicGame.imageUrl ? strategicGame.imageUrl : defaultStrategicGameImage;
   };
 
-  return <Avatar src={resolveImage()} sx={{ width: size, height: size }} />;
+  return (
+    <Avatar
+      src={resolveImage()}
+      onClick={onClick}
+      sx={{ width: size, height: size, cursor: onClick ? 'pointer' : 'default' }}
+    />
+  );
 };
 
 export default GameAvatar;

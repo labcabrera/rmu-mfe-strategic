@@ -1,10 +1,10 @@
 import React, { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
+import { Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import { t } from 'i18next';
 import { CreateFactionDto } from '../../api/faction.dto';
 import NumericInput from '../../shared/inputs/NumericInput';
-import NumericTextField from '../../shared/inputs/NumericTextField';
 
 const FactionCreateAttributes: FC<{
   formData: CreateFactionDto;
@@ -17,6 +17,11 @@ const FactionCreateAttributes: FC<{
 
   return (
     <Grid container spacing={2}>
+      <Grid size={12}>
+        <Typography variant="h6" color="primary">
+          {t('create-faction')}
+        </Typography>
+      </Grid>
       <Grid size={3}>
         <TextField
           label={t('name')}
@@ -33,8 +38,8 @@ const FactionCreateAttributes: FC<{
         <NumericInput
           label={t('available-gold')}
           name="availableGold"
-          value={formData.availableGold}
-          onChange={(e) => setFormData({ ...formData, availableGold: e })}
+          value={formData.management.availableGold}
+          onChange={(e) => setFormData({ ...formData, management: { ...formData.management, availableGold: e } })}
           maxFractionDigits={2}
         />
       </Grid>
@@ -42,8 +47,8 @@ const FactionCreateAttributes: FC<{
         <NumericInput
           label={t('available-xp')}
           name="availableXP"
-          value={formData.availableXP}
-          onChange={(e) => setFormData({ ...formData, availableXP: e })}
+          value={formData.management.availableXP}
+          onChange={(e) => setFormData({ ...formData, management: { ...formData.management, availableXP: e } })}
           integer
         />
       </Grid>

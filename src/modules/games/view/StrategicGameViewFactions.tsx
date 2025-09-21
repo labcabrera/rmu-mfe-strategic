@@ -21,7 +21,7 @@ const StrategicGameViewFactions: FC<{
   };
 
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} sx={{ mt: 5 }}>
       <Grid size={12}>
         <Box display="flex" alignItems="center">
           <Typography variant="h6" color="primary" display="inline">

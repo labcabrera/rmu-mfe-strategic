@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Faction } from '../../api/faction.dto';
+import { defaultFactionImage } from '../../services/image-service';
 import CardListItem from './CardListItem';
 
 const FactionCard: FC<{
@@ -12,13 +13,17 @@ const FactionCard: FC<{
     navigate(`/strategic/factions/view/${faction.id}`, { state: { faction } });
   };
 
+  const getImage = () => {
+    return faction.imageUrl ? faction.imageUrl : defaultFactionImage;
+  };
+
   if (!faction) return <p>Loading...</p>;
 
   return (
     <CardListItem
       title={faction.name}
       subtitle={faction.shortDescription}
-      image="/static/images/avatars/generic-faction-01.png"
+      image={getImage()}
       onClick={handleFactionClick}
     />
   );
