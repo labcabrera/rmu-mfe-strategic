@@ -133,13 +133,13 @@ const CharacterViewInfo: FC<{
             <NumericCard
               value={character.initiative.totalBonus}
               subtitle={t('initiative-total-bonus')}
-              image={`/static/images/generic/stride-bonus.png`}
+              image={`/static/images/generic/initiative.png`}
               applyColor={false}
             />
             <NumericCard
               value={character.initiative.baseBonus}
               subtitle={t('initiative-base-bonus')}
-              image={`/static/images/generic/stride-bonus.png`}
+              image={`/static/images/generic/initiative.png`}
               applyColor={false}
             />
           </Box>

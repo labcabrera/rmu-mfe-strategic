@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
-import { Grid, Typography } from '@mui/material';
+import { Link as RouterLink, useLocation, useParams } from 'react-router-dom';
+import { Grid, Link, Typography } from '@mui/material';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacters } from '../../api/character';
 import { Character } from '../../api/character.dto';
@@ -70,10 +70,14 @@ const FactionView: FC = () => {
       <Grid container spacing={12}>
         <Grid size={2}>
           <FactionAvatar faction={faction} size={200} />
-          <Typography variant="h6" color="primary">
+          <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
             {faction.name}
           </Typography>
-          <Typography variant="h6">{game.name}</Typography>
+          <Typography variant="h6" sx={{ mt: 2 }}>
+            <Link component={RouterLink} color="inherit" to={`/strategic/games/view/${game.id}`}>
+              {game.name}
+            </Link>
+          </Typography>
           <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
             {faction.description}
           </Typography>
