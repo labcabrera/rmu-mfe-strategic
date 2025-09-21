@@ -1,16 +1,11 @@
-/* eslint-disable react/prop-types */
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import Grid from '@mui/material/Grid';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
+import React, { FC } from 'react';
+import { Grid, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { t } from 'i18next';
+import { Character } from '../../api/character.dto';
 
-const CharacterViewAttacks = ({ character }) => {
-  const { t } = useTranslation();
-
+const CharacterViewAttacks: FC<{
+  character: Character;
+}> = ({ character }) => {
   return (
     <>
       <Grid container spacing={2}>
@@ -41,7 +36,6 @@ const CharacterViewAttacks = ({ character }) => {
           </TableBody>
         </Table>
       </Grid>
-      <pre>{JSON.stringify(character.attacks, null, 2)}</pre>
     </>
   );
 };

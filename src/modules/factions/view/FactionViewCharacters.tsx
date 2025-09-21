@@ -2,14 +2,13 @@ import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import { Box } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { Character } from '../../api/character.dto';
 import { Faction } from '../../api/faction.dto';
-import CharacterListItem from '../../shared/list-items/CharacterListItem';
+import CharacterCard from '../../shared/cards/CharacterCard';
 
 interface FactionViewCharactersProps {
   faction: Faction;
@@ -37,9 +36,11 @@ const FactionViewCharacters: FC<FactionViewCharactersProps> = ({ faction, charac
         </IconButton>
       </Box>
       <Grid size={12}>
-        {characters.map((character) => (
-          <CharacterListItem key={character.id} character={character} />
-        ))}
+        <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+          {characters.map((character) => (
+            <CharacterCard key={character.id} character={character} />
+          ))}
+        </Box>
         {characters.length === 0 && <Typography variant="body1">{t('not-found-characters')}</Typography>}
       </Grid>
     </Grid>

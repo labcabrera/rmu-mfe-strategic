@@ -76,7 +76,7 @@ const CharacterViewStats: FC<CharacterViewStatsProps> = ({ character }) => {
         </TableHead>
         <TableBody>
           {stats.map((key) => (
-            <CharacterViewStatsEntry statKey={key} statName={key} character={character} />
+            <CharacterViewStatsEntry key={key} statKey={key} statName={key} character={character} />
           ))}
         </TableBody>
       </Table>

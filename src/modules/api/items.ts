@@ -11,6 +11,23 @@ export interface Item {
   [key: string]: any;
 }
 
+export interface Equipment {
+  weight: number;
+  maneuverPenalty: number;
+  baseManeuverPenalty: number;
+  rangedPenalty: number;
+  perceptionPenalty: number;
+  movementBaseDifficulty: string;
+}
+
+export interface Armor {
+  at?: string;
+  bodyAt?: string;
+  headAt?: string;
+  armsAt?: string;
+  legsAt?: string;
+}
+
 export interface ItemInfo {
   type?: string;
   weight?: number;

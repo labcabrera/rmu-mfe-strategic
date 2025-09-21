@@ -7,7 +7,7 @@ import { Card, CardActions, CardContent, CardMedia, Grid, IconButton, Typography
 import { useError } from '../../../ErrorContext';
 import { deleteItem, updateCarriedStatus } from '../../api/character';
 import { Character } from '../../api/character.dto';
-import { Faction } from '../../api/faction';
+import { Faction } from '../../api/faction.dto';
 import { Item } from '../../api/items';
 import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 import CharacterViewAddItem from './CharacterViewAddItem';

@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { Box, Grid, TextField, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { Character, stats } from '../../api/character.dto';
 import NumericCard from '../../shared/cards/NumericCard';

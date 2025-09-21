@@ -61,6 +61,7 @@ export interface CharacterItem {
   category?: string;
   weapon?: WeaponInfo;
   armor?: ArmorInfo;
+  amount?: number;
 }
 
 export interface WeaponInfo {

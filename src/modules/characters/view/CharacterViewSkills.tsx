@@ -259,9 +259,9 @@ const CharacterViewSkills: FC<{
   const { t } = useTranslation();
 
   return (
-    <Grid container spacing={2} sx={{ marginTop: 2 }}>
+    <Grid container spacing={2}>
       <Grid size={12}>
-        <Typography color="secondary" variant="h5">
+        <Typography color="secondary" variant="h6">
           {t('skills')}
         </Typography>
       </Grid>

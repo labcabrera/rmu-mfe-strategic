@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { Grid, Link, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
@@ -96,15 +96,15 @@ const CharacterView: React.FC = () => {
             profession={profession}
           />
         </Grid>
-        <Grid size={4}></Grid>
+        <Grid size={3}>
+          <Typography variant="h6" color="primary">
+            {t('description')}
+          </Typography>
+          <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
+            {character.description}
+          </Typography>
+        </Grid>
       </Grid>
-      <CharacterViewTabs
-        character={character}
-        setCharacter={setCharacter}
-        strategicGame={strategicGame}
-        faction={faction}
-        profession={profession}
-      />
     </>
   );
 };
