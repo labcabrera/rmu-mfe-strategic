@@ -1,12 +1,5 @@
 import React, { FC, useState } from 'react';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
+import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography } from '@mui/material';
 import { t } from 'i18next';
 
 const ImageSelectorDialog: FC<{
@@ -45,15 +38,15 @@ const ImageSelectorDialog: FC<{
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <Grid container spacing={1}>
-          {images.map((img) => (
-            <Grid key={img}>
+          {images.map((img, index) => (
+            <Grid key={`image-${index}`}>
               <Avatar
                 src={img}
                 variant="square"
                 sx={{
                   width: 150,
                   height: 150,
-                  border: selectedImage === img ? '3px solid #d99714ff' : '2px solid #cccccc',
+                  border: selectedImage === img ? '3px solid #d99714ff' : '2px solid #e6e0caff',
                   cursor: 'pointer',
                   transition: 'border 0.2s',
                 }}

@@ -45,7 +45,7 @@ const StrategicGameUpdateActions: FC<{
           <Link component={RouterLink} color="inherit" to="/strategic/games">
             {t('games')}
           </Link>
-          <Link component={RouterLink} color="inherit" to={`/strategic/games/${strategicGame.id}`}>
+          <Link component={RouterLink} color="inherit" to={`/strategic/games/view/${strategicGame.id}`}>
             {strategicGame.name}
           </Link>
           <span>{t('edit')}</span>
