@@ -1,52 +1,14 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { FC } from 'react';
 import { Box } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { t } from 'i18next';
 import { Faction } from '../../api/faction.dto';
 import NumericCard from '../../shared/cards/NumericCard';
 
-interface FactionViewAttributesProps {
+const FactionViewAttributes: FC<{
   faction: Faction;
-  setFaction: React.Dispatch<React.SetStateAction<Faction>>;
-}
-
-interface InfoFieldProps {
-  i18n: string;
-  value: string | number | undefined;
-  size?: number;
-}
-
-const InfoField: React.FC<InfoFieldProps> = ({ i18n, value, size = 2 }) => {
-  const { t } = useTranslation();
-
-  return (
-    <Grid size={size}>
-      <TextField label={t(i18n)} variant="standard" value={value} fullWidth />
-    </Grid>
-  );
-};
-
-interface HeaderCategoryProps {
-  i18nLabel: string;
-}
-
-const HeaderCategory: React.FC<HeaderCategoryProps> = ({ i18nLabel }) => {
-  const { t } = useTranslation();
-
-  return (
-    <Grid size={12}>
-      <Typography variant="h6" color="primary">
-        {t(i18nLabel)}
-      </Typography>
-    </Grid>
-  );
-};
-
-const FactionViewAttributes: React.FC<FactionViewAttributesProps> = ({ faction, setFaction }) => {
-  const { t } = useTranslation();
-
+}> = ({ faction }) => {
   return (
     <Grid container spacing={2}>
       <Grid size={12}>
@@ -65,6 +27,7 @@ const FactionViewAttributes: React.FC<FactionViewAttributesProps> = ({ faction, 
             subtitle={t('available-xp')}
             image={`/static/images/generic/experience.png`}
             applyColor={false}
+            applyFormat={true}
           />
         </Box>
       </Grid>

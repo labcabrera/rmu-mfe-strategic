@@ -29,7 +29,7 @@ const StrategicGameUpdate: FC = () => {
           <StrategicGameUpdateAttributes formData={formData} setFormData={setFormData} />
         </Grid>
       </Grid>
-      <pre>{JSON.stringify(formData, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
     </>
   );
 };

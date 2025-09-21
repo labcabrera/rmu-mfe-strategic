@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, TextField, Typography } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { UpdateFactionDto } from '../../api/faction.dto';
 import NumericInput from '../../shared/inputs/NumericInput';
@@ -9,11 +9,6 @@ const FactionUpdateAttributes: React.FC<{
   setFormData: React.Dispatch<React.SetStateAction<UpdateFactionDto>>;
 }> = ({ formData, setFormData }) => {
   if (!formData) return <p>Loading...</p>;
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
 
   const handleManagementChange = (field: string, value: number) => {
     setFormData({
@@ -33,16 +28,6 @@ const FactionUpdateAttributes: React.FC<{
         </Typography>
       </Grid>
       <Grid size={12}>
-        <TextField
-          label={t('name')}
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          variant="standard"
-          fullWidth
-        />
-      </Grid>
-      <Grid size={12}>
         <NumericInput
           label={t('available-xp')}
           name="availableXP"
@@ -60,26 +45,6 @@ const FactionUpdateAttributes: React.FC<{
           integer
           min={0}
           onChange={(e) => handleManagementChange('availableGold', e)}
-        />
-      </Grid>
-      <Grid size={12}>
-        <TextField
-          label={t('short-description')}
-          name="shortDescription"
-          value={formData.shortDescription}
-          onChange={handleChange}
-          variant="standard"
-          fullWidth
-        />
-      </Grid>
-      <Grid size={12}>
-        <TextField
-          label={t('description')}
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          variant="standard"
-          fullWidth
         />
       </Grid>
     </Grid>

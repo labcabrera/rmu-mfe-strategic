@@ -72,11 +72,12 @@ const FactionView: FC = () => {
           <FactionViewResume faction={faction} setFaction={setFaction} game={game} />
         </Grid>
         <Grid size={7}>
-          <FactionViewAttributes faction={faction} setFaction={setFaction} />
+          <FactionViewAttributes faction={faction} />
           <FactionViewCharacters faction={faction} characters={characters} />
         </Grid>
         <Grid size={4}></Grid>
       </Grid>
+      {/* <pre>{JSON.stringify(faction, null, 2)}</pre> */}
     </>
   );
 };

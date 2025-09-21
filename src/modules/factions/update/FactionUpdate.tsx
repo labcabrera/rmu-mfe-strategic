@@ -1,9 +1,12 @@
 import React, { FC, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { Grid } from '@mui/material';
 import { Faction, UpdateFactionDto } from '../../api/faction.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
+import FactionAvatar from '../../shared/avatars/FactionAvatar';
 import FactionUpdateActions from './FactionUpdateActions';
 import FactionUpdateAttributes from './FactionUpdateAttributes';
+import FactionUpdateResume from './FactionUpdateResume';
 
 const FactionUpdate: FC = () => {
   const location = useLocation();
@@ -22,8 +25,16 @@ const FactionUpdate: FC = () => {
   return (
     <>
       <FactionUpdateActions formData={formData} game={game} faction={faction} />
-      <FactionUpdateAttributes formData={formData} setFormData={setFormData} />
-      <pre>{JSON.stringify(formData, null, 2)}</pre>
+      <Grid container spacing={5}>
+        <Grid size={2}>
+          <FactionAvatar faction={faction} size={300} />
+          <FactionUpdateResume formData={formData} setFormData={setFormData} />
+        </Grid>
+        <Grid size={7}>
+          <FactionUpdateAttributes formData={formData} setFormData={setFormData} />
+        </Grid>
+      </Grid>
+      {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
     </>
   );
 };
