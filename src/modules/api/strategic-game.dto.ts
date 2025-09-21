@@ -7,6 +7,7 @@ export interface StrategicGame {
   options: StrategicGameOptions;
   powerLevel: StrategicGamePowerLevel;
   description?: string;
+  shortDescription?: string;
   imageUrl?: string;
   owner: string;
 }
