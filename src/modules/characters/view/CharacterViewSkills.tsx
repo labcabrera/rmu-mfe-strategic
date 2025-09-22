@@ -16,6 +16,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../api/character';
 import { Character, CharacterSkill } from '../../api/character.dto';
@@ -35,75 +36,63 @@ interface Profession {
   professionalSkills: string[];
 }
 
-const CharacterViewSkillsAdd: FC<{
+const CharacterViewSkills: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>>;
-  setErrorMessage?: (msg: string) => void;
-  setDisplayError?: (v: boolean) => void;
-}> = ({ character, setCharacter, setErrorMessage, setDisplayError }) => {
-  const [skill, setSkill] = useState<any>(null);
-  const [formData, setFormData] = useState(addSkillFormDataTemplate);
-
-  const handleSkillChange = (value: string, skillObj: any) => {
-    setFormData({ ...formData, skillId: value, specialization: skillObj?.specialization });
-    setSkill(skillObj);
-  };
-
-  const handleSpecializationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, specialization: e.target.value });
-  };
-
-  const isSpecializationAllowed = () => {
-    return skill && skill.specializations && skill.specializations.length > 0;
-  };
-
-  const handleAddSkill = async () => {
-    try {
-      const updated = await addSkill(character.id, formData);
-      setCharacter(updated);
-      setFormData(addSkillFormDataTemplate);
-    } catch (error: any) {
-      setErrorMessage && setErrorMessage(error.message);
-      setDisplayError && setDisplayError(true);
-    }
-  };
-
-  if (!character) return <>...</>;
+  setCharacter: React.Dispatch<React.SetStateAction<Character>>;
+  profession?: Profession;
+}> = ({ character, setCharacter, profession }) => {
+  const { t } = useTranslation();
 
   return (
-    <TableRow key="newSkill" sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-      <TableCell component="th" scope="row">
-        <SelectSkill i18n="add-skill" value={formData.skillId} onChange={handleSkillChange} />
-      </TableCell>
-      <TableCell component="th" scope="row">
-        {isSpecializationAllowed() ? (
-          <TextField label="Specialization" value={formData.specialization} onChange={handleSpecializationChange} />
-        ) : null}
-      </TableCell>
-      <TableCell align="right"></TableCell>
-      <TableCell align="right"></TableCell>
-      <TableCell align="right"></TableCell>
-      <TableCell align="right"></TableCell>
-      <TableCell align="right"></TableCell>
-      <TableCell align="right"></TableCell>
-      <TableCell align="right"></TableCell>
-      <TableCell align="right"></TableCell>
-      <TableCell align="left">
-        <IconButton aria-label="add" onClick={handleAddSkill}>
-          <AddCircleOutlineIcon />
-        </IconButton>
-      </TableCell>
-    </TableRow>
+    <Grid container spacing={2}>
+      <Grid size={12}>
+        <Typography color="secondary" variant="h6">
+          {t('skills')}
+        </Typography>
+      </Grid>
+      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell align="left">{t('skill')}</TableCell>
+            <TableCell align="left">Specialization</TableCell>
+            <TableCell align="left">Stats</TableCell>
+            <TableCell align="right">Dev</TableCell>
+            <TableCell align="right">Ranks</TableCell>
+            <TableCell align="right">Rank bonus</TableCell>
+            <TableCell align="right">Stats</TableCell>
+            <TableCell align="right">Racial</TableCell>
+            <TableCell align="right">Professional</TableCell>
+            <TableCell align="right">Custom</TableCell>
+            <TableCell align="right">Total</TableCell>
+            <TableCell align="left">
+              Development points: {character.experience.availableDevelopmentPoints} /{' '}
+              {character.experience.developmentPoints}
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {character?.skills.map((item) => (
+            <CharacterViewSkillsEntry
+              key={item.skillId}
+              skill={item}
+              character={character}
+              setCharacter={setCharacter}
+              profession={profession}
+            />
+          ))}
+          <CharacterViewSkillsAdd character={character} setCharacter={setCharacter} />
+        </TableBody>
+      </Table>
+    </Grid>
   );
 };
 
 const CharacterViewSkillsEntry: FC<{
   character: Character;
-  setCharacter: React.Dispatch<React.SetStateAction<Character>>;
+  setCharacter: Dispatch<SetStateAction<Character>>;
   skill: CharacterSkill;
   profession?: Profession;
 }> = ({ character, setCharacter, skill, profession }) => {
-  const { t } = useTranslation();
   const { showError } = useError();
 
   const handleLevelUp = () => {
@@ -181,6 +170,10 @@ const CharacterViewSkillsEntry: FC<{
     return skillObj.professional && skillObj.professional.includes('professional');
   };
 
+  const getStatistics = (skill: CharacterSkill) => {
+    return skill.statistics && skill.statistics.length > 0 ? skill.statistics.join('/').toUpperCase() : '-';
+  };
+
   return (
     <TableRow key={skill.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
       <TableCell component="th" scope="row">
@@ -188,9 +181,9 @@ const CharacterViewSkillsEntry: FC<{
         {isProfessionalSkill(skill) ? ' *' : null}
       </TableCell>
       <TableCell component="th" scope="row">
-        {skill.category}
+        {skill.specialization || '-'}
       </TableCell>
-      <TableCell align="right">{skill.statistics?.join('/') || '-'}</TableCell>
+      <TableCell align="left">{getStatistics(skill)}</TableCell>
       <TableCell align="right">{skill.development?.join(' / ') || '-'}</TableCell>
       <TableCell align="right">
         {skill.ranks}
@@ -251,54 +244,65 @@ const CharacterViewSkillsEntry: FC<{
   );
 };
 
-const CharacterViewSkills: FC<{
+const CharacterViewSkillsAdd: FC<{
   character: Character;
-  setCharacter: React.Dispatch<React.SetStateAction<Character>>;
-  profession?: Profession;
-}> = ({ character, setCharacter, profession }) => {
-  const { t } = useTranslation();
+  setCharacter: Dispatch<SetStateAction<Character>>;
+  setErrorMessage?: (msg: string) => void;
+  setDisplayError?: (v: boolean) => void;
+}> = ({ character, setCharacter, setErrorMessage, setDisplayError }) => {
+  const [skill, setSkill] = useState<any>(null);
+  const [formData, setFormData] = useState(addSkillFormDataTemplate);
+
+  const handleSkillChange = (value: string, skillObj: any) => {
+    setFormData({ ...formData, skillId: value, specialization: skillObj?.specialization });
+    setSkill(skillObj);
+  };
+
+  const handleSpecializationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, specialization: e.target.value });
+  };
+
+  const isSpecializationAllowed = () => {
+    return skill && skill.specializations && skill.specializations.length > 0;
+  };
+
+  const handleAddSkill = async () => {
+    try {
+      const updated = await addSkill(character.id, formData);
+      setCharacter(updated);
+      setFormData(addSkillFormDataTemplate);
+    } catch (error: any) {
+      setErrorMessage && setErrorMessage(error.message);
+      setDisplayError && setDisplayError(true);
+    }
+  };
+
+  if (!character) return <>...</>;
 
   return (
-    <Grid container spacing={2}>
-      <Grid size={12}>
-        <Typography color="secondary" variant="h6">
-          {t('skills')}
-        </Typography>
-      </Grid>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell align="left">Skill</TableCell>
-            <TableCell align="left">Specialization</TableCell>
-            <TableCell align="right">Stats</TableCell>
-            <TableCell align="right">Dev</TableCell>
-            <TableCell align="right">Ranks</TableCell>
-            <TableCell align="right">Rank bonus</TableCell>
-            <TableCell align="right">Stats</TableCell>
-            <TableCell align="right">Racial</TableCell>
-            <TableCell align="right">Professional</TableCell>
-            <TableCell align="right">Custom</TableCell>
-            <TableCell align="right">Total</TableCell>
-            <TableCell align="left">
-              Development points: {character.experience.availableDevelopmentPoints} /{' '}
-              {character.experience.developmentPoints}
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {character?.skills.map((item) => (
-            <CharacterViewSkillsEntry
-              key={item.skillId}
-              skill={item}
-              character={character}
-              setCharacter={setCharacter}
-              profession={profession}
-            />
-          ))}
-          <CharacterViewSkillsAdd character={character} setCharacter={setCharacter} />
-        </TableBody>
-      </Table>
-    </Grid>
+    <TableRow key="newSkill" sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+      <TableCell component="th" scope="row">
+        <SelectSkill i18n="add-skill" value={formData.skillId} onChange={handleSkillChange} />
+      </TableCell>
+      <TableCell component="th" scope="row">
+        {isSpecializationAllowed() ? (
+          <TextField label="Specialization" value={formData.specialization} onChange={handleSpecializationChange} />
+        ) : null}
+      </TableCell>
+      <TableCell align="right"></TableCell>
+      <TableCell align="right"></TableCell>
+      <TableCell align="right"></TableCell>
+      <TableCell align="right"></TableCell>
+      <TableCell align="right"></TableCell>
+      <TableCell align="right"></TableCell>
+      <TableCell align="right"></TableCell>
+      <TableCell align="right"></TableCell>
+      <TableCell align="left">
+        <IconButton aria-label="add" onClick={handleAddSkill}>
+          <AddCircleOutlineIcon />
+        </IconButton>
+      </TableCell>
+    </TableRow>
   );
 };
 

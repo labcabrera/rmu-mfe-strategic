@@ -42,7 +42,7 @@ const CharacterViewInfo: FC<{
               image={`/static/images/generic/realm.png`}
             />
             <TextCard
-              value={t(character.info.sizeId)}
+              value={t(`size-${character.info.sizeId}`)}
               subtitle={t('size')}
               image={`/static/images/generic/race-size.png`}
             />
@@ -58,11 +58,13 @@ const CharacterViewInfo: FC<{
               image={`/static/images/generic/character-weight.png`}
               applyColor={false}
             />
-            <TextCard
-              value={`${character.hp.current} / ${character.hp.max}`}
-              subtitle={t('hit-points')}
-              image={`/static/images/generic/hp.png`}
-            />
+            <Badge color="warning" badgeContent={character.hp.max} invisible={character.hp.max > 0}>
+              <TextCard
+                value={`${character.hp.current} / ${character.hp.max}`}
+                subtitle={t('hit-points')}
+                image={`/static/images/generic/hp.png`}
+              />
+            </Badge>
           </Box>
         </Grid>
         <Grid size={12}>
@@ -100,6 +102,21 @@ const CharacterViewInfo: FC<{
                 image={`/static/images/generic/trait-combat.png`}
               />
             </Badge>
+          </Box>
+        </Grid>
+        <Grid size={8}>
+          <Typography color="secondary" variant="h6">
+            {t('stats')}
+          </Typography>
+          <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+            {stats.map((stat) => (
+              <NumericCard
+                key={stat}
+                value={character.statistics[stat].totalBonus}
+                subtitle={t(stat)}
+                image={`/static/images/generic/stat-${stat}.png`}
+              />
+            ))}
           </Box>
         </Grid>
         <Grid size={12}>
@@ -159,22 +176,7 @@ const CharacterViewInfo: FC<{
             />
           </Box>
         </Grid>
-        <Grid size={12}>
-          <Typography color="secondary" variant="h6">
-            {t('stats')}
-          </Typography>
-          <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
-            {stats.map((stat) => (
-              <NumericCard
-                key={stat}
-                value={character.statistics[stat].totalBonus}
-                subtitle={t(stat)}
-                image={`/static/images/generic/stat-${stat}.png`}
-              />
-            ))}
-          </Box>
-        </Grid>
-        <Grid size={12}>
+        <Grid size={8}>
           <Typography color="secondary" variant="h6">
             {t('resistances')}
           </Typography>
