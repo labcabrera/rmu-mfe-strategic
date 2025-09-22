@@ -23,20 +23,20 @@ const CharacterUpdateAttributes: FC<{
       </Grid>
       <Grid size={4}>
         <NumericInput
-          label={t('weight')}
-          name="weight"
-          value={formData.info?.weight || 0}
-          onChange={(e) => setFormData({ ...formData, info: { ...formData.info, weight: e } })}
+          label={t('height')}
+          name="height"
+          value={formData.info?.height || 0}
+          onChange={(e) => setFormData({ ...formData, info: { ...formData.info, height: e } })}
           allowNegatives={false}
           maxFractionDigits={2}
         />
       </Grid>
       <Grid size={4}>
         <NumericInput
-          label={t('height')}
-          name="height"
-          value={formData.info?.height || 0}
-          onChange={(e) => setFormData({ ...formData, info: { ...formData.info, height: e } })}
+          label={t('weight')}
+          name="weight"
+          value={formData.info?.weight || 0}
+          onChange={(e) => setFormData({ ...formData, info: { ...formData.info, weight: e } })}
           allowNegatives={false}
           maxFractionDigits={2}
         />

@@ -1,15 +1,26 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Grid, TextField, Typography } from '@mui/material';
+import { Box, Grid, TextField, Typography } from '@mui/material';
+import { t } from 'i18next';
 import { Character } from '../../api/character.dto';
+import NumericCard from '../../shared/cards/NumericCard';
+import TextCard from '../../shared/cards/TextCard';
 import PenaltyTextField from '../../shared/inputs/PenaltyTextField';
 
-interface CharacterViewEquipmentInfoProps {
+const CharacterViewEquipmentInfo: React.FC<{
   character: Character;
-}
+}> = ({ character }) => {
+  if (!character) return <div>Loading...</div>;
 
-const CharacterViewEquipmentInfo: React.FC<CharacterViewEquipmentInfoProps> = ({ character }) => {
-  const { t } = useTranslation();
+  const getArmorManeuverSkill = (): number | undefined => {
+    return character.skills.find((s) => s.skillId === 'armor-maneuver')?.totalBonus || undefined;
+  };
+
+  const getArmorType = () => {
+    const armor = character.defense.armor;
+    if (!armor) return null;
+    if (armor.at) return t(armor.at);
+    return `${armor.headAt} / ${armor.bodyAt} / ${armor.armsAt} / ${armor.legsAt}`;
+  };
 
   return (
     <Grid container spacing={2}>
@@ -18,92 +29,48 @@ const CharacterViewEquipmentInfo: React.FC<CharacterViewEquipmentInfoProps> = ({
           {t('equipment-info')}
         </Typography>
       </Grid>
-      <Grid size={6}>
-        <TextField value={character.equipment.weight} variant="standard" fullWidth />
-      </Grid>
-      <Grid size={6}></Grid>
-      <Grid size={6}>
-        <PenaltyTextField
-          value={character.equipment.maneuverPenalty}
-          i18nLabel="maneuver-penalty"
-          onChange={undefined}
-        />
-      </Grid>
-      <Grid size={6}>
-        <PenaltyTextField
-          value={character.equipment.baseManeuverPenalty}
-          i18nLabel="base-maneuver-penalty"
-          onChange={undefined}
-        />
-      </Grid>
-      <Grid size={6}>
-        <PenaltyTextField value={character.equipment.rangedPenalty} i18nLabel="ranged-penalty" onChange={undefined} />
-      </Grid>
-      <Grid size={6}>
-        <PenaltyTextField
-          value={character.equipment.perceptionPenalty}
-          i18nLabel="perception-penalty"
-          onChange={undefined}
-        />
-      </Grid>
-      <Grid size={6}>
-        <TextField
-          label={t('movement-base-difficulty')}
-          variant="standard"
-          name="movement-base-difficulty"
-          value={t(`difficulty-${character.equipment.movementBaseDifficulty}`)}
-          fullWidth
-        />
-      </Grid>
       <Grid size={12}>
-        <Typography variant="h6" color="primary">
-          {t('armor')}
-        </Typography>
+        <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+          <TextCard value={getArmorType()} subtitle={t('armor-type')} image={`/static/images/generic/armor.png`} />
+          <NumericCard
+            value={getArmorManeuverSkill()}
+            subtitle={t('armor-maneuver-skill')}
+            image={`/static/images/generic/carried-weight.png`}
+          />
+          <NumericCard
+            value={character.equipment.weight}
+            subtitle={t('carried-weight')}
+            image={`/static/images/generic/carried-weight.png`}
+            applyColor={false}
+          />
+          <NumericCard value={0} subtitle={t('weight-penalty')} image={`/static/images/generic/weight-penalty.png`} />
+          <NumericCard
+            value={character.equipment.maneuverPenalty}
+            subtitle={t('maneuver-penalty')}
+            image={`/static/images/generic/maneuver-penalty.png`}
+          />
+          <NumericCard
+            value={character.equipment.baseManeuverPenalty}
+            subtitle={t('base-maneuver-penalty')}
+            image={`/static/images/generic/maneuver-penalty.png`}
+          />
+          <TextCard
+            value={t(`difficulty-${character.equipment.movementBaseDifficulty}`)}
+            subtitle={t('movement-base-difficulty')}
+            image={`/static/images/generic/maneuver-penalty.png`}
+          />
+          <NumericCard
+            value={character.equipment.rangedPenalty}
+            subtitle={t('ranged-penalty')}
+            image={`/static/images/generic/armor-ranged-penalty.png`}
+          />
+          <NumericCard
+            value={character.equipment.perceptionPenalty}
+            subtitle={t('perception-penalty')}
+            image={`/static/images/generic/armor-perception-penalty.png`}
+          />
+        </Box>
       </Grid>
-      {character.defense.armor.at ? (
-        <Grid size={6}>
-          <TextField label={t('at')} variant="standard" name="at" value={character.defense.armor.at} fullWidth />
-        </Grid>
-      ) : (
-        <>
-          <Grid size={6}>
-            <TextField
-              label={t('body-at')}
-              variant="standard"
-              name="body-at"
-              value={character.defense.armor.bodyAt}
-              fullWidth
-            />
-          </Grid>
-          <Grid size={6}>
-            <TextField
-              label={t('head-at')}
-              variant="standard"
-              name="head-at"
-              value={character.defense.armor.headAt}
-              fullWidth
-            />
-          </Grid>
-          <Grid size={6}>
-            <TextField
-              label={t('arms-at')}
-              variant="standard"
-              name="arms-at"
-              value={character.defense.armor.armsAt}
-              fullWidth
-            />
-          </Grid>
-          <Grid size={6}>
-            <TextField
-              label={t('legs-at')}
-              variant="standard"
-              name="legs-at"
-              value={character.defense.armor.legsAt}
-              fullWidth
-            />
-          </Grid>
-        </>
-      )}
     </Grid>
   );
 };

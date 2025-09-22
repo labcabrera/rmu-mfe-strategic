@@ -50,11 +50,13 @@ const CharacterViewInfo: FC<{
               value={character.info.height}
               subtitle={t('height')}
               image={`/static/images/generic/character-height.png`}
+              applyColor={false}
             />
             <NumericCard
               value={character.info.weight}
               subtitle={t('weight')}
               image={`/static/images/generic/character-weight.png`}
+              applyColor={false}
             />
             <TextCard
               value={`${character.hp.current} / ${character.hp.max}`}

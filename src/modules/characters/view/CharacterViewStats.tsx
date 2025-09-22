@@ -62,7 +62,7 @@ const CharacterViewStats: FC<CharacterViewStatsProps> = ({ character }) => {
       <Typography variant="h6" color="primary">
         {t('statistics')}
       </Typography>
-      <Table sx={{ minWidth: 650 }} aria-label="stats table">
+      <Table sx={{ minWidth: 650, maxWidth: 800 }} aria-label="stats table">
         <TableHead>
           <TableRow>
             <TableCell align="left">Stat</TableCell>

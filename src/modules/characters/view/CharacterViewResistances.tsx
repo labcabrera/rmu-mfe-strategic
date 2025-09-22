@@ -22,7 +22,7 @@ const CharacterViewResistances: FC<{
       <Typography variant="h6" color="primary">
         {t('resistances')}
       </Typography>
-      <Table sx={{ minWidth: 650 }} aria-label="stats table">
+      <Table sx={{ minWidth: 650, maxWidth: 800 }} aria-label="stats table">
         <TableHead>
           <TableRow>
             <TableCell align="left">{t('resistance')}</TableCell>
