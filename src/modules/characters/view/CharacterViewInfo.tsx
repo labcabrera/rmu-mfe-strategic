@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { Box, Grid, Typography } from '@mui/material';
+import { Badge, Box, Grid, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { Character, stats } from '../../api/character.dto';
 import NumericCard from '../../shared/cards/NumericCard';
@@ -68,11 +68,18 @@ const CharacterViewInfo: FC<{
             {t('experience')}
           </Typography>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
-            <NumericCard
-              value={character.experience.level}
-              subtitle={t('current-level')}
-              image={`/static/images/generic/experience.png`}
-            />
+            <Badge
+              color="warning"
+              badgeContent={`+${character.experience.availableLevel - character.experience.level}`}
+              invisible={character.experience.availableLevel <= character.experience.level}
+            >
+              <NumericCard
+                value={character.experience.level}
+                subtitle={t('current-level')}
+                image={`/static/images/generic/experience.png`}
+                applyColor={false}
+              />
+            </Badge>
             <NumericCard
               value={character.experience.xp}
               subtitle={t('xp')}
@@ -80,11 +87,17 @@ const CharacterViewInfo: FC<{
               applyColor={false}
               applyFormat={true}
             />
-            <TextCard
-              value={`${character.experience.developmentPoints} / ${character.experience.availableDevelopmentPoints}`}
-              subtitle={t('development-points')}
-              image={`/static/images/generic/trait-combat.png`}
-            />
+            <Badge
+              color="warning"
+              badgeContent={`+${character.experience.availableDevelopmentPoints}`}
+              invisible={character.experience.availableDevelopmentPoints < 1}
+            >
+              <TextCard
+                value={`${character.experience.availableDevelopmentPoints} / ${character.experience.developmentPoints}`}
+                subtitle={t('development-points')}
+                image={`/static/images/generic/trait-combat.png`}
+              />
+            </Badge>
           </Box>
         </Grid>
         <Grid size={12}>

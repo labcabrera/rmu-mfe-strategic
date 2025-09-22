@@ -2,9 +2,13 @@ export const stats = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'
 
 export interface Character {
   id: string;
+  gameId: string;
+  factionId: string;
   name: string;
-  raceId: string;
-  sizeId: string;
+  info: CharacterInfo;
+  roleplay: CharacterRoleplay;
+  experience: CharacterExperience;
+  statistics: CharacterStatistics;
   resistances: CharacterResistance[];
   skills: CharacterSkill[];
   items: CharacterItem[];
@@ -12,7 +16,36 @@ export interface Character {
   [key: string]: any;
 }
 
-export interface Roleplay {
+export interface CreateCharacterDto extends Omit<Character, 'items'> {}
+
+export interface UpdateCharacterDto {
+  name: string | undefined;
+  description: string | undefined;
+  info:
+    | {
+        weight: number | undefined;
+        height: number | undefined;
+      }
+    | undefined;
+  roleplay:
+    | {
+        gender: string | undefined;
+        age: number | undefined;
+      }
+    | undefined;
+}
+
+export interface CharacterInfo {
+  raceId: string;
+  raceName: string;
+  professionId: string;
+  sizeId: string;
+  realmType: string;
+  height: number;
+  weight: number;
+}
+
+export interface CharacterRoleplay {
   gender: string;
   age: number;
 }
@@ -77,10 +110,15 @@ export interface ArmorInfo {
 export interface Stat {
   potential: number;
   temporary: number;
+  bonus: number;
   racial: number | undefined;
+  custom: number;
+  totalBonus: number;
 }
 
-export type Statistics = Record<string, Stat>;
+export type CharacterStatistics = {
+  [key in (typeof stats)[number]]: Stat;
+};
 
 export interface CharacterResistance {
   resistance: string;
@@ -91,15 +129,11 @@ export interface CharacterResistance {
   totalBonus: number;
 }
 
-export interface CreateCharacterDto {
-  gameId: string;
-  factionId: string;
-  info: RaceInfo;
-  statistics: Statistics;
-  name: string;
-  description: string;
-  roleplay: Roleplay;
+export interface CharacterExperience {
   level: number;
+  availableLevel: number;
+  xp: number;
+  developmentPoints: number;
+  availableDevelopmentPoints: number;
   weaponDevelopment: string[];
-  [key: string]: any;
 }

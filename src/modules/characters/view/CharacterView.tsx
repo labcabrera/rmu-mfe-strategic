@@ -67,7 +67,7 @@ const CharacterView: FC = () => {
         <Grid size={2}>
           <CharacterViewResume character={character} strategicGame={strategicGame} faction={faction} />
         </Grid>
-        <Grid size={7}>
+        <Grid size={9}>
           <CharacterViewTabs
             character={character}
             setCharacter={setCharacter}
@@ -75,14 +75,6 @@ const CharacterView: FC = () => {
             faction={faction}
             profession={profession}
           />
-        </Grid>
-        <Grid size={3}>
-          <Typography variant="h6" color="primary">
-            {t('description')}
-          </Typography>
-          <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
-            {character.description}
-          </Typography>
         </Grid>
       </Grid>
     </>
