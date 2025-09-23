@@ -27,23 +27,28 @@ const FactionCreateActions: FC<{
     <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center" sx={{ minHeight: 80 }}>
       <Box>
         <Breadcrumbs aria-label="breadcrumb">
-          <Link underline="hover" color="inherit" href="/">
+          <Link underline="hover" color="primary" href="/">
             {t('home')}
           </Link>
-          <Link component={RouterLink} color="inherit" to="/strategic/games">
+          <Link component={RouterLink} color="primary" underline="hover" to="/strategic/games">
             {t('strategic')}
           </Link>
-          <Link component={RouterLink} color="inherit" to="/strategic/games">
+          <Link component={RouterLink} color="primary" underline="hover" to="/strategic/games">
             {t('games')}
           </Link>
-          <Link component={RouterLink} color="inherit" to={`/strategic/games/view/${strategicGame.id}`}>
+          <Link
+            component={RouterLink}
+            color="primary"
+            underline="hover"
+            to={`/strategic/games/view/${strategicGame.id}`}
+          >
             {strategicGame.name}
           </Link>
           <span>{t('create-faction')}</span>
         </Breadcrumbs>
       </Box>
       <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>
-        <IconButton onClick={handleCreate}>
+        <IconButton onClick={handleCreate} color="primary">
           <SaveIcon />
         </IconButton>
       </Stack>

@@ -27,7 +27,7 @@ const StrategicGameViewFactions: FC<{
           <Typography variant="h6" color="primary" display="inline">
             {t('factions')}
           </Typography>
-          <IconButton onClick={handleCreateFaction} sx={{ ml: 1 }}>
+          <IconButton onClick={handleCreateFaction} sx={{ ml: 1 }} color="primary">
             <AddCircleIcon />
           </IconButton>
         </Box>

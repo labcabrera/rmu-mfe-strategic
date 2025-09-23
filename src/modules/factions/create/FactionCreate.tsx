@@ -1,7 +1,11 @@
 import React, { FC, useState } from 'react';
 import { useSearchParams, useLocation } from 'react-router-dom';
+import { Grid, TextField } from '@mui/material';
+import { t } from 'i18next';
 import { CreateFactionDto } from '../../api/faction.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
+import FactionAvatar from '../../shared/avatars/FactionAvatar';
+import GenericAvatar from '../../shared/avatars/GenericAvatar';
 import FactionCreateActions from './FactionCreateActions';
 import FactionCreateAttributes from './FactionCreateAttributes';
 
@@ -24,7 +28,32 @@ const FactionCreate: FC = () => {
   return (
     <>
       <FactionCreateActions formData={formData} strategicGame={strategicGame} />
-      <FactionCreateAttributes formData={formData} setFormData={setFormData} />
+      <Grid container spacing={5} sx={{ mb: 5 }}>
+        <Grid size={2}>
+          <GenericAvatar imageUrl="/static/images/avatars/avatar-001.png" size={300} />
+          <TextField
+            label={t('faction-name')}
+            value={formData.name}
+            variant="standard"
+            fullWidth
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          />
+          <TextField
+            label={t('description')}
+            variant="standard"
+            name="description"
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            multiline
+            rows={12}
+            maxRows={12}
+            fullWidth
+          />
+        </Grid>
+        <Grid size={7}>
+          <FactionCreateAttributes formData={formData} setFormData={setFormData} />
+        </Grid>
+      </Grid>
       {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
     </>
   );

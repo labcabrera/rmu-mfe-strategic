@@ -55,23 +55,23 @@ const StrategicGameViewActions: FC<{
       <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center" sx={{ minHeight: 80 }}>
         <Box>
           <Breadcrumbs aria-label="breadcrumb">
-            <Link color="inherit" href="/">
+            <Link underline="hover" color="primary" href="/">
               {t('home')}
             </Link>
-            <Link component={RouterLink} color="inherit" to="/strategic/games">
+            <Link component={RouterLink} underline="hover" color="primary" to="/strategic/games">
               {t('strategic')}
             </Link>
-            <Link component={RouterLink} color="inherit" to="/strategic/games">
+            <Link component={RouterLink} underline="hover" color="primary" to="/strategic/games">
               {t('games')}
             </Link>
             <span>{strategicGame.name}</span>
           </Breadcrumbs>
         </Box>
         <Stack direction="row" spacing={2}>
-          <IconButton onClick={handleEditClick}>
+          <IconButton onClick={handleEditClick} size="large" color="primary">
             <EditIcon />
           </IconButton>
-          <IconButton onClick={handleDeleteClick}>
+          <IconButton onClick={handleDeleteClick} size="large" color="primary">
             <DeleteIcon />
           </IconButton>
         </Stack>

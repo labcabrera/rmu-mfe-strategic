@@ -33,7 +33,7 @@ const StrategicGameViewTacticalGames: React.FC<StrategicGameViewTacticalGamesPro
           <Typography variant="h6" color="primary" display="inline">
             {t('tactical-games')}
           </Typography>
-          <IconButton onClick={handleNewTacticalGame} sx={{ ml: 1 }}>
+          <IconButton onClick={handleNewTacticalGame} color="primary" sx={{ ml: 1 }}>
             <AddCircleIcon />
           </IconButton>
         </Box>

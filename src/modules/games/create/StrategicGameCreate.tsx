@@ -51,7 +51,7 @@ const StrategicGameCreate: FC = () => {
           <StrategicGameCreateAttributes formData={formData} setFormData={setFormData} realms={realms} />
         </Grid>
       </Grid>
-      <pre>{JSON.stringify(formData, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
     </>
   );
 };

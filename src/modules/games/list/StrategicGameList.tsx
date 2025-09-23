@@ -1,7 +1,8 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Link, Grid, List, Box, Typography } from '@mui/material';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { Link, Grid, Box, Typography, IconButton } from '@mui/material';
 import { useError } from '../../../ErrorContext';
 import { fetchStrategicGames } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
@@ -38,9 +39,14 @@ const StrategicGameList: FC = () => {
       <StrategicGameListActions />
       <Grid container spacing={2} mb={2} alignItems="center">
         <Grid size={12}>
-          <Typography variant="h6" color="primary">
-            {t('strategic-games')}
-          </Typography>
+          <Box display="flex" alignItems="center">
+            <Typography variant="h6" color="primary" display="inline">
+              {t('strategic-games')}
+            </Typography>
+            <IconButton onClick={handleNewGame} sx={{ ml: 1 }} color="primary">
+              <AddCircleIcon />
+            </IconButton>
+          </Box>
         </Grid>
         <Grid size={12}>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
@@ -49,15 +55,8 @@ const StrategicGameList: FC = () => {
             ))}
           </Box>
         </Grid>
+        {strategicGames.length === 0 && <p>No games found.</p>}
       </Grid>
-      {strategicGames.length === 0 ? (
-        <p>
-          No games found.{' '}
-          <Link component="button" onClick={handleNewGame}>
-            {t('create-new')}
-          </Link>
-        </p>
-      ) : null}
     </>
   );
 };
