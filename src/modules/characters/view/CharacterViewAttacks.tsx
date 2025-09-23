@@ -23,10 +23,8 @@ const CharacterViewAttacks: FC<{
           <TableBody>
             {character.attacks.map((row) => (
               <TableRow key={row.name}>
-                <TableCell component="th" scope="row">
-                  {row.attackName}
-                </TableCell>
-                <TableCell align="left">{row.attackTable}</TableCell>
+                <TableCell align="left">{t(row.attackName)}</TableCell>
+                <TableCell align="left">{t(row.attackTable)}</TableCell>
                 <TableCell align="left">{row.fumbleTable}</TableCell>
                 <TableCell align="left">{row.sizeAdjustment}</TableCell>
                 <TableCell align="left">{row.fumble}</TableCell>

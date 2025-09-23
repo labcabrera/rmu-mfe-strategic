@@ -30,11 +30,21 @@ const CharacterViewStatsEntry: FC<{
     return 'inherit';
   };
 
+  const getStatColor = (value: number) => {
+    if (value > 75) return green;
+    if (value < 45) return red;
+    return 'inherit';
+  };
+
   return (
     <TableRow key={statKey} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
       <TableCell>{t(statName)}</TableCell>
-      <TableCell align="right">{character.statistics[statKey].potential}</TableCell>
-      <TableCell align="right">{character.statistics[statKey].temporary}</TableCell>
+      <TableCell align="right" sx={{ color: getStatColor(character.statistics[statKey].potential) }}>
+        {character.statistics[statKey].potential}
+      </TableCell>
+      <TableCell align="right" sx={{ color: getStatColor(character.statistics[statKey].temporary) }}>
+        {character.statistics[statKey].temporary}
+      </TableCell>
       <TableCell align="right" sx={{ color: getColor(character.statistics[statKey].bonus) }}>
         {character.statistics[statKey].bonus}
       </TableCell>
@@ -51,11 +61,9 @@ const CharacterViewStatsEntry: FC<{
   );
 };
 
-interface CharacterViewStatsProps {
+const CharacterViewStats: FC<{
   character: Character;
-}
-
-const CharacterViewStats: FC<CharacterViewStatsProps> = ({ character }) => {
+}> = ({ character }) => {
   const { t } = useTranslation();
   return (
     <>
@@ -63,7 +71,13 @@ const CharacterViewStats: FC<CharacterViewStatsProps> = ({ character }) => {
         {t('statistics')}
       </Typography>
       <Table sx={{ minWidth: 650, maxWidth: 800 }} aria-label="stats table">
-        <TableHead>
+        <TableHead
+          sx={{
+            '& .MuiTableCell-root': {
+              fontWeight: 'bold',
+            },
+          }}
+        >
           <TableRow>
             <TableCell align="left">Stat</TableCell>
             <TableCell align="right">{t('potential')}</TableCell>

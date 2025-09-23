@@ -1,6 +1,7 @@
 import { buildErrorFromResponse } from './api-errors';
 import { Character } from './character.dto';
 import { Item } from './items';
+import { AddSkill } from './skill.dto';
 
 export async function fetchCharacter(characterId: string): Promise<Character> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}`;
@@ -64,7 +65,7 @@ export async function deleteCharacter(characterId: string): Promise<void> {
   }
 }
 
-export async function addSkill(characterId: string, data: any): Promise<Character> {
+export async function addSkill(characterId: string, data: AddSkill): Promise<Character> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/skills`;
   const response = await fetch(url, {
     method: 'POST',

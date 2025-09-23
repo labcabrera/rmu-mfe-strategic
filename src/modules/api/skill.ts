@@ -1,10 +1,5 @@
 import { buildErrorFromResponse } from './api-errors';
-
-export interface Skill {
-  id: string;
-  name: string;
-  [key: string]: any;
-}
+import { Skill } from './skill.dto';
 
 export async function fetchSkills(): Promise<Skill[]> {
   const url = `${process.env.RMU_API_CORE_URL}/skills`;

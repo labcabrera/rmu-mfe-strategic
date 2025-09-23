@@ -1,26 +1,16 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-import {
-  Grid,
-  IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Grid, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../api/character';
 import { Character, CharacterSkill } from '../../api/character.dto';
-import SelectSkill from '../../shared/selects/SelectSkill';
+import { AddSkill, Skill } from '../../api/skill.dto';
+import CharacterAddSkillDialog from './CharacterViewAddSkillDialog';
 
 const addSkillFormDataTemplate = {
   skillId: '',
@@ -38,20 +28,43 @@ interface Profession {
 
 const CharacterViewSkills: FC<{
   character: Character;
-  setCharacter: React.Dispatch<React.SetStateAction<Character>>;
+  setCharacter: Dispatch<SetStateAction<Character>>;
   profession?: Profession;
 }> = ({ character, setCharacter, profession }) => {
-  const { t } = useTranslation();
+  const { showError } = useError();
+  const [openAddSkillDialog, setOpenAddSkillDialog] = useState(false);
+
+  const onSkillAdded = (value: AddSkill) => {
+    addSkill(character.id, value)
+      .then((updatedCharacter) => {
+        setCharacter(updatedCharacter);
+        setOpenAddSkillDialog(false);
+      })
+      .catch((error: any) => {
+        showError(error.message);
+      });
+  };
 
   return (
     <Grid container spacing={2}>
       <Grid size={12}>
-        <Typography color="secondary" variant="h6">
-          {t('skills')}
-        </Typography>
+        <Box display="flex" alignItems="center">
+          <Typography variant="h6" color="primary" display="inline">
+            {t('skills')}
+          </Typography>
+          <IconButton onClick={() => setOpenAddSkillDialog(true)} sx={{ ml: 1 }}>
+            <AddCircleIcon />
+          </IconButton>
+        </Box>
       </Grid>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
+        <TableHead
+          sx={{
+            '& .MuiTableCell-root': {
+              fontWeight: 'bold',
+            },
+          }}
+        >
           <TableRow>
             <TableCell align="left">{t('skill')}</TableCell>
             <TableCell align="left">Specialization</TableCell>
@@ -80,9 +93,14 @@ const CharacterViewSkills: FC<{
               profession={profession}
             />
           ))}
-          <CharacterViewSkillsAdd character={character} setCharacter={setCharacter} />
         </TableBody>
       </Table>
+      <CharacterAddSkillDialog
+        open={openAddSkillDialog}
+        character={undefined}
+        onClose={() => setOpenAddSkillDialog(false)}
+        onSkillAdded={(value) => onSkillAdded(value)}
+      />
     </Grid>
   );
 };
@@ -239,68 +257,6 @@ const CharacterViewSkillsEntry: FC<{
             <StarBorderIcon />
           </IconButton>
         )}
-      </TableCell>
-    </TableRow>
-  );
-};
-
-const CharacterViewSkillsAdd: FC<{
-  character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>>;
-  setErrorMessage?: (msg: string) => void;
-  setDisplayError?: (v: boolean) => void;
-}> = ({ character, setCharacter, setErrorMessage, setDisplayError }) => {
-  const [skill, setSkill] = useState<any>(null);
-  const [formData, setFormData] = useState(addSkillFormDataTemplate);
-
-  const handleSkillChange = (value: string, skillObj: any) => {
-    setFormData({ ...formData, skillId: value, specialization: skillObj?.specialization });
-    setSkill(skillObj);
-  };
-
-  const handleSpecializationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, specialization: e.target.value });
-  };
-
-  const isSpecializationAllowed = () => {
-    return skill && skill.specializations && skill.specializations.length > 0;
-  };
-
-  const handleAddSkill = async () => {
-    try {
-      const updated = await addSkill(character.id, formData);
-      setCharacter(updated);
-      setFormData(addSkillFormDataTemplate);
-    } catch (error: any) {
-      setErrorMessage && setErrorMessage(error.message);
-      setDisplayError && setDisplayError(true);
-    }
-  };
-
-  if (!character) return <>...</>;
-
-  return (
-    <TableRow key="newSkill" sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-      <TableCell component="th" scope="row">
-        <SelectSkill i18n="add-skill" value={formData.skillId} onChange={handleSkillChange} />
-      </TableCell>
-      <TableCell component="th" scope="row">
-        {isSpecializationAllowed() ? (
-          <TextField label="Specialization" value={formData.specialization} onChange={handleSpecializationChange} />
-        ) : null}
-      </TableCell>
-      <TableCell align="right"></TableCell>
-      <TableCell align="right"></TableCell>
-      <TableCell align="right"></TableCell>
-      <TableCell align="right"></TableCell>
-      <TableCell align="right"></TableCell>
-      <TableCell align="right"></TableCell>
-      <TableCell align="right"></TableCell>
-      <TableCell align="right"></TableCell>
-      <TableCell align="left">
-        <IconButton aria-label="add" onClick={handleAddSkill}>
-          <AddCircleOutlineIcon />
-        </IconButton>
       </TableCell>
     </TableRow>
   );
