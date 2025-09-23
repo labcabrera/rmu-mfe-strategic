@@ -1,20 +1,22 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ClearIcon from '@mui/icons-material/Clear';
 import {
+  Box,
   Card,
   CardActions,
   CardContent,
   CardHeader,
   CardMedia,
   Grid,
-  IconButton,
   MenuItem,
   Select,
   Typography,
 } from '@mui/material';
 import { equipItem, unequipItem } from '../../api/character';
 import { Character, CharacterItem } from '../../api/character.dto';
+import AddButton from '../../shared/buttons/AddButton';
+import ClearButton from '../../shared/buttons/ClearButton';
+import EquipmentSlotCard from '../../shared/cards/EquipmentSlotCard';
 
 const slots = ['mainHand', 'offHand', 'body', 'head', 'arms', 'legs'];
 
@@ -23,15 +25,28 @@ const CharacterViewEquipment: FC<{
   setCharacter: Dispatch<SetStateAction<Character>>;
 }> = ({ character, setCharacter }) => {
   const { t } = useTranslation();
+  const [openAddItemDialog, setOpenAddItemDialog] = useState(false);
 
   return (
     <>
-      <Typography variant="h6" color="primary">
-        {t('equipment')}
-      </Typography>
+      <Box display="flex" alignItems="center" sx={{ minHeight: 60 }}>
+        <Typography variant="h6" color="primary" display="inline">
+          {t('equipment')}
+        </Typography>
+        <AddButton onClick={() => setOpenAddItemDialog(true)} />
+      </Box>
       <Grid container spacing={2}>
-        {slots.map((slot) => (
+        {/* {slots.map((slot) => (
           <EquipmentSlot
+            key={slot}
+            character={character}
+            setCharacter={setCharacter}
+            slot={slot}
+            itemId={character.equipment[slot]}
+          />
+        ))} */}
+        {slots.map((slot) => (
+          <EquipmentSlotCard
             key={slot}
             character={character}
             setCharacter={setCharacter}
@@ -101,13 +116,7 @@ const EquipmentSlot: FC<{
     <Card sx={{ maxWidth: maxWidth, minWidth: minWidth, minHeight: minHeight, maxHeight: maxHeight }}>
       <CardHeader
         title={t(slot)}
-        action={
-          item && (
-            <IconButton aria-label="settings" onClick={handleUnequip}>
-              <ClearIcon />
-            </IconButton>
-          )
-        }
+        action={item && <ClearButton onClick={handleUnequip} />}
         sx={{
           '& .MuiCardHeader-title': {
             fontSize: '1rem',

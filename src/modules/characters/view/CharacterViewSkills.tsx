@@ -22,9 +22,7 @@ import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../api/character';
 import { Character, CharacterSkill } from '../../api/character.dto';
-import { AddSkill, Skill } from '../../api/skill.dto';
-import DeleteButton from '../../shared/buttons/DeleteButton';
-import EditButton from '../../shared/buttons/EditButton';
+import { AddSkill } from '../../api/skill.dto';
 import CharacterAddSkillDialog from './CharacterViewAddSkillDialog';
 
 const addSkillFormDataTemplate = {
