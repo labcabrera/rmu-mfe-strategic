@@ -50,6 +50,7 @@ const StrategicGameUpdateActions: FC<{
             color="primary"
             underline="hover"
             to={`/strategic/games/view/${strategicGame.id}`}
+            state={{ strategicGame }}
           >
             {strategicGame.name}
           </Link>
@@ -57,10 +58,10 @@ const StrategicGameUpdateActions: FC<{
         </Breadcrumbs>
       </Box>
       <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>
-        <IconButton onClick={handleCancelClick}>
+        <IconButton onClick={handleCancelClick} size="large" color="primary">
           <CancelIcon />
         </IconButton>
-        <IconButton onClick={updateGame}>
+        <IconButton onClick={updateGame} size="large" color="primary">
           <SaveIcon />
         </IconButton>
       </Stack>

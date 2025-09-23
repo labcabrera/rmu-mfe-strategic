@@ -1,13 +1,11 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
+import { Grid } from '@mui/material';
 import { Character, UpdateCharacterDto } from '../../api/character.dto';
 import { fetchFaction } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import CharacterAvatar from '../../shared/avatars/CharacterAvatar';
 import RaceAvatar from '../../shared/avatars/RaceAvatar';
 import CharacterUpdateActions from './CharacterUpdateActions';
 import CharacterUpdateAttributes from './CharacterUpdateAttributes';
@@ -39,11 +37,6 @@ const CharacterUpdate: React.FC = () => {
     fetchStrategicGame(gameId).then((game: StrategicGame) => setGame(game));
   };
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
   useEffect(() => {
     if (character) {
       bindFaction(character.factionId);
@@ -65,8 +58,8 @@ const CharacterUpdate: React.FC = () => {
           <CharacterUpdateAttributes formData={formData} setFormData={setFormData} />
         </Grid>
       </Grid>
-      <pre>formData: {JSON.stringify(formData, null, 2)}</pre>
-      <pre>character: {JSON.stringify(character, null, 2)}</pre>
+      {/* <pre>formData: {JSON.stringify(formData, null, 2)}</pre>
+      <pre>character: {JSON.stringify(character, null, 2)}</pre> */}
     </>
   );
 };

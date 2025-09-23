@@ -95,7 +95,7 @@ const CharacterViewActions: FC<{
             <Link
               underline="hover"
               component={RouterLink}
-              color="inherit"
+              color="primary"
               to={`/strategic/factions/view/${faction.id}`}
             >
               {faction.name}

@@ -12,8 +12,8 @@ import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 
 const FactionViewActions: FC<{
   faction: Faction;
-  game: StrategicGame;
-}> = ({ faction, game }) => {
+  strategicGame: StrategicGame;
+}> = ({ faction, strategicGame }) => {
   const navigate = useNavigate();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { showError } = useError();
@@ -58,8 +58,13 @@ const FactionViewActions: FC<{
             <Link component={RouterLink} color="primary" underline="hover" to="/strategic/games">
               {t('games')}
             </Link>
-            <Link component={RouterLink} color="primary" underline="hover" to={`/strategic/games/view/${game.id}`}>
-              {game.name}
+            <Link
+              component={RouterLink}
+              color="primary"
+              underline="hover"
+              to={`/strategic/games/view/${strategicGame.id}`}
+            >
+              {strategicGame.name}
             </Link>
             <span>{faction.name}</span>
           </Breadcrumbs>

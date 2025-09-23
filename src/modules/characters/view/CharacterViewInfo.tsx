@@ -32,7 +32,7 @@ const CharacterViewInfo: FC<{
     <>
       <Grid container spacing={2}>
         <Grid size={12}>
-          <Typography variant="h6" color="secondary">
+          <Typography variant="h6" color="primary">
             {t('general')}
           </Typography>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
@@ -68,7 +68,7 @@ const CharacterViewInfo: FC<{
           </Box>
         </Grid>
         <Grid size={12}>
-          <Typography color="secondary" variant="h6">
+          <Typography color="primary" variant="h6">
             {t('experience')}
           </Typography>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
@@ -104,8 +104,8 @@ const CharacterViewInfo: FC<{
             </Badge>
           </Box>
         </Grid>
-        <Grid size={8}>
-          <Typography color="secondary" variant="h6">
+        <Grid size={12}>
+          <Typography color="primary" variant="h6">
             {t('stats')}
           </Typography>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
@@ -120,7 +120,7 @@ const CharacterViewInfo: FC<{
           </Box>
         </Grid>
         <Grid size={12}>
-          <Typography color="secondary" variant="h6">
+          <Typography color="primary" variant="h6">
             {t('defense')}
           </Typography>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
@@ -133,7 +133,7 @@ const CharacterViewInfo: FC<{
           </Box>
         </Grid>
         <Grid size={12}>
-          <Typography color="secondary" variant="h6">
+          <Typography color="primary" variant="h6">
             {t('movement')}
           </Typography>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
@@ -158,7 +158,7 @@ const CharacterViewInfo: FC<{
           </Box>
         </Grid>
         <Grid size={12}>
-          <Typography color="secondary" variant="h6">
+          <Typography color="primary" variant="h6">
             {t('initiative')}
           </Typography>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
@@ -177,7 +177,7 @@ const CharacterViewInfo: FC<{
           </Box>
         </Grid>
         <Grid size={8}>
-          <Typography color="secondary" variant="h6">
+          <Typography color="primary" variant="h6">
             {t('resistances')}
           </Typography>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>

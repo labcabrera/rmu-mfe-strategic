@@ -66,7 +66,7 @@ const FactionView: FC = () => {
 
   return (
     <>
-      <FactionViewActions faction={faction} game={game} />
+      <FactionViewActions faction={faction} strategicGame={game} />
       <Grid container spacing={12}>
         <Grid size={2}>
           <FactionViewResume faction={faction} setFaction={setFaction} game={game} />

@@ -1,6 +1,6 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
-import { Typography } from '@mui/material';
+import { Link as RouterLink, useLocation, useParams } from 'react-router-dom';
+import { Link, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { updateStrategicGame } from '../../api/strategic-game';
@@ -36,8 +36,10 @@ const StrategicGameViewResume: FC<{ game: StrategicGame; setGame: Dispatch<SetSt
       <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
         {t(game.name)}
       </Typography>
-      <Typography variant="h6" sx={{ mt: 2 }}>
-        {t(game.realmName)}
+      <Typography variant="body1" sx={{ mt: 2 }}>
+        <Link component={RouterLink} underline="hover" color="inherit" to={`/core/realms/view/${game.realmId}`}>
+          {game.realmName}
+        </Link>
       </Typography>
       <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
         {game.description}

@@ -6,7 +6,7 @@ const EditButton: FC<{
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
 }> = ({ onClick, disabled = false }) => (
-  <IconButton onClick={onClick} aria-label="edit" disabled={disabled} size="large">
+  <IconButton onClick={onClick} aria-label="edit" disabled={disabled} size="large" color="primary">
     <EditDocumentIcon fontSize="inherit" />
   </IconButton>
 );

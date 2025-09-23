@@ -9,6 +9,8 @@ import { updateCharacter } from '../../api/character';
 import { Character, CreateCharacterDto } from '../../api/character.dto';
 import { Faction } from '../../api/faction.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
+import CancelButton from '../../shared/buttons/CancelButton';
+import SaveButton from '../../shared/buttons/SaveButton';
 
 const CharacterUpdateActions: FC<{
   character: Character;
@@ -43,34 +45,41 @@ const CharacterUpdateActions: FC<{
       <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center" sx={{ minHeight: 80 }}>
         <Box>
           <Breadcrumbs aria-label="breadcrumb">
-            <Link underline="hover" color="inherit" href="/">
+            <Link underline="hover" color="primary" href="/">
               {t('home')}
             </Link>
-            <Link component={RouterLink} color="inherit" to="/strategic/games">
+            <Link component={RouterLink} color="primary" underline="hover" to="/strategic/games">
               {t('strategic')}
             </Link>
-            <Link component={RouterLink} color="inherit" to="/strategic/games">
+            <Link component={RouterLink} color="primary" underline="hover" to="/strategic/games">
               {t('games')}
             </Link>
-            <Link component={RouterLink} color="inherit" to={`/strategic/games/view/${game.id}`}>
+            <Link component={RouterLink} color="primary" underline="hover" to={`/strategic/games/view/${game.id}`}>
               {game.name}
             </Link>
-            <Link component={RouterLink} color="inherit" to={`/strategic/factions/view/${faction.id}`}>
+            <Link
+              component={RouterLink}
+              color="primary"
+              underline="hover"
+              to={`/strategic/factions/view/${faction.id}`}
+            >
               {faction.name}
             </Link>
-            <Link component={RouterLink} color="inherit" to={`/strategic/characters/view/${character.id}`}>
+            <Link
+              component={RouterLink}
+              color="primary"
+              underline="hover"
+              to={`/strategic/characters/view/${character.id}`}
+              state={{ character }}
+            >
               {character.name}
             </Link>
             <span>{t('edit')}</span>
           </Breadcrumbs>
         </Box>
         <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>
-          <IconButton onClick={handleCancel}>
-            <CancelIcon />
-          </IconButton>
-          <IconButton onClick={handleUpdate}>
-            <SaveIcon />
-          </IconButton>
+          <CancelButton onClick={handleCancel} />
+          <SaveButton onClick={handleUpdate} />
         </Stack>
       </Stack>
       <Snackbar
@@ -79,11 +88,11 @@ const CharacterUpdateActions: FC<{
         onClose={handleSnackbarClose}
         message={errorMessage}
         action={
-          <React.Fragment>
-            <IconButton aria-label="close" color="inherit" sx={{ p: 0.5 }} onClick={handleSnackbarClose}>
+          <>
+            <IconButton aria-label="close" color="primary" sx={{ p: 0.5 }} onClick={handleSnackbarClose}>
               <CloseIcon />
             </IconButton>
-          </React.Fragment>
+          </>
         }
       />
     </>

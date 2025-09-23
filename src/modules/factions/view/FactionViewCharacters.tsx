@@ -31,7 +31,7 @@ const FactionViewCharacters: FC<FactionViewCharactersProps> = ({ faction, charac
         <Typography variant="h6" color="primary" display="inline">
           {t('characters')}
         </Typography>
-        <IconButton onClick={handleCreate} sx={{ ml: 1 }}>
+        <IconButton onClick={handleCreate} sx={{ ml: 1 }} color="primary" aria-label="add">
           <AddCircleIcon />
         </IconButton>
       </Box>
