@@ -17,8 +17,8 @@ const CharacterUpdateAttributes: FC<{
   return (
     <Grid container spacing={2}>
       <Grid size={12}>
-        <Typography variant="h6" gutterBottom>
-          {t('character-info')}
+        <Typography component="h6" gutterBottom color="primary">
+          {t('information')}
         </Typography>
       </Grid>
       <Grid size={4}>

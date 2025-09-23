@@ -20,15 +20,15 @@ const CharacterViewResume: FC<{ character: Character; strategicGame: StrategicGa
       <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
         {character.name}
       </Typography>
-      <Typography variant="h6" sx={{ mt: 2 }}>
+      <Typography variant="body1" sx={{ mt: 2 }}>
         {character.info.raceName} - {t(character.info.professionId)} - {character.experience.availableLevel}
       </Typography>
-      <Typography variant="h6" sx={{ mt: 2 }}>
+      <Typography variant="body1" sx={{ mt: 2 }}>
         <Link component={RouterLink} color="inherit" to={`/strategic/factions/view/${faction.id}`}>
           {strategicGame.name}
         </Link>
       </Typography>
-      <Typography variant="h6" sx={{ mt: 2 }}>
+      <Typography variant="body1" sx={{ mt: 2 }}>
         <Link component={RouterLink} color="inherit" to={`/strategic/factions/view/${faction.id}`}>
           {faction.name}
         </Link>

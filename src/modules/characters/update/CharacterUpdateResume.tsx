@@ -34,8 +34,8 @@ const CharacterUpdateResume: FC<{
           variant="standard"
           multiline
           minRows={4}
-          rows={6}
-          maxRows={12}
+          rows={12}
+          maxRows={24}
         />
       </Grid>
     </Grid>

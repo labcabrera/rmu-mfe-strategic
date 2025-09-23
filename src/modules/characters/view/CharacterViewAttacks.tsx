@@ -1,23 +1,39 @@
 import React, { FC } from 'react';
-import { Grid, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { Character } from '../../api/character.dto';
 
 const CharacterViewAttacks: FC<{
   character: Character;
 }> = ({ character }) => {
+  const getColor = (value: number) => {
+    if (value < 0) return 'error.main';
+    if (value > 0) return 'success.main';
+    return 'inherit';
+  };
+
   return (
     <>
-      <Grid container spacing={2}>
+      <Typography variant="h6" color="primary">
+        {t('attacks')}
+      </Typography>
+      <Paper sx={{ width: 'fit-content', padding: 2 }}>
         <Table aria-label="item table">
-          <TableHead>
+          <TableHead
+            sx={{
+              '& .MuiTableCell-root': {
+                color: 'primary.main',
+                fontWeight: 'bold',
+              },
+            }}
+          >
             <TableRow>
               <TableCell>{t('name')}</TableCell>
               <TableCell align="left">{t('attack-table')}</TableCell>
               <TableCell align="left">{t('fumble-table')}</TableCell>
               <TableCell align="left">{t('size-adjustment')}</TableCell>
               <TableCell align="left">{t('fumble')}</TableCell>
-              <TableCell align="left">{t('bo')}</TableCell>
+              <TableCell align="left">{t('offensive-bonus')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -27,13 +43,15 @@ const CharacterViewAttacks: FC<{
                 <TableCell align="left">{t(row.attackTable)}</TableCell>
                 <TableCell align="left">{row.fumbleTable}</TableCell>
                 <TableCell align="left">{row.sizeAdjustment}</TableCell>
-                <TableCell align="left">{row.fumble}</TableCell>
-                <TableCell align="left">{row.bo}</TableCell>
+                <TableCell align="right">{row.fumble}</TableCell>
+                <TableCell align="right" sx={{ color: getColor(row.bo), fontWeight: 'bold' }}>
+                  {row.bo}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-      </Grid>
+      </Paper>
     </>
   );
 };

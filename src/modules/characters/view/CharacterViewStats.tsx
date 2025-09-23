@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { Character, stats } from '../../api/character.dto';
 
 const red = '#ffab91';
@@ -70,30 +70,33 @@ const CharacterViewStats: FC<{
       <Typography variant="h6" color="primary">
         {t('statistics')}
       </Typography>
-      <Table sx={{ minWidth: 650, maxWidth: 800 }} aria-label="stats table">
-        <TableHead
-          sx={{
-            '& .MuiTableCell-root': {
-              fontWeight: 'bold',
-            },
-          }}
-        >
-          <TableRow>
-            <TableCell align="left">Stat</TableCell>
-            <TableCell align="right">{t('potential')}</TableCell>
-            <TableCell align="right">{t('temporary')}</TableCell>
-            <TableCell align="right">{t('bonus')}</TableCell>
-            <TableCell align="right">{t('racial')}</TableCell>
-            <TableCell align="right">{t('custom')}</TableCell>
-            <TableCell align="right">{t('total')}</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {stats.map((key) => (
-            <CharacterViewStatsEntry key={key} statKey={key} statName={key} character={character} />
-          ))}
-        </TableBody>
-      </Table>
+      <Paper sx={{ width: 'fit-content', padding: 2 }}>
+        <Table sx={{ minWidth: 650, maxWidth: 800 }} aria-label="stats table">
+          <TableHead
+            sx={{
+              '& .MuiTableCell-root': {
+                color: 'primary.main',
+                fontWeight: 'bold',
+              },
+            }}
+          >
+            <TableRow>
+              <TableCell align="left">Stat</TableCell>
+              <TableCell align="right">{t('potential')}</TableCell>
+              <TableCell align="right">{t('temporary')}</TableCell>
+              <TableCell align="right">{t('bonus')}</TableCell>
+              <TableCell align="right">{t('racial')}</TableCell>
+              <TableCell align="right">{t('custom')}</TableCell>
+              <TableCell align="right">{t('total')}</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {stats.map((key) => (
+              <CharacterViewStatsEntry key={key} statKey={key} statName={key} character={character} />
+            ))}
+          </TableBody>
+        </Table>
+      </Paper>
     </>
   );
 };

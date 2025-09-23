@@ -4,12 +4,27 @@ import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-import { Box, Grid, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  Paper,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../api/character';
 import { Character, CharacterSkill } from '../../api/character.dto';
 import { AddSkill, Skill } from '../../api/skill.dto';
+import DeleteButton from '../../shared/buttons/DeleteButton';
+import EditButton from '../../shared/buttons/EditButton';
 import CharacterAddSkillDialog from './CharacterViewAddSkillDialog';
 
 const addSkillFormDataTemplate = {
@@ -18,9 +33,6 @@ const addSkillFormDataTemplate = {
   ranks: 0,
   customBonus: 0,
 };
-
-const red = '#ffab91';
-const green = '#a5d6a7';
 
 interface Profession {
   professionalSkills: string[];
@@ -46,62 +58,63 @@ const CharacterViewSkills: FC<{
   };
 
   return (
-    <Grid container spacing={2}>
-      <Grid size={12}>
-        <Box display="flex" alignItems="center">
-          <Typography variant="h6" color="primary" display="inline">
-            {t('skills')}
-          </Typography>
-          <IconButton onClick={() => setOpenAddSkillDialog(true)} sx={{ ml: 1 }}>
-            <AddCircleIcon />
-          </IconButton>
-        </Box>
-      </Grid>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead
-          sx={{
-            '& .MuiTableCell-root': {
-              fontWeight: 'bold',
-            },
-          }}
-        >
-          <TableRow>
-            <TableCell align="left">{t('skill')}</TableCell>
-            <TableCell align="left">Specialization</TableCell>
-            <TableCell align="left">Stats</TableCell>
-            <TableCell align="right">Dev</TableCell>
-            <TableCell align="right">Ranks</TableCell>
-            <TableCell align="right">Rank bonus</TableCell>
-            <TableCell align="right">Stats</TableCell>
-            <TableCell align="right">Racial</TableCell>
-            <TableCell align="right">Professional</TableCell>
-            <TableCell align="right">Custom</TableCell>
-            <TableCell align="right">Total</TableCell>
-            <TableCell align="left">
-              Development points: {character.experience.availableDevelopmentPoints} /{' '}
-              {character.experience.developmentPoints}
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {character?.skills.map((item) => (
-            <CharacterViewSkillsEntry
-              key={item.skillId}
-              skill={item}
-              character={character}
-              setCharacter={setCharacter}
-              profession={profession}
-            />
-          ))}
-        </TableBody>
-      </Table>
-      <CharacterAddSkillDialog
-        open={openAddSkillDialog}
-        character={undefined}
-        onClose={() => setOpenAddSkillDialog(false)}
-        onSkillAdded={(value) => onSkillAdded(value)}
-      />
-    </Grid>
+    <>
+      <Box display="flex" alignItems="center" sx={{ minHeight: 60 }}>
+        <Typography variant="h6" color="primary" display="inline">
+          {t('skills')}
+        </Typography>
+        <IconButton onClick={() => setOpenAddSkillDialog(true)} color="primary">
+          <AddCircleIcon />
+        </IconButton>
+      </Box>
+      <Paper sx={{ width: '100%' }}>
+        <Table sx={{ minWidth: 900 }} aria-label="simple table">
+          <TableHead
+            sx={{
+              '& .MuiTableCell-root': {
+                color: 'primary.main',
+                fontWeight: 'bold',
+              },
+            }}
+          >
+            <TableRow>
+              <TableCell align="left">{t('skill')}</TableCell>
+              <TableCell align="left">Specialization</TableCell>
+              <TableCell align="left">Stats</TableCell>
+              <TableCell align="right">Dev</TableCell>
+              <TableCell align="right">Ranks</TableCell>
+              <TableCell align="right">Rank bonus</TableCell>
+              <TableCell align="right">Stat</TableCell>
+              <TableCell align="right">Racial</TableCell>
+              <TableCell align="right">Professional</TableCell>
+              <TableCell align="right">Custom</TableCell>
+              <TableCell align="right">Total</TableCell>
+              <TableCell align="left">
+                Development points: {character.experience.availableDevelopmentPoints} /{' '}
+                {character.experience.developmentPoints}
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {character?.skills.map((item) => (
+              <CharacterViewSkillsEntry
+                key={item.skillId}
+                skill={item}
+                character={character}
+                setCharacter={setCharacter}
+                profession={profession}
+              />
+            ))}
+          </TableBody>
+        </Table>
+        <CharacterAddSkillDialog
+          open={openAddSkillDialog}
+          character={undefined}
+          onClose={() => setOpenAddSkillDialog(false)}
+          onSkillAdded={(value) => onSkillAdded(value)}
+        />
+      </Paper>
+    </>
   );
 };
 
@@ -170,8 +183,8 @@ const CharacterViewSkillsEntry: FC<{
   };
 
   const getColor = (value: number) => {
-    if (value < 0) return red;
-    if (value > 0) return green;
+    if (value < 0) return 'error.main';
+    if (value > 0) return 'success.main';
     return 'inherit';
   };
 
@@ -204,8 +217,14 @@ const CharacterViewSkillsEntry: FC<{
       <TableCell align="left">{getStatistics(skill)}</TableCell>
       <TableCell align="right">{skill.development?.join(' / ') || '-'}</TableCell>
       <TableCell align="right">
-        {skill.ranks}
-        {skill.ranksDeveloped > 0 && ` (↑${skill.ranksDeveloped})`}
+        <Typography variant="body2" display="inline">
+          {skill.ranks}
+        </Typography>
+        {skill.ranksDeveloped > 0 && (
+          <Typography variant="body2" display="inline" color="success">
+            {` (↑${skill.ranksDeveloped})`}
+          </Typography>
+        )}
       </TableCell>
       <TableCell
         align="right"
@@ -234,29 +253,39 @@ const CharacterViewSkillsEntry: FC<{
       <TableCell
         align="right"
         sx={{
-          color: skill.totalBonus < 0 ? red : skill.totalBonus > 0 ? green : 'inherit',
+          color: getColor(skill.totalBonus),
           fontWeight: 'bold',
         }}
       >
         {skill.totalBonus}
       </TableCell>
       <TableCell align="left">
-        <IconButton onClick={handleLevelUp} disabled={isLevelUpDisabled()}>
-          <ArrowCircleUpIcon />
-        </IconButton>
-        <IconButton onClick={handleLevelDown} disabled={isLevelDownDisabled()}>
-          <ArrowCircleDownIcon />
-        </IconButton>
-        {!isDeletedDisabled() && (
-          <IconButton onClick={() => handleDeleteSkill(skill)}>
-            <DeleteForeverIcon />
-          </IconButton>
-        )}
-        {isAvailableProfessionSkill(skill) && (
-          <IconButton aria-label="set-professional" onClick={() => handleSetUpProfessionalSkill(skill)}>
-            <StarBorderIcon />
-          </IconButton>
-        )}
+        <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center">
+          <Box>
+            <IconButton onClick={handleLevelUp} disabled={isLevelUpDisabled()} color="primary">
+              <ArrowCircleUpIcon />
+            </IconButton>
+            <IconButton onClick={handleLevelDown} disabled={isLevelDownDisabled()} color="primary">
+              <ArrowCircleDownIcon />
+            </IconButton>
+            {!isDeletedDisabled() && (
+              <IconButton onClick={() => handleDeleteSkill(skill)} color="primary">
+                <DeleteForeverIcon />
+              </IconButton>
+            )}
+          </Box>
+          <Stack direction="row" spacing={2}>
+            {isAvailableProfessionSkill(skill) && (
+              <IconButton
+                aria-label="set-professional"
+                onClick={() => handleSetUpProfessionalSkill(skill)}
+                color="primary"
+              >
+                <StarBorderIcon />
+              </IconButton>
+            )}
+          </Stack>
+        </Stack>
       </TableCell>
     </TableRow>
   );
