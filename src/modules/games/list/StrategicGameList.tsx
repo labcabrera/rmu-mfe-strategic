@@ -60,7 +60,7 @@ const StrategicGameList: FC = () => {
         <Grid size={2}>
           <StrategicGameListResume />
         </Grid>
-        <Grid size={8}>
+        <Grid size={10}>
           <Box display="flex" alignItems="center" gap={1} mb={2}>
             <Typography variant="h6" color="primary">
               {t('strategic-games')}
