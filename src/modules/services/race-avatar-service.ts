@@ -1,7 +1,7 @@
 const raceImageMap: Record<string, string> = {
   noldor: '/static/images/races/generic-high-elf-01.png',
   sindar: '/static/images/races/generic-grey-elf-01.png',
-  silvan: '/static/images/races/generic-wood-elf-01.png',
+  silvan: '/static/images/races/generic-elf-03.png',
   elf: '/static/images/races/generic-elf-01.png',
   dúnedain: '/static/images/races/generic-high-human-01.png',
   dunedain: '/static/images/races/generic-high-human-01.png',

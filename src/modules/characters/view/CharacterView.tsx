@@ -64,7 +64,12 @@ const CharacterView: FC = () => {
       <CharacterViewActions character={character} setCharacter={setCharacter} faction={faction} game={strategicGame} />
       <Grid container spacing={5}>
         <Grid size={2}>
-          <CharacterViewResume character={character} strategicGame={strategicGame} faction={faction} />
+          <CharacterViewResume
+            character={character}
+            setCharacter={setCharacter}
+            strategicGame={strategicGame}
+            faction={faction}
+          />
         </Grid>
         <Grid size={10}>
           <CharacterViewTabs

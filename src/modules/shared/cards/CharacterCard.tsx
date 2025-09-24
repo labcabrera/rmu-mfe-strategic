@@ -20,7 +20,7 @@ const CharacterCard: FC<{
     <CardListItem
       title={character.name}
       subtitle={`${character.info.raceName} - ${t(character.info.professionId)} - ${character.experience.availableLevel}`}
-      image={resolveRaceImage(character.info.raceName)}
+      image={character.imageUrl || resolveRaceImage(character.info.raceName)}
       onClick={handleCharacterClick}
     />
   );
