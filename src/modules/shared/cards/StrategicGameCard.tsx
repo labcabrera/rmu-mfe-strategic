@@ -11,7 +11,7 @@ const StrategicGameCard: FC<{
   const navigate = useNavigate();
 
   const handleRealmClick = () => {
-    navigate(`/strategic/games/view/${strategicGame.id}`, { state: { realm: strategicGame } });
+    navigate(`/strategic/games/view/${strategicGame.id}`, { state: { strategicGame } });
   };
 
   const getImage = () => {

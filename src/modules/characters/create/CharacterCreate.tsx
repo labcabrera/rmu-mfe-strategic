@@ -35,6 +35,7 @@ const CharacterCreate: FC = () => {
   const [searchParams] = useSearchParams();
   const gameId = searchParams.get('gameId');
   const factionId = searchParams.get('factionId');
+  const [faction, setFaction] = useState<Faction | null>(null);
   const { showError } = useError();
   const [game, setGame] = useState<StrategicGame | null>(null);
   const [races, setRaces] = useState<Race[]>([]);
@@ -118,6 +119,7 @@ const CharacterCreate: FC = () => {
     fetchFactions(`gameId==${gameId}`, 0, 20)
       .then((factions) => {
         setFactions(factions);
+        setFaction(factions.find((f) => f.id === factionId) || null);
       })
       .catch((error: Error) => {
         showError(error.message);
@@ -176,10 +178,10 @@ const CharacterCreate: FC = () => {
 
   return (
     <>
-      <CharacterCreateActions formData={formData} game={game} isValid={isValid} />
+      <CharacterCreateActions formData={formData} game={game} faction={faction} isValid={isValid} />
       <Grid container spacing={5}>
         <Grid size={2}>
-          <RaceAvatar raceName={formData.info.raceName} size={200} />
+          <RaceAvatar raceName={formData.info.raceName} size={300} />
           <CharacterCreateAttributesBasic
             formData={formData}
             setFormData={setFormData}

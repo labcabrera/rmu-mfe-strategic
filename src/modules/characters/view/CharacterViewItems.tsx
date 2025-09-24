@@ -3,20 +3,71 @@ import { useTranslation } from 'react-i18next';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import { Card, CardActions, CardContent, CardMedia, Grid, IconButton, Typography } from '@mui/material';
+import { Box, Card, CardActions, CardContent, CardMedia, Grid, IconButton, Typography } from '@mui/material';
+import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { deleteItem, updateCarriedStatus } from '../../api/character';
-import { Character } from '../../api/character.dto';
+import { addItem, deleteItem, updateCarriedStatus } from '../../api/character';
+import { AddItemDto, Character } from '../../api/character.dto';
 import { Faction } from '../../api/faction.dto';
 import { Item } from '../../api/items';
+import AddButton from '../../shared/buttons/AddButton';
 import DeleteDialog from '../../shared/dialogs/DeleteDialog';
-import CharacterViewAddItem from './CharacterViewAddItem';
+import CharacterViewAddItemDialog from './CharacterViewAddItemDialog';
 import CharacterViewEquipment from './CharacterViewEquipment';
 import CharacterViewEquipmentInfo from './CharacterViewEquipmentInfo';
 import CharacterViewTransferGold from './CharacterViewTransferGold';
 
 const itemCardWidth = 120;
 const itemCardHeight = 260;
+
+const CharacterViewItems: FC<{
+  character: Character;
+  setCharacter: Dispatch<SetStateAction<Character>>;
+  faction: Faction;
+}> = ({ character, setCharacter, faction }) => {
+  const { showError } = useError();
+  const [openAddItemDialog, setOpenAddItemDialog] = useState(false);
+
+  const onItemAdded = (addItemDto: AddItemDto) => {
+    addItem(character.id, addItemDto)
+      .then((data) => {
+        setCharacter(data);
+      })
+      .catch((err: Error) => {
+        showError(err.message);
+      });
+  };
+
+  return (
+    <>
+      <Grid container spacing={2}>
+        <Grid size={7}>
+          <CharacterViewEquipment character={character} setCharacter={setCharacter} />
+        </Grid>
+        <Grid size={5}>
+          <CharacterViewEquipmentInfo character={character} />
+        </Grid>
+        <Grid size={12}>
+          <Box display="flex" alignItems="center" sx={{ minHeight: 60 }}>
+            <Typography variant="h6" color="primary" display="inline">
+              {t('items')}
+            </Typography>
+            <AddButton onClick={() => setOpenAddItemDialog(true)} />
+          </Box>
+          <ItemCardList items={character.items} character={character} setCharacter={setCharacter} />
+        </Grid>
+        <Grid size={12}>
+          <CharacterViewTransferGold character={character} setCharacter={setCharacter} faction={faction} />
+        </Grid>
+      </Grid>
+      <CharacterViewAddItemDialog
+        open={openAddItemDialog}
+        onClose={() => setOpenAddItemDialog(false)}
+        onItemAdded={(addItemDto) => onItemAdded(addItemDto)}
+      />
+    </>
+  );
+};
 
 const ItemCardListItem: FC<{
   item: Item;
@@ -114,33 +165,6 @@ const ItemCardList: FC<{
       {items.map((item) => (
         <ItemCardListItem key={item.id} item={item} character={character} setCharacter={setCharacter} />
       ))}
-    </Grid>
-  );
-};
-
-const CharacterViewItems: FC<{
-  character: Character;
-  setCharacter: React.Dispatch<React.SetStateAction<Character>>;
-  faction: Faction;
-}> = ({ character, setCharacter, faction }) => {
-  return (
-    <Grid container spacing={2}>
-      <Grid size={7}>
-        <CharacterViewEquipment character={character} setCharacter={setCharacter} />
-      </Grid>
-      <Grid size={5}>
-        <CharacterViewEquipmentInfo character={character} />
-      </Grid>
-      <Grid size={12}>
-        <ItemCardList items={character.items} character={character} setCharacter={setCharacter} />
-      </Grid>
-      <Grid size={12}></Grid>
-      <Grid size={12}>
-        <CharacterViewAddItem character={character} setCharacter={setCharacter} />
-      </Grid>
-      <Grid size={12}>
-        <CharacterViewTransferGold character={character} setCharacter={setCharacter} faction={faction} />
-      </Grid>
     </Grid>
   );
 };

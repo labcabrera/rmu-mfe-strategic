@@ -36,26 +36,32 @@ const StrategicGameUpdateActions: FC<{
     <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center" sx={{ minHeight: 80 }}>
       <Box>
         <Breadcrumbs aria-label="breadcrumb">
-          <Link color="inherit" href="/">
+          <Link color="primary" underline="hover" href="/">
             {t('home')}
           </Link>
-          <Link component={RouterLink} color="inherit" to="/strategic/games">
+          <Link component={RouterLink} color="primary" underline="hover" to="/strategic/games">
             {t('strategic')}
           </Link>
-          <Link component={RouterLink} color="inherit" to="/strategic/games">
+          <Link component={RouterLink} color="primary" underline="hover" to="/strategic/games">
             {t('games')}
           </Link>
-          <Link component={RouterLink} color="inherit" to={`/strategic/games/view/${strategicGame.id}`}>
+          <Link
+            component={RouterLink}
+            color="primary"
+            underline="hover"
+            to={`/strategic/games/view/${strategicGame.id}`}
+            state={{ strategicGame }}
+          >
             {strategicGame.name}
           </Link>
           <span>{t('edit')}</span>
         </Breadcrumbs>
       </Box>
       <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>
-        <IconButton onClick={handleCancelClick}>
+        <IconButton onClick={handleCancelClick} size="large" color="primary">
           <CancelIcon />
         </IconButton>
-        <IconButton onClick={updateGame}>
+        <IconButton onClick={updateGame} size="large" color="primary">
           <SaveIcon />
         </IconButton>
       </Stack>

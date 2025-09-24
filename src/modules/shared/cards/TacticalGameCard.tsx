@@ -10,7 +10,7 @@ const TacticalGameCard: FC<{
   const navigate = useNavigate();
 
   const handleRealmClick = () => {
-    navigate(`/strategic/games/view/${tacticalGame.id}`, { state: { realm: tacticalGame } });
+    navigate(`/tactical/games/view/${tacticalGame.id}`, { state: { tacticalGame: tacticalGame } });
   };
 
   if (!tacticalGame) return <p>Loading...</p>;

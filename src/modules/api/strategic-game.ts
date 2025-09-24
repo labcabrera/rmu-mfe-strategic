@@ -1,4 +1,5 @@
 import { buildErrorFromResponse } from './api-errors';
+import { Page } from './common.dto';
 import { CreateStrategicGameDto, StrategicGame, UpdateStrategicGameDto } from './strategic-game.dto';
 
 export async function fetchStrategicGames(rsql: string, page: number, size: number): Promise<StrategicGame[]> {
@@ -9,6 +10,16 @@ export async function fetchStrategicGames(rsql: string, page: number, size: numb
   }
   const pageContent = await response.json();
   return pageContent.content as StrategicGame[];
+}
+
+export async function fetchStrategicGamesPaged(rsql: string, page: number, size: number): Promise<Page<StrategicGame>> {
+  const url = `${process.env.RMU_API_STRATEGIC_URL}/strategic-games?q=${rsql}&page=${page}&size=${size}`;
+  const response = await fetch(url, { method: 'GET' });
+  if (response.status !== 200) {
+    throw await buildErrorFromResponse(response, url);
+  }
+  const pageContent = await response.json();
+  return pageContent;
 }
 
 export async function fetchStrategicGame(gameId: string): Promise<StrategicGame> {

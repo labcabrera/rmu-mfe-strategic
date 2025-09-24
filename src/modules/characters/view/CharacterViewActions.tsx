@@ -80,19 +80,24 @@ const CharacterViewActions: FC<{
       <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center" sx={{ minHeight: 80 }}>
         <Box>
           <Breadcrumbs aria-label="breadcrumb">
-            <Link color="inherit" href="/">
+            <Link underline="hover" color="primary" href="/">
               Home
             </Link>
-            <Link component={RouterLink} color="inherit" to="/strategic/games">
+            <Link underline="hover" component={RouterLink} color="primary" to="/strategic/games">
               {t('strategic')}
             </Link>
-            <Link component={RouterLink} color="inherit" to="/strategic/games">
+            <Link underline="hover" component={RouterLink} color="primary" to="/strategic/games">
               {t('games')}
             </Link>
-            <Link component={RouterLink} color="inherit" to={`/strategic/games/view/${game.id}`}>
+            <Link underline="hover" component={RouterLink} color="primary" to={`/strategic/games/view/${game.id}`}>
               {game.name}
             </Link>
-            <Link component={RouterLink} color="inherit" to={`/strategic/factions/view/${faction.id}`}>
+            <Link
+              underline="hover"
+              component={RouterLink}
+              color="primary"
+              to={`/strategic/factions/view/${faction.id}`}
+            >
               {faction.name}
             </Link>
             <span>{character.name}</span>

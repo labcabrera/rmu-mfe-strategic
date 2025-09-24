@@ -1,14 +1,14 @@
 import React, { FC, MouseEvent } from 'react';
-import DeleteIcon from '@mui/icons-material/Delete';
+import CancelIcon from '@mui/icons-material/Cancel';
 import IconButton from '@mui/material/IconButton';
 
-const DeleteButton: FC<{
+const CancelButton: FC<{
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
 }> = ({ onClick, disabled = false }) => (
   <IconButton onClick={onClick} aria-label="delete" disabled={disabled} size="large" color="primary">
-    <DeleteIcon fontSize="inherit" />
+    <CancelIcon fontSize="inherit" />
   </IconButton>
 );
 
-export default DeleteButton;
+export default CancelButton;

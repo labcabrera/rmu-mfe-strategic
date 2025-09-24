@@ -10,15 +10,30 @@ const TextCard: FC<{
   height?: number;
   imageSize?: number;
   grayscale?: number;
-}> = ({ value, subtitle, image, maxWidth = 250, minWidth = 250, height = 70, imageSize = 70, grayscale = 0.5 }) => {
+  valueVariant?: 'h5' | 'h6' | 'subtitle1' | 'subtitle2' | 'body1' | 'body2';
+  onClick?: () => void;
+}> = ({
+  value,
+  subtitle,
+  image,
+  maxWidth = 250,
+  minWidth = 250,
+  height = 70,
+  imageSize = 70,
+  grayscale = 0.5,
+  valueVariant = 'h6',
+  onClick,
+}) => {
   return (
     <Card
+      onClick={onClick}
       sx={{
         display: 'flex',
         alignItems: 'center',
         maxWidth: { maxWidth },
         minWidth: { minWidth },
         height: { height },
+        cursor: onClick ? 'pointer' : 'default',
       }}
     >
       <CardMedia
@@ -41,7 +56,7 @@ const TextCard: FC<{
       >
         <Typography
           component="div"
-          variant="h6"
+          variant={valueVariant}
           sx={{
             mt: 2,
             overflow: 'hidden',

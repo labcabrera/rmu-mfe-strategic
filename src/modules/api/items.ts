@@ -29,8 +29,12 @@ export interface Armor {
 }
 
 export interface ItemInfo {
+  weightPercent: number;
   type?: string;
   weight?: number;
+  length?: number;
+  strength?: number;
+  cost: any;
 }
 
 export async function fetchItems(rsql: string, page: number, size: number): Promise<Item[]> {

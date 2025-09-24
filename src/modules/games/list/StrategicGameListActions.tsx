@@ -15,10 +15,10 @@ const StrategicGameListActions: FC = () => {
     <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center" sx={{ minHeight: 80 }}>
       <Box>
         <Breadcrumbs aria-label="breadcrumb">
-          <Link color="inherit" href="/">
+          <Link underline="hover" color="primary" href="/">
             {t('home')}
           </Link>
-          <Link component={RouterLink} color="inherit" to="/strategic">
+          <Link underline="hover" component={RouterLink} color="primary" to="/strategic">
             {t('strategic')}
           </Link>
           <span>{t('games')}</span>

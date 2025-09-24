@@ -36,7 +36,7 @@ const FactionViewResume: FC<{
       <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
         {faction.name}
       </Typography>
-      <Typography variant="h6" sx={{ mt: 2 }}>
+      <Typography variant="body1" sx={{ mt: 2 }}>
         <Link component={RouterLink} color="inherit" to={`/strategic/games/view/${game.id}`}>
           {game.name}
         </Link>

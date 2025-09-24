@@ -6,15 +6,18 @@ import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import { useError } from '../../../ErrorContext';
-import { createCharacter, CreateCharacterDto } from '../../api/character';
-import { StrategicGame } from '../../api/strategic-game';
+import { createCharacter } from '../../api/character';
+import { CreateCharacterDto } from '../../api/character.dto';
+import { Faction } from '../../api/faction.dto';
+import { StrategicGame } from '../../api/strategic-game.dto';
 import SaveButton from '../../shared/buttons/SaveButton';
 
 const CharacterCreateActions: FC<{
   formData: CreateCharacterDto;
   game?: StrategicGame;
+  faction?: Faction;
   isValid: boolean;
-}> = ({ formData, game, isValid }) => {
+}> = ({ formData, game, faction, isValid }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { showError } = useError();
@@ -33,16 +36,31 @@ const CharacterCreateActions: FC<{
     <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center" sx={{ minHeight: 80 }}>
       <Box>
         <Breadcrumbs aria-label="breadcrumb">
-          <Link color="inherit" href="/">
+          <Link underline="hover" color="primary" href="/">
             {t('home')}
           </Link>
-          <Link component={RouterLink} color="inherit" to="/strategic/games">
+          <Link component={RouterLink} underline="hover" color="primary" to="/strategic/games">
             {t('strategic')}
           </Link>
-          <Link component={RouterLink} color="inherit" to="/strategic/characters">
-            {t('characters')}
+          <Link component={RouterLink} underline="hover" color="primary" to="/strategic/games">
+            {t('games')}
           </Link>
-          <span>{t('create')}</span>
+          {game && (
+            <Link component={RouterLink} underline="hover" color="primary" to={`/strategic/games/view/${game.id}`}>
+              {game.name}
+            </Link>
+          )}
+          {faction && (
+            <Link
+              component={RouterLink}
+              underline="hover"
+              color="primary"
+              to={`/strategic/factions/view/${faction.id}`}
+            >
+              {faction.name}
+            </Link>
+          )}
+          <span>{t('create-character')}</span>
         </Breadcrumbs>
       </Box>
       <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>

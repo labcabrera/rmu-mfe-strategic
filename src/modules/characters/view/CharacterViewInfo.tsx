@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { Box, Grid, Typography } from '@mui/material';
+import { Badge, Box, Grid, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { Character, stats } from '../../api/character.dto';
 import NumericCard from '../../shared/cards/NumericCard';
@@ -32,7 +32,7 @@ const CharacterViewInfo: FC<{
     <>
       <Grid container spacing={2}>
         <Grid size={12}>
-          <Typography variant="h6" color="secondary">
+          <Typography variant="h6" color="primary">
             {t('general')}
           </Typography>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
@@ -42,7 +42,7 @@ const CharacterViewInfo: FC<{
               image={`/static/images/generic/realm.png`}
             />
             <TextCard
-              value={t(character.info.sizeId)}
+              value={t(`size-${character.info.sizeId}`)}
               subtitle={t('size')}
               image={`/static/images/generic/race-size.png`}
             />
@@ -50,29 +50,40 @@ const CharacterViewInfo: FC<{
               value={character.info.height}
               subtitle={t('height')}
               image={`/static/images/generic/character-height.png`}
+              applyColor={false}
             />
             <NumericCard
               value={character.info.weight}
               subtitle={t('weight')}
               image={`/static/images/generic/character-weight.png`}
+              applyColor={false}
             />
-            <TextCard
-              value={`${character.hp.current} / ${character.hp.max}`}
-              subtitle={t('hit-points')}
-              image={`/static/images/generic/hp.png`}
-            />
+            <Badge color="warning" badgeContent={character.hp.max} invisible={character.hp.max > 0}>
+              <TextCard
+                value={`${character.hp.current} / ${character.hp.max}`}
+                subtitle={t('hit-points')}
+                image={`/static/images/generic/hp.png`}
+              />
+            </Badge>
           </Box>
         </Grid>
         <Grid size={12}>
-          <Typography color="secondary" variant="h6">
+          <Typography color="primary" variant="h6">
             {t('experience')}
           </Typography>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
-            <NumericCard
-              value={character.experience.level}
-              subtitle={t('current-level')}
-              image={`/static/images/generic/experience.png`}
-            />
+            <Badge
+              color="warning"
+              badgeContent={`+${character.experience.availableLevel - character.experience.level}`}
+              invisible={character.experience.availableLevel <= character.experience.level}
+            >
+              <NumericCard
+                value={character.experience.level}
+                subtitle={t('current-level')}
+                image={`/static/images/generic/experience.png`}
+                applyColor={false}
+              />
+            </Badge>
             <NumericCard
               value={character.experience.xp}
               subtitle={t('xp')}
@@ -80,15 +91,36 @@ const CharacterViewInfo: FC<{
               applyColor={false}
               applyFormat={true}
             />
-            <TextCard
-              value={`${character.experience.developmentPoints} / ${character.experience.availableDevelopmentPoints}`}
-              subtitle={t('development-points')}
-              image={`/static/images/generic/trait-combat.png`}
-            />
+            <Badge
+              color="warning"
+              badgeContent={`+${character.experience.availableDevelopmentPoints}`}
+              invisible={character.experience.availableDevelopmentPoints < 1}
+            >
+              <TextCard
+                value={`${character.experience.availableDevelopmentPoints} / ${character.experience.developmentPoints}`}
+                subtitle={t('development-points')}
+                image={`/static/images/generic/trait-combat.png`}
+              />
+            </Badge>
           </Box>
         </Grid>
         <Grid size={12}>
-          <Typography color="secondary" variant="h6">
+          <Typography color="primary" variant="h6">
+            {t('stats')}
+          </Typography>
+          <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+            {stats.map((stat) => (
+              <NumericCard
+                key={stat}
+                value={character.statistics[stat].totalBonus}
+                subtitle={t(stat)}
+                image={`/static/images/generic/stat-${stat}.png`}
+              />
+            ))}
+          </Box>
+        </Grid>
+        <Grid size={12}>
+          <Typography color="primary" variant="h6">
             {t('defense')}
           </Typography>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
@@ -101,7 +133,7 @@ const CharacterViewInfo: FC<{
           </Box>
         </Grid>
         <Grid size={12}>
-          <Typography color="secondary" variant="h6">
+          <Typography color="primary" variant="h6">
             {t('movement')}
           </Typography>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
@@ -126,7 +158,7 @@ const CharacterViewInfo: FC<{
           </Box>
         </Grid>
         <Grid size={12}>
-          <Typography color="secondary" variant="h6">
+          <Typography color="primary" variant="h6">
             {t('initiative')}
           </Typography>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
@@ -144,23 +176,8 @@ const CharacterViewInfo: FC<{
             />
           </Box>
         </Grid>
-        <Grid size={12}>
-          <Typography color="secondary" variant="h6">
-            {t('stats')}
-          </Typography>
-          <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
-            {stats.map((stat) => (
-              <NumericCard
-                key={stat}
-                value={character.statistics[stat].totalBonus}
-                subtitle={t(stat)}
-                image={`/static/images/generic/stat-${stat}.png`}
-              />
-            ))}
-          </Box>
-        </Grid>
-        <Grid size={12}>
-          <Typography color="secondary" variant="h6">
+        <Grid size={8}>
+          <Typography color="primary" variant="h6">
             {t('resistances')}
           </Typography>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
