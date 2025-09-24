@@ -1,34 +1,53 @@
 import React, { FC, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { Link, Grid, Box, Typography, IconButton } from '@mui/material';
+import { Grid, Box, Typography, IconButton, Pagination } from '@mui/material';
+import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { fetchStrategicGames } from '../../api/strategic-game';
+import { Page } from '../../api/common.dto';
+import { fetchStrategicGamesPaged } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import StrategicGameCard from '../../shared/cards/StrategicGameCard';
 import StrategicGameListActions from './StrategicGameListActions';
+import StrategicGameListResume from './StrategicGameListResume';
+
+const pageSize = 24;
 
 const StrategicGameList: FC = () => {
-  const { t } = useTranslation();
   const { showError } = useError();
   const navigate = useNavigate();
   const [strategicGames, setStrategicGames] = useState<StrategicGame[]>([]);
+  const [page, setPage] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(false);
 
-  const bindStrategicGames = () => {
-    fetchStrategicGames('', 0, 24)
-      .then((response: StrategicGame[]) => {
-        setStrategicGames(response);
+  const bindStrategicGames = (pageNumber: number = page) => {
+    setLoading(true);
+    fetchStrategicGamesPaged('', pageNumber, pageSize)
+      .then((response) => {
+        setStrategicGames(response.content);
+        setTotalCount(response.pagination.totalElements);
       })
       .catch((err: unknown) => {
         if (err instanceof Error) showError(err.message);
         else showError('Unknown error fetching games');
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
   const handleNewGame = () => {
     navigate('/strategic/games/create');
   };
+
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    const newPage = value - 1; // Pagination usa 1-based, pero la API usa 0-based
+    setPage(newPage);
+    bindStrategicGames(newPage);
+  };
+
+  const totalPages = Math.ceil(totalCount / pageSize);
 
   useEffect(() => {
     bindStrategicGames();
@@ -37,25 +56,48 @@ const StrategicGameList: FC = () => {
   return (
     <>
       <StrategicGameListActions />
-      <Grid container spacing={2} mb={2} alignItems="center">
-        <Grid size={12}>
-          <Box display="flex" alignItems="center">
-            <Typography variant="h6" color="primary" display="inline">
+      <Grid container spacing={2} mb={2} alignItems="flex-start">
+        <Grid size={2}>
+          <StrategicGameListResume />
+        </Grid>
+        <Grid size={8}>
+          <Box display="flex" alignItems="center" gap={1} mb={2}>
+            <Typography variant="h6" color="primary">
               {t('strategic-games')}
             </Typography>
-            <IconButton onClick={handleNewGame} sx={{ ml: 1 }} color="primary">
+            <IconButton onClick={handleNewGame} color="primary">
               <AddCircleIcon />
             </IconButton>
           </Box>
+
+          {loading ? (
+            <Typography>Loading...</Typography>
+          ) : (
+            <>
+              <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+                {strategicGames.map((game) => (
+                  <StrategicGameCard key={game.id} strategicGame={game} />
+                ))}
+              </Box>
+
+              {strategicGames.length === 0 && !loading && (
+                <Typography variant="body1" color="text.secondary">
+                  No games found.
+                </Typography>
+              )}
+              <Box display="flex" justifyContent="center" mt={5}>
+                <Pagination
+                  count={totalPages}
+                  page={page + 1}
+                  onChange={handlePageChange}
+                  color="primary"
+                  showFirstButton
+                  showLastButton
+                />
+              </Box>
+            </>
+          )}
         </Grid>
-        <Grid size={12}>
-          <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
-            {strategicGames.map((game) => (
-              <StrategicGameCard key={game.id} strategicGame={game} />
-            ))}
-          </Box>
-        </Grid>
-        {strategicGames.length === 0 && <p>No games found.</p>}
       </Grid>
     </>
   );

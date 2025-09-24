@@ -1,6 +1,6 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
-import ClearIcon from '@mui/icons-material/Clear';
-import { Card, CardContent, CardMedia, Grid, IconButton, InputAdornment, MenuItem, Select } from '@mui/material';
+import { Card, CardContent, CardMedia, Autocomplete, TextField, Typography } from '@mui/material';
+import { t } from 'i18next';
 import { equipItem, unequipItem } from '../../api/character';
 import { Character, CharacterItem } from '../../api/character.dto';
 
@@ -9,11 +9,10 @@ const EquipmentSlotCard: FC<{
   setCharacter: Dispatch<SetStateAction<Character>>;
   slot: string;
   itemId?: string;
-
   onClick?: () => void;
 }> = ({ character, setCharacter, slot, itemId, onClick }) => {
-  const maxWidth = 400;
-  const minWidth = 400;
+  const maxWidth = 500;
+  const minWidth = 500;
   const height = 80;
   const imageSize = 80;
 
@@ -42,11 +41,14 @@ const EquipmentSlotCard: FC<{
     return [];
   };
 
-  const handleEquipmentChange = (event: any) => {
-    const newItemId = event.target.value;
-    equipItem(character.id, slot, newItemId)
-      .then((data) => setCharacter(data))
-      .catch((err) => console.error(err));
+  const handleEquipmentChange = (_event: React.SyntheticEvent, newValue: CharacterItem | null) => {
+    if (newValue) {
+      equipItem(character.id, slot, newValue.id)
+        .then((data) => setCharacter(data))
+        .catch((err) => console.error(err));
+    } else {
+      handleUnequip();
+    }
   };
 
   const handleUnequip = () => {
@@ -54,6 +56,12 @@ const EquipmentSlotCard: FC<{
       .then((data) => setCharacter(data))
       .catch((err) => console.error(err));
   };
+
+  const selectedItem = character.equipment[slot]
+    ? getSlotOptions(character, slot).find((option) => option.id === character.equipment[slot]) || null
+    : null;
+
+  const slotOptions = getSlotOptions(character, slot);
 
   return (
     <Card
@@ -90,41 +98,22 @@ const EquipmentSlotCard: FC<{
           minWidth: 0,
         }}
       >
-        {/* <Grid container spacing={1} sx={{ padding: 1 }}>
-          <Grid size={12}> */}
-        {getSlotOptions(character, slot).length > 0 && (
-          <Select
-            value={character.equipment[slot] || ''}
+        {slotOptions.length > 0 ? (
+          <Autocomplete
+            options={slotOptions}
+            getOptionLabel={(option) => option.name}
+            value={selectedItem}
             onChange={handleEquipmentChange}
-            variant="standard"
-            fullWidth
-            sx={{ padding: 1 }}
-            endAdornment={
-              character.equipment[slot] && (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleUnequip();
-                    }}
-                    size="small"
-                    sx={{ mr: 4 }}
-                  >
-                    <ClearIcon fontSize="small" />
-                  </IconButton>
-                </InputAdornment>
-              )
-            }
-          >
-            {getSlotOptions(character, slot).map((option) => (
-              <MenuItem key={option.id} value={option.id} selected={option.id === character.equipment[slot]}>
-                {option.name}
-              </MenuItem>
-            ))}
-          </Select>
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            renderInput={(params) => (
+              <TextField {...params} variant="standard" placeholder={t(slot)} sx={{ padding: 1 }} />
+            )}
+          />
+        ) : (
+          <Typography variant="body1" color="secondary">
+            {t(slot)}
+          </Typography>
         )}
-        {/* </Grid>
-        </Grid> */}
       </CardContent>
     </Card>
   );
