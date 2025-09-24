@@ -1,7 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Grid, Typography } from '@mui/material';
-import { t } from 'i18next';
+import { Grid } from '@mui/material';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacter } from '../../api/character';
 import { Character } from '../../api/character.dto';

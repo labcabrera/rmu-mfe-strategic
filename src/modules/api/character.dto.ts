@@ -100,6 +100,7 @@ export interface CharacterItem {
   category?: string;
   weapon?: WeaponInfo;
   armor?: ArmorInfo;
+  info: any;
   amount?: number;
 }
 
@@ -142,4 +143,14 @@ export interface CharacterExperience {
   developmentPoints: number;
   availableDevelopmentPoints: number;
   weaponDevelopment: string[];
+}
+
+export interface AddItemDto {
+  name: string;
+  itemTypeId: string;
+  amount?: number;
+  weight?: number;
+  weightPercent?: number;
+  strength?: number;
+  cost?: number;
 }

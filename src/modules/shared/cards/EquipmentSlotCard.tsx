@@ -11,8 +11,8 @@ const EquipmentSlotCard: FC<{
   itemId?: string;
   onClick?: () => void;
 }> = ({ character, setCharacter, slot, itemId, onClick }) => {
-  const maxWidth = 500;
-  const minWidth = 500;
+  const maxWidth = 390;
+  const minWidth = 390;
   const height = 80;
   const imageSize = 80;
 

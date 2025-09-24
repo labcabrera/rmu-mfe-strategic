@@ -3,9 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { Character, stats } from '../../api/character.dto';
 
-const red = '#ffab91';
-const green = '#a5d6a7';
-
 export interface CharacterStatistics {
   [key: string]: {
     potential: number;
@@ -25,14 +22,14 @@ const CharacterViewStatsEntry: FC<{
   const { t } = useTranslation();
 
   const getColor = (value: number) => {
-    if (value < 0) return red;
-    if (value > 0) return green;
+    if (value < 0) return 'error.main';
+    if (value > 0) return 'success.main';
     return 'inherit';
   };
 
   const getStatColor = (value: number) => {
-    if (value > 75) return green;
-    if (value < 45) return red;
+    if (value > 75) return 'success.main';
+    if (value < 45) return 'error.main';
     return 'inherit';
   };
 

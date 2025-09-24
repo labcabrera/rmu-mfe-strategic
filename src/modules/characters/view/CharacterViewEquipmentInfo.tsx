@@ -1,10 +1,9 @@
 import React from 'react';
-import { Box, Grid, TextField, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { Character } from '../../api/character.dto';
 import NumericCard from '../../shared/cards/NumericCard';
 import TextCard from '../../shared/cards/TextCard';
-import PenaltyTextField from '../../shared/inputs/PenaltyTextField';
 
 const CharacterViewEquipmentInfo: React.FC<{
   character: Character;
