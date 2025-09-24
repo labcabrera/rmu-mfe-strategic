@@ -3,17 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { Character, stats } from '../../api/character.dto';
 
-export interface CharacterStatistics {
-  [key: string]: {
-    potential: number;
-    temporary: number;
-    bonus: number;
-    racial: number;
-    custom: number;
-    totalBonus: number;
-  };
-}
-
 const CharacterViewStatsEntry: FC<{
   statKey: string;
   statName: string;

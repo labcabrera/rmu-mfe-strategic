@@ -1,33 +1,20 @@
-import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  Grid,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import React, { useState, useEffect, FC } from 'react';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { AddItemDto, Character, CharacterItem } from '../../api/character.dto';
+import { AddItemDto } from '../../api/character.dto';
 import { fetchItems, Item } from '../../api/items';
 import TextCard from '../../shared/cards/TextCard';
-import NumericInput from '../../shared/inputs/NumericInput';
+import CharacterViewAddItemDialogForm from './CharacterViewAddItemDialogForm';
 
 const categories = ['weapon', 'armor', 'shield', 'clothes', 'ammunition', 'tools', 'food'];
 const armorSubcategories = ['head', 'body', 'arms', 'legs'];
 
 const CharacterAddItemDialog: FC<{
   open: boolean;
-  character: Character;
   onClose: () => void;
   onItemAdded: (item: AddItemDto) => void;
-}> = ({ open, character, onClose, onItemAdded }) => {
+}> = ({ open, onClose, onItemAdded }) => {
   const { showError } = useError();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
@@ -35,6 +22,7 @@ const CharacterAddItemDialog: FC<{
   const [isValid, setIsValid] = useState(false);
   const [formData, setFormData] = useState<AddItemDto | null>(null);
   const [items, setItems] = useState<Item[]>([]);
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 
   const handleClose = () => {
     setFormData(null);
@@ -62,18 +50,20 @@ const CharacterAddItemDialog: FC<{
   };
 
   const loadItem = (item: Item) => {
+    setSelectedItem(item);
     setFormData({
       itemTypeId: item.id,
       name: t(item.id),
       weight: item.info?.weight || null,
       weightPercent: item.info?.weightPercent || null,
       strength: item.info?.strength || null,
+      cost: item.info?.cost?.average || null,
       amount: 1,
     } as AddItemDto);
   };
 
   const getItemDetail = (item: Item) => {
-    return `Cost: ${item.info?.cost?.average || ''}`;
+    return `${item.info?.cost?.average || '0'}g`;
   };
 
   useEffect(() => {
@@ -169,7 +159,11 @@ const CharacterAddItemDialog: FC<{
               ))}
             </Box>
           </Grid>
-          <Grid size={12}>{formData && <AddItemForm formData={formData} setFormData={setFormData} />}</Grid>
+          <Grid size={12}>
+            {formData && (
+              <CharacterViewAddItemDialogForm formData={formData} setFormData={setFormData} item={selectedItem} />
+            )}
+          </Grid>
         </Grid>
         {/* <pre>{JSON.stringify(formData, null, 2)}</pre>
         <pre>{JSON.stringify(items, null, 2)}</pre> */}
@@ -181,63 +175,6 @@ const CharacterAddItemDialog: FC<{
         </Button>
       </DialogActions>
     </Dialog>
-  );
-};
-
-const AddItemForm: FC<{
-  formData: AddItemDto;
-  setFormData: Dispatch<SetStateAction<AddItemDto | null>>;
-}> = ({ formData, setFormData }) => {
-  return (
-    <>
-      <Grid container spacing={2}>
-        <Grid size={12}>
-          <Typography variant="h6">{t(formData.itemTypeId)}</Typography>
-        </Grid>
-        <Grid size={4}>
-          <Grid container spacing={2}>
-            <Grid size={6}>
-              <TextField
-                label={t('item-name')}
-                value={formData.name || ''}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                variant="standard"
-                fullWidth
-              />
-            </Grid>
-            <Grid size={6}>
-              <NumericInput
-                label={t('weight')}
-                value={formData.weight}
-                onChange={(value) => setFormData({ ...formData, weight: value })}
-              />
-            </Grid>
-            <Grid size={6}>
-              <NumericInput
-                label={t('weight-percent')}
-                value={formData.weightPercent}
-                onChange={(value) => setFormData({ ...formData, weightPercent: value })}
-              />
-            </Grid>
-            <Grid size={6}>
-              <NumericInput
-                label={t('strength')}
-                value={formData.strength}
-                onChange={(value) => setFormData({ ...formData, strength: value })}
-              />
-            </Grid>
-            <Grid size={6}>
-              <NumericInput
-                label={t('amount')}
-                value={formData.amount}
-                onChange={(value) => setFormData({ ...formData, amount: value })}
-              />
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid size={8}></Grid>
-      </Grid>
-    </>
   );
 };
 

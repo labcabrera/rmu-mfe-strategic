@@ -62,7 +62,6 @@ const CharacterViewItems: FC<{
       </Grid>
       <CharacterViewAddItemDialog
         open={openAddItemDialog}
-        character={character}
         onClose={() => setOpenAddItemDialog(false)}
         onItemAdded={(addItemDto) => onItemAdded(addItemDto)}
       />
