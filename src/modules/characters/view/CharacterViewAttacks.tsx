@@ -29,9 +29,10 @@ const CharacterViewAttacks: FC<{
           >
             <TableRow>
               <TableCell>{t('name')}</TableCell>
+              <TableCell align="left">{t('type')}</TableCell>
               <TableCell align="left">{t('attack-table')}</TableCell>
-              <TableCell align="left">{t('fumble-table')}</TableCell>
               <TableCell align="left">{t('size-adjustment')}</TableCell>
+              <TableCell align="left">{t('fumble-table')}</TableCell>
               <TableCell align="left">{t('fumble')}</TableCell>
               <TableCell align="left">{t('offensive-bonus')}</TableCell>
             </TableRow>
@@ -40,9 +41,10 @@ const CharacterViewAttacks: FC<{
             {character.attacks.map((row) => (
               <TableRow key={row.name}>
                 <TableCell align="left">{t(row.attackName)}</TableCell>
+                <TableCell align="left">{t(row.type)}</TableCell>
                 <TableCell align="left">{t(row.attackTable)}</TableCell>
-                <TableCell align="left">{row.fumbleTable}</TableCell>
                 <TableCell align="left">{row.sizeAdjustment}</TableCell>
+                <TableCell align="left">{row.fumbleTable}</TableCell>
                 <TableCell align="right">{row.fumble}</TableCell>
                 <TableCell align="right" sx={{ color: getColor(row.bo), fontWeight: 'bold' }}>
                   {row.bo}
@@ -52,6 +54,7 @@ const CharacterViewAttacks: FC<{
           </TableBody>
         </Table>
       </Paper>
+      {/* <pre>{JSON.stringify(character.attacks, null, 2)}</pre> */}
     </>
   );
 };

@@ -85,7 +85,8 @@ export interface CharacterEquipment {
   arms: string | undefined;
   legs: string | undefined;
   weight: number | undefined;
-  encumbrance?: number;
+  weightAllowance: number | undefined;
+  encumbrancePenalty?: number;
   baseManeuverPenalty: number | undefined;
   maneuverPenalty?: number;
   rangedPenalty?: number;
