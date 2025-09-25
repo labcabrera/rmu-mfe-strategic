@@ -4,7 +4,6 @@ import { Grid, TextField } from '@mui/material';
 import { t } from 'i18next';
 import { CreateFactionDto } from '../../api/faction.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import FactionAvatar from '../../shared/avatars/FactionAvatar';
 import GenericAvatar from '../../shared/avatars/GenericAvatar';
 import FactionCreateActions from './FactionCreateActions';
 import FactionCreateAttributes from './FactionCreateAttributes';
@@ -46,7 +45,6 @@ const FactionCreate: FC = () => {
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             multiline
             rows={12}
-            maxRows={12}
             fullWidth
           />
         </Grid>

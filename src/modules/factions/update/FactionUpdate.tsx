@@ -11,7 +11,7 @@ import FactionUpdateResume from './FactionUpdateResume';
 const FactionUpdate: FC = () => {
   const location = useLocation();
   const faction = location.state?.faction as Faction;
-  const game = location.state?.game as StrategicGame;
+  const strategicGame = location.state?.strategicGame as StrategicGame;
   const [formData, setFormData] = useState<UpdateFactionDto>({
     name: faction?.name || '',
     management: {
@@ -24,7 +24,7 @@ const FactionUpdate: FC = () => {
 
   return (
     <>
-      <FactionUpdateActions formData={formData} game={game} faction={faction} />
+      <FactionUpdateActions formData={formData} strategicGame={strategicGame} faction={faction} />
       <Grid container spacing={5}>
         <Grid size={2}>
           <FactionAvatar faction={faction} size={300} />
@@ -35,6 +35,7 @@ const FactionUpdate: FC = () => {
         </Grid>
       </Grid>
       {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
+      {/* <pre>{JSON.stringify(faction, null, 2)}</pre> */}
     </>
   );
 };
