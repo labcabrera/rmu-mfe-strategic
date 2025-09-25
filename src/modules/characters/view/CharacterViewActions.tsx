@@ -14,12 +14,13 @@ import {
   DialogTitle,
 } from '@mui/material';
 import { useError } from '../../../ErrorContext';
-import { deleteCharacter, levelUpCharacter } from '../../api/character';
+import { fetchCharacter, deleteCharacter, levelUpCharacter } from '../../api/character';
 import { Character } from '../../api/character.dto';
 import { Faction } from '../../api/faction.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import DeleteButton from '../../shared/buttons/DeleteButton';
 import EditButton from '../../shared/buttons/EditButton';
+import RefreshButton from '../../shared/buttons/RefreshButton';
 import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 
 const CharacterViewActions: FC<{
@@ -33,6 +34,16 @@ const CharacterViewActions: FC<{
   const { showError } = useError();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
+
+  const handleRefresh = () => {
+    fetchCharacter(character.id)
+      .then((data) => {
+        setCharacter(data);
+      })
+      .catch((err: Error) => {
+        showError(err.message);
+      });
+  };
 
   const handleDelete = () => {
     deleteCharacter(character.id)
@@ -105,6 +116,7 @@ const CharacterViewActions: FC<{
         </Box>
         <Stack direction="row" spacing={2}>
           {levelUpAvailable && <Button onClick={() => onLevelUp(false)}>Level up</Button>}
+          <RefreshButton onClick={handleRefresh} />
           <EditButton onClick={handleEditClick} />
           <DeleteButton onClick={handleDeleteClick} />
         </Stack>

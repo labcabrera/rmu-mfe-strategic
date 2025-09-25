@@ -1,26 +1,38 @@
-import React, { FC, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
-import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { deleteStrategicGame } from '../../api/strategic-game';
+import { fetchStrategicGame, deleteStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
+import DeleteButton from '../../shared/buttons/DeleteButton';
+import EditButton from '../../shared/buttons/EditButton';
+import RefreshButton from '../../shared/buttons/RefreshButton';
 import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 
 const StrategicGameViewActions: FC<{
   strategicGame: StrategicGame;
-}> = ({ strategicGame }) => {
+  setStrategicGame?: Dispatch<SetStateAction<StrategicGame | null>>;
+}> = ({ strategicGame, setStrategicGame }) => {
   const navigate = useNavigate();
   const { showError } = useError();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   if (!strategicGame) return <p>Loading...</p>;
+
+  const handleRefresh = () => {
+    fetchStrategicGame(strategicGame.id)
+      .then((data) => {
+        setStrategicGame(data);
+      })
+      .catch((error: unknown) => {
+        if (error instanceof Error) showError(error.message);
+        else showError('Unknown error fetching game');
+      });
+  };
 
   const handleDelete = () => {
     deleteStrategicGame(strategicGame.id)
@@ -28,7 +40,7 @@ const StrategicGameViewActions: FC<{
         navigate('/strategic/games');
       })
       .catch((error: unknown) => {
-        if (error instanceof Error) showError(`Error deleting game: ${error.message}`);
+        if (error instanceof Error) showError(error.message);
         else showError('Unknown error deleting game');
       });
   };
@@ -68,12 +80,9 @@ const StrategicGameViewActions: FC<{
           </Breadcrumbs>
         </Box>
         <Stack direction="row" spacing={2}>
-          <IconButton onClick={handleEditClick} size="large" color="primary">
-            <EditIcon />
-          </IconButton>
-          <IconButton onClick={handleDeleteClick} size="large" color="primary">
-            <DeleteIcon />
-          </IconButton>
+          <RefreshButton onClick={handleRefresh} />
+          <EditButton onClick={handleEditClick} />
+          <DeleteButton onClick={handleDeleteClick} />
         </Stack>
       </Stack>
       <DeleteDialog

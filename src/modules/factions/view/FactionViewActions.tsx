@@ -3,22 +3,34 @@ import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { Box, Breadcrumbs, Link, Stack } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { deleteFaction } from '../../api/faction';
+import { fetchFaction, deleteFaction } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import DeleteButton from '../../shared/buttons/DeleteButton';
 import EditButton from '../../shared/buttons/EditButton';
+import RefreshButton from '../../shared/buttons/RefreshButton';
 import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 
 const FactionViewActions: FC<{
   faction: Faction;
+  setFaction: React.Dispatch<React.SetStateAction<Faction | null>>;
   strategicGame: StrategicGame;
-}> = ({ faction, strategicGame }) => {
+}> = ({ faction, setFaction, strategicGame }) => {
   const navigate = useNavigate();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { showError } = useError();
 
   if (!faction || !strategicGame) return <p>Loading...</p>;
+
+  const handleRefresh = () => {
+    fetchFaction(faction.id)
+      .then((data: Faction) => {
+        setFaction(data);
+      })
+      .catch((error: Error) => {
+        showError(error.message);
+      });
+  };
 
   const handleDelete = async () => {
     try {
@@ -72,6 +84,7 @@ const FactionViewActions: FC<{
           </Breadcrumbs>
         </Box>
         <Stack direction="row" spacing={2}>
+          <RefreshButton onClick={handleRefresh} />
           <EditButton onClick={handleEditClick} />
           <DeleteButton onClick={handleDeleteClick} />
         </Stack>
