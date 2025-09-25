@@ -9,7 +9,7 @@ import NumericInput from '../../shared/inputs/NumericInput';
 import NumericReadonlyInput from '../../shared/inputs/NumericReadonlyInput';
 import SelectTrait from '../../shared/selects/SelectTraitCategory';
 
-const CharacterAddTraitDialog: FC<{
+const CharacterViewAddTraitDialog: FC<{
   open: boolean;
   onClose: () => void;
   onTraitAdded: (addTrait: AddTraitDto) => void;
@@ -52,7 +52,7 @@ const CharacterAddTraitDialog: FC<{
       setFormData({
         traitId: trait.id,
         tier: trait.isTierBased ? 1 : undefined,
-        value: undefined,
+        specialization: undefined,
       });
     } else {
       setFormData(null);
@@ -93,7 +93,7 @@ const CharacterAddTraitDialog: FC<{
               {selectedTrait.isTierBased && (
                 <Grid size={4}>
                   <NumericInput
-                    label={t('tier')}
+                    label={`${t('tier')} 1-${selectedTrait.maxTier}`}
                     value={formData.tier}
                     onChange={(value) => setFormData({ ...formData, tier: value })}
                     integer
@@ -106,9 +106,9 @@ const CharacterAddTraitDialog: FC<{
                 <Grid size={6}>
                   <TextField
                     label={t('specialization')}
-                    value={formData.value}
-                    name="value"
-                    onChange={(e) => setFormData({ ...formData, value: e.target.value })}
+                    value={formData.specialization}
+                    name="specialization"
+                    onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
                     variant="standard"
                     fullWidth
                   />
@@ -117,7 +117,7 @@ const CharacterAddTraitDialog: FC<{
             </>
           )}
         </Grid>
-        <pre>{JSON.stringify(formData, null, 2)} </pre>
+        {/* <pre>{JSON.stringify(formData, null, 2)} </pre> */}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>{t('cancel')}</Button>
@@ -129,4 +129,4 @@ const CharacterAddTraitDialog: FC<{
   );
 };
 
-export default CharacterAddTraitDialog;
+export default CharacterViewAddTraitDialog;

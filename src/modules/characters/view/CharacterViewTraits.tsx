@@ -2,11 +2,15 @@ import React, { FC, useState } from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { addTrait } from '../../api/character';
-import { AddTraitDto, Character } from '../../api/character.dto';
+import { addTrait, deleteTrait } from '../../api/character';
+import { AddTraitDto, Character, CharacterTrait } from '../../api/character.dto';
+import { toRoman } from '../../services/roman-number-service';
 import AddButton from '../../shared/buttons/AddButton';
+import DeleteButton from '../../shared/buttons/DeleteButton';
 import TextCard from '../../shared/cards/TextCard';
-import CharacterAddTraitDialog from './CharacterViewAddTraitDialog';
+import DeleteDialog from '../../shared/dialogs/DeleteDialog';
+import CharacterViewAddTraitDialog from './CharacterViewAddTraitDialog';
+import CharacterViewTraitDialog from './CharacterViewTraitDialog';
 
 const CharacterViewTraits: FC<{
   character: Character;
@@ -14,10 +18,17 @@ const CharacterViewTraits: FC<{
 }> = ({ character, setCharacter }) => {
   const { showError } = useError();
   const [openAddTraitDialog, setOpenAddTraitDialog] = useState(false);
+  const [openTraitDialog, setOpenTraitDialog] = useState(false);
+  const [traitId, setTraitId] = useState<string | null>(null);
 
   if (!character) return <div>Loading...</div>;
 
   if (!character.traits) return <div>No traits available.</div>;
+
+  const handleTraitView = (traitId: string) => {
+    setTraitId(traitId);
+    setOpenTraitDialog(true);
+  };
 
   const handleAddTrait = (addTraitDto: AddTraitDto) => {
     addTrait(character.id, addTraitDto)
@@ -28,6 +39,21 @@ const CharacterViewTraits: FC<{
       .catch((error) => {
         showError(error.message);
       });
+  };
+
+  const handleDeleteTrait = (trait: CharacterTrait) => {
+    deleteTrait(character.id, trait)
+      .then((updatedCharacter) => {
+        setCharacter(updatedCharacter);
+      })
+      .catch((error) => {
+        showError(error.message);
+      });
+  };
+
+  const getTraitName = (trait: CharacterTrait): string => {
+    const name = trait.tier ? `${trait.traitName} ${toRoman(trait.tier)}` : trait.traitName;
+    return trait.specialization ? `${name}: ${t(trait.specialization)}` : name;
   };
 
   return (
@@ -42,21 +68,28 @@ const CharacterViewTraits: FC<{
           </Box>
         </Grid>
         {character.traits.map((trait, index) => (
-          <TextCard
-            key={index}
-            value={trait.traitId}
-            subtitle={trait.tier ? `Tier ${trait.tier}` : ''}
-            image={trait.isTalent ? '/static/images/generic/trait.png' : '/static/images/generic/disease.png'}
-          />
+          <Grid size={12}>
+            <Box display="flex" alignItems="center" gap={2}>
+              <TextCard
+                key={index}
+                value={getTraitName(trait)}
+                subtitle={trait.tier ? `Tier ${trait.tier}` : ''}
+                image={trait.isTalent ? '/static/images/generic/trait.png' : '/static/images/generic/disease.png'}
+                minWidth={500}
+                maxWidth={500}
+                onClick={() => handleTraitView(trait.traitId)}
+              />
+              <DeleteButton onClick={() => handleDeleteTrait(trait)} />
+            </Box>
+          </Grid>
         ))}
-        <pre>{JSON.stringify(character.traits, null, 2)}</pre>
       </Grid>
-      <CharacterAddTraitDialog
+      <CharacterViewAddTraitDialog
         open={openAddTraitDialog}
-        character={character}
         onClose={() => setOpenAddTraitDialog(false)}
         onTraitAdded={(addTraitDto) => handleAddTrait(addTraitDto)}
       />
+      <CharacterViewTraitDialog traitId={traitId} open={openTraitDialog} onClose={() => setOpenTraitDialog(false)} />
     </>
   );
 };

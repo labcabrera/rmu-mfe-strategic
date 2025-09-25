@@ -22,7 +22,7 @@ export interface CreateCharacterDto extends Omit<Character, 'items'> {}
 export interface AddTraitDto {
   traitId: string;
   tier: number | undefined;
-  value: string | undefined;
+  specialization: string | undefined;
 }
 
 export interface UpdateCharacterDto {
@@ -68,10 +68,11 @@ export interface RaceInfo {
 
 export interface CharacterTrait {
   traitId: string;
+  traitName: string;
   isTalent: boolean;
   tier: number | undefined;
   cost: number;
-  value: string | undefined;
+  specialization: string | undefined;
 }
 
 export interface CharacterSkill {
