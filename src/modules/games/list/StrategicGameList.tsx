@@ -11,7 +11,7 @@ import StrategicGameCard from '../../shared/cards/StrategicGameCard';
 import StrategicGameListActions from './StrategicGameListActions';
 import StrategicGameListResume from './StrategicGameListResume';
 
-const pageSize = 24;
+const pageSize = 12;
 
 const StrategicGameList: FC = () => {
   const { showError } = useError();
@@ -86,14 +86,7 @@ const StrategicGameList: FC = () => {
                 </Typography>
               )}
               <Box display="flex" justifyContent="center" mt={5}>
-                <Pagination
-                  count={totalPages}
-                  page={page + 1}
-                  onChange={handlePageChange}
-                  color="primary"
-                  showFirstButton
-                  showLastButton
-                />
+                <Pagination count={totalPages} page={page + 1} onChange={handlePageChange} color="primary" />
               </Box>
             </>
           )}

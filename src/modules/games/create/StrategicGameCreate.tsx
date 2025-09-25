@@ -44,11 +44,11 @@ const StrategicGameCreate: FC = () => {
       <StrategicGameCreateActions formData={formData} isValid={isValid} />
       <Grid container spacing={5}>
         <Grid size={2}>
-          <GenericAvatar imageUrl={defaultStrategicGameImage} size={250} />
+          <GenericAvatar imageUrl={defaultStrategicGameImage} size={300} />
           <StrategicGameCreateAttributesBasic formData={formData} setFormData={setFormData} realms={realms} />
         </Grid>
         <Grid size={7}>
-          <StrategicGameCreateAttributes formData={formData} setFormData={setFormData} realms={realms} />
+          <StrategicGameCreateAttributes formData={formData} setFormData={setFormData} />
         </Grid>
       </Grid>
       {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
