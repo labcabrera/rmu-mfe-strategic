@@ -61,14 +61,14 @@ const StrategicGameList: FC = () => {
           <StrategicGameListResume />
         </Grid>
         <Grid size={10}>
-          <Box display="flex" alignItems="center" gap={1} mb={2}>
+          {/* <Box display="flex" alignItems="center" gap={1} mb={2}>
             <Typography variant="h6" color="primary">
               {t('strategic-games')}
             </Typography>
             <IconButton onClick={handleNewGame} color="primary">
               <AddCircleIcon />
             </IconButton>
-          </Box>
+          </Box> */}
 
           {loading ? (
             <Typography>Loading...</Typography>

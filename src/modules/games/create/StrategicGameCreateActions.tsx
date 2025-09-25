@@ -1,10 +1,12 @@
 import React from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { Cancel } from '@mui/icons-material';
 import { Box, Breadcrumbs, Link, Stack } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { createStrategicGame } from '../../api/strategic-game';
 import { CreateStrategicGameDto } from '../../api/strategic-game.dto';
+import CancelButton from '../../shared/buttons/CancelButton';
 import SaveButton from '../../shared/buttons/SaveButton';
 
 const StrategicGameCreateActions: React.FC<{
@@ -42,6 +44,7 @@ const StrategicGameCreateActions: React.FC<{
         </Breadcrumbs>
       </Box>
       <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>
+        <CancelButton onClick={() => navigate(-1)} />
         <SaveButton onClick={createGame} disabled={!isValid} />
       </Stack>
     </Stack>

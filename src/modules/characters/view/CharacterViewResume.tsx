@@ -43,6 +43,11 @@ const CharacterViewResume: FC<{
       <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
         {character.name}
       </Typography>
+      {character.experience.availableDevelopmentPoints > 0 && (
+        <Typography variant="body1" color="primary" sx={{ mt: 2 }}>
+          {`+${character.experience.availableDevelopmentPoints} unspent dev points`}
+        </Typography>
+      )}
       <Typography variant="body1" sx={{ mt: 2 }}>
         {character.info.raceName} - {t(character.info.professionId)} - {character.experience.availableLevel}
       </Typography>

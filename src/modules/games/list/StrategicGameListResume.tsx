@@ -4,7 +4,7 @@ import { Typography } from '@mui/material';
 const StrategicGameListResume: FC = () => {
   return (
     <>
-      <Typography variant="body1" mt={5}>
+      <Typography variant="body1">
         A strategic game is a campaign that takes place in a specific realm. A campaign consists of one or more
         factions, and each faction will define the characters that players control. Each campaign will have different
         encounters, called tactical games, where different factions will fight each other or against environmental NPCs.

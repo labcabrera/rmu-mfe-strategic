@@ -28,7 +28,7 @@ const CharacterViewTraitDialog: FC<{
     }
   }, [traitId]);
 
-  if (!trait) return <div>Loading...</div>;
+  if (!trait) return null;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>

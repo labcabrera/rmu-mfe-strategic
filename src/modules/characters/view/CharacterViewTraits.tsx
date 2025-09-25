@@ -21,9 +21,7 @@ const CharacterViewTraits: FC<{
   const [openTraitDialog, setOpenTraitDialog] = useState(false);
   const [traitId, setTraitId] = useState<string | null>(null);
 
-  if (!character) return <div>Loading...</div>;
-
-  if (!character.traits) return <div>No traits available.</div>;
+  if (!character) return <div>Loading for character...</div>;
 
   const handleTraitView = (traitId: string) => {
     setTraitId(traitId);
@@ -83,6 +81,7 @@ const CharacterViewTraits: FC<{
             </Box>
           </Grid>
         ))}
+        {character.traits.length === 0 && <div>This character has no traits.</div>}
       </Grid>
       <CharacterViewAddTraitDialog
         open={openAddTraitDialog}

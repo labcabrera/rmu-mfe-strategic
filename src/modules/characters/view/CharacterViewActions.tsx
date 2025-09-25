@@ -117,16 +117,8 @@ const CharacterViewActions: FC<{
           </Breadcrumbs>
         </Box>
         <Stack direction="row" spacing={2} alignItems={'center'}>
-          {character.experience.availableDevelopmentPoints > 0 && (
-            <Chip
-              label={`+${character.experience.availableDevelopmentPoints} Dev Points`}
-              avatar={<UploadIcon />}
-              color="warning"
-              variant="outlined"
-            />
-          )}
           {levelUpAvailable && (
-            <Button onClick={() => onLevelUp(false)} startIcon={<UploadIcon />} variant="outlined" color="warning">
+            <Button onClick={() => onLevelUp(false)} startIcon={<UploadIcon />} variant="outlined" color="primary">
               Level up
             </Button>
           )}
