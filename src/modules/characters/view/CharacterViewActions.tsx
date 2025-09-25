@@ -1,6 +1,7 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import UploadIcon from '@mui/icons-material/Upload';
 import {
   Box,
   Button,
@@ -115,7 +116,11 @@ const CharacterViewActions: FC<{
           </Breadcrumbs>
         </Box>
         <Stack direction="row" spacing={2}>
-          {levelUpAvailable && <Button onClick={() => onLevelUp(false)}>Level up</Button>}
+          {levelUpAvailable && (
+            <Button onClick={() => onLevelUp(false)} startIcon={<UploadIcon />} variant="outlined" color="warning">
+              Level up
+            </Button>
+          )}
           <RefreshButton onClick={handleRefresh} />
           <EditButton onClick={handleEditClick} />
           <DeleteButton onClick={handleDeleteClick} />
