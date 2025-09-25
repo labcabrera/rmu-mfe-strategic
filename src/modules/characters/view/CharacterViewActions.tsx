@@ -56,7 +56,7 @@ const CharacterViewActions: FC<{
       });
   };
 
-  const levelUpAvailable = character.experience.level <= character.experience.availableLevel;
+  const levelUpAvailable = character.experience.level < character.experience.availableLevel;
 
   const onLevelUp = (force: boolean) => {
     levelUpCharacter(character.id, force)
