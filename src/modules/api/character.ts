@@ -1,5 +1,5 @@
 import { buildErrorFromResponse } from './api-errors';
-import { AddItemDto, Character } from './character.dto';
+import { AddItemDto, AddTraitDto, Character } from './character.dto';
 import { Item } from './items';
 import { AddSkill } from './skill.dto';
 
@@ -217,6 +217,19 @@ export async function levelUpCharacter(characterId: string, force: boolean): Pro
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+  });
+  if (response.status !== 200) {
+    throw await buildErrorFromResponse(response, url);
+  }
+  return await response.json();
+}
+
+export async function addTrait(characterId: string, addTraitDto: AddTraitDto): Promise<Character> {
+  const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/traits`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(addTraitDto),
   });
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);

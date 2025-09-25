@@ -10,6 +10,7 @@ import CharacterViewItems from './CharacterViewItems';
 import CharacterViewResistances from './CharacterViewResistances';
 import CharacterViewSkills from './CharacterViewSkills';
 import CharacterViewStats from './CharacterViewStats';
+import CharacterViewTraits from './CharacterViewTraits';
 
 function CustomTabPanel(props: { children?: ReactNode; value: number; index: number }) {
   const { children, value, index, ...other } = props;
@@ -55,9 +56,10 @@ const CharacterViewTabs: FC<{
           <Tab label="Stats" {...a11yProps(1)} />
           <Tab label="Resistances" {...a11yProps(2)} />
           <Tab label="Skills" {...a11yProps(3)} />
-          <Tab label="Items" {...a11yProps(4)} />
-          <Tab label="Attacks" {...a11yProps(5)} />
-          <Tab label="Debug" {...a11yProps(6)} />
+          <Tab label="Traits" {...a11yProps(4)} />
+          <Tab label="Items" {...a11yProps(5)} />
+          <Tab label="Attacks" {...a11yProps(6)} />
+          <Tab label="Debug" {...a11yProps(7)} />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
@@ -73,12 +75,15 @@ const CharacterViewTabs: FC<{
         <CharacterViewSkills character={character} setCharacter={setCharacter} profession={profession} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={4}>
-        <CharacterViewItems character={character} setCharacter={setCharacter} faction={faction} />
+        <CharacterViewTraits character={character} setCharacter={setCharacter} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={5}>
-        <CharacterViewAttacks character={character} />
+        <CharacterViewItems character={character} setCharacter={setCharacter} faction={faction} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={6}>
+        <CharacterViewAttacks character={character} />
+      </CustomTabPanel>
+      <CustomTabPanel value={value} index={7}>
         <pre>Character: {JSON.stringify(character, null, 2)}</pre>
         <pre>Profession: {JSON.stringify(profession, null, 2)}</pre>
         <pre>Faction: {JSON.stringify(faction, null, 2)}</pre>

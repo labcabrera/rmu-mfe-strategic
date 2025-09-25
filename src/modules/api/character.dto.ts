@@ -13,10 +13,17 @@ export interface Character {
   skills: CharacterSkill[];
   items: CharacterItem[];
   equipment: CharacterEquipment;
+  traits: CharacterTrait[];
   [key: string]: any;
 }
 
 export interface CreateCharacterDto extends Omit<Character, 'items'> {}
+
+export interface AddTraitDto {
+  traitId: string;
+  tier: number | undefined;
+  value: string | undefined;
+}
 
 export interface UpdateCharacterDto {
   name: string | undefined;
@@ -57,6 +64,14 @@ export interface RaceInfo {
   realmType: string;
   height: number;
   weight: number;
+}
+
+export interface CharacterTrait {
+  traitId: string;
+  isTalent: boolean;
+  tier: number | undefined;
+  cost: number;
+  value: string | undefined;
 }
 
 export interface CharacterSkill {
