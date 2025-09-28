@@ -1,5 +1,5 @@
 {
-  "name": "rmu-fe-strategic",
+  "name": "rmu-mfe-strategic",
   "version": "0.5.1",
   "scripts": {
     "build": "webpack --mode production",
