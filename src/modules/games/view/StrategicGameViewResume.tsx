@@ -13,7 +13,6 @@ const StrategicGameViewResume: FC<{ game: StrategicGame; setGame: Dispatch<SetSt
   game,
   setGame,
 }) => {
-  const location = useLocation();
   const { showError } = useError();
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
 

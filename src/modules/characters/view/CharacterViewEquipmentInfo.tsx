@@ -42,7 +42,17 @@ const CharacterViewEquipmentInfo: React.FC<{
             image={`/static/images/generic/carried-weight.png`}
             applyColor={false}
           />
-          <NumericCard value={0} subtitle={t('weight-penalty')} image={`/static/images/generic/weight-penalty.png`} />
+          <NumericCard
+            value={character.equipment.weightAllowance}
+            subtitle={t('Weight allowance')}
+            image={`/static/images/generic/carried-weight.png`}
+            applyColor={false}
+          />
+          <NumericCard
+            value={character.equipment.encumbrancePenalty}
+            subtitle={t('weight-penalty')}
+            image={`/static/images/generic/weight-penalty.png`}
+          />
           <NumericCard
             value={character.equipment.maneuverPenalty}
             subtitle={t('maneuver-penalty')}
@@ -50,7 +60,7 @@ const CharacterViewEquipmentInfo: React.FC<{
           />
           <NumericCard
             value={character.equipment.baseManeuverPenalty}
-            subtitle={t('base-maneuver-penalty')}
+            subtitle={t('Maneuver penalty')}
             image={`/static/images/generic/maneuver-penalty.png`}
           />
           <TextCard

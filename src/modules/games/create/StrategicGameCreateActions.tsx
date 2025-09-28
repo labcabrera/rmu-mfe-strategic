@@ -1,11 +1,13 @@
 import React from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import SaveIcon from '@mui/icons-material/Save';
-import { Box, Breadcrumbs, IconButton, Link, Stack } from '@mui/material';
+import { Cancel } from '@mui/icons-material';
+import { Box, Breadcrumbs, Link, Stack } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { createStrategicGame } from '../../api/strategic-game';
 import { CreateStrategicGameDto } from '../../api/strategic-game.dto';
+import CancelButton from '../../shared/buttons/CancelButton';
+import SaveButton from '../../shared/buttons/SaveButton';
 
 const StrategicGameCreateActions: React.FC<{
   formData: CreateStrategicGameDto;
@@ -29,19 +31,21 @@ const StrategicGameCreateActions: React.FC<{
     <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center" sx={{ minHeight: 80 }}>
       <Box>
         <Breadcrumbs aria-label="breadcrumb">
-          <Link color="inherit" href="/">
+          <Link color="primary" underline="hover" href="/">
             {t('home')}
           </Link>
-          <Link component={RouterLink} color="inherit" to="/strategic">
+          <Link component={RouterLink} color="primary" underline="hover" to="/strategic">
             {t('strategic')}
           </Link>
-          <span>{t('games')}</span>
+          <Link component={RouterLink} color="primary" underline="hover" to="/strategic/games">
+            {t('games')}
+          </Link>
+          <span>{t('Creation')}</span>
         </Breadcrumbs>
       </Box>
       <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>
-        <IconButton onClick={createGame} disabled={!isValid}>
-          <SaveIcon />
-        </IconButton>
+        <CancelButton onClick={() => navigate(-1)} />
+        <SaveButton onClick={createGame} disabled={!isValid} />
       </Stack>
     </Stack>
   );

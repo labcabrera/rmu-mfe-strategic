@@ -13,10 +13,17 @@ export interface Character {
   skills: CharacterSkill[];
   items: CharacterItem[];
   equipment: CharacterEquipment;
+  traits: CharacterTrait[];
   [key: string]: any;
 }
 
 export interface CreateCharacterDto extends Omit<Character, 'items'> {}
+
+export interface AddTraitDto {
+  traitId: string;
+  tier: number | undefined;
+  specialization: string | undefined;
+}
 
 export interface UpdateCharacterDto {
   name: string | undefined;
@@ -59,6 +66,15 @@ export interface RaceInfo {
   weight: number;
 }
 
+export interface CharacterTrait {
+  traitId: string;
+  traitName: string;
+  isTalent: boolean;
+  tier: number | undefined;
+  cost: number;
+  specialization: string | undefined;
+}
+
 export interface CharacterSkill {
   id: string;
   skillId: string;
@@ -85,7 +101,8 @@ export interface CharacterEquipment {
   arms: string | undefined;
   legs: string | undefined;
   weight: number | undefined;
-  encumbrance?: number;
+  weightAllowance: number | undefined;
+  encumbrancePenalty?: number;
   baseManeuverPenalty: number | undefined;
   maneuverPenalty?: number;
   rangedPenalty?: number;

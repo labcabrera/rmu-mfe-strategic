@@ -1,22 +1,36 @@
 import React, { FC, useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import { Box, Breadcrumbs, IconButton, Link, Stack } from '@mui/material';
+import { Box, Breadcrumbs, Link, Stack } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { deleteFaction } from '../../api/faction';
+import { fetchFaction, deleteFaction } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
+import DeleteButton from '../../shared/buttons/DeleteButton';
+import EditButton from '../../shared/buttons/EditButton';
+import RefreshButton from '../../shared/buttons/RefreshButton';
 import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 
 const FactionViewActions: FC<{
   faction: Faction;
+  setFaction: React.Dispatch<React.SetStateAction<Faction | null>>;
   strategicGame: StrategicGame;
-}> = ({ faction, strategicGame }) => {
+}> = ({ faction, setFaction, strategicGame }) => {
   const navigate = useNavigate();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { showError } = useError();
+
+  if (!faction || !strategicGame) return <p>Loading...</p>;
+
+  const handleRefresh = () => {
+    fetchFaction(faction.id)
+      .then((data: Faction) => {
+        setFaction(data);
+      })
+      .catch((error: Error) => {
+        showError(error.message);
+      });
+  };
 
   const handleDelete = async () => {
     try {
@@ -28,7 +42,7 @@ const FactionViewActions: FC<{
   };
 
   const handleEditClick = () => {
-    navigate(`/strategic/factions/edit/${faction.id}`, { state: { faction, game } });
+    navigate(`/strategic/factions/edit/${faction.id}`, { state: { faction, strategicGame } });
   };
 
   const handleDeleteClick = () => {
@@ -70,12 +84,9 @@ const FactionViewActions: FC<{
           </Breadcrumbs>
         </Box>
         <Stack direction="row" spacing={2}>
-          <IconButton onClick={handleEditClick}>
-            <EditIcon />
-          </IconButton>
-          <IconButton onClick={handleDeleteClick}>
-            <DeleteIcon />
-          </IconButton>
+          <RefreshButton onClick={handleRefresh} />
+          <EditButton onClick={handleEditClick} />
+          <DeleteButton onClick={handleDeleteClick} />
         </Stack>
       </Stack>
       <DeleteDialog

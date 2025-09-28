@@ -1,4 +1,4 @@
-= RMU Engine Strategic MFE
+= RMU Engine MFE Strategic
 :linkattrs:
 :icons: font
 

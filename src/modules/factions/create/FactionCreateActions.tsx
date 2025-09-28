@@ -1,12 +1,13 @@
 import React, { FC } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import SaveIcon from '@mui/icons-material/Save';
-import { Box, Breadcrumbs, IconButton, Link, Stack } from '@mui/material';
+import { Box, Breadcrumbs, Link, Stack } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { createFaction } from '../../api/faction';
 import { CreateFactionDto } from '../../api/faction.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
+import CancelButton from '../../shared/buttons/CancelButton';
+import SaveButton from '../../shared/buttons/SaveButton';
 
 const FactionCreateActions: FC<{
   strategicGame: StrategicGame;
@@ -48,9 +49,8 @@ const FactionCreateActions: FC<{
         </Breadcrumbs>
       </Box>
       <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>
-        <IconButton onClick={handleCreate} color="primary">
-          <SaveIcon />
-        </IconButton>
+        <CancelButton onClick={() => navigate(-1)} />
+        <SaveButton onClick={handleCreate} />
       </Stack>
     </Stack>
   );

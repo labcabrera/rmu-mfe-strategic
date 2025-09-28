@@ -19,7 +19,7 @@ const StrategicGameView: React.FC = () => {
   const location = useLocation();
   const { showError } = useError();
   const params = useParams<{ gameId: string }>();
-  const [game, setGame] = useState<StrategicGame | null>(location.state?.strategicGame || null);
+  const [strategicGame, setStrategicGame] = useState<StrategicGame | null>(location.state?.strategicGame || null);
   const [factions, setFactions] = useState<Faction[]>([]);
   const [tacticalGames, setTacticalGames] = useState<TacticalGame[]>([]);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
@@ -27,7 +27,7 @@ const StrategicGameView: React.FC = () => {
   const bindStrategicGame = (gameId: string) => {
     fetchStrategicGame(gameId)
       .then((data) => {
-        setGame(data);
+        setStrategicGame(data);
       })
       .catch((err: Error) => {
         showError(err.message);
@@ -55,34 +55,34 @@ const StrategicGameView: React.FC = () => {
   };
 
   useEffect(() => {
-    if (game) {
-      bindFactions(game.id);
-      bindTacticalGames(game.id);
+    if (strategicGame) {
+      bindFactions(strategicGame.id);
+      bindTacticalGames(strategicGame.id);
     }
-  }, [game]);
+  }, [strategicGame]);
 
   useEffect(() => {
     if (location.state?.strategicGame) {
-      setGame(location.state.strategicGame);
+      setStrategicGame(location.state.strategicGame);
     }
     if (params.gameId) {
       bindStrategicGame(params.gameId);
     }
   }, [location.state, params.gameId]);
 
-  if (!game) return <div>Loading...</div>;
+  if (!strategicGame) return <div>Loading...</div>;
 
   return (
     <>
-      <StrategicGameViewActions strategicGame={game} />
+      <StrategicGameViewActions strategicGame={strategicGame} setStrategicGame={setStrategicGame} />
       <Grid container spacing={5}>
         <Grid size={2}>
-          <StrategicGameViewResume game={game} setGame={setGame} />
+          <StrategicGameViewResume game={strategicGame} setGame={setStrategicGame} />
         </Grid>
         <Grid size={9}>
-          <StrategicGameViewAttributes strategicGame={game} />
-          <StrategicGameViewFactions strategicGame={game} factions={factions} />
-          <StrategicGameViewTacticalGames strategicGame={game} tacticalGames={tacticalGames} />
+          <StrategicGameViewAttributes strategicGame={strategicGame} />
+          <StrategicGameViewFactions strategicGame={strategicGame} factions={factions} />
+          <StrategicGameViewTacticalGames strategicGame={strategicGame} tacticalGames={tacticalGames} />
         </Grid>
       </Grid>
       <ImageSelectorDialog

@@ -1,9 +1,9 @@
 import { initReactI18next } from 'react-i18next';
 import i18n from 'i18next';
-import enItems from './locales/en-items.json';
-import enSkills from './locales/en-skills.json';
 import en from './locales/en.json';
 import es from './locales/es.json';
+import enItems from './locales/items_en.json';
+import enSkills from './locales/skills_en.json';
 
 const enTranslations = {
   ...en,
