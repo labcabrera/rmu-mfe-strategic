@@ -53,6 +53,7 @@ const CharacterCreateAttributes: FC<{
           value={formData.info.weight}
           onChange={(e: any) => updateFormData('info', 'weight', e)}
           allowNegatives={false}
+          error={!formData.info.weight}
         />
       </Grid>
       <Grid size={12}>

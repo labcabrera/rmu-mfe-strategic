@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacter } from '../../api/character';
@@ -14,6 +14,7 @@ import CharacterViewResume from './CharacterViewResume';
 import CharacterViewTabs from './CharacterViewTabs';
 
 const CharacterView: FC = () => {
+  const location = useLocation();
   const { characterId } = useParams<{ characterId: string }>();
   const [character, setCharacter] = useState<Character | null>(null);
   const [strategicGame, setStrategicGame] = useState<StrategicGame | null>(null);
@@ -22,40 +23,28 @@ const CharacterView: FC = () => {
   const { showError } = useError();
 
   useEffect(() => {
-    if (characterId) {
-      fetchCharacter(characterId)
-        .then((char) => {
-          setCharacter(char);
-        })
-        .catch((err: Error) => {
-          showError(err.message);
-        });
-    }
-  }, [characterId, showError]);
-
-  useEffect(() => {
-    if (character && character.gameId) {
+    if (character) {
       fetchStrategicGame(character.gameId)
         .then((game) => setStrategicGame(game))
-        .catch((err: Error) => {
-          showError(err.message);
-        });
-    }
-    if (character && character.factionId) {
+        .catch((err) => showError(err.message));
       fetchFaction(character.factionId)
         .then((factionData) => setFaction(factionData))
-        .catch((err: Error) => {
-          showError(err.message);
-        });
-    }
-    if (character && character.info && character.info.professionId) {
+        .catch((err) => showError(err.message));
       fetchProfession(character.info.professionId)
         .then((professionData) => setProfession(professionData))
-        .catch((err: Error) => {
-          showError(err.message);
-        });
+        .catch((err) => showError(err.message));
     }
   }, [character, showError]);
+
+  useEffect(() => {
+    if (location.state?.character) {
+      setCharacter(location.state.character);
+    } else if (characterId) {
+      fetchCharacter(characterId)
+        .then((data) => setCharacter(data))
+        .catch((err) => showError(err.message));
+    }
+  }, [location.state, characterId, showError]);
 
   if (!character || !strategicGame || !faction) return <div>Loading...</div>;
 

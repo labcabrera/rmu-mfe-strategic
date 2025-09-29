@@ -17,7 +17,7 @@ export interface Character {
   [key: string]: any;
 }
 
-export interface CreateCharacterDto extends Omit<Character, 'items'> {}
+export interface CreateCharacterDto extends Omit<Character, 'id'> {}
 
 export interface AddTraitDto {
   traitId: string;

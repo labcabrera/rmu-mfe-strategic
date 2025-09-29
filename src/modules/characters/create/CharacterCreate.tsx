@@ -104,6 +104,8 @@ const CharacterCreate: FC = () => {
     if (!formData.info?.raceId) valid = false;
     if (!formData.info?.professionId) valid = false;
     if (!formData.info?.realmType) valid = false;
+    if (!formData.factionId) valid = false;
+    if (!formData.info?.weight) valid = false;
     setIsValid(valid);
   };
 
