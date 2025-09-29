@@ -38,9 +38,7 @@ const CharacterViewSkills: FC<{
         setCharacter(updatedCharacter);
         setOpenAddSkillDialog(false);
       })
-      .catch((error: any) => {
-        showError(error.message);
-      });
+      .catch((error) => showError(error.message));
   };
 
   return (

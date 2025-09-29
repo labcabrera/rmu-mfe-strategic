@@ -1,6 +1,6 @@
-import { CreateCharacterDto } from '../api/character';
+import { CreateCharacterDto } from '../api/character.dto';
 
-export const characterCreateTemplate: CreateCharacterDto = {
+export const CHARACTER_CREATION_TEMPLATE: CreateCharacterDto = {
   name: '',
   gameId: '',
   factionId: '',

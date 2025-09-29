@@ -15,6 +15,7 @@ import {
   DialogTitle,
   Chip,
 } from '@mui/material';
+import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacter, deleteCharacter, levelUpCharacter } from '../../api/character';
 import { Character } from '../../api/character.dto';
@@ -31,33 +32,23 @@ const CharacterViewActions: FC<{
   game: StrategicGame;
   faction: Faction;
 }> = ({ character, setCharacter, game, faction }) => {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const { showError } = useError();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
-
-  const handleRefresh = () => {
-    fetchCharacter(character.id)
-      .then((data) => {
-        setCharacter(data);
-      })
-      .catch((err: Error) => {
-        showError(err.message);
-      });
-  };
-
-  const handleDelete = () => {
-    deleteCharacter(character.id)
-      .then(() => {
-        navigate(`/strategic/factions/view/${character.factionId}`);
-      })
-      .catch((err: Error) => {
-        showError(err.message);
-      });
-  };
-
   const levelUpAvailable = character.experience.level < character.experience.availableLevel;
+
+  const onRefresh = () => {
+    fetchCharacter(character.id)
+      .then((data) => setCharacter(data))
+      .catch((err) => showError(err.message));
+  };
+
+  const onDelete = () => {
+    deleteCharacter(character.id)
+      .then(() => navigate(`/strategic/factions/view/${character.factionId}`, { state: { faction } }))
+      .catch((err) => showError(err.message));
+  };
 
   const onLevelUp = (force: boolean) => {
     levelUpCharacter(character.id, force)
@@ -65,8 +56,7 @@ const CharacterViewActions: FC<{
         setCharacter(updated);
         setLevelUpDialogOpen(false);
       })
-      .catch((err: Error) => {
-        //TODO check error code
+      .catch((err) => {
         if (force === false) {
           setLevelUpDialogOpen(true);
         } else {
@@ -75,16 +65,12 @@ const CharacterViewActions: FC<{
       });
   };
 
-  const handleEditClick = () => {
+  const onEdit = () => {
     navigate(`/strategic/characters/edit/${character.id}`, { state: { character } });
   };
 
-  const handleDeleteClick = () => {
-    setDeleteDialogOpen(true);
-  };
-
   const handleDialogDelete = () => {
-    handleDelete();
+    onDelete();
     setDeleteDialogOpen(false);
   };
 
@@ -94,7 +80,7 @@ const CharacterViewActions: FC<{
         <Box>
           <Breadcrumbs aria-label="breadcrumb">
             <Link underline="hover" color="primary" href="/">
-              Home
+              {t('home')}
             </Link>
             <Link underline="hover" component={RouterLink} color="primary" to="/strategic/games">
               {t('strategic')}
@@ -119,12 +105,12 @@ const CharacterViewActions: FC<{
         <Stack direction="row" spacing={2} alignItems={'center'}>
           {levelUpAvailable && (
             <Button onClick={() => onLevelUp(false)} startIcon={<UploadIcon />} variant="outlined" color="primary">
-              Level up
+              {t('level-up')}
             </Button>
           )}
-          <RefreshButton onClick={handleRefresh} />
-          <EditButton onClick={handleEditClick} />
-          <DeleteButton onClick={handleDeleteClick} />
+          <RefreshButton onClick={onRefresh} />
+          <EditButton onClick={onEdit} />
+          <DeleteButton onClick={() => setDeleteDialogOpen(true)} />
         </Stack>
       </Stack>
       <DeleteDialog

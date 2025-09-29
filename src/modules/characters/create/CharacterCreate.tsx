@@ -10,7 +10,7 @@ import { fetchRaces } from '../../api/race';
 import { Race } from '../../api/race.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import { characterCreateTemplate } from '../../data/character-create';
+import { CHARACTER_CREATION_TEMPLATE } from '../../data/character-create';
 import { randomizeStats } from '../../services/randomize-stats';
 import RaceAvatar from '../../shared/avatars/RaceAvatar';
 import CharacterCreateActions from './CharacterCreateActions';
@@ -40,7 +40,7 @@ const CharacterCreate: FC = () => {
   const [game, setGame] = useState<StrategicGame | null>(null);
   const [races, setRaces] = useState<Race[]>([]);
   const [factions, setFactions] = useState<Faction[]>([]);
-  const [formData, setFormData] = useState<CreateCharacterDto>(characterCreateTemplate);
+  const [formData, setFormData] = useState<CreateCharacterDto>(CHARACTER_CREATION_TEMPLATE);
   const [statBonusFormData, setStatBonusFormData] = useState<StatBonusFormData>({
     ag: { potential: 0, temporary: 0 },
     co: { potential: 0, temporary: 0 },
