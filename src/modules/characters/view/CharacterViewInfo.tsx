@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { Badge, Box, Grid, Typography } from '@mui/material';
 import { t } from 'i18next';
-import { Character, stats } from '../../api/character.dto';
+import { Character, STATS } from '../../api/character.dto';
 import NumericCard from '../../shared/cards/NumericCard';
 import TextCard from '../../shared/cards/TextCard';
 
@@ -109,7 +109,7 @@ const CharacterViewInfo: FC<{
             {t('stats')}
           </Typography>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
-            {stats.map((stat) => (
+            {STATS.map((stat) => (
               <NumericCard
                 key={stat}
                 value={character.statistics[stat].totalBonus}

@@ -2,7 +2,7 @@ import React, { useState, useEffect, FC } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
 import { useError } from '../../../ErrorContext';
-import { CreateCharacterDto, stats } from '../../api/character.dto';
+import { CreateCharacterDto } from '../../api/character.dto';
 import { fetchFactions } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
 import { Profession } from '../../api/professions';
@@ -11,7 +11,7 @@ import { Race } from '../../api/race.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { characterCreateTemplate } from '../../data/character-create';
-import { getStatBonus } from '../../services/stat-service';
+import { randomizeStats } from '../../services/randomize-stats';
 import RaceAvatar from '../../shared/avatars/RaceAvatar';
 import CharacterCreateActions from './CharacterCreateActions';
 import CharacterCreateAttributes from './CharacterCreateAttributes';
@@ -59,45 +59,12 @@ const CharacterCreate: FC = () => {
   const [isValid, setIsValid] = useState<boolean>(false);
 
   const onRandomStats = () => {
-    for (const key of stats) {
-      const values = [randomStatValue(), randomStatValue(), randomStatValue()];
-      values.sort((a, b) => b - a);
-      const potentialValue = values[0];
-      const temporaryValue = values[1];
-      const potentialBonus = getStatBonus(potentialValue);
-      const temporaryBonus = getStatBonus(temporaryValue);
-
-      setFormData((prevState) => ({
-        ...prevState,
-        statistics: {
-          ...prevState.statistics,
-          [key]: {
-            ...prevState.statistics[key],
-            potential: potentialValue,
-            temporary: temporaryValue,
-          },
-        },
-      }));
-
-      setStatBonusFormData((prevState) => ({
-        ...prevState,
-        [key]: {
-          potential: potentialBonus,
-          temporary: temporaryBonus,
-        },
-      }));
-      setBoosts(game?.powerLevel.statCreationBoost || 2);
-      setSwaps(game?.powerLevel.statCreationSwap || 2);
-    }
+    randomizeStats(setFormData, setStatBonusFormData);
+    setBoosts(game?.powerLevel.statCreationBoost || 2);
+    setSwaps(game?.powerLevel.statCreationSwap || 2);
   };
 
-  const randomStatValue = (): number => {
-    const min = 11;
-    const max = 100;
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  };
-
-  const checkValidForm = () => {
+  const checkValidForm = (formData: CreateCharacterDto) => {
     let valid = true;
     if (!formData.gameId) valid = false;
     if (!formData.name || formData.name.trim() === '') valid = false;
@@ -112,20 +79,14 @@ const CharacterCreate: FC = () => {
   const bindStrategicGame = () => {
     if (!gameId) return;
     fetchStrategicGame(gameId)
-      .then((game) => {
-        setGame(game);
-      })
-      .catch((error: Error) => {
-        showError(error.message);
-      });
+      .then((game) => setGame(game))
+      .catch((err) => showError(err.message));
     fetchFactions(`gameId==${gameId}`, 0, 20)
       .then((factions) => {
         setFactions(factions);
         setFaction(factions.find((f) => f.id === factionId) || null);
       })
-      .catch((error: Error) => {
-        showError(error.message);
-      });
+      .catch((err) => showError(err.message));
   };
 
   const handleWeaponOrderChange = (newOrder: string[]) => {
@@ -136,8 +97,7 @@ const CharacterCreate: FC = () => {
   };
 
   useEffect(() => {
-    checkValidForm();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    checkValidForm(formData);
   }, [formData]);
 
   useEffect(() => {
@@ -156,7 +116,6 @@ const CharacterCreate: FC = () => {
         gameId: gameId,
       }));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameId]);
 
   useEffect(() => {

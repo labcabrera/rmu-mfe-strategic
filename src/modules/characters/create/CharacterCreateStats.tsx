@@ -4,7 +4,7 @@ import SyncIcon from '@mui/icons-material/Sync';
 import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { t } from 'i18next';
-import { CreateCharacterDto, stats } from '../../api/character.dto';
+import { CreateCharacterDto, STATS } from '../../api/character.dto';
 import { StatBonusFormData } from './CharacterCreate';
 
 const CharacterStats: FC<{
@@ -102,7 +102,7 @@ const CharacterCreateStats: FC<{
           </TableRow>
         </TableHead>
         <TableBody>
-          {stats.map((key) => (
+          {STATS.map((key) => (
             <CharacterStats
               key={key}
               statKey={key}

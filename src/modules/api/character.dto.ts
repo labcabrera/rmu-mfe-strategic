@@ -1,4 +1,4 @@
-export const stats = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
+export const STATS = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
 
 export interface Character {
   id: string;
@@ -141,7 +141,7 @@ export interface Stat {
 }
 
 export type CharacterStatistics = {
-  [key in (typeof stats)[number]]: Stat;
+  [key in (typeof STATS)[number]]: Stat;
 };
 
 export interface CharacterResistance {
