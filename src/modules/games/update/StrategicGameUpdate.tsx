@@ -15,6 +15,18 @@ const StrategicGameUpdate: FC = () => {
   const { gameId } = useParams<{ gameId?: string }>();
   const [strategicGame, setStrategicGame] = useState<StrategicGame | null>(null);
   const [formData, setFormData] = useState<UpdateStrategicGameDto | null>(null);
+  const [isValid, setIsValid] = useState(false);
+
+  const validateForm = (data: UpdateStrategicGameDto) => {
+    if (!data.name || data.name.trim() === '') return false;
+    return true;
+  };
+
+  useEffect(() => {
+    if (formData) {
+      setIsValid(validateForm(formData));
+    }
+  }, [formData]);
 
   useEffect(() => {
     if (strategicGame) {
@@ -41,7 +53,7 @@ const StrategicGameUpdate: FC = () => {
 
   return (
     <>
-      <StrategicGameUpdateActions strategicGame={strategicGame} formData={formData} />
+      <StrategicGameUpdateActions strategicGame={strategicGame} formData={formData} isValid={isValid} />
       <Grid container spacing={5}>
         <Grid size={2}>
           <StrategicGameAvatar strategicGame={strategicGame} size={300} />

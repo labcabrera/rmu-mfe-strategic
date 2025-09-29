@@ -5,7 +5,7 @@ import { Realm } from '../../api/realm.dto';
 import { CreateStrategicGameDto } from '../../api/strategic-game.dto';
 import SelectRealm from '../../shared/selects/SelectRealm';
 
-const StrategicGameCreateAttributesBasic: FC<{
+const StrategicGameCreateResume: FC<{
   formData: CreateStrategicGameDto;
   setFormData: Dispatch<SetStateAction<CreateStrategicGameDto>>;
   realms: Realm[];
@@ -20,7 +20,7 @@ const StrategicGameCreateAttributesBasic: FC<{
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           error={formData.name.trim() === ''}
-          helperText={formData.name.trim() === '' ? t('required-field') : ''}
+          autoFocus
           fullWidth
         />
       </Grid>
@@ -59,4 +59,4 @@ const StrategicGameCreateAttributesBasic: FC<{
   );
 };
 
-export default StrategicGameCreateAttributesBasic;
+export default StrategicGameCreateResume;

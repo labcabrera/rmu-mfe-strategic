@@ -31,7 +31,6 @@ const NameTextField = ({ label, value, onChange, required = true, generateRandom
       onChange={onChange}
       fullWidth
       error={required && (!value || value.trim() === '')}
-      helperText={required && !value ? t('required-field') : ''}
       slotProps={{
         input: {
           endAdornment: (

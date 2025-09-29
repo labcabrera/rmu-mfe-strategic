@@ -14,7 +14,8 @@ import SaveButton from '../../shared/buttons/SaveButton';
 const StrategicGameUpdateActions: FC<{
   strategicGame: StrategicGame;
   formData: UpdateStrategicGameDto;
-}> = ({ strategicGame, formData }) => {
+  isValid: boolean;
+}> = ({ strategicGame, formData, isValid }) => {
   const navigate = useNavigate();
   const { showError } = useError();
 

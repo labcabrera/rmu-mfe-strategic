@@ -55,7 +55,6 @@ const CharacterCreateAttributes: FC<{
           allowNegatives={false}
         />
       </Grid>
-      <Grid size={12}></Grid>
       <Grid size={12}>
         <Typography variant="h6" color="primary">
           {t('roleplay')}
@@ -76,7 +75,7 @@ const CharacterCreateAttributes: FC<{
       </Grid>
       <Grid size={12}>
         <TextField
-          label="Description"
+          label={t('description')}
           variant="standard"
           name="description"
           value={formData.description}

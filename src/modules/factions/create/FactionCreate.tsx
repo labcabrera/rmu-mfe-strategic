@@ -53,7 +53,6 @@ const FactionCreate: FC = () => {
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             error={!formData.name}
-            helperText={!formData.name ? t('required-field') : ' '}
             fullWidth
           />
           <TextField

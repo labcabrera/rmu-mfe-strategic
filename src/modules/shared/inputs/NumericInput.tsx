@@ -6,10 +6,10 @@ export type NumericInputProps = {
   onChange: (value: number | null) => void;
   integer?: boolean;
   allowNegatives?: boolean;
-  maxFractionDigits?: number; // default 2
+  maxFractionDigits?: number;
   min?: number;
   max?: number;
-  formatOnBlur?: boolean; // default true
+  formatOnBlur?: boolean;
   name?: string;
   id?: string;
   label?: string;
@@ -39,6 +39,7 @@ export function NumericInput({
   autoFocus,
   className,
   inputMode,
+
   onBlur,
   onFocus,
 }: NumericInputProps) {

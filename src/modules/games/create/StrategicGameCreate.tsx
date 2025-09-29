@@ -8,7 +8,7 @@ import { defaultStrategicGameImage } from '../../services/image-service';
 import GenericAvatar from '../../shared/avatars/GenericAvatar';
 import StrategicGameCreateActions from './StrategicGameCreateActions';
 import StrategicGameCreateAttributes from './StrategicGameCreateAttributes';
-import StrategicGameCreateAttributesBasic from './StrategicGameCreateAttributesBasic';
+import StrategicGameCreateResume from './StrategicGameCreateResume';
 
 const StrategicGameCreate: FC = () => {
   const { showError } = useError();
@@ -38,7 +38,7 @@ const StrategicGameCreate: FC = () => {
       <Grid container spacing={5}>
         <Grid size={2}>
           <GenericAvatar imageUrl={defaultStrategicGameImage} size={300} />
-          <StrategicGameCreateAttributesBasic formData={formData} setFormData={setFormData} realms={realms} />
+          <StrategicGameCreateResume formData={formData} setFormData={setFormData} realms={realms} />
         </Grid>
         <Grid size={10}>
           <StrategicGameCreateAttributes formData={formData} setFormData={setFormData} />

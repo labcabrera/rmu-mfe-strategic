@@ -113,7 +113,7 @@ const CharacterCreateResume: FC<{
         <SelectProfession value={formData.info.professionId} onChange={onProfessionChange} />
       </Grid>
       <Grid size={12}>
-        <SelectRealmType value={formData.info.realmType} onChange={handleRealmTypeChange} />
+        <SelectRealmType value={formData.info.realmType} onChange={(e) => handleRealmTypeChange(e.target.value)} />
       </Grid>
       <Grid size={12}>
         <NumericInput

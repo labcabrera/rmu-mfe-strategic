@@ -14,10 +14,11 @@ const StrategicGameUpdateResume: FC<{
         <TextField
           label={t('name')}
           name="name"
+          variant="standard"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          error={!formData.name || formData.name.trim() === ''}
           fullWidth
-          variant="standard"
         />
       </Grid>
       <Grid size={12}>
