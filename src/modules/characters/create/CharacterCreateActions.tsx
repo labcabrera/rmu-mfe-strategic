@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
+import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { createCharacter } from '../../api/character';
 import { CreateCharacterDto } from '../../api/character.dto';
@@ -18,18 +18,13 @@ const CharacterCreateActions: FC<{
   faction?: Faction;
   isValid: boolean;
 }> = ({ formData, game, faction, isValid }) => {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const { showError } = useError();
 
-  const handleCreate = async () => {
+  const onCreate = async () => {
     createCharacter(formData)
-      .then((data) => {
-        navigate('/strategic/characters/view/' + data.id, { state: { character: data, game: game } });
-      })
-      .catch((err: Error) => {
-        showError(err.message);
-      });
+      .then((data) => navigate('/strategic/characters/view/' + data.id, { state: { character: data, game: game } }))
+      .catch((err) => showError(err.message));
   };
 
   return (
@@ -63,8 +58,8 @@ const CharacterCreateActions: FC<{
           <span>{t('create-character')}</span>
         </Breadcrumbs>
       </Box>
-      <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>
-        <SaveButton onClick={handleCreate} disabled={!isValid} />
+      <Stack spacing={2} direction="row">
+        <SaveButton onClick={onCreate} disabled={!isValid} />
       </Stack>
     </Stack>
   );

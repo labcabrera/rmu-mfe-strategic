@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -6,11 +5,10 @@ import CachedIcon from '@mui/icons-material/Cached';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
+import { t } from 'i18next';
 import { fetchRandomName } from '../../api/npc-random-names';
 
-const NameTextField = ({ value, onChange, required = false, generateRandomRaceValue }) => {
-  const { t } = useTranslation();
-
+const NameTextField = ({ label, value, onChange, required = true, generateRandomRaceValue }) => {
   const handleRandomNameClick = async () => {
     var race = 'generic';
     if (generateRandomRaceValue) {
@@ -27,19 +25,15 @@ const NameTextField = ({ value, onChange, required = false, generateRandomRaceVa
 
   return (
     <TextField
-      label={t('name')}
+      label={label}
       variant="standard"
       value={value}
       onChange={onChange}
-      required={required}
       fullWidth
+      error={required && (!value || value.trim() === '')}
+      helperText={required && !value ? t('required-field') : ''}
       slotProps={{
         input: {
-          startAdornment: (
-            <InputAdornment position="start">
-              <AccountCircleIcon />
-            </InputAdornment>
-          ),
           endAdornment: (
             <InputAdornment position="start">
               <IconButton onClick={handleRandomNameClick}>

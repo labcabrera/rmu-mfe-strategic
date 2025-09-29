@@ -1,19 +1,11 @@
-import React, { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { Dispatch, FC, SetStateAction } from 'react';
 import { Grid, TextField, Typography } from '@mui/material';
+import { t } from 'i18next';
 import { CreateCharacterDto } from '../../api/character.dto';
 import { Faction } from '../../api/faction.dto';
 import { Profession } from '../../api/professions';
-import { Race } from '../../api/race.dto';
-import CharacterAvatar from '../../shared/avatars/CharacterAvatar';
-import NameTextField from '../../shared/inputs/NameTextField';
 import { NumericInput } from '../../shared/inputs/NumericInput';
-import SelectFaction from '../../shared/selects/SelectFaction';
-import SelectGame from '../../shared/selects/SelectGame';
 import SelectGender from '../../shared/selects/SelectGender';
-import SelectProfession from '../../shared/selects/SelectProfession';
-import SelectRace from '../../shared/selects/SelectRace';
-import SelectRealmType from '../../shared/selects/SelectRealmType';
 
 const CharacterCreateAttributes: FC<{
   formData: CreateCharacterDto;
@@ -21,88 +13,10 @@ const CharacterCreateAttributes: FC<{
   setProfession: Dispatch<SetStateAction<Profession | null>>;
   factions: Faction[];
 }> = ({ formData, setFormData, setProfession, factions }) => {
-  const { t } = useTranslation();
-
-  const onRaceChange = (raceId: string, raceInfo: Race) => {
-    if (raceInfo) {
-      const stats = { ...formData.statistics };
-      const keys = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
-      keys.forEach((key) => {
-        stats[key].racial = raceInfo.stats[key];
-      });
-      setFormData((prevState) => ({
-        ...prevState,
-        info: {
-          ...prevState.info,
-          raceId: raceId,
-          sizeId: raceInfo.sizeId,
-          height: raceInfo.averageHeight.male,
-          weight: raceInfo.averageWeight.male,
-        },
-        movement: {
-          ...prevState.movement,
-          strideRacialBonus: raceInfo.strideBonus,
-        },
-        statistics: stats,
-      }));
-    }
-  };
-
-  const onProfessionChange = (professionId: string, profession: Profession) => {
-    let realmType = formData.info.realmType;
-    if (profession && profession.realmType) {
-      realmType = profession.realmType;
-    }
-    setFormData((prevState) => ({
-      ...prevState,
-      info: {
-        ...prevState.info,
-        professionId: professionId,
-        realmType: realmType,
-      },
-    }));
-    setProfession(profession);
-  };
-
-  const onFactionChange = (faction: string) => {
-    setFormData({ ...formData, factionId: faction });
-  };
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    try {
-      const { name, value } = e.target;
-      setFormData({ ...formData, [name]: value });
-    } catch (error) {
-      console.log('handleChange error ' + error);
-    }
-  };
-
-  const handleRealmTypeChange = (realmType: string) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      info: { ...prevState.info, realmType: realmType },
-    }));
-  };
-
   const handleGenderChange = (gender: string) => {
     setFormData((prevState) => ({
       ...prevState,
       roleplay: { ...prevState.roleplay, gender: gender },
-    }));
-  };
-
-  const onNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prevState) => ({ ...prevState, name: e.target.value }));
-  };
-
-  const onGameChange = (gameId: string, gameInfo: any) => {
-    setFormData((prevState) => ({ ...prevState, gameId: gameId }));
-  };
-
-  const updateField = (field: string, value: any) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      [field]: value,
     }));
   };
 
@@ -166,7 +80,7 @@ const CharacterCreateAttributes: FC<{
           variant="standard"
           name="description"
           value={formData.description}
-          onChange={handleChange}
+          onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
           fullWidth
           multiline
           maxRows={4}

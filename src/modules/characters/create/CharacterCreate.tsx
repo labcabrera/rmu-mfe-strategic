@@ -15,8 +15,8 @@ import { getStatBonus } from '../../services/stat-service';
 import RaceAvatar from '../../shared/avatars/RaceAvatar';
 import CharacterCreateActions from './CharacterCreateActions';
 import CharacterCreateAttributes from './CharacterCreateAttributes';
-import CharacterCreateAttributesBasic from './CharacterCreateAttributesBasic';
 import CharacterCreateProfessionalSkills from './CharacterCreateProfessionalSkills';
+import CharacterCreateResume from './CharacterCreateResume';
 import CharacterCreateSkillCosts from './CharacterCreateSkillCosts';
 import { CharacterCreateSortCombat } from './CharacterCreateSortCombat';
 import CharacterCreateStats from './CharacterCreateStats';
@@ -126,16 +126,6 @@ const CharacterCreate: FC = () => {
       });
   };
 
-  const bindRaces = (realmId) => {
-    fetchRaces(`realmId==${realmId}`, 0, 100)
-      .then((data) => {
-        setRaces(data);
-      })
-      .catch((error: Error) => {
-        showError(error.message);
-      });
-  };
-
   const handleWeaponOrderChange = (newOrder: string[]) => {
     setFormData((prevState) => ({
       ...prevState,
@@ -150,7 +140,9 @@ const CharacterCreate: FC = () => {
 
   useEffect(() => {
     if (game) {
-      bindRaces(game.realmId);
+      fetchRaces(`realmId==${game.realmId}`, 0, 100)
+        .then((data) => setRaces(data))
+        .catch((err) => showError(err.message));
     }
   }, [game]);
 
@@ -182,7 +174,7 @@ const CharacterCreate: FC = () => {
       <Grid container spacing={5}>
         <Grid size={2}>
           <RaceAvatar raceName={formData.info.raceName} size={300} />
-          <CharacterCreateAttributesBasic
+          <CharacterCreateResume
             formData={formData}
             setFormData={setFormData}
             setProfession={setProfession}

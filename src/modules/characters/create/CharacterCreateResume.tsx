@@ -1,5 +1,4 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Grid } from '@mui/material';
 import { t } from 'i18next';
 import { CreateCharacterDto } from '../../api/character.dto';
@@ -14,7 +13,7 @@ import SelectProfession from '../../shared/selects/SelectProfession';
 import SelectRace from '../../shared/selects/SelectRace';
 import SelectRealmType from '../../shared/selects/SelectRealmType';
 
-const CharacterCreateAttributesBasic: FC<{
+const CharacterCreateResume: FC<{
   formData: CreateCharacterDto;
   setFormData: Dispatch<SetStateAction<CreateCharacterDto>>;
   setProfession: Dispatch<SetStateAction<Profession | null>>;
@@ -94,7 +93,12 @@ const CharacterCreateAttributesBasic: FC<{
   return (
     <Grid container spacing={2}>
       <Grid size={12}>
-        <NameTextField value={formData.name} onChange={onNameChange} generateRandomRaceValue={formData.info.raceName} />
+        <NameTextField
+          label={t('name')}
+          value={formData.name}
+          onChange={onNameChange}
+          generateRandomRaceValue={formData.info.raceName}
+        />
       </Grid>
       <Grid size={12}>
         <SelectGame value={formData.gameId} onChange={onGameChange} />
@@ -125,4 +129,4 @@ const CharacterCreateAttributesBasic: FC<{
   );
 };
 
-export default CharacterCreateAttributesBasic;
+export default CharacterCreateResume;

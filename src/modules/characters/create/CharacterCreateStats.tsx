@@ -3,11 +3,9 @@ import { useTranslation } from 'react-i18next';
 import SyncIcon from '@mui/icons-material/Sync';
 import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import { t } from 'i18next';
 import { CreateCharacterDto, stats } from '../../api/character.dto';
 import { StatBonusFormData } from './CharacterCreate';
-
-const red = '#ffab91';
-const green = '#a5d6a7';
 
 const CharacterStats: FC<{
   key: string;
@@ -19,7 +17,9 @@ const CharacterStats: FC<{
   const { t } = useTranslation();
 
   const getColor = (value: number): string => {
-    return value < 0 ? red : value > 0 ? green : 'inherit';
+    if (value > 0) return 'success.main';
+    if (value < 0) return 'error.main';
+    return 'inherit';
   };
 
   const getTotal = (): number => {
@@ -81,8 +81,6 @@ const CharacterCreateStats: FC<{
   onRandomStats?: () => void;
   statBonusFormData: StatBonusFormData;
 }> = ({ formData, onRandomStats, statBonusFormData }) => {
-  const { t } = useTranslation();
-
   return (
     <>
       <Typography variant="h6" color="primary">
