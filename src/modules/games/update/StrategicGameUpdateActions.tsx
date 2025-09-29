@@ -1,34 +1,30 @@
 import React, { FC } from 'react';
-import { useLocation, useNavigate, Link as RouterLink } from 'react-router-dom';
-import CancelIcon from '@mui/icons-material/Cancel';
-import SaveIcon from '@mui/icons-material/Save';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
-import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { updateStrategicGame } from '../../api/strategic-game';
 import { StrategicGame, UpdateStrategicGameDto } from '../../api/strategic-game.dto';
+import CancelButton from '../../shared/buttons/CancelButton';
+import SaveButton from '../../shared/buttons/SaveButton';
 
 const StrategicGameUpdateActions: FC<{
   strategicGame: StrategicGame;
   formData: UpdateStrategicGameDto;
 }> = ({ strategicGame, formData }) => {
-  const location = useLocation();
   const navigate = useNavigate();
   const { showError } = useError();
 
-  const updateGame = async () => {
+  const onUpdateGame = async () => {
     updateStrategicGame(strategicGame.id, formData)
       .then((data: StrategicGame) => navigate(`/strategic/games/view/${data.id}`, { state: { strategicGame: data } }))
-      .catch((error: Error) => {
-        showError(error.message);
-      });
+      .catch((err) => showError(err.message));
   };
 
-  const handleCancelClick = () => {
+  const onCancel = () => {
     navigate(`/strategic/games/view/${strategicGame.id}`, { state: { strategicGame } });
   };
 
@@ -57,13 +53,9 @@ const StrategicGameUpdateActions: FC<{
           <span>{t('edit')}</span>
         </Breadcrumbs>
       </Box>
-      <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>
-        <IconButton onClick={handleCancelClick} size="large" color="primary">
-          <CancelIcon />
-        </IconButton>
-        <IconButton onClick={updateGame} size="large" color="primary">
-          <SaveIcon />
-        </IconButton>
+      <Stack spacing={2} direction="row">
+        <CancelButton onClick={onCancel} />
+        <SaveButton onClick={onUpdateGame} />
       </Stack>
     </Stack>
   );

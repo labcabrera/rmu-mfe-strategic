@@ -23,42 +23,20 @@ const StrategicGameViewActions: FC<{
 
   if (!strategicGame) return <p>Loading...</p>;
 
-  const handleRefresh = () => {
+  const onRefresh = () => {
     fetchStrategicGame(strategicGame.id)
-      .then((data) => {
-        setStrategicGame(data);
-      })
-      .catch((error: unknown) => {
-        if (error instanceof Error) showError(error.message);
-        else showError('Unknown error fetching game');
-      });
+      .then((data) => setStrategicGame(data))
+      .catch((err) => showError(err.message));
   };
 
-  const handleDelete = () => {
-    deleteStrategicGame(strategicGame.id)
-      .then(() => {
-        navigate('/strategic/games');
-      })
-      .catch((error: unknown) => {
-        if (error instanceof Error) showError(error.message);
-        else showError('Unknown error deleting game');
-      });
-  };
-
-  const handleEditClick = () => {
+  const onEdit = () => {
     navigate(`/strategic/games/edit/${strategicGame.id}`, { state: { strategicGame } });
   };
 
-  const handleDeleteClick = () => {
-    setDeleteDialogOpen(true);
-  };
-
-  const handleDialogDeleteClose = () => {
-    setDeleteDialogOpen(false);
-  };
-
-  const handleDialogDelete = () => {
-    handleDelete();
+  const onDelete = () => {
+    deleteStrategicGame(strategicGame.id)
+      .then(() => navigate('/strategic/games'))
+      .catch((err) => showError(err.message));
     setDeleteDialogOpen(false);
   };
 
@@ -80,16 +58,16 @@ const StrategicGameViewActions: FC<{
           </Breadcrumbs>
         </Box>
         <Stack direction="row" spacing={2}>
-          <RefreshButton onClick={handleRefresh} />
-          <EditButton onClick={handleEditClick} />
-          <DeleteButton onClick={handleDeleteClick} />
+          <RefreshButton onClick={onRefresh} />
+          <EditButton onClick={onEdit} />
+          <DeleteButton onClick={() => setDeleteDialogOpen(true)} />
         </Stack>
       </Stack>
       <DeleteDialog
         message={`Are you sure you want to delete ${strategicGame.name} game? All factions and characters will be eliminated. This action cannot be undone.`}
-        onDelete={handleDialogDelete}
+        onDelete={onDelete}
         open={deleteDialogOpen}
-        onClose={handleDialogDeleteClose}
+        onClose={() => setDeleteDialogOpen(false)}
       />
     </>
   );

@@ -1,13 +1,12 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { Grid } from '@mui/material';
 import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { t } from 'i18next';
 import { Faction } from '../../api/faction.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
+import AddButton from '../../shared/buttons/AddButton';
 import FactionCard from '../../shared/cards/FactionCard';
 
 const StrategicGameViewFactions: FC<{
@@ -16,7 +15,7 @@ const StrategicGameViewFactions: FC<{
 }> = ({ strategicGame, factions }) => {
   const navigate = useNavigate();
 
-  const handleCreateFaction = () => {
+  const onCreateFaction = () => {
     navigate(`/strategic/factions/create?gameId=${strategicGame.id}`, { state: { strategicGame } });
   };
 
@@ -27,9 +26,7 @@ const StrategicGameViewFactions: FC<{
           <Typography variant="h6" color="primary" display="inline">
             {t('factions')}
           </Typography>
-          <IconButton onClick={handleCreateFaction} sx={{ ml: 1 }} color="primary">
-            <AddCircleIcon />
-          </IconButton>
+          <AddButton onClick={onCreateFaction} />
         </Box>
       </Grid>
       <Grid size={12}>

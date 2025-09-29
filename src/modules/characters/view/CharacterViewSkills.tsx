@@ -6,8 +6,6 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import {
   Box,
-  Button,
-  Grid,
   IconButton,
   Paper,
   Stack,
@@ -22,19 +20,9 @@ import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../api/character';
 import { Character, CharacterSkill } from '../../api/character.dto';
+import { Profession } from '../../api/professions';
 import { AddSkill } from '../../api/skill.dto';
 import CharacterAddSkillDialog from './CharacterViewAddSkillDialog';
-
-const addSkillFormDataTemplate = {
-  skillId: '',
-  specialization: '',
-  ranks: 0,
-  customBonus: 0,
-};
-
-interface Profession {
-  professionalSkills: string[];
-}
 
 const CharacterViewSkills: FC<{
   character: Character;

@@ -1,6 +1,8 @@
-import React, { FC, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { FC, useEffect, useState } from 'react';
+import { useLocation, useParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
+import { useError } from '../../../ErrorContext';
+import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame, UpdateStrategicGameDto } from '../../api/strategic-game.dto';
 import StrategicGameAvatar from '../../shared/avatars/StrategicGameAvatar';
 import StrategicGameUpdateActions from './StrategicGameUpdateActions';
@@ -9,13 +11,33 @@ import StrategicGameUpdateResume from './StrategicGameUpdateResume';
 
 const StrategicGameUpdate: FC = () => {
   const location = useLocation();
-  const strategicGame = location.state?.strategicGame as StrategicGame;
-  const [formData, setFormData] = useState<UpdateStrategicGameDto>({
-    name: strategicGame.name,
-    description: strategicGame.description,
-    options: strategicGame.options,
-    powerLevel: strategicGame.powerLevel,
-  });
+  const { showError } = useError();
+  const { gameId } = useParams<{ gameId?: string }>();
+  const [strategicGame, setStrategicGame] = useState<StrategicGame | null>(null);
+  const [formData, setFormData] = useState<UpdateStrategicGameDto | null>(null);
+
+  useEffect(() => {
+    if (strategicGame) {
+      setFormData({
+        name: strategicGame.name,
+        description: strategicGame.description,
+        options: strategicGame.options,
+        powerLevel: strategicGame.powerLevel,
+      });
+    }
+  }, [strategicGame]);
+
+  useEffect(() => {
+    if (location.state && location.state.strategicGame) {
+      setStrategicGame(location.state.strategicGame);
+    } else if (gameId) {
+      fetchStrategicGame(gameId)
+        .then((response) => setStrategicGame(response))
+        .catch((err) => showError(err.message));
+    }
+  }, [location.state, gameId, showError]);
+
+  if (!strategicGame || !formData) return <div>Loading...</div>;
 
   return (
     <>

@@ -8,11 +8,6 @@ const StrategicGameUpdateResume: FC<{
   formData: UpdateStrategicGameDto;
   setFormData: Dispatch<SetStateAction<UpdateStrategicGameDto>>;
 }> = ({ formData, setFormData }) => {
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
   return (
     <Grid container spacing={2}>
       <Grid size={12}>
@@ -20,7 +15,7 @@ const StrategicGameUpdateResume: FC<{
           label={t('name')}
           name="name"
           value={formData.name}
-          onChange={handleChange}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           fullWidth
           variant="standard"
         />
@@ -30,7 +25,7 @@ const StrategicGameUpdateResume: FC<{
           label={t('short-description')}
           name="shortDescription"
           value={formData.shortDescription}
-          onChange={handleChange}
+          onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
           fullWidth
           variant="standard"
         />
@@ -40,7 +35,7 @@ const StrategicGameUpdateResume: FC<{
           label={t('description')}
           name="description"
           value={formData.description}
-          onChange={handleChange}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           fullWidth
           maxRows={12}
           multiline

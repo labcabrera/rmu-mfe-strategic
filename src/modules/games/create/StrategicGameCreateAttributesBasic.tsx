@@ -10,22 +10,17 @@ const StrategicGameCreateAttributesBasic: FC<{
   setFormData: Dispatch<SetStateAction<CreateStrategicGameDto>>;
   realms: Realm[];
 }> = ({ formData, setFormData, realms }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  if (!realms) return <div>Loading...</div>;
-
   return (
     <Grid container spacing={2}>
       <Grid size={12}>
         <TextField
           label={t('strategic-game-name')}
           name="name"
-          value={formData.name}
-          onChange={handleChange}
           variant="standard"
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          error={formData.name.trim() === ''}
+          helperText={formData.name.trim() === '' ? t('required-field') : ''}
           fullWidth
         />
       </Grid>
@@ -43,7 +38,7 @@ const StrategicGameCreateAttributesBasic: FC<{
           name="shortDescription"
           variant="standard"
           value={formData.shortDescription}
-          onChange={handleChange}
+          onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
           fullWidth
           multiline
         />
@@ -54,7 +49,7 @@ const StrategicGameCreateAttributesBasic: FC<{
           name="description"
           variant="standard"
           value={formData.description}
-          onChange={handleChange}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           fullWidth
           multiline
           maxRows={12}
