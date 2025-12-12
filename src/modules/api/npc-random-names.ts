@@ -4,7 +4,7 @@ export async function fetchRandomName(race: string): Promise<string> {
   // TODO: service map
   console.log('fetch race:', race);
   let requestRace = 'generic';
-  if (race.includes('orc') || race.includes('troll')) {
+  if (race.includes('orc') || race.includes('troll') || race.includes('snaga') || race.includes('uruk')) {
     requestRace = 'orc';
   } else if (race.includes('elf')) {
     requestRace = 'sindar';

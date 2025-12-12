@@ -22,32 +22,33 @@ const CharacterAddSkillDialog: FC<{
   const [formData, setFormData] = useState<SkillFormData>(emptyFormData);
 
   const bindSkills = () => {
-    fetchSkills()
-      .then((data: Skill[]) => {
-        setSkills(data);
-      })
-      .catch((error) => {
-        showError(error.message);
-      });
+    fetchSkills(null)
+      .then((data: Skill[]) => setSkills(data))
+      .catch((error) => showError(error.message));
   };
 
   const bindSkillCategories = () => {
     fetchSkillCategories()
-      .then((data: SkillCategory[]) => {
-        setSkillCategories(data);
-      })
-      .catch((error) => {
-        showError(error.message);
-      });
+      .then((data: SkillCategory[]) => setSkillCategories(data))
+      .catch((error) => showError(error.message));
   };
 
-  useEffect(() => {
-    bindSkills();
-    bindSkillCategories();
-  }, []);
+  const handleSkillCategoryChange = (category: SkillCategory) => {
+    console.log('Selected category:', category);
+    if (category) {
+      setFormData({ ...formData, categoryId: category.id, skillId: null });
+      fetchSkills(category.id)
+        .then((data: Skill[]) => setSkills(data))
+        .catch((error) => showError(error.message));
+    } else {
+      setFormData({ ...formData, categoryId: null, skillId: null });
+    }
+  };
 
   const handleSkillChange = (skill: Skill) => {
-    setFormData({ ...formData, skillId: skill.id });
+    if (skill) {
+      setFormData({ ...formData, skillId: skill.id });
+    }
   };
 
   const handleSave = async () => {
@@ -73,6 +74,11 @@ const CharacterAddSkillDialog: FC<{
     onClose();
   };
 
+  useEffect(() => {
+    bindSkills();
+    bindSkillCategories();
+  }, []);
+
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>{t('add-skill')}</DialogTitle>
@@ -83,7 +89,7 @@ const CharacterAddSkillDialog: FC<{
               label={t('category')}
               categories={skillCategories}
               value={formData.categoryId}
-              onChange={(category) => setFormData({ ...formData, categoryId: category.id, skillId: null })}
+              onChange={handleSkillCategoryChange}
             />
           </Grid>
           <Grid size={12}>

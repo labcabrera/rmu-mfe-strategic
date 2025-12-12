@@ -112,42 +112,26 @@ const CharacterViewSkillsEntry: FC<{
 
   const handleLevelUp = () => {
     levelUpSkill(character.id, skill.skillId)
-      .then((updated) => {
-        setCharacter(updated);
-      })
-      .catch((error: any) => {
-        showError(error.message);
-      });
+      .then((updated) => setCharacter(updated))
+      .catch((error: any) => showError(error.message));
   };
 
   const handleLevelDown = () => {
     levelDownSkill(character.id, skill.skillId)
-      .then((updated) => {
-        setCharacter(updated);
-      })
-      .catch((error: any) => {
-        showError(error.message);
-      });
+      .then((updated) => setCharacter(updated))
+      .catch((error: any) => showError(error.message));
   };
 
   const handleSetUpProfessionalSkill = (skillObj: CharacterSkill) => {
     setUpProfessionalSkill(character.id, skillObj.skillId)
-      .then((updated) => {
-        setCharacter(updated);
-      })
-      .catch((error: any) => {
-        showError(error.message);
-      });
+      .then((updated) => setCharacter(updated))
+      .catch((error: any) => showError(error.message));
   };
 
   const handleDeleteSkill = (skillObj: CharacterSkill) => {
     deleteSkill(character.id, skillObj.skillId)
-      .then((updated) => {
-        setCharacter(updated);
-      })
-      .catch((error: any) => {
-        showError(error.message);
-      });
+      .then((updated) => setCharacter(updated))
+      .catch((error: any) => showError(error.message));
   };
 
   const isLevelUpDisabled = () => {
