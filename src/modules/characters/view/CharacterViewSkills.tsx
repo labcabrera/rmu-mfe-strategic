@@ -52,7 +52,7 @@ const CharacterViewSkills: FC<{
         </IconButton>
       </Box>
       <Paper sx={{ width: '100%' }}>
-        <Table sx={{ minWidth: 900 }} aria-label="simple table">
+        <Table size="small" sx={{ minWidth: 900 }} aria-label="character skills table">
           <TableHead
             sx={{
               '& .MuiTableCell-root': {

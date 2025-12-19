@@ -31,7 +31,8 @@ const CharacterAddItemDialog: FC<{
 
   const handleSave = async () => {
     onItemAdded(formData);
-    handleClose();
+    setSelectedItem(null);
+    setFormData(null);
   };
 
   const isFormValid = () => {
@@ -97,7 +98,7 @@ const CharacterAddItemDialog: FC<{
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth>
       <DialogTitle>{t('add-item')}</DialogTitle>
-      <DialogContent sx={{ minHeight: '1000px' }}>
+      <DialogContent sx={{ minHeight: '700px' }}>
         <Grid container spacing={1}>
           <Grid size={12}>
             <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
@@ -165,8 +166,6 @@ const CharacterAddItemDialog: FC<{
             )}
           </Grid>
         </Grid>
-        {/* <pre>{JSON.stringify(formData, null, 2)}</pre>
-        <pre>{JSON.stringify(items, null, 2)}</pre> */}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>{t('cancel')}</Button>

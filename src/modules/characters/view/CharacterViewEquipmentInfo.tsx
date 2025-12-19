@@ -36,17 +36,15 @@ const CharacterViewEquipmentInfo: React.FC<{
             subtitle={t('armor-maneuver-skill')}
             image={`/static/images/generic/carried-weight.png`}
           />
-          <NumericCard
-            value={character.equipment.weight}
+          <TextCard
+            value={`${character.equipment.weight} lbs`}
             subtitle={t('carried-weight')}
             image={`/static/images/generic/carried-weight.png`}
-            applyColor={false}
           />
-          <NumericCard
-            value={character.equipment.weightAllowance}
+          <TextCard
+            value={`${character.equipment.weightAllowance} lbs`}
             subtitle={t('Weight allowance')}
             image={`/static/images/generic/carried-weight.png`}
-            applyColor={false}
           />
           <NumericCard
             value={character.equipment.encumbrancePenalty}
