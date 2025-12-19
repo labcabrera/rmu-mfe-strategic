@@ -56,7 +56,7 @@ const CharacterViewInfo: FC<{
               subtitle={t('weight')}
               image={`/static/images/generic/character-weight.png`}
             />
-            <Badge color="warning" badgeContent={character.hp.max} invisible={character.hp.max > 0}>
+            <Badge color="error" badgeContent={character.hp.max} invisible={character.hp.max > 0}>
               <TextCard
                 value={`${character.hp.current} / ${character.hp.max}`}
                 subtitle={t('hit-points')}
@@ -71,7 +71,7 @@ const CharacterViewInfo: FC<{
           </Typography>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
             <Badge
-              color="warning"
+              color="success"
               badgeContent={`+${character.experience.availableLevel - character.experience.level}`}
               invisible={character.experience.availableLevel <= character.experience.level}
             >
@@ -90,7 +90,7 @@ const CharacterViewInfo: FC<{
               applyFormat={true}
             />
             <Badge
-              color="warning"
+              color="success"
               badgeContent={`+${character.experience.availableDevelopmentPoints}`}
               invisible={character.experience.availableDevelopmentPoints < 1}
             >

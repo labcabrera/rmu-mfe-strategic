@@ -37,13 +37,13 @@ const CharacterView: FC = () => {
   }, [character, showError]);
 
   useEffect(() => {
-    if (location.state?.character) {
-      setCharacter(location.state.character);
-    } else if (characterId) {
-      fetchCharacter(characterId)
-        .then((data) => setCharacter(data))
-        .catch((err) => showError(err.message));
-    }
+    // if (location.state?.character) {
+    //   setCharacter(location.state.character);
+    // } else if (characterId) {
+    fetchCharacter(characterId)
+      .then((data) => setCharacter(data))
+      .catch((err) => showError(err.message));
+    // }
   }, [location.state, characterId, showError]);
 
   if (!character || !strategicGame || !faction) return <div>Loading...</div>;
