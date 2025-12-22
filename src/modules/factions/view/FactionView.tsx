@@ -15,52 +15,32 @@ import FactionViewResume from './FactionViewResume';
 
 const FactionView: FC = () => {
   const location = useLocation();
+  const { showError } = useError();
   const { factionId } = useParams<{ factionId: string }>();
-  const [faction, setFaction] = useState<Faction | null>(location.state?.faction || null);
+  const [faction, setFaction] = useState<Faction | null>(null);
   const [game, setGame] = useState<StrategicGame | null>(null);
   const [characters, setCharacters] = useState<Character[]>([]);
-  const { showError } = useError();
-
-  const bindFaction = (factionId: string) => {
-    fetchFaction(factionId)
-      .then((data: Faction) => {
-        setFaction(data);
-      })
-      .catch((error: Error) => {
-        showError(error.message);
-      });
-  };
-
-  const bindGame = (gameId: string) => {
-    fetchStrategicGame(gameId)
-      .then((data: StrategicGame) => {
-        setGame(data);
-      })
-      .catch((error: Error) => {
-        showError(error.message);
-      });
-  };
-
-  const bindCharacters = (factionId: string) => {
-    fetchCharacters(`factionId==${factionId}`, 0, 100)
-      .then((data: Character[]) => setCharacters(data))
-      .catch((error: Error) => {
-        showError(error.message);
-      });
-  };
 
   useEffect(() => {
-    if (faction && faction.id) {
-      bindCharacters(faction.id);
-      bindGame(faction.gameId);
+    if (faction) {
+      fetchStrategicGame(faction.gameId)
+        .then((data: StrategicGame) => setGame(data))
+        .catch((err) => showError(err.message));
+      fetchCharacters(`factionId==${faction.id}`, 0, 100)
+        .then((data: Character[]) => setCharacters(data))
+        .catch((err) => showError(err.message));
     }
   }, [faction]);
 
   useEffect(() => {
-    if (!faction && factionId) {
-      bindFaction(factionId);
+    if (location.state?.faction) {
+      setFaction(location.state.faction);
+    } else if (factionId) {
+      fetchFaction(factionId)
+        .then((data: Faction) => setFaction(data))
+        .catch((err) => showError(err.message));
     }
-  }, [faction, factionId]);
+  }, [location.state, factionId, showError]);
 
   if (!faction || !game) return <div>Loading...</div>;
 

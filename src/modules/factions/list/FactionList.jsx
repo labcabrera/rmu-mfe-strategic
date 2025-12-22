@@ -8,26 +8,13 @@ import FactionListActions from './FactionListActions';
 import FactionListItem from './FactionListItem';
 
 const FactionList = () => {
+  const { showError } = useError();
   const [factions, setFactions] = useState([]);
-  const [displayError, setDisplayError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-
-  const bindFactions = async () => {
-    try {
-      const games = await fetchFactions('', 0, 10);
-      setFactions(games);
-    } catch (error) {
-      setDisplayError(true);
-      setErrorMessage(`Error fetching factions. ${error.message}`);
-    }
-  };
-
-  const handleSnackbarClose = () => {
-    setDisplayError(false);
-  };
 
   useEffect(() => {
-    bindFactions();
+    fetchFactions(20, 0, 10)
+      .then((data) => setFactions(data))
+      .catch((err) => showError(err.message));
   }, []);
 
   return (
@@ -38,19 +25,6 @@ const FactionList = () => {
           <FactionListItem key={item.id} strategicGame={item} />
         ))}
       </List>
-      <Snackbar
-        open={displayError}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        onClose={handleSnackbarClose}
-        message={errorMessage}
-        action={
-          <React.Fragment>
-            <IconButton aria-label="close" color="inherit" sx={{ p: 0.5 }} onClick={handleSnackbarClose}>
-              <CloseIcon />
-            </IconButton>
-          </React.Fragment>
-        }
-      />
     </>
   );
 };

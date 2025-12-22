@@ -6,8 +6,6 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import {
   Box,
-  Button,
-  Grid,
   IconButton,
   Paper,
   Stack,
@@ -22,19 +20,9 @@ import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../api/character';
 import { Character, CharacterSkill } from '../../api/character.dto';
+import { Profession } from '../../api/professions';
 import { AddSkill } from '../../api/skill.dto';
 import CharacterAddSkillDialog from './CharacterViewAddSkillDialog';
-
-const addSkillFormDataTemplate = {
-  skillId: '',
-  specialization: '',
-  ranks: 0,
-  customBonus: 0,
-};
-
-interface Profession {
-  professionalSkills: string[];
-}
 
 const CharacterViewSkills: FC<{
   character: Character;
@@ -50,9 +38,7 @@ const CharacterViewSkills: FC<{
         setCharacter(updatedCharacter);
         setOpenAddSkillDialog(false);
       })
-      .catch((error: any) => {
-        showError(error.message);
-      });
+      .catch((error) => showError(error.message));
   };
 
   return (
@@ -66,7 +52,7 @@ const CharacterViewSkills: FC<{
         </IconButton>
       </Box>
       <Paper sx={{ width: '100%' }}>
-        <Table sx={{ minWidth: 900 }} aria-label="simple table">
+        <Table size="small" sx={{ minWidth: 900 }} aria-label="character skills table">
           <TableHead
             sx={{
               '& .MuiTableCell-root': {
@@ -126,42 +112,26 @@ const CharacterViewSkillsEntry: FC<{
 
   const handleLevelUp = () => {
     levelUpSkill(character.id, skill.skillId)
-      .then((updated) => {
-        setCharacter(updated);
-      })
-      .catch((error: any) => {
-        showError(error.message);
-      });
+      .then((updated) => setCharacter(updated))
+      .catch((error: any) => showError(error.message));
   };
 
   const handleLevelDown = () => {
     levelDownSkill(character.id, skill.skillId)
-      .then((updated) => {
-        setCharacter(updated);
-      })
-      .catch((error: any) => {
-        showError(error.message);
-      });
+      .then((updated) => setCharacter(updated))
+      .catch((error: any) => showError(error.message));
   };
 
   const handleSetUpProfessionalSkill = (skillObj: CharacterSkill) => {
     setUpProfessionalSkill(character.id, skillObj.skillId)
-      .then((updated) => {
-        setCharacter(updated);
-      })
-      .catch((error: any) => {
-        showError(error.message);
-      });
+      .then((updated) => setCharacter(updated))
+      .catch((error: any) => showError(error.message));
   };
 
   const handleDeleteSkill = (skillObj: CharacterSkill) => {
     deleteSkill(character.id, skillObj.skillId)
-      .then((updated) => {
-        setCharacter(updated);
-      })
-      .catch((error: any) => {
-        showError(error.message);
-      });
+      .then((updated) => setCharacter(updated))
+      .catch((error: any) => showError(error.message));
   };
 
   const isLevelUpDisabled = () => {

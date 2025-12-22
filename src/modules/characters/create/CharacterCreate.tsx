@@ -2,7 +2,7 @@ import React, { useState, useEffect, FC } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
 import { useError } from '../../../ErrorContext';
-import { CreateCharacterDto, stats } from '../../api/character.dto';
+import { CreateCharacterDto } from '../../api/character.dto';
 import { fetchFactions } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
 import { Profession } from '../../api/professions';
@@ -10,13 +10,13 @@ import { fetchRaces } from '../../api/race';
 import { Race } from '../../api/race.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import { characterCreateTemplate } from '../../data/character-create';
-import { getStatBonus } from '../../services/stat-service';
+import { CHARACTER_CREATION_TEMPLATE } from '../../data/character-create';
+import { randomizeStats } from '../../services/randomize-stats';
 import RaceAvatar from '../../shared/avatars/RaceAvatar';
 import CharacterCreateActions from './CharacterCreateActions';
 import CharacterCreateAttributes from './CharacterCreateAttributes';
-import CharacterCreateAttributesBasic from './CharacterCreateAttributesBasic';
 import CharacterCreateProfessionalSkills from './CharacterCreateProfessionalSkills';
+import CharacterCreateResume from './CharacterCreateResume';
 import CharacterCreateSkillCosts from './CharacterCreateSkillCosts';
 import { CharacterCreateSortCombat } from './CharacterCreateSortCombat';
 import CharacterCreateStats from './CharacterCreateStats';
@@ -40,7 +40,7 @@ const CharacterCreate: FC = () => {
   const [game, setGame] = useState<StrategicGame | null>(null);
   const [races, setRaces] = useState<Race[]>([]);
   const [factions, setFactions] = useState<Faction[]>([]);
-  const [formData, setFormData] = useState<CreateCharacterDto>(characterCreateTemplate);
+  const [formData, setFormData] = useState<CreateCharacterDto>(CHARACTER_CREATION_TEMPLATE);
   const [statBonusFormData, setStatBonusFormData] = useState<StatBonusFormData>({
     ag: { potential: 0, temporary: 0 },
     co: { potential: 0, temporary: 0 },
@@ -59,81 +59,34 @@ const CharacterCreate: FC = () => {
   const [isValid, setIsValid] = useState<boolean>(false);
 
   const onRandomStats = () => {
-    for (const key of stats) {
-      const values = [randomStatValue(), randomStatValue(), randomStatValue()];
-      values.sort((a, b) => b - a);
-      const potentialValue = values[0];
-      const temporaryValue = values[1];
-      const potentialBonus = getStatBonus(potentialValue);
-      const temporaryBonus = getStatBonus(temporaryValue);
-
-      setFormData((prevState) => ({
-        ...prevState,
-        statistics: {
-          ...prevState.statistics,
-          [key]: {
-            ...prevState.statistics[key],
-            potential: potentialValue,
-            temporary: temporaryValue,
-          },
-        },
-      }));
-
-      setStatBonusFormData((prevState) => ({
-        ...prevState,
-        [key]: {
-          potential: potentialBonus,
-          temporary: temporaryBonus,
-        },
-      }));
-      setBoosts(game?.powerLevel.statCreationBoost || 2);
-      setSwaps(game?.powerLevel.statCreationSwap || 2);
-    }
+    randomizeStats(setFormData, setStatBonusFormData);
+    setBoosts(game?.powerLevel.statCreationBoost || 2);
+    setSwaps(game?.powerLevel.statCreationSwap || 2);
   };
 
-  const randomStatValue = (): number => {
-    const min = 11;
-    const max = 100;
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  };
-
-  const checkValidForm = () => {
+  const checkValidForm = (formData: CreateCharacterDto) => {
     let valid = true;
     if (!formData.gameId) valid = false;
     if (!formData.name || formData.name.trim() === '') valid = false;
     if (!formData.info?.raceId) valid = false;
     if (!formData.info?.professionId) valid = false;
     if (!formData.info?.realmType) valid = false;
+    if (!formData.factionId) valid = false;
+    if (!formData.info?.weight) valid = false;
     setIsValid(valid);
   };
 
   const bindStrategicGame = () => {
     if (!gameId) return;
     fetchStrategicGame(gameId)
-      .then((game) => {
-        setGame(game);
-      })
-      .catch((error: Error) => {
-        showError(error.message);
-      });
+      .then((game) => setGame(game))
+      .catch((err) => showError(err.message));
     fetchFactions(`gameId==${gameId}`, 0, 20)
       .then((factions) => {
         setFactions(factions);
         setFaction(factions.find((f) => f.id === factionId) || null);
       })
-      .catch((error: Error) => {
-        showError(error.message);
-      });
-  };
-
-  const bindRaces = (realmId) => {
-    fetchRaces(`realmId==${realmId}`, 0, 100)
-      .then((data) => {
-        setRaces(data);
-      })
-      .catch((error: Error) => {
-        showError(error.message);
-      });
+      .catch((err) => showError(err.message));
   };
 
   const handleWeaponOrderChange = (newOrder: string[]) => {
@@ -144,13 +97,14 @@ const CharacterCreate: FC = () => {
   };
 
   useEffect(() => {
-    checkValidForm();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    checkValidForm(formData);
   }, [formData]);
 
   useEffect(() => {
     if (game) {
-      bindRaces(game.realmId);
+      fetchRaces(`realmId==${game.realmId}`, 0, 100)
+        .then((data) => setRaces(data))
+        .catch((err) => showError(err.message));
     }
   }, [game]);
 
@@ -162,7 +116,6 @@ const CharacterCreate: FC = () => {
         gameId: gameId,
       }));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameId]);
 
   useEffect(() => {
@@ -182,7 +135,7 @@ const CharacterCreate: FC = () => {
       <Grid container spacing={5}>
         <Grid size={2}>
           <RaceAvatar raceName={formData.info.raceName} size={300} />
-          <CharacterCreateAttributesBasic
+          <CharacterCreateResume
             formData={formData}
             setFormData={setFormData}
             setProfession={setProfession}

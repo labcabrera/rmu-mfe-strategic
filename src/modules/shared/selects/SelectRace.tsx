@@ -1,6 +1,7 @@
 import React, { ChangeEvent, FC } from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
+import { t } from 'i18next';
 import { Race } from '../../api/race.dto';
 
 const SelectFaction: FC<{
@@ -24,6 +25,7 @@ const SelectFaction: FC<{
       variant="standard"
       fullWidth
       onChange={handleChange}
+      error={value === undefined || value === null || value === '' ? true : false}
     >
       {races.map((option) => (
         <MenuItem key={option.id} value={option.id}>

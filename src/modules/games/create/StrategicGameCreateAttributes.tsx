@@ -1,7 +1,6 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { Grid, Typography } from '@mui/material';
 import { t } from 'i18next';
-import { Realm } from '../../api/realm.dto';
 import { CreateStrategicGameDto } from '../../api/strategic-game.dto';
 import NumericInput from '../../shared/inputs/NumericInput';
 

@@ -9,17 +9,11 @@ const CharacterList = () => {
   const { showError } = useError();
   const [characters, setCharacters] = useState([]);
 
-  const bindCharacters = async () => {
-    fetchCharacters('', 0, 20)
-      .then(() => setCharacters(characters))
-      .catch((error) => {
-        showError(error.message);
-      });
-  };
-
   useEffect(() => {
-    bindCharacters();
-  }, []);
+    fetchCharacters('', 0, 20)
+      .then((data) => setCharacters(data))
+      .catch((err) => showError(err.message));
+  }, [showError]);
 
   return (
     <>

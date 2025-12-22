@@ -1,10 +1,8 @@
-import React, { FC, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { FC } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import CancelIcon from '@mui/icons-material/Cancel';
-import CloseIcon from '@mui/icons-material/Close';
-import SaveIcon from '@mui/icons-material/Save';
-import { Box, Breadcrumbs, IconButton, Link, Snackbar, Stack } from '@mui/material';
+import { Box, Breadcrumbs, Link, Stack } from '@mui/material';
+import { t } from 'i18next';
+import { useError } from '../../../ErrorContext';
 import { updateCharacter } from '../../api/character';
 import { Character, CreateCharacterDto } from '../../api/character.dto';
 import { Faction } from '../../api/faction.dto';
@@ -19,24 +17,15 @@ const CharacterUpdateActions: FC<{
   formData: CreateCharacterDto;
 }> = ({ character, game, faction, formData }) => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
-  const [displayError, setDisplayError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const { showError } = useError();
 
-  const handleUpdate = () => {
+  const onUpdate = () => {
     updateCharacter(character.id, formData)
       .then((data: Character) => navigate(`/strategic/characters/view/${data.id}`, { state: { character: data } }))
-      .catch((error: Error) => {
-        setDisplayError(true);
-        setErrorMessage(`Error updating character: ${error.message}`);
-      });
+      .catch((err) => showError(err.message));
   };
 
-  const handleSnackbarClose = () => {
-    setDisplayError(false);
-  };
-
-  const handleCancel = () => {
+  const onCancel = () => {
     navigate(`/strategic/characters/view/${character.id}`, { state: { character: character } });
   };
 
@@ -77,24 +66,11 @@ const CharacterUpdateActions: FC<{
             <span>{t('edit')}</span>
           </Breadcrumbs>
         </Box>
-        <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>
-          <CancelButton onClick={handleCancel} />
-          <SaveButton onClick={handleUpdate} />
+        <Stack spacing={2} direction="row">
+          <CancelButton onClick={onCancel} />
+          <SaveButton onClick={onUpdate} />
         </Stack>
       </Stack>
-      <Snackbar
-        open={displayError}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        onClose={handleSnackbarClose}
-        message={errorMessage}
-        action={
-          <>
-            <IconButton aria-label="close" color="primary" sx={{ p: 0.5 }} onClick={handleSnackbarClose}>
-              <CloseIcon />
-            </IconButton>
-          </>
-        }
-      />
     </>
   );
 };

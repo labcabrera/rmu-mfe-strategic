@@ -1,30 +1,21 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { Box, Grid, IconButton, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { TacticalGame } from '../../api/tactical-games';
+import AddButton from '../../shared/buttons/AddButton';
 import TacticalGameCard from '../../shared/cards/TacticalGameCard';
 
-interface StrategicGameViewTacticalGamesProps {
+const StrategicGameViewTacticalGames: FC<{
   strategicGame: StrategicGame;
   tacticalGames: TacticalGame[];
-}
-
-const StrategicGameViewTacticalGames: React.FC<StrategicGameViewTacticalGamesProps> = ({
-  strategicGame,
-  tacticalGames,
-}) => {
+}> = ({ strategicGame, tacticalGames }) => {
   const navigate = useNavigate();
 
-  const handleNewTacticalGame = () => {
+  const onNewTacticalGame = () => {
     navigate(`/tactical/games/create?strategicGame=${strategicGame.id}`);
   };
-
-  if (!tacticalGames) {
-    return <p>{t('loading')}</p>;
-  }
 
   return (
     <Grid container spacing={2} sx={{ mt: 5 }}>
@@ -33,9 +24,7 @@ const StrategicGameViewTacticalGames: React.FC<StrategicGameViewTacticalGamesPro
           <Typography variant="h6" color="primary" display="inline">
             {t('tactical-games')}
           </Typography>
-          <IconButton onClick={handleNewTacticalGame} color="primary" sx={{ ml: 1 }}>
-            <AddCircleIcon />
-          </IconButton>
+          <AddButton onClick={onNewTacticalGame} />
         </Box>
       </Grid>
       <Grid size={12}>

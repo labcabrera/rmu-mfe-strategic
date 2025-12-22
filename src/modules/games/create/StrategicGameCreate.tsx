@@ -8,36 +8,29 @@ import { defaultStrategicGameImage } from '../../services/image-service';
 import GenericAvatar from '../../shared/avatars/GenericAvatar';
 import StrategicGameCreateActions from './StrategicGameCreateActions';
 import StrategicGameCreateAttributes from './StrategicGameCreateAttributes';
-import StrategicGameCreateAttributesBasic from './StrategicGameCreateAttributesBasic';
+import StrategicGameCreateResume from './StrategicGameCreateResume';
 
 const StrategicGameCreate: FC = () => {
-  const [realms, setRealms] = useState<Realm[]>([]);
   const { showError } = useError();
+  const [realms, setRealms] = useState<Realm[]>([]);
   const [formData, setFormData] = useState<CreateStrategicGameDto>(gameCreateTemplate);
   const [isValid, setIsValid] = useState<boolean>(false);
 
-  const bindRealms = async () => {
-    fetchRealms()
-      .then((data) => {
-        setRealms(data);
-      })
-      .catch((err: unknown) => {
-        if (err instanceof Error) showError(err.message);
-        else showError('Unknown error');
-      });
-  };
-
-  const validateForm = () => {
+  const validateForm = (formData: CreateStrategicGameDto) => {
     return !!formData.name && !!formData.realmId;
   };
 
   useEffect(() => {
-    setIsValid(validateForm());
+    setIsValid(validateForm(formData));
   }, [formData]);
 
   useEffect(() => {
-    bindRealms();
+    fetchRealms()
+      .then((data) => setRealms(data))
+      .catch((err) => showError(err.message));
   }, []);
+
+  if (!realms) return <div>Loading...</div>;
 
   return (
     <>
@@ -45,9 +38,9 @@ const StrategicGameCreate: FC = () => {
       <Grid container spacing={5}>
         <Grid size={2}>
           <GenericAvatar imageUrl={defaultStrategicGameImage} size={300} />
-          <StrategicGameCreateAttributesBasic formData={formData} setFormData={setFormData} realms={realms} />
+          <StrategicGameCreateResume formData={formData} setFormData={setFormData} realms={realms} />
         </Grid>
-        <Grid size={7}>
+        <Grid size={10}>
           <StrategicGameCreateAttributes formData={formData} setFormData={setFormData} />
         </Grid>
       </Grid>

@@ -1,9 +1,8 @@
 import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import InfoOutlineIcon from '@mui/icons-material/InfoOutline';
-import { Button, Grid, Tooltip, MenuItem, TextField, IconButton, Typography } from '@mui/material';
+import { Button, Grid, MenuItem, TextField, Typography } from '@mui/material';
 import { t } from 'i18next';
-import { CreateCharacterDto, stats } from '../../api/character.dto';
+import { CreateCharacterDto, STATS } from '../../api/character.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { getStatBonus } from '../../services/stat-service';
 import { StatBonus } from './CharacterCreate';
@@ -17,11 +16,6 @@ const StatSelect: FC<{
   value: string;
   setValue: (value: string) => void;
 }> = ({ name, value, setValue }) => {
-  const { t } = useTranslation();
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
-  };
-
   return (
     <TextField
       select
@@ -30,9 +24,9 @@ const StatSelect: FC<{
       value={value}
       variant="standard"
       fullWidth
-      onChange={handleChange}
+      onChange={(e) => setValue(e.target.value)}
     >
-      {stats.map((option) => (
+      {STATS.map((option) => (
         <MenuItem key={option} value={option}>
           {t(option)}
         </MenuItem>

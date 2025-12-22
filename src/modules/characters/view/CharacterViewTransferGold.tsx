@@ -1,8 +1,8 @@
 import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Button, Grid, Stack, Typography } from '@mui/material';
+import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { transferFactionGold } from '../../api/character';
 import { Character } from '../../api/character.dto';
@@ -14,18 +14,13 @@ const CharacterViewTransferGold: FC<{
   setCharacter: Dispatch<SetStateAction<Character>>;
   faction: Faction;
 }> = ({ character, setCharacter, faction }) => {
-  const { t } = useTranslation();
   const [goldAmount, setGoldAmount] = useState<number>(0);
   const { showError } = useError();
 
   const handleTransfer = (amount: number) => {
     transferFactionGold(character.id, amount)
-      .then((updatedCharacter: Character) => {
-        setCharacter(updatedCharacter);
-      })
-      .catch((err: Error) => {
-        showError(err.message);
-      });
+      .then((data) => setCharacter(data))
+      .catch((err) => showError(err.message));
   };
 
   useEffect(() => {
@@ -35,9 +30,7 @@ const CharacterViewTransferGold: FC<{
     }
   }, [character]);
 
-  if (!character || !faction) {
-    return null;
-  }
+  if (!character || !faction) return null;
 
   return (
     <Grid container spacing={2}>

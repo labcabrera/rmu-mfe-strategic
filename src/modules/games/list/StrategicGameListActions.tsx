@@ -1,13 +1,13 @@
 import React, { FC } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import { Box, Breadcrumbs, IconButton, Link, Stack } from '@mui/material';
+import { Box, Breadcrumbs, Link, Stack } from '@mui/material';
 import { t } from 'i18next';
 import AddButton from '../../shared/buttons/AddButton';
 
 const StrategicGameListActions: FC = () => {
   const navigate = useNavigate();
 
-  const handleCreateGame = () => {
+  const onCreateNewGame = () => {
     navigate('/strategic/games/create');
   };
 
@@ -24,8 +24,8 @@ const StrategicGameListActions: FC = () => {
           <span>{t('games')}</span>
         </Breadcrumbs>
       </Box>
-      <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>
-        <AddButton onClick={handleCreateGame} />
+      <Stack spacing={2} direction="row">
+        <AddButton onClick={onCreateNewGame} />
       </Stack>
     </Stack>
   );

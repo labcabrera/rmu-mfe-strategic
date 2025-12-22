@@ -12,16 +12,15 @@ import SaveButton from '../../shared/buttons/SaveButton';
 const FactionCreateActions: FC<{
   strategicGame: StrategicGame;
   formData: CreateFactionDto;
-}> = ({ strategicGame, formData }) => {
+  isValid: boolean;
+}> = ({ strategicGame, formData, isValid }) => {
   const navigate = useNavigate();
   const { showError } = useError();
 
-  const handleCreate = () => {
+  const onCreate = () => {
     createFaction(formData)
       .then((data: { id: string }) => navigate(`/strategic/factions/view/${data.id}`, { state: { faction: data } }))
-      .catch((err: Error) => {
-        showError(err.message);
-      });
+      .catch((err) => showError(err.message));
   };
 
   return (
@@ -48,9 +47,9 @@ const FactionCreateActions: FC<{
           <span>{t('create-faction')}</span>
         </Breadcrumbs>
       </Box>
-      <Stack spacing={2} direction="row" sx={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>
+      <Stack spacing={2} direction="row">
         <CancelButton onClick={() => navigate(-1)} />
-        <SaveButton onClick={handleCreate} />
+        <SaveButton onClick={onCreate} disabled={!isValid} />
       </Stack>
     </Stack>
   );

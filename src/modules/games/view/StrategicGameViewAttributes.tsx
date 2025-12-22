@@ -7,8 +7,6 @@ import NumericCard from '../../shared/cards/NumericCard';
 const StrategicGameViewAttributes: FC<{
   strategicGame: StrategicGame;
 }> = ({ strategicGame }) => {
-  if (!strategicGame) return <div>Loading...</div>;
-
   return (
     <Grid container spacing={2}>
       <Grid size={12}>

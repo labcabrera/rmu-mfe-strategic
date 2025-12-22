@@ -1,7 +1,7 @@
-import React, { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
-import { Grid, TextField, Typography } from '@mui/material';
+import React, { Dispatch, FC, SetStateAction } from 'react';
+import { Grid, Typography } from '@mui/material';
 import { t } from 'i18next';
-import { CreateCharacterDto, UpdateCharacterDto } from '../../api/character.dto';
+import { UpdateCharacterDto } from '../../api/character.dto';
 import NumericInput from '../../shared/inputs/NumericInput';
 import SelectGender from '../../shared/selects/SelectGender';
 
@@ -9,11 +9,6 @@ const CharacterUpdateAttributes: FC<{
   formData: UpdateCharacterDto;
   setFormData: Dispatch<SetStateAction<UpdateCharacterDto>>;
 }> = ({ formData, setFormData }) => {
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
   return (
     <Grid container spacing={2}>
       <Grid size={12}>

@@ -14,7 +14,6 @@ export const CharacterCreateSortCombat: FC<{
     const newOrder = [...order];
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
     if (targetIndex < 0 || targetIndex >= newOrder.length) return;
-    // swap
     [newOrder[index], newOrder[targetIndex]] = [newOrder[targetIndex], newOrder[index]];
     setOrder(newOrder);
     onChange?.(newOrder);

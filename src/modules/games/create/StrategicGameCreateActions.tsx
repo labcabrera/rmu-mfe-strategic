@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import { Cancel } from '@mui/icons-material';
 import { Box, Breadcrumbs, Link, Stack } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
@@ -18,13 +17,8 @@ const StrategicGameCreateActions: React.FC<{
 
   const createGame = () => {
     createStrategicGame(formData)
-      .then((data: { id: string }) => {
-        navigate('/strategic/games/view/' + data.id, { state: { strategicGame: data } });
-      })
-      .catch((err: unknown) => {
-        if (err instanceof Error) showError(err.message);
-        else showError('Unknown error');
-      });
+      .then((data) => navigate('/strategic/games/view/' + data.id, { state: { strategicGame: data } }))
+      .catch((err) => showError(err.message));
   };
 
   return (

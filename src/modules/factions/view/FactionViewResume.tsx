@@ -18,7 +18,6 @@ const FactionViewResume: FC<{
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
 
   const onImageUpdated = (imageId: string) => {
-    console.log(`Image selected: ${imageId}`);
     updateFaction(faction.id, { ...faction, imageUrl: imageId })
       .then(() => {
         setFaction({ ...faction, imageUrl: imageId });

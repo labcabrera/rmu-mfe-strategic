@@ -1,12 +1,11 @@
 import React, { FC } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Chip, Grid, Typography } from '@mui/material';
+import { t } from 'i18next';
 import { Profession } from '../../api/professions';
 
 const CharacterCreateProfessionalSkills: FC<{
   profession: Profession;
 }> = ({ profession }) => {
-  const { t } = useTranslation();
   const skillsTranslated = profession.professionalSkills.map((skill) => t(skill)).sort();
 
   return (

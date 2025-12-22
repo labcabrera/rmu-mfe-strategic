@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { t } from 'i18next';
-import { Character, stats } from '../../api/character.dto';
+import { Character, STATS } from '../../api/character.dto';
 
 const CharacterViewStats: FC<{
   character: Character;
@@ -35,7 +35,7 @@ const CharacterViewStats: FC<{
             </TableRow>
           </TableHead>
           <TableBody>
-            {stats.map((key) => (
+            {STATS.map((key) => (
               <CharacterViewStatsEntry key={key} statKey={key} statName={key} character={character} />
             ))}
           </TableBody>

@@ -9,11 +9,6 @@ const StrategicGameUpdateAttributes: FC<{
   formData: UpdateStrategicGameDto;
   setFormData: Dispatch<SetStateAction<UpdateStrategicGameDto>>;
 }> = ({ formData, setFormData }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
   const handleOptionsChange = (field: string, value: number) => {
     setFormData({ ...formData, options: { ...formData.options, [field]: value } });
   };

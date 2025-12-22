@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { Badge, Box, Grid, Typography } from '@mui/material';
 import { t } from 'i18next';
-import { Character, stats } from '../../api/character.dto';
+import { Character, STATS } from '../../api/character.dto';
 import NumericCard from '../../shared/cards/NumericCard';
 import TextCard from '../../shared/cards/TextCard';
 
@@ -46,19 +46,17 @@ const CharacterViewInfo: FC<{
               subtitle={t('size')}
               image={`/static/images/generic/race-size.png`}
             />
-            <NumericCard
-              value={character.info.height}
+            <TextCard
+              value={`${character.info.height}'`}
               subtitle={t('height')}
               image={`/static/images/generic/character-height.png`}
-              applyColor={false}
             />
-            <NumericCard
-              value={character.info.weight}
+            <TextCard
+              value={`${character.info.weight} lbs`}
               subtitle={t('weight')}
               image={`/static/images/generic/character-weight.png`}
-              applyColor={false}
             />
-            <Badge color="warning" badgeContent={character.hp.max} invisible={character.hp.max > 0}>
+            <Badge color="error" badgeContent={character.hp.max} invisible={character.hp.max > 0}>
               <TextCard
                 value={`${character.hp.current} / ${character.hp.max}`}
                 subtitle={t('hit-points')}
@@ -73,7 +71,7 @@ const CharacterViewInfo: FC<{
           </Typography>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
             <Badge
-              color="warning"
+              color="success"
               badgeContent={`+${character.experience.availableLevel - character.experience.level}`}
               invisible={character.experience.availableLevel <= character.experience.level}
             >
@@ -92,7 +90,7 @@ const CharacterViewInfo: FC<{
               applyFormat={true}
             />
             <Badge
-              color="warning"
+              color="success"
               badgeContent={`+${character.experience.availableDevelopmentPoints}`}
               invisible={character.experience.availableDevelopmentPoints < 1}
             >
@@ -109,7 +107,7 @@ const CharacterViewInfo: FC<{
             {t('stats')}
           </Typography>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
-            {stats.map((stat) => (
+            {STATS.map((stat) => (
               <NumericCard
                 key={stat}
                 value={character.statistics[stat].totalBonus}
@@ -137,11 +135,10 @@ const CharacterViewInfo: FC<{
             {t('movement')}
           </Typography>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
-            <NumericCard
-              value={character.movement.baseMovementRate}
+            <TextCard
+              value={`${character.movement.baseMovementRate}' /rnd`}
               subtitle={t('base-movement-rate')}
               image={`/static/images/generic/stride-bonus.png`}
-              applyColor={false}
             />
             <NumericCard
               value={character.movement.strideRacialBonus}
@@ -176,7 +173,7 @@ const CharacterViewInfo: FC<{
             />
           </Box>
         </Grid>
-        <Grid size={8}>
+        <Grid size={12}>
           <Typography color="primary" variant="h6">
             {t('resistances')}
           </Typography>

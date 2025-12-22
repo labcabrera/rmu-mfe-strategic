@@ -8,7 +8,6 @@ import { toRoman } from '../../services/roman-number-service';
 import AddButton from '../../shared/buttons/AddButton';
 import DeleteButton from '../../shared/buttons/DeleteButton';
 import TextCard from '../../shared/cards/TextCard';
-import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 import CharacterViewAddTraitDialog from './CharacterViewAddTraitDialog';
 import CharacterViewTraitDialog from './CharacterViewTraitDialog';
 
@@ -28,25 +27,19 @@ const CharacterViewTraits: FC<{
     setOpenTraitDialog(true);
   };
 
-  const handleAddTrait = (addTraitDto: AddTraitDto) => {
+  const onAddTrait = (addTraitDto: AddTraitDto) => {
     addTrait(character.id, addTraitDto)
       .then((updatedCharacter) => {
         setCharacter(updatedCharacter);
         setOpenAddTraitDialog(false);
       })
-      .catch((error) => {
-        showError(error.message);
-      });
+      .catch((err) => showError(err.message));
   };
 
-  const handleDeleteTrait = (trait: CharacterTrait) => {
+  const onDeleteTrait = (trait: CharacterTrait) => {
     deleteTrait(character.id, trait)
-      .then((updatedCharacter) => {
-        setCharacter(updatedCharacter);
-      })
-      .catch((error) => {
-        showError(error.message);
-      });
+      .then((updatedCharacter) => setCharacter(updatedCharacter))
+      .catch((error) => showError(error.message));
   };
 
   const getTraitName = (trait: CharacterTrait): string => {
@@ -77,7 +70,7 @@ const CharacterViewTraits: FC<{
                 maxWidth={500}
                 onClick={() => handleTraitView(trait.traitId)}
               />
-              <DeleteButton onClick={() => handleDeleteTrait(trait)} />
+              <DeleteButton onClick={() => onDeleteTrait(trait)} />
             </Box>
           </Grid>
         ))}
@@ -86,7 +79,7 @@ const CharacterViewTraits: FC<{
       <CharacterViewAddTraitDialog
         open={openAddTraitDialog}
         onClose={() => setOpenAddTraitDialog(false)}
-        onTraitAdded={(addTraitDto) => handleAddTrait(addTraitDto)}
+        onTraitAdded={(addTraitDto) => onAddTrait(addTraitDto)}
       />
       <CharacterViewTraitDialog traitId={traitId} open={openTraitDialog} onClose={() => setOpenTraitDialog(false)} />
     </>

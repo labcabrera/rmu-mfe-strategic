@@ -7,11 +7,6 @@ const CharacterUpdateResume: FC<{
   formData: UpdateCharacterDto;
   setFormData: Dispatch<SetStateAction<UpdateCharacterDto>>;
 }> = ({ formData, setFormData }) => {
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
   return (
     <Grid container spacing={2}>
       <Grid size={12}>
@@ -19,8 +14,9 @@ const CharacterUpdateResume: FC<{
           label={t('name')}
           name="name"
           value={formData.name}
-          onChange={handleChange}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           variant="standard"
+          error={!formData.name || formData.name.trim() === ''}
           fullWidth
         />
       </Grid>
@@ -30,7 +26,7 @@ const CharacterUpdateResume: FC<{
           fullWidth
           name="description"
           value={formData.description}
-          onChange={handleChange}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           variant="standard"
           multiline
           rows={18}

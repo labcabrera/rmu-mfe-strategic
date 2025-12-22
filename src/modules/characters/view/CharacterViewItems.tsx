@@ -1,5 +1,4 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
@@ -11,6 +10,7 @@ import { AddItemDto, Character } from '../../api/character.dto';
 import { Faction } from '../../api/faction.dto';
 import { Item } from '../../api/items';
 import AddButton from '../../shared/buttons/AddButton';
+import DeleteButton from '../../shared/buttons/DeleteButton';
 import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 import CharacterViewAddItemDialog from './CharacterViewAddItemDialog';
 import CharacterViewEquipment from './CharacterViewEquipment';
@@ -30,12 +30,8 @@ const CharacterViewItems: FC<{
 
   const onItemAdded = (addItemDto: AddItemDto) => {
     addItem(character.id, addItemDto)
-      .then((data) => {
-        setCharacter(data);
-      })
-      .catch((err: Error) => {
-        showError(err.message);
-      });
+      .then((data) => setCharacter(data))
+      .catch((err) => showError(err.message));
   };
 
   return (
@@ -74,32 +70,23 @@ const ItemCardListItem: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character>>;
 }> = ({ item, character, setCharacter }) => {
-  const { t } = useTranslation();
   const { showError } = useError();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  const handleOpenDeleteDialog = () => {
-    setDeleteDialogOpen(true);
-  };
+  // const handleOpenDeleteDialog = () => {
+  //   setDeleteDialogOpen(true);
+  // };
 
   const handleDelete = () => {
     deleteItem(character.id, item.id)
-      .then((data) => {
-        setCharacter(data);
-      })
-      .catch((err: Error) => {
-        showError(err.message);
-      });
+      .then((data) => setCharacter(data))
+      .catch((err) => showError(err.message));
   };
 
   const handleCarried = (itemId: string, carried: boolean) => {
     updateCarriedStatus(character.id, itemId, carried)
-      .then((data) => {
-        setCharacter(data);
-      })
-      .catch((err: Error) => {
-        showError(err.message);
-      });
+      .then((data) => setCharacter(data))
+      .catch((err) => showError(err.message));
   };
 
   return (
@@ -118,9 +105,7 @@ const ItemCardListItem: FC<{
               {item.info?.type}
             </Typography>
             {item.itemTypeId !== 'gold-coin' && (
-              <IconButton aria-label="delete" onClick={handleOpenDeleteDialog}>
-                <DeleteOutlineIcon />
-              </IconButton>
+              <DeleteButton aria-label="delete" onClick={() => setDeleteDialogOpen(true)} />
             )}
             {item.carried ? (
               <IconButton aria-label="archive" onClick={() => handleCarried(item.id, false)}>
