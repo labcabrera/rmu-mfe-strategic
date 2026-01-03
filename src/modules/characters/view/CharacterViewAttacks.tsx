@@ -44,7 +44,7 @@ const CharacterViewAttacks: FC<{
                 <TableCell align="left">{t(row.type)}</TableCell>
                 <TableCell align="left">{t(row.attackTable)}</TableCell>
                 <TableCell align="left">{row.sizeAdjustment}</TableCell>
-                <TableCell align="left">{row.fumbleTable}</TableCell>
+                <TableCell align="left">{t(row.fumbleTable)}</TableCell>
                 <TableCell align="right">{row.fumble}</TableCell>
                 <TableCell align="right" sx={{ color: getColor(row.bo), fontWeight: 'bold' }}>
                   {row.bo}
