@@ -12,6 +12,7 @@ import { Item } from '../../api/items';
 import AddButton from '../../shared/buttons/AddButton';
 import DeleteButton from '../../shared/buttons/DeleteButton';
 import DeleteDialog from '../../shared/dialogs/DeleteDialog';
+import CharacterEquipmentLayout from './CharacterEquipment';
 import CharacterViewAddItemDialog from './CharacterViewAddItemDialog';
 import CharacterViewEquipment from './CharacterViewEquipment';
 import CharacterViewEquipmentInfo from './CharacterViewEquipmentInfo';
@@ -37,10 +38,10 @@ const CharacterViewItems: FC<{
   return (
     <>
       <Grid container spacing={2}>
-        <Grid size={7}>
-          <CharacterViewEquipment character={character} setCharacter={setCharacter} />
+        <Grid size={6}>
+          <CharacterEquipmentLayout character={character} setCharacter={setCharacter} />
         </Grid>
-        <Grid size={5}>
+        <Grid size={6}>
           <CharacterViewEquipmentInfo character={character} />
         </Grid>
         <Grid size={12}>

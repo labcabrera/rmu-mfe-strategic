@@ -121,10 +121,14 @@ export interface CharacterItem {
   amount?: number;
 }
 
+export interface WeaponMode {
+  type: string;
+}
+
 export interface WeaponInfo {
   fumble: string;
   sizeAdjustment: string;
-  requiredHands: number;
+  modes: WeaponMode[];
 }
 
 export interface ArmorInfo {
