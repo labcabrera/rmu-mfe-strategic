@@ -2,17 +2,17 @@ import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import { Box, Card, CardActions, CardContent, CardMedia, Grid, IconButton, Typography } from '@mui/material';
+import { Box, Card, CardActions, CardContent, CardMedia, Grid, IconButton, Paper, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { addItem, deleteItem, updateCarriedStatus } from '../../api/character';
-import { AddItemDto, Character } from '../../api/character.dto';
+import { AddItemDto, Character, CharacterItem } from '../../api/character.dto';
 import { Faction } from '../../api/faction.dto';
 import { Item } from '../../api/items';
 import AddButton from '../../shared/buttons/AddButton';
 import DeleteButton from '../../shared/buttons/DeleteButton';
 import DeleteDialog from '../../shared/dialogs/DeleteDialog';
-import CharacterEquipmentLayout from './CharacterEquipment';
+import CharacterItemDetail from './CharacterItemDetail';
 import CharacterItemTable from './CharacterItemTable';
 import CharacterViewAddItemDialog from './CharacterViewAddItemDialog';
 import CharacterViewEquipment from './CharacterViewEquipment';
@@ -29,6 +29,7 @@ const CharacterViewItems: FC<{
 }> = ({ character, setCharacter, faction }) => {
   const { showError } = useError();
   const [openAddItemDialog, setOpenAddItemDialog] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<CharacterItem | null>(null);
 
   const onItemAdded = (addItemDto: AddItemDto) => {
     addItem(character.id, addItemDto)
@@ -38,16 +39,37 @@ const CharacterViewItems: FC<{
 
   return (
     <>
-      <Grid container spacing={2}>
-        <Grid size={6}>
-          <CharacterEquipmentLayout character={character} setCharacter={setCharacter} />
+      <Grid container spacing={1}>
+        <Grid size={12}>
+          <CharacterViewEquipment character={character} setCharacter={setCharacter} />
         </Grid>
-        <Grid size={6}>
+        <Grid size={12} mt={2}>
           <CharacterViewEquipmentInfo character={character} />
         </Grid>
         <Grid size={12}>
-          <CharacterItemTable character={character} setCharacter={setCharacter} />
+          <Grid container spacing={1}>
+            <Grid size={6}>
+              <CharacterItemTable
+                character={character}
+                setCharacter={setCharacter}
+                carried={true}
+                onItemClick={setSelectedItem}
+                onButtonAddClick={() => setOpenAddItemDialog(true)}
+              />
+              <CharacterItemTable
+                character={character}
+                setCharacter={setCharacter}
+                carried={false}
+                onItemClick={setSelectedItem}
+                onButtonAddClick={() => setOpenAddItemDialog(true)}
+              />
+            </Grid>
+            <Grid size={6}>
+              <CharacterItemDetail item={selectedItem!} />
+            </Grid>
+          </Grid>
         </Grid>
+        <Grid size={6}></Grid>
         <Grid size={12}>
           <Box display="flex" alignItems="center" sx={{ minHeight: 60 }}>
             <Typography variant="h6" color="primary" display="inline">

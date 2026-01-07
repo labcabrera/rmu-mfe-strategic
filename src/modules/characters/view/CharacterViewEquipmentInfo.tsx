@@ -24,11 +24,6 @@ const CharacterViewEquipmentInfo: React.FC<{
   return (
     <Grid container spacing={2}>
       <Grid size={12}>
-        <Typography variant="h6" color="primary">
-          {t('equipment-info')}
-        </Typography>
-      </Grid>
-      <Grid size={12}>
         <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
           <TextCard value={getArmorType()} subtitle={t('armor-type')} image={`/static/images/generic/armor.png`} />
           <NumericCard

@@ -5,7 +5,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {
   Avatar,
-  Checkbox,
   IconButton,
   Menu,
   MenuItem,
@@ -22,14 +21,18 @@ import {
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { updateCarriedStatus, deleteItem } from '../../api/character';
-import { Character } from '../../api/character.dto';
+import { Character, CharacterItem } from '../../api/character.dto';
+import AddButton from '../../shared/buttons/AddButton';
 
-const IMG_SIZE = 48;
+const IMG_SIZE = 60;
 
 const CharacterItemTable: FC<{
   character: Character;
   setCharacter?: Dispatch<SetStateAction<Character>>;
-}> = ({ character, setCharacter }) => {
+  carried?: boolean;
+  onItemClick?: (item: CharacterItem) => void;
+  onButtonAddClick?: () => void;
+}> = ({ character, setCharacter, carried, onItemClick, onButtonAddClick }) => {
   const { showError } = useError();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuItemId, setMenuItemId] = useState<string | null>(null);
@@ -66,69 +69,88 @@ const CharacterItemTable: FC<{
 
   return (
     <TableContainer component={Paper} sx={{ mt: 2 }}>
-      <Table size="small">
+      <Table size="small" sx={{ tableLayout: 'fixed' }}>
         <TableHead>
           <TableRow>
-            <TableCell></TableCell>
-            <TableCell>{t('name')}</TableCell>
-            <TableCell>{t('type')}</TableCell>
-            <TableCell>{t('amount')}</TableCell>
-            <TableCell>{t('weight')}</TableCell>
-            <TableCell align="center">{t('carried')}</TableCell>
-            <TableCell align="right">{t('actions')}</TableCell>
+            <TableCell sx={{ width: '72px' }}>{carried ? t('Carried') : t('Stored')}</TableCell>
+            <TableCell sx={{ width: '240px' }}>{t('name')}</TableCell>
+            <TableCell sx={{ width: '140px' }}>{t('type')}</TableCell>
+            <TableCell sx={{ width: '80px' }}>{t('amount')}</TableCell>
+            <TableCell sx={{ width: '80px' }}>{t('weight')}</TableCell>
+            <TableCell align="right" sx={{ width: '80px' }}>
+              <AddButton onClick={() => onButtonAddClick && onButtonAddClick()} />
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {character.items.map((item) => (
-            <TableRow key={item.id} hover>
-              <TableCell>
-                <Avatar
-                  variant="square"
-                  src={`/static/images/items/${item.itemTypeId}.png`}
-                  alt={item.name}
-                  sx={{
-                    width: IMG_SIZE,
-                    height: IMG_SIZE,
-                    filter: !!item.carried ? 'none' : 'grayscale(100%)',
-                  }}
-                />
-              </TableCell>
-              <TableCell>
-                <Typography variant="body2">{item.name}</Typography>
-              </TableCell>
-              <TableCell>
-                <Typography variant="body2">{t(item.itemTypeId) || ''}</Typography>
-              </TableCell>
-              <TableCell>
-                <Typography variant="body2">{item.amount && item.amount > 1 ? item.amount : ''}</Typography>
-              </TableCell>
-              <TableCell>
-                <Typography variant="body2">{item.info?.weight ?? ''}</Typography>
-              </TableCell>
-              <TableCell align="center">
-                <Checkbox checked={!!item.carried} disabled />
-              </TableCell>
-              <TableCell align="right">
-                <IconButton size="small" onClick={(e) => handleOpenMenu(e, item.id)}>
-                  <MoreVertIcon fontSize="small" />
-                </IconButton>
-                <Menu anchorEl={anchorEl} open={Boolean(anchorEl) && menuItemId === item.id} onClose={handleCloseMenu}>
-                  <MenuItem onClick={() => handleToggleCarried(item.id, !!item.carried)}>
-                    <ListItemIcon>
-                      {item.carried ? <BlockIcon fontSize="small" /> : <AssignmentTurnedInIcon fontSize="small" />}
-                    </ListItemIcon>
-                    {item.carried ? t('noCarry') : t('carry')}
-                  </MenuItem>
-                  <MenuItem onClick={() => handleDelete(item.id)}>
-                    <ListItemIcon>
-                      <DeleteIcon fontSize="small" />
-                    </ListItemIcon>
-                    {t('delete')}
-                  </MenuItem>
-                </Menu>
-              </TableCell>
-            </TableRow>
-          ))}
+          {character.items
+            .filter((item) => (typeof carried === 'boolean' ? !!item.carried === carried : true))
+            .map((item) => (
+              <TableRow
+                key={item.id}
+                hover
+                onClick={() => onItemClick && onItemClick(item)}
+                sx={{ cursor: onItemClick ? 'pointer' : 'default' }}
+              >
+                <TableCell sx={{ width: '72px' }}>
+                  <Avatar
+                    variant="square"
+                    src={`/static/images/items/${item.itemTypeId}.png`}
+                    alt={item.name}
+                    sx={{
+                      width: IMG_SIZE,
+                      height: IMG_SIZE,
+                      filter: !!item.carried ? 'none' : 'grayscale(100%)',
+                    }}
+                  />
+                </TableCell>
+                <TableCell sx={{ width: '240px' }}>
+                  <Typography variant="body2" noWrap>
+                    {item.name}
+                  </Typography>
+                </TableCell>
+                <TableCell sx={{ width: '140px' }}>
+                  <Typography variant="body2" noWrap>
+                    {t(item.itemTypeId) || ''}
+                  </Typography>
+                </TableCell>
+                <TableCell sx={{ width: '80px' }}>
+                  <Typography variant="body2">{item.amount && item.amount > 1 ? item.amount : ''}</Typography>
+                </TableCell>
+                <TableCell sx={{ width: '80px' }}>
+                  <Typography variant="body2">{item.info?.weight ?? ''}</Typography>
+                </TableCell>
+                <TableCell align="right">
+                  <IconButton
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenMenu(e, item.id);
+                    }}
+                  >
+                    <MoreVertIcon fontSize="small" />
+                  </IconButton>
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl) && menuItemId === item.id}
+                    onClose={handleCloseMenu}
+                  >
+                    <MenuItem onClick={() => handleToggleCarried(item.id, !!item.carried)}>
+                      <ListItemIcon>
+                        {item.carried ? <BlockIcon fontSize="small" /> : <AssignmentTurnedInIcon fontSize="small" />}
+                      </ListItemIcon>
+                      {item.carried ? t('noCarry') : t('carry')}
+                    </MenuItem>
+                    <MenuItem onClick={() => handleDelete(item.id)}>
+                      <ListItemIcon>
+                        <DeleteIcon fontSize="small" />
+                      </ListItemIcon>
+                      {t('delete')}
+                    </MenuItem>
+                  </Menu>
+                </TableCell>
+              </TableRow>
+            ))}
         </TableBody>
       </Table>
     </TableContainer>
