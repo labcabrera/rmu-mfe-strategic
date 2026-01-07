@@ -13,6 +13,7 @@ import AddButton from '../../shared/buttons/AddButton';
 import DeleteButton from '../../shared/buttons/DeleteButton';
 import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 import CharacterEquipmentLayout from './CharacterEquipment';
+import CharacterItemTable from './CharacterItemTable';
 import CharacterViewAddItemDialog from './CharacterViewAddItemDialog';
 import CharacterViewEquipment from './CharacterViewEquipment';
 import CharacterViewEquipmentInfo from './CharacterViewEquipmentInfo';
@@ -43,6 +44,9 @@ const CharacterViewItems: FC<{
         </Grid>
         <Grid size={6}>
           <CharacterViewEquipmentInfo character={character} />
+        </Grid>
+        <Grid size={12}>
+          <CharacterItemTable character={character} setCharacter={setCharacter} />
         </Grid>
         <Grid size={12}>
           <Box display="flex" alignItems="center" sx={{ minHeight: 60 }}>

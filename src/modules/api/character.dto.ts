@@ -119,6 +119,7 @@ export interface CharacterItem {
   armor?: ArmorInfo;
   info: any;
   amount?: number;
+  carried: boolean;
 }
 
 export interface WeaponMode {
