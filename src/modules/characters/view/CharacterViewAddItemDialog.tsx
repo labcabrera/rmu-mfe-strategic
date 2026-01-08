@@ -1,10 +1,21 @@
 import React, { useState, useEffect, FC } from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid } from '@mui/material';
+import {
+  Box,
+  Button,
+  CardMedia,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Grid,
+  Tooltip,
+} from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { AddItemDto } from '../../api/character.dto';
 import { fetchItems, Item } from '../../api/items';
-import TextCard from '../../shared/cards/TextCard';
+// TextCard replaced by CardMedia instances
 import CharacterViewAddItemDialogForm from './CharacterViewAddItemDialogForm';
 
 const categories = ['weapon', 'armor', 'shield', 'clothes', 'ammunition', 'tools', 'food'];
@@ -23,6 +34,8 @@ const CharacterAddItemDialog: FC<{
   const [formData, setFormData] = useState<AddItemDto | null>(null);
   const [items, setItems] = useState<Item[]>([]);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+
+  const IMAGE_SIZE = 100;
 
   const handleClose = () => {
     setFormData(null);
@@ -98,43 +111,50 @@ const CharacterAddItemDialog: FC<{
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth>
       <DialogTitle>{t('add-item')}</DialogTitle>
-      <DialogContent sx={{ minHeight: '700px' }}>
+      <DialogContent sx={{ minHeight: '800px' }}>
         <Grid container spacing={1}>
           <Grid size={12}>
             <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
               {categories.map((category) => (
-                <TextCard
-                  key={category}
-                  value={t(category)}
-                  subtitle=""
-                  onClick={() => setSelectedCategory(category)}
-                  image={`/static/images/items/category-${category}.png`}
-                  maxWidth={190}
-                  minWidth={190}
-                  height={70}
-                  imageSize={70}
-                  grayscale={selectedCategory === category ? 0 : 1}
-                  valueVariant="body1"
-                />
+                <>
+                  <CardMedia
+                    key={category}
+                    component="img"
+                    image={`/static/images/items/category-${category}.png`}
+                    alt={t(category)}
+                    onClick={() => setSelectedCategory(category)}
+                    sx={{
+                      width: IMAGE_SIZE,
+                      height: IMAGE_SIZE,
+                      objectFit: 'cover',
+                      cursor: 'pointer',
+                      border: selectedCategory === category ? '2px solid' : 'none',
+                      borderColor: 'success.main',
+                    }}
+                  />
+                </>
               ))}
             </Box>
           </Grid>
+          <Divider />
           {subcategories && subcategories.length > 0 && (
             <Grid size={12}>
               <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
                 {subcategories.map((subcategory) => (
-                  <TextCard
+                  <CardMedia
                     key={subcategory}
-                    value={t(subcategory)}
-                    subtitle=""
-                    onClick={() => setSelectedSubcategory(subcategory)}
+                    component="img"
                     image={`/static/images/generic/slot-${subcategory}.png`}
-                    maxWidth={190}
-                    minWidth={190}
-                    height={70}
-                    imageSize={70}
-                    grayscale={selectedSubcategory === subcategory ? 0 : 1}
-                    valueVariant="body1"
+                    alt={t(subcategory)}
+                    onClick={() => setSelectedSubcategory(subcategory)}
+                    sx={{
+                      width: IMAGE_SIZE,
+                      height: IMAGE_SIZE,
+                      objectFit: 'cover',
+                      cursor: 'pointer',
+                      border: selectedSubcategory === subcategory ? '2px solid' : 'none',
+                      borderColor: 'success.main',
+                    }}
                   />
                 ))}
               </Box>
@@ -144,19 +164,23 @@ const CharacterAddItemDialog: FC<{
           <Grid size={12}>
             <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
               {items.map((item) => (
-                <TextCard
-                  key={item.id}
-                  value={t(item.id)}
-                  subtitle={getItemDetail(item)}
-                  onClick={() => loadItem(item)}
-                  image={`/static/images/items/${item.id}.png`}
-                  maxWidth={300}
-                  minWidth={300}
-                  height={70}
-                  imageSize={70}
-                  grayscale={0}
-                  valueVariant="body1"
-                />
+                <Tooltip title={t(item.id)} arrow>
+                  <CardMedia
+                    key={item.id}
+                    component="img"
+                    image={`/static/images/items/${item.id}.png`}
+                    alt={t(item.id)}
+                    onClick={() => loadItem(item)}
+                    sx={{
+                      width: IMAGE_SIZE,
+                      height: IMAGE_SIZE,
+                      objectFit: 'cover',
+                      cursor: 'pointer',
+                      border: selectedItem && selectedItem.id === item.id ? '2px solid' : 'none',
+                      borderColor: 'success.main',
+                    }}
+                  />
+                </Tooltip>
               ))}
             </Box>
           </Grid>

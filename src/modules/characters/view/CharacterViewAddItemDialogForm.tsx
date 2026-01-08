@@ -74,17 +74,17 @@ const CharacterViewAddItemDialogForm: FC<{
             <TextCard
               value={`${item.info.cost.min || ''}g`}
               subtitle="Min cost"
-              image={`/static/images/items/gold-coin.png`}
+              image={`/static/images/generic/coins.png`}
             />
             <TextCard
               value={`${item.info.cost.average || ''}g`}
               subtitle="Average cost"
-              image={`/static/images/items/gold-coin.png`}
+              image={`/static/images/generic/coins.png`}
             />
             <TextCard
               value={`${item.info.cost.max || ''}g`}
               subtitle="Max cost"
-              image={`/static/images/items/gold-coin.png`}
+              image={`/static/images/generic/coins.png`}
             />
             {item.info && item.info.weight && (
               <NumericCard

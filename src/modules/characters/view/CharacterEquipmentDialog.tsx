@@ -81,7 +81,7 @@ const CharacterEquipmentDialog: FC<{
         <Stack direction="row" alignItems="center">
           <CardMedia
             component="img"
-            image="/static/images/generic/items.png"
+            image="/static/images/items/no-item.png"
             sx={{ width: 40, height: 40, verticalAlign: 'middle', marginRight: 1 }}
           />
           <Typography variant="h6" component="div">

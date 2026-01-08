@@ -1,15 +1,13 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import { Box, Card, CardActions, CardContent, CardMedia, Grid, IconButton, Paper, Typography } from '@mui/material';
+import { Card, CardActions, CardContent, CardMedia, Grid, IconButton, Paper, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { addItem, deleteItem, updateCarriedStatus } from '../../api/character';
 import { AddItemDto, Character, CharacterItem } from '../../api/character.dto';
 import { Faction } from '../../api/faction.dto';
 import { Item } from '../../api/items';
-import AddButton from '../../shared/buttons/AddButton';
 import DeleteButton from '../../shared/buttons/DeleteButton';
 import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 import CharacterItemDetail from './CharacterItemDetail';
@@ -67,20 +65,10 @@ const CharacterViewItems: FC<{
             <Grid size={6}>
               <CharacterItemDetail item={selectedItem!} />
             </Grid>
+            <Grid size={12}>
+              <CharacterViewTransferGold character={character} setCharacter={setCharacter} faction={faction} />
+            </Grid>
           </Grid>
-        </Grid>
-        <Grid size={6}></Grid>
-        <Grid size={12}>
-          <Box display="flex" alignItems="center" sx={{ minHeight: 60 }}>
-            <Typography variant="h6" color="primary" display="inline">
-              {t('items')}
-            </Typography>
-            <AddButton onClick={() => setOpenAddItemDialog(true)} />
-          </Box>
-          <ItemCardList items={character.items} character={character} setCharacter={setCharacter} />
-        </Grid>
-        <Grid size={12}>
-          <CharacterViewTransferGold character={character} setCharacter={setCharacter} faction={faction} />
         </Grid>
       </Grid>
       <CharacterViewAddItemDialog
@@ -99,10 +87,6 @@ const ItemCardListItem: FC<{
 }> = ({ item, character, setCharacter }) => {
   const { showError } = useError();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-
-  // const handleOpenDeleteDialog = () => {
-  //   setDeleteDialogOpen(true);
-  // };
 
   const handleDelete = () => {
     deleteItem(character.id, item.id)

@@ -7,6 +7,7 @@ import { useError } from '../../../ErrorContext';
 import { transferFactionGold } from '../../api/character';
 import { Character } from '../../api/character.dto';
 import { Faction } from '../../api/faction.dto';
+import NumericCard from '../../shared/cards/NumericCard';
 import GoldTextField from '../../shared/inputs/GoldTextField';
 
 const CharacterViewTransferGold: FC<{
@@ -33,35 +34,26 @@ const CharacterViewTransferGold: FC<{
   if (!character || !faction) return null;
 
   return (
-    <Grid container spacing={2}>
-      <Grid size={12}>
-        <Typography variant="h6" color="primary">
-          {t('transfer-faction-gold')}
-        </Typography>
-      </Grid>
-      <Grid size={4}>
-        <GoldTextField value={goldAmount} i18nLabel="gold-amount" />
-      </Grid>
-      <Grid size={4}>
-        <Stack direction="row" spacing={1}>
-          <Button onClick={() => handleTransfer(1)} variant="outlined" startIcon={<ChevronLeftIcon />}>
-            +1G
-          </Button>
-          <Button onClick={() => handleTransfer(10)} variant="outlined" startIcon={<ChevronLeftIcon />}>
-            +10G
-          </Button>
-          <Button onClick={() => handleTransfer(-10)} variant="outlined" endIcon={<ChevronRightIcon />}>
-            -10G
-          </Button>
-          <Button onClick={() => handleTransfer(-1)} variant="outlined" endIcon={<ChevronRightIcon />}>
-            -1G
-          </Button>
-        </Stack>
-      </Grid>
-      <Grid size={4}>
-        <GoldTextField value={faction.management.availableGold} i18nLabel="faction-gold-amount" />
-      </Grid>
-    </Grid>
+    <Stack direction="row" spacing={1} alignItems="center" mt={2}>
+      <NumericCard value={goldAmount} subtitle={t('Character')} image={`/static/images/generic/coins.png`} />
+      <Button onClick={() => handleTransfer(1)} variant="outlined" startIcon={<ChevronLeftIcon />}>
+        +1G
+      </Button>
+      <Button onClick={() => handleTransfer(10)} variant="outlined" startIcon={<ChevronLeftIcon />}>
+        +10G
+      </Button>
+      <Button onClick={() => handleTransfer(-10)} variant="outlined" endIcon={<ChevronRightIcon />}>
+        -10G
+      </Button>
+      <Button onClick={() => handleTransfer(-1)} variant="outlined" endIcon={<ChevronRightIcon />}>
+        -1G
+      </Button>
+      <NumericCard
+        value={faction.management.availableGold}
+        subtitle={t('Faction')}
+        image={`/static/images/generic/coins.png`}
+      />
+    </Stack>
   );
 };
 
