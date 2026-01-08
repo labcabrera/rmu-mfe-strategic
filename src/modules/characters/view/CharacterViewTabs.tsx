@@ -1,5 +1,5 @@
 import React, { useState, SyntheticEvent, ReactNode, FC } from 'react';
-import { Box, Tab, Tabs } from '@mui/material';
+import { Box, Grid, Tab, Tabs } from '@mui/material';
 import { Character } from '../../api/character.dto';
 import { Faction } from '../../api/faction.dto';
 import { Profession } from '../../api/professions';
@@ -10,6 +10,7 @@ import CharacterViewItems from './CharacterViewItems';
 import CharacterViewResistances from './CharacterViewResistances';
 import CharacterViewSkills from './CharacterViewSkills';
 import CharacterViewStats from './CharacterViewStats';
+import CharacterViewStatsChart from './CharacterViewStatsChart';
 import CharacterViewTraits from './CharacterViewTraits';
 
 function CustomTabPanel(props: { children?: ReactNode; value: number; index: number }) {
@@ -66,7 +67,14 @@ const CharacterViewTabs: FC<{
         <CharacterViewInfo character={character} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        <CharacterViewStats character={character} />
+        <Grid container spacing={1}>
+          <Grid size={6}>
+            <CharacterViewStats character={character} />
+          </Grid>
+          <Grid size={6}>
+            <CharacterViewStatsChart stats={character.statistics} />
+          </Grid>
+        </Grid>
       </CustomTabPanel>
       <CustomTabPanel value={value} index={2}>
         <CharacterViewResistances character={character} />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, FC } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Grid } from '@mui/material';
+import { Box, Grid, Paper } from '@mui/material';
 import { useError } from '../../../ErrorContext';
 import { CreateCharacterDto } from '../../api/character.dto';
 import { fetchFactions } from '../../api/faction';
@@ -13,6 +13,7 @@ import { StrategicGame } from '../../api/strategic-game.dto';
 import { CHARACTER_CREATION_TEMPLATE } from '../../data/character-create';
 import { randomizeStats } from '../../services/randomize-stats';
 import RaceAvatar from '../../shared/avatars/RaceAvatar';
+import CharacterViewStatsChart from '../view/CharacterViewStatsChart';
 import CharacterCreateActions from './CharacterCreateActions';
 import CharacterCreateAttributes from './CharacterCreateAttributes';
 import CharacterCreateProfessionalSkills from './CharacterCreateProfessionalSkills';
@@ -132,7 +133,8 @@ const CharacterCreate: FC = () => {
   return (
     <>
       <CharacterCreateActions formData={formData} game={game} faction={faction} isValid={isValid} />
-      <Grid container spacing={5}>
+
+      <Grid container spacing={1}>
         <Grid size={2}>
           <RaceAvatar raceName={formData.info.raceName} size={300} />
           <CharacterCreateResume
@@ -143,37 +145,49 @@ const CharacterCreate: FC = () => {
             races={races}
           />
         </Grid>
-        <Grid size={7}>
-          <CharacterCreateStats
-            formData={formData}
-            onRandomStats={onRandomStats}
-            statBonusFormData={statBonusFormData}
-          />
-          <CharacterCreateStatsActions
-            strategicGame={game}
-            formData={formData}
-            setFormData={setFormData}
-            setStatBonusFormData={setStatBonusFormData}
-            boosts={boosts}
-            setBoosts={setBoosts}
-            swaps={swaps}
-            setSwaps={setSwaps}
-          />
-          <CharacterCreateAttributes
-            formData={formData}
-            setFormData={setFormData}
-            setProfession={setProfession}
-            factions={factions}
-          />
-        </Grid>
-        <Grid size={3}>
-          <CharacterCreateSortCombat items={formData.weaponDevelopment || []} onChange={handleWeaponOrderChange} />
-          {profession && (
-            <>
-              <CharacterCreateSkillCosts profession={profession} />
-              <CharacterCreateProfessionalSkills profession={profession} />
-            </>
-          )}
+
+        <Grid size={10}>
+          <Grid container spacing={1}>
+            <Grid size={6}>
+              <CharacterCreateStats
+                formData={formData}
+                onRandomStats={onRandomStats}
+                statBonusFormData={statBonusFormData}
+              />
+            </Grid>
+            <Grid size={3} sx={{ display: 'flex', alignItems: 'flex-start' }}>
+              <CharacterViewStatsChart stats={formData.statistics} />
+            </Grid>
+            <Grid size={3}>
+              <CharacterCreateSortCombat items={formData.weaponDevelopment || []} onChange={handleWeaponOrderChange} />
+            </Grid>
+            <Grid size={6}>
+              <CharacterCreateStatsActions
+                strategicGame={game}
+                formData={formData}
+                setFormData={setFormData}
+                setStatBonusFormData={setStatBonusFormData}
+                boosts={boosts}
+                setBoosts={setBoosts}
+                swaps={swaps}
+                setSwaps={setSwaps}
+              />
+              <CharacterCreateAttributes
+                formData={formData}
+                setFormData={setFormData}
+                setProfession={setProfession}
+                factions={factions}
+              />
+            </Grid>
+            <Grid size={6}>
+              {profession && (
+                <>
+                  <CharacterCreateSkillCosts profession={profession} />
+                  <CharacterCreateProfessionalSkills profession={profession} />
+                </>
+              )}
+            </Grid>
+          </Grid>
         </Grid>
       </Grid>
       <pre>{JSON.stringify(formData, null, 2)}</pre>
