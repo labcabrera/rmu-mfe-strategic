@@ -15,11 +15,21 @@ import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { AddItemDto } from '../../api/character.dto';
 import { fetchItems, Item } from '../../api/items';
-// TextCard replaced by CardMedia instances
 import CharacterViewAddItemDialogForm from './CharacterViewAddItemDialogForm';
 
 const categories = ['weapon', 'armor', 'shield', 'clothes', 'ammunition', 'tools', 'food'];
 const armorSubcategories = ['head', 'body', 'arms', 'legs'];
+const weaponSubcategories = [
+  'melee-weapon@blade',
+  'melee-weapon@greater-blade',
+  // 'melee-weapon@chain',
+  'melee-weapon@hafted',
+  'melee-weapon@greater-hafted',
+  'melee-weapon@pole-arm',
+  'melee-weapon@exotic',
+  'ranged-weapon@bow',
+  'ranged-weapon@crossbow',
+];
 
 const CharacterAddItemDialog: FC<{
   open: boolean;
@@ -55,7 +65,9 @@ const CharacterAddItemDialog: FC<{
 
   const bindItems = (category: string | null, subcategory: string | null) => {
     let rsql = `category==${category}`;
-    if (category === 'armor' && selectedSubcategory) {
+    if (category === 'weapon' && subcategory) {
+      rsql += `;weapon.skillId==${subcategory}`;
+    } else if (category === 'armor' && selectedSubcategory) {
       rsql += `;armor.slot==${selectedSubcategory}`;
     }
     fetchItems(rsql, 0, 100)
@@ -76,10 +88,6 @@ const CharacterAddItemDialog: FC<{
     } as AddItemDto);
   };
 
-  const getItemDetail = (item: Item) => {
-    return `${item.info?.cost?.average || '0'}g`;
-  };
-
   useEffect(() => {
     if (selectedSubcategory) {
       bindItems(selectedCategory, selectedSubcategory);
@@ -93,6 +101,10 @@ const CharacterAddItemDialog: FC<{
         setSelectedSubcategory(null);
         setItems([]);
         setSubcategories(armorSubcategories);
+      } else if (selectedCategory === 'weapon') {
+        setSelectedSubcategory(null);
+        setItems([]);
+        setSubcategories(weaponSubcategories);
       } else {
         setSubcategories([]);
         bindItems(selectedCategory, null);
@@ -117,21 +129,23 @@ const CharacterAddItemDialog: FC<{
             <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
               {categories.map((category) => (
                 <>
-                  <CardMedia
-                    key={category}
-                    component="img"
-                    image={`/static/images/items/category-${category}.png`}
-                    alt={t(category)}
-                    onClick={() => setSelectedCategory(category)}
-                    sx={{
-                      width: IMAGE_SIZE,
-                      height: IMAGE_SIZE,
-                      objectFit: 'cover',
-                      cursor: 'pointer',
-                      border: selectedCategory === category ? '2px solid' : 'none',
-                      borderColor: 'success.main',
-                    }}
-                  />
+                  <Tooltip key={category} title={category} arrow>
+                    <CardMedia
+                      key={category}
+                      component="img"
+                      image={`/static/images/items/category-${category}.png`}
+                      alt={t(category)}
+                      onClick={() => setSelectedCategory(category)}
+                      sx={{
+                        width: IMAGE_SIZE,
+                        height: IMAGE_SIZE,
+                        objectFit: 'cover',
+                        cursor: 'pointer',
+                        border: selectedCategory === category ? '2px solid' : 'none',
+                        borderColor: 'success.main',
+                      }}
+                    />
+                  </Tooltip>
                 </>
               ))}
             </Box>
@@ -141,21 +155,23 @@ const CharacterAddItemDialog: FC<{
             <Grid size={12}>
               <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
                 {subcategories.map((subcategory) => (
-                  <CardMedia
-                    key={subcategory}
-                    component="img"
-                    image={`/static/images/generic/slot-${subcategory}.png`}
-                    alt={t(subcategory)}
-                    onClick={() => setSelectedSubcategory(subcategory)}
-                    sx={{
-                      width: IMAGE_SIZE,
-                      height: IMAGE_SIZE,
-                      objectFit: 'cover',
-                      cursor: 'pointer',
-                      border: selectedSubcategory === subcategory ? '2px solid' : 'none',
-                      borderColor: 'success.main',
-                    }}
-                  />
+                  <Tooltip key={subcategory} title={subcategory} arrow>
+                    <CardMedia
+                      key={subcategory}
+                      component="img"
+                      image={`/static/images/items/category-${subcategory}.png`}
+                      alt={t(subcategory)}
+                      onClick={() => setSelectedSubcategory(subcategory)}
+                      sx={{
+                        width: IMAGE_SIZE,
+                        height: IMAGE_SIZE,
+                        objectFit: 'cover',
+                        cursor: 'pointer',
+                        border: selectedSubcategory === subcategory ? '2px solid' : 'none',
+                        borderColor: 'success.main',
+                      }}
+                    />
+                  </Tooltip>
                 ))}
               </Box>
             </Grid>
