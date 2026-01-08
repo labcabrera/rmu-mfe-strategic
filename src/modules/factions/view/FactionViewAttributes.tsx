@@ -19,7 +19,7 @@ const FactionViewAttributes: FC<{
           <NumericCard
             value={faction.management.availableGold}
             subtitle={t('available-gold')}
-            image={`/static/images/items/gold-coin.png`}
+            image={`/static/images/generic/coins.png`}
             applyColor={false}
           />
           <NumericCard
