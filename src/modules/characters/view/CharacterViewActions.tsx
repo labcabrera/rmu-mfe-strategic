@@ -1,5 +1,4 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import UploadIcon from '@mui/icons-material/Upload';
 import {
@@ -19,7 +18,6 @@ import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacter, deleteCharacter, levelUpCharacter } from '../../api/character';
 import { Character } from '../../api/character.dto';
-import { Faction } from '../../api/faction.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import DeleteButton from '../../shared/buttons/DeleteButton';
 import EditButton from '../../shared/buttons/EditButton';
@@ -30,8 +28,7 @@ const CharacterViewActions: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character>>;
   game: StrategicGame;
-  faction: Faction;
-}> = ({ character, setCharacter, game, faction }) => {
+}> = ({ character, setCharacter, game }) => {
   const navigate = useNavigate();
   const { showError } = useError();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -46,7 +43,7 @@ const CharacterViewActions: FC<{
 
   const onDelete = () => {
     deleteCharacter(character.id)
-      .then(() => navigate(`/strategic/factions/view/${character.factionId}`, { state: { faction } }))
+      .then(() => navigate(`/strategic/factions/view/${character.faction.id}`))
       .catch((err) => showError(err.message));
   };
 
@@ -95,9 +92,9 @@ const CharacterViewActions: FC<{
               underline="hover"
               component={RouterLink}
               color="primary"
-              to={`/strategic/factions/view/${faction.id}`}
+              to={`/strategic/factions/view/${character.faction.id}`}
             >
-              {faction.name}
+              {character.faction.name}
             </Link>
             <span>{character.name}</span>
           </Breadcrumbs>

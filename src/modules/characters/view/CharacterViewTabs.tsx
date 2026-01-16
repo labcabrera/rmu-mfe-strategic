@@ -1,7 +1,6 @@
 import React, { useState, SyntheticEvent, ReactNode, FC } from 'react';
 import { Box, Grid, Tab, Tabs } from '@mui/material';
 import { Character } from '../../api/character.dto';
-import { Faction } from '../../api/faction.dto';
 import { Profession } from '../../api/professions';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import CharacterViewAttacks from './CharacterViewAttacks';
@@ -40,9 +39,8 @@ const CharacterViewTabs: FC<{
   character: Character;
   setCharacter: React.Dispatch<React.SetStateAction<Character>>;
   strategicGame: StrategicGame;
-  faction: Faction;
   profession: Profession;
-}> = ({ character, setCharacter, strategicGame, faction, profession }) => {
+}> = ({ character, setCharacter, strategicGame, profession }) => {
   const [value, setValue] = useState<number>(0);
 
   const handleChange = (_event: SyntheticEvent, newValue: number) => {
@@ -86,7 +84,7 @@ const CharacterViewTabs: FC<{
         <CharacterViewTraits character={character} setCharacter={setCharacter} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={5}>
-        <CharacterViewItems character={character} setCharacter={setCharacter} faction={faction} />
+        <CharacterViewItems character={character} setCharacter={setCharacter} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={6}>
         <CharacterViewAttacks character={character} />
@@ -94,7 +92,6 @@ const CharacterViewTabs: FC<{
       <CustomTabPanel value={value} index={7}>
         <pre>Character: {JSON.stringify(character, null, 2)}</pre>
         <pre>Profession: {JSON.stringify(profession, null, 2)}</pre>
-        <pre>Faction: {JSON.stringify(faction, null, 2)}</pre>
       </CustomTabPanel>
     </Box>
   );

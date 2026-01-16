@@ -9,6 +9,8 @@ import { t } from 'i18next';
 import { fetchRandomName } from '../../api/npc-random-names';
 
 const NameTextField = ({ label, value, onChange, required = true, generateRandomRaceValue }) => {
+  const error = required && (!value || value.trim() === '');
+
   const handleRandomNameClick = async () => {
     var race = 'generic';
     if (generateRandomRaceValue) {
@@ -30,7 +32,8 @@ const NameTextField = ({ label, value, onChange, required = true, generateRandom
       value={value}
       onChange={onChange}
       fullWidth
-      error={required && (!value || value.trim() === '')}
+      error={error}
+      helperText={error && t('Name is required')}
       slotProps={{
         input: {
           endAdornment: (

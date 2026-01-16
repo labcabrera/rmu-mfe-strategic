@@ -15,6 +15,8 @@ const SelectFaction: FC<{
     onChange(race);
   };
 
+  const error = value === undefined || value === null || value === '' ? true : false;
+
   if (!races) return <p>Loading...</p>;
 
   return (
@@ -25,7 +27,8 @@ const SelectFaction: FC<{
       variant="standard"
       fullWidth
       onChange={handleChange}
-      error={value === undefined || value === null || value === '' ? true : false}
+      error={error}
+      helperText={error && t('Race is required')}
     >
       {races.map((option) => (
         <MenuItem key={option.id} value={option.id}>

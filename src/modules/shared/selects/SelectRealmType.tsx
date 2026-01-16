@@ -12,6 +12,7 @@ const SelectRealmType: FC<{
 }> = ({ value, onChange, required = true }) => {
   const { t } = useTranslation();
   const categories: RealmType[] = ['channeling', 'essence', 'mentalism'];
+  const error = required && (!value || value.trim() === '');
 
   return (
     <TextField
@@ -21,7 +22,8 @@ const SelectRealmType: FC<{
       variant="standard"
       fullWidth
       onChange={onChange}
-      error={required && (!value || value.trim() === '')}
+      error={error}
+      helperText={error && t('Realm type is required')}
     >
       {categories.map((c) => (
         <MenuItem key={c} value={c}>

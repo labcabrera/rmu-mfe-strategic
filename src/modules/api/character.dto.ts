@@ -1,9 +1,11 @@
+import { NamedId } from './shared-model';
+
 export const STATS = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
 
 export interface Character {
   id: string;
   gameId: string;
-  factionId: string;
+  faction: NamedId;
   name: string;
   info: CharacterInfo;
   roleplay: CharacterRoleplay;
@@ -14,7 +16,8 @@ export interface Character {
   items: CharacterItem[];
   equipment: CharacterEquipment;
   traits: CharacterTrait[];
-  [key: string]: any;
+  description: string | undefined;
+  imageUrl: string | undefined;
 }
 
 export interface CreateCharacterDto extends Omit<Character, 'id'> {}
@@ -43,8 +46,7 @@ export interface UpdateCharacterDto {
 }
 
 export interface CharacterInfo {
-  raceId: string;
-  raceName: string;
+  race: NamedId;
   professionId: string;
   sizeId: string;
   realmType: string;

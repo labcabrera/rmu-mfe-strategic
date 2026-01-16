@@ -26,7 +26,7 @@ const FactionView: FC = () => {
       fetchStrategicGame(faction.gameId)
         .then((data: StrategicGame) => setGame(data))
         .catch((err) => showError(err.message));
-      fetchCharacters(`factionId==${faction.id}`, 0, 100)
+      fetchCharacters(`faction.id==${faction.id}`, 0, 100)
         .then((data: Character[]) => setCharacters(data))
         .catch((err) => showError(err.message));
     }

@@ -23,8 +23,7 @@ const itemCardHeight = 260;
 const CharacterViewItems: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character>>;
-  faction: Faction;
-}> = ({ character, setCharacter, faction }) => {
+}> = ({ character, setCharacter }) => {
   const { showError } = useError();
   const [openAddItemDialog, setOpenAddItemDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState<CharacterItem | null>(null);
@@ -66,7 +65,7 @@ const CharacterViewItems: FC<{
               <CharacterItemDetail item={selectedItem!} />
             </Grid>
             <Grid size={12}>
-              <CharacterViewTransferGold character={character} setCharacter={setCharacter} faction={faction} />
+              <CharacterViewTransferGold character={character} setCharacter={setCharacter} />
             </Grid>
           </Grid>
         </Grid>
