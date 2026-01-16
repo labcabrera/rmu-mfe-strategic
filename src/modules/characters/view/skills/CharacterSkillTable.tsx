@@ -94,7 +94,7 @@ const CharacterViewSkillsEntry: FC<{
   };
 
   const handleSetUpProfessionalSkill = (skillObj: CharacterSkill) => {
-    setUpProfessionalSkill(character.id, skillObj.skillId)
+    setUpProfessionalSkill(character.id, skillObj.skillId, ['professional'])
       .then((updated) => setCharacter(updated))
       .catch((error: any) => showError(error.message));
   };

@@ -122,13 +122,14 @@ export async function levelDownSkill(characterId: string, skillId: string): Prom
   return await response.json();
 }
 
-export async function setUpProfessionalSkill(characterId: string, skillId: string): Promise<any> {
+export async function setUpProfessionalSkill(characterId: string, skillId: string, types: string[]): Promise<any> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/skills/${skillId}/professional`;
   const response = await fetch(url, {
-    method: 'PATCH',
+    method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
     },
+    body: JSON.stringify({ types: types }),
   });
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
