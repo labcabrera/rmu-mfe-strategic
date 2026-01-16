@@ -1,5 +1,4 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -18,11 +17,9 @@ import {
 } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
-import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../../api/character';
+import { levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../../api/character';
 import { Character, CharacterSkill } from '../../../api/character.dto';
 import { Profession } from '../../../api/professions';
-import { AddSkill } from '../../../api/skill.dto';
-import AddSkillDialog from './AddSkillDialog';
 
 const CharacterSkillTable: FC<{
   character: Character;
@@ -30,75 +27,49 @@ const CharacterSkillTable: FC<{
   profession?: Profession;
 }> = ({ character, setCharacter, profession }) => {
   const { showError } = useError();
-  const [openAddSkillDialog, setOpenAddSkillDialog] = useState(false);
-
-  const onSkillAdded = (value: AddSkill) => {
-    addSkill(character.id, value)
-      .then((updatedCharacter) => {
-        setCharacter(updatedCharacter);
-        setOpenAddSkillDialog(false);
-      })
-      .catch((error) => showError(error.message));
-  };
 
   return (
-    <>
-      <Box display="flex" alignItems="center" sx={{ minHeight: 60 }}>
-        <Typography variant="h6" color="primary" display="inline">
-          {t('skills')}
-        </Typography>
-        <IconButton onClick={() => setOpenAddSkillDialog(true)} color="primary">
-          <AddCircleIcon />
-        </IconButton>
-      </Box>
-      <Paper sx={{ width: '100%' }}>
-        <Table size="small" sx={{ minWidth: 900 }} aria-label="character skills table">
-          <TableHead
-            sx={{
-              '& .MuiTableCell-root': {
-                color: 'primary.main',
-                fontWeight: 'bold',
-              },
-            }}
-          >
-            <TableRow>
-              <TableCell align="left">{t('skill')}</TableCell>
-              <TableCell align="left">Specialization</TableCell>
-              <TableCell align="left">Stats</TableCell>
-              <TableCell align="right">Dev</TableCell>
-              <TableCell align="right">Ranks</TableCell>
-              <TableCell align="right">Rank bonus</TableCell>
-              <TableCell align="right">Stat</TableCell>
-              <TableCell align="right">Racial</TableCell>
-              <TableCell align="right">Professional</TableCell>
-              <TableCell align="right">Custom</TableCell>
-              <TableCell align="right">Total</TableCell>
-              <TableCell align="left">
-                Development points: {character.experience.availableDevelopmentPoints} /{' '}
-                {character.experience.developmentPoints}
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {character?.skills.map((item) => (
-              <CharacterViewSkillsEntry
-                key={item.skillId}
-                skill={item}
-                character={character}
-                setCharacter={setCharacter}
-                profession={profession}
-              />
-            ))}
-          </TableBody>
-        </Table>
-        <AddSkillDialog
-          open={openAddSkillDialog}
-          character={undefined}
-          onClose={() => setOpenAddSkillDialog(false)}
-          onSkillAdded={(value) => onSkillAdded(value)}
-        />
-      </Paper>
-    </>
+    <Paper sx={{ width: '100%' }}>
+      <Table size="small" sx={{ minWidth: 900 }} aria-label="character skills table">
+        <TableHead
+          sx={{
+            '& .MuiTableCell-root': {
+              color: 'primary.main',
+              fontWeight: 'bold',
+            },
+          }}
+        >
+          <TableRow>
+            <TableCell align="left">{t('skill')}</TableCell>
+            <TableCell align="left">Specialization</TableCell>
+            <TableCell align="left">Stats</TableCell>
+            <TableCell align="right">Dev</TableCell>
+            <TableCell align="right">Ranks</TableCell>
+            <TableCell align="right">Rank bonus</TableCell>
+            <TableCell align="right">Stat</TableCell>
+            <TableCell align="right">Racial</TableCell>
+            <TableCell align="right">Professional</TableCell>
+            <TableCell align="right">Custom</TableCell>
+            <TableCell align="right">Total</TableCell>
+            <TableCell align="left">
+              Development points: {character.experience.availableDevelopmentPoints} /{' '}
+              {character.experience.developmentPoints}
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {character?.skills.map((item) => (
+            <CharacterViewSkillsEntry
+              key={item.skillId}
+              skill={item}
+              character={character}
+              setCharacter={setCharacter}
+              profession={profession}
+            />
+          ))}
+        </TableBody>
+      </Table>
+    </Paper>
   );
 };
 
