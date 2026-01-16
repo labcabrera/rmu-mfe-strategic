@@ -24,7 +24,7 @@ import { Profession } from '../../api/professions';
 import { AddSkill } from '../../api/skill.dto';
 import CharacterAddSkillDialog from './CharacterViewAddSkillDialog';
 
-const CharacterViewSkills: FC<{
+const CharacterSkillTable: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character>>;
   profession?: Profession;
@@ -259,4 +259,4 @@ const CharacterViewSkillsEntry: FC<{
   );
 };
 
-export default CharacterViewSkills;
+export default CharacterSkillTable;

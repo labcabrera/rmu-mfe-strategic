@@ -3,11 +3,11 @@ import { Box, Grid, Tab, Tabs } from '@mui/material';
 import { Character } from '../../api/character.dto';
 import { Profession } from '../../api/professions';
 import { StrategicGame } from '../../api/strategic-game.dto';
+import CharacterSkillTable from './CharacterSkillTable';
 import CharacterViewAttacks from './CharacterViewAttacks';
 import CharacterViewInfo from './CharacterViewInfo';
 import CharacterViewItems from './CharacterViewItems';
 import CharacterViewResistances from './CharacterViewResistances';
-import CharacterViewSkills from './CharacterViewSkills';
 import CharacterViewStats from './CharacterViewStats';
 import CharacterViewStatsChart from './CharacterViewStatsChart';
 import CharacterViewTraits from './CharacterViewTraits';
@@ -78,7 +78,7 @@ const CharacterViewTabs: FC<{
         <CharacterViewResistances character={character} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={3}>
-        <CharacterViewSkills character={character} setCharacter={setCharacter} profession={profession} />
+        <CharacterSkillTable character={character} setCharacter={setCharacter} profession={profession} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={4}>
         <CharacterViewTraits character={character} setCharacter={setCharacter} />
