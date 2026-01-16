@@ -12,9 +12,9 @@ import {
   Tooltip,
 } from '@mui/material';
 import { t } from 'i18next';
-import { useError } from '../../../ErrorContext';
-import { AddItemDto } from '../../api/character.dto';
-import { fetchItems, Item } from '../../api/items';
+import { useError } from '../../../../ErrorContext';
+import { AddItemDto } from '../../../api/character.dto';
+import { fetchItems, Item } from '../../../api/items';
 import CharacterViewAddItemDialogForm from './CharacterViewAddItemDialogForm';
 
 const categories = ['weapon', 'armor', 'shield', 'clothes', 'ammunition', 'tools', 'food'];

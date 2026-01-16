@@ -5,11 +5,11 @@ import { Profession } from '../../api/professions';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import CharacterViewAttacks from './CharacterViewAttacks';
 import CharacterViewInfo from './CharacterViewInfo';
-import CharacterViewItems from './CharacterViewItems';
 import CharacterViewResistances from './CharacterViewResistances';
 import CharacterViewStats from './CharacterViewStats';
 import CharacterViewStatsChart from './CharacterViewStatsChart';
 import CharacterViewTraits from './CharacterViewTraits';
+import CharacterViewItems from './items/CharacterViewItems';
 import CharacterSkillTable from './skills/CharacterSkillTable';
 import CharacterViewSkills from './skills/CharacterViewSkills';
 

@@ -1,6 +1,9 @@
 import React, { FC } from 'react';
 import { Card, CardContent, CardMedia, Typography } from '@mui/material';
 
+const red = '#ffab91';
+const green = '#a5d6a7';
+
 const NumericCard: FC<{
   value: number;
   subtitle: string;
@@ -24,9 +27,6 @@ const NumericCard: FC<{
   applyColor = true,
   applyFormat = false,
 }) => {
-  const red = '#ffab91';
-  const green = '#a5d6a7';
-
   const formattedValue = value ? new Intl.NumberFormat('en-EN').format(value) : '';
 
   const getColor = (): string => {

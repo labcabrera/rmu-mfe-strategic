@@ -1,11 +1,11 @@
 import React, { FC, Dispatch, SetStateAction } from 'react';
 import { Box, Chip, Grid, Stack, TextField, Typography } from '@mui/material';
 import { t } from 'i18next';
-import { AddItemDto } from '../../api/character.dto';
-import { Item } from '../../api/items';
-import NumericCard from '../../shared/cards/NumericCard';
-import TextCard from '../../shared/cards/TextCard';
-import NumericInput from '../../shared/inputs/NumericInput';
+import { AddItemDto } from '../../../api/character.dto';
+import { Item } from '../../../api/items';
+import NumericCard from '../../../shared/cards/NumericCard';
+import TextCard from '../../../shared/cards/TextCard';
+import NumericInput from '../../../shared/inputs/NumericInput';
 
 const CharacterViewAddItemDialogForm: FC<{
   formData: AddItemDto;

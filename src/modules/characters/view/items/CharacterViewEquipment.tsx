@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 import { Box, CardMedia, Typography, Stack, Tooltip } from '@mui/material';
 import { t } from 'i18next';
-import { Character, CharacterItem } from '../../api/character.dto';
+import { Character, CharacterItem } from '../../../api/character.dto';
 import CharacterEquipmentDialog from './CharacterEquipmentDialog';
 
 const slots = ['mainHand', 'offHand', 'head', 'body', 'arms', 'legs'];

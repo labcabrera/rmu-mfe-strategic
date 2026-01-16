@@ -12,8 +12,8 @@ import {
   Tooltip,
 } from '@mui/material';
 import { t } from 'i18next';
-import { equipItem, unequipItem } from '../../api/character';
-import { Character, CharacterItem } from '../../api/character.dto';
+import { equipItem, unequipItem } from '../../../api/character';
+import { Character, CharacterItem } from '../../../api/character.dto';
 
 const CharacterEquipmentDialog: FC<{
   open: boolean;

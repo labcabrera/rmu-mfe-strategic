@@ -3,6 +3,8 @@ import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import BlockIcon from '@mui/icons-material/Block';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
+import SwapVerticalCircleIcon from '@mui/icons-material/SwapVerticalCircle';
 import {
   Avatar,
   IconButton,
@@ -17,12 +19,13 @@ import {
   TableRow,
   Typography,
   ListItemIcon,
+  Icon,
 } from '@mui/material';
 import { t } from 'i18next';
-import { useError } from '../../../ErrorContext';
-import { updateCarriedStatus, deleteItem } from '../../api/character';
-import { Character, CharacterItem } from '../../api/character.dto';
-import AddButton from '../../shared/buttons/AddButton';
+import { useError } from '../../../../ErrorContext';
+import { updateCarriedStatus, deleteItem } from '../../../api/character';
+import { Character, CharacterItem } from '../../../api/character.dto';
+import AddButton from '../../../shared/buttons/AddButton';
 
 const IMG_SIZE = 60;
 
@@ -77,6 +80,7 @@ const CharacterItemTable: FC<{
             <TableCell sx={{ width: '140px' }}>{t('type')}</TableCell>
             <TableCell sx={{ width: '80px' }}>{t('amount')}</TableCell>
             <TableCell sx={{ width: '80px' }}>{t('weight')}</TableCell>
+            <TableCell sx={{ width: '80px' }}></TableCell>
             <TableCell align="right" sx={{ width: '80px' }}>
               <AddButton onClick={() => onButtonAddClick && onButtonAddClick()} />
             </TableCell>
@@ -119,6 +123,11 @@ const CharacterItemTable: FC<{
                 </TableCell>
                 <TableCell sx={{ width: '80px' }}>
                   <Typography variant="body2">{item.info?.weight ?? ''}</Typography>
+                </TableCell>
+                <TableCell sx={{ width: '80px' }}>
+                  <IconButton size="small" color="primary" onClick={() => handleToggleCarried(item.id, !!item.carried)}>
+                    <SwapVerticalCircleIcon />
+                  </IconButton>
                 </TableCell>
                 <TableCell align="right">
                   <IconButton

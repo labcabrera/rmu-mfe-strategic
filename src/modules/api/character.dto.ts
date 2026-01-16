@@ -12,6 +12,7 @@ export interface Character {
   experience: CharacterExperience;
   statistics: CharacterStatistics;
   resistances: CharacterResistance[];
+  defense: CharacterDefense;
   skills: CharacterSkill[];
   items: CharacterItem[];
   equipment: CharacterEquipment;
@@ -21,6 +22,20 @@ export interface Character {
 }
 
 export interface CreateCharacterDto extends Omit<Character, 'id'> {}
+
+export interface CharacterDefense {
+  defensiveBonus: number;
+  armor: CharacterArmor;
+}
+
+export interface CharacterArmor {
+  at: number | undefined;
+  racialAtBonus: number | undefined;
+  headAt: number | undefined;
+  bodyAt: number | undefined;
+  armsAt: number | undefined;
+  legsAt: number | undefined;
+}
 
 export interface AddTraitDto {
   traitId: string;
