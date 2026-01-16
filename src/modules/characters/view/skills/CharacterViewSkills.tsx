@@ -80,7 +80,7 @@ const CharacterViewSkills: FC<{
       </Box>
       <AddSkillDialog
         open={openAddSkillDialog}
-        character={undefined}
+        character={character}
         onClose={() => setOpenAddSkillDialog(false)}
         onSkillAdded={(value) => onSkillAdded(value)}
       />

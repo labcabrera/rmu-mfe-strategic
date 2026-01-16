@@ -26,45 +26,50 @@ const AddSkillDialog: FC<{
   onSkillAdded: (addSkill: AddSkill) => void;
 }> = ({ open, character, onClose, onSkillAdded }) => {
   const { showError } = useError();
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
+  const [selectedSpecialization, setSelectedSpecialization] = useState<string | null>(null);
+
   const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
-  const [formData, setFormData] = useState<SkillFormData>(emptyFormData);
+  const [filteredCategories, setFilteredCategories] = useState<SkillCategory[]>([]);
+  const [filteredSkills, setFilteredSkills] = useState<Skill[]>([]);
 
   const bindSkillCategories = () => {
     fetchSkillCategories()
-      .then((data: SkillCategory[]) => setSkillCategories(data))
+      .then((data) => setSkillCategories(data))
       .catch((error) => showError(error.message));
   };
 
-  const handleSkillCategoryChange = (_event: React.MouseEvent<HTMLElement>, newCategoryId: string | null) => {
-    if (newCategoryId) {
-      setFormData({ ...formData, categoryId: newCategoryId, skillId: null });
-      fetchSkills(newCategoryId)
-        .then((data: Skill[]) => setSkills(data))
-        .catch((error) => showError(error.message));
-    } else {
-      setFormData({ ...formData, categoryId: null, skillId: null });
-      setSkills([]);
-    }
+  const bindSkills = () => {
+    fetchSkills()
+      .then((data) => setSkills(data))
+      .catch((error) => showError(error.message));
   };
 
-  const handleSkillChange = (_event: React.MouseEvent<HTMLElement>, newSkillId: string | null) => {
-    if (newSkillId) {
-      setFormData({ ...formData, skillId: newSkillId });
-    } else {
-      setFormData({ ...formData, skillId: null });
-    }
+  //TODO check if skill had specialization
+  const hasSkill = (skill: Skill): boolean => {
+    return character.skills?.some((s) => s.skillId === skill.id) ?? false;
   };
 
-  const handleSave = async () => {
-    if (!formData.skillId) {
+  //TODO check if skill had specialization
+  const filterSkills = () => {
+    const notSelectedSkills = skills.filter((s) => !hasSkill(s));
+    setFilteredCategories(skillCategories.filter((c) => notSelectedSkills.some((s) => s.categoryId === c.id)));
+    setFilteredSkills(
+      notSelectedSkills.filter((s) => (selectedCategoryId ? s.categoryId === selectedCategoryId : true))
+    );
+  };
+
+  const onAddSkill = async () => {
+    if (!selectedSkillId) {
       showError('Please select a skill');
       return;
     }
     try {
       const skill = {
-        skillId: formData.skillId,
-        specialization: null,
+        skillId: selectedSkillId,
+        specialization: selectedSpecialization,
         ranks: 0,
       } as AddSkill;
       onSkillAdded(skill);
@@ -75,12 +80,18 @@ const AddSkillDialog: FC<{
   };
 
   const handleClose = () => {
-    setFormData(emptyFormData);
+    setSelectedSkillId(null);
+    setSelectedSpecialization(null);
     onClose();
   };
 
   useEffect(() => {
+    filterSkills();
+  }, [character, selectedCategoryId, skills]);
+
+  useEffect(() => {
     bindSkillCategories();
+    bindSkills();
   }, []);
 
   return (
@@ -95,14 +106,14 @@ const AddSkillDialog: FC<{
             <Box sx={{ display: 'flex' }}>
               <ToggleButtonGroup
                 orientation="vertical"
-                value={formData.categoryId}
+                value={selectedCategoryId}
                 exclusive
-                onChange={handleSkillCategoryChange}
+                onChange={(_event, newCategoryId) => setSelectedCategoryId(newCategoryId)}
                 fullWidth
                 size="small"
                 aria-label="skill-categories"
               >
-                {skillCategories.map((c) => (
+                {filteredCategories.map((c) => (
                   <ToggleButton key={c.id} value={c.id} aria-label={c.id} sx={{ justifyContent: 'flex-start' }}>
                     {t(c.id)}
                   </ToggleButton>
@@ -117,14 +128,14 @@ const AddSkillDialog: FC<{
             <Box sx={{ display: 'flex' }}>
               <ToggleButtonGroup
                 orientation="vertical"
-                value={formData.skillId}
+                value={selectedSkillId}
                 exclusive
-                onChange={handleSkillChange}
+                onChange={(_event, newSkillId) => setSelectedSkillId(newSkillId)}
                 fullWidth
                 size="small"
                 aria-label="skills"
               >
-                {skills.map((s) => (
+                {filteredSkills.map((s) => (
                   <ToggleButton key={s.id} value={s.id} aria-label={s.id} sx={{ justifyContent: 'flex-start' }}>
                     {t(s.id)}
                   </ToggleButton>
@@ -135,8 +146,8 @@ const AddSkillDialog: FC<{
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>{t('cancel')}</Button>
-        <Button onClick={handleSave} variant="contained" disabled={!formData.skillId}>
+        <Button onClick={handleClose}>{t('close')}</Button>
+        <Button onClick={onAddSkill} variant="contained" disabled={!selectedSkillId}>
           {t('add')}
         </Button>
       </DialogActions>
