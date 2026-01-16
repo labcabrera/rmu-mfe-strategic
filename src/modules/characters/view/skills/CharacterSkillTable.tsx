@@ -2,7 +2,10 @@ import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
+import TurnedInIcon from '@mui/icons-material/TurnedIn';
+import TurnedInNotIcon from '@mui/icons-material/TurnedInNot';
 import {
   Box,
   IconButton,
@@ -13,6 +16,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { t } from 'i18next';
@@ -21,12 +25,16 @@ import { levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } fro
 import { Character, CharacterSkill } from '../../../api/character.dto';
 import { Profession } from '../../../api/professions';
 
+const maxProfessionalSkills = 10;
+const maxKnackSkills = 2;
+
 const CharacterSkillTable: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character>>;
   profession?: Profession;
 }> = ({ character, setCharacter, profession }) => {
-  const { showError } = useError();
+  const currentKnackSkills = character.skills.filter((s) => s.professional?.includes('knack')).length;
+  const currentProfessionalSkills = character.skills.filter((s) => s.professional?.includes('professional')).length;
 
   return (
     <Paper sx={{ width: '100%' }}>
@@ -41,7 +49,8 @@ const CharacterSkillTable: FC<{
         >
           <TableRow>
             <TableCell align="left">{t('skill')}</TableCell>
-            <TableCell align="left">Specialization</TableCell>
+            <TableCell align="left">Spec</TableCell>
+            <TableCell align="left">Prof</TableCell>
             <TableCell align="left">Stats</TableCell>
             <TableCell align="right">Dev</TableCell>
             <TableCell align="right">Ranks</TableCell>
@@ -52,8 +61,11 @@ const CharacterSkillTable: FC<{
             <TableCell align="right">Custom</TableCell>
             <TableCell align="right">Total</TableCell>
             <TableCell align="left">
-              Development points: {character.experience.availableDevelopmentPoints} /{' '}
-              {character.experience.developmentPoints}
+              <Tooltip title={t('Development points available / total')}>
+                <Typography variant="subtitle2">
+                  DP: {character.experience.availableDevelopmentPoints} / {character.experience.developmentPoints}
+                </Typography>
+              </Tooltip>
             </TableCell>
           </TableRow>
         </TableHead>
@@ -65,6 +77,8 @@ const CharacterSkillTable: FC<{
               character={character}
               setCharacter={setCharacter}
               profession={profession}
+              currentKnackSkills={currentKnackSkills}
+              currentProfessionalSkills={currentProfessionalSkills}
             />
           ))}
         </TableBody>
@@ -78,7 +92,12 @@ const CharacterViewSkillsEntry: FC<{
   setCharacter: Dispatch<SetStateAction<Character>>;
   skill: CharacterSkill;
   profession?: Profession;
-}> = ({ character, setCharacter, skill, profession }) => {
+  currentKnackSkills: number;
+  currentProfessionalSkills: number;
+}> = ({ character, setCharacter, skill, profession, currentKnackSkills, currentProfessionalSkills }) => {
+  const isProfessional = skill.professional?.includes('professional');
+  const isKnack = skill.professional?.includes('knack');
+
   const { showError } = useError();
 
   const handleLevelUp = () => {
@@ -94,7 +113,35 @@ const CharacterViewSkillsEntry: FC<{
   };
 
   const handleSetUpProfessionalSkill = (skillObj: CharacterSkill) => {
-    setUpProfessionalSkill(character.id, skillObj.skillId, ['professional'])
+    const array = skillObj.professional || [];
+    if (array.includes('professional')) {
+      //remove
+      const index = array.indexOf('professional');
+      if (index > -1) {
+        array.splice(index, 1);
+      }
+    } else {
+      //add
+      array.push('professional');
+    }
+    setUpProfessionalSkill(character.id, skillObj.skillId, array)
+      .then((updated) => setCharacter(updated))
+      .catch((error: any) => showError(error.message));
+  };
+
+  const handleSetUpKnackSkill = (skillObj: CharacterSkill) => {
+    const array = skillObj.professional || [];
+    if (array.includes('knack')) {
+      //remove
+      const index = array.indexOf('knack');
+      if (index > -1) {
+        array.splice(index, 1);
+      }
+    } else {
+      //add
+      array.push('knack');
+    }
+    setUpProfessionalSkill(character.id, skillObj.skillId, array)
       .then((updated) => setCharacter(updated))
       .catch((error: any) => showError(error.message));
   };
@@ -128,16 +175,7 @@ const CharacterViewSkillsEntry: FC<{
   };
 
   const isAvailableProfessionSkill = (skillObj: CharacterSkill) => {
-    if (profession) {
-      const includes = profession.professionalSkills.includes(skillObj.skillId);
-      const alreadyAdded = skillObj.professional && skillObj.professional.includes('professional');
-      return includes && !alreadyAdded;
-    }
-    return false;
-  };
-
-  const isProfessionalSkill = (skillObj: CharacterSkill) => {
-    return skillObj.professional && skillObj.professional.includes('professional');
+    return profession && profession.professionalSkills.includes(skillObj.skillId);
   };
 
   const getStatistics = (skill: CharacterSkill) => {
@@ -148,10 +186,35 @@ const CharacterViewSkillsEntry: FC<{
     <TableRow key={skill.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
       <TableCell component="th" scope="row">
         {t(skill.skillId)}
-        {isProfessionalSkill(skill) ? ' *' : null}
       </TableCell>
       <TableCell component="th" scope="row">
         {skill.specialization || '-'}
+      </TableCell>
+      <TableCell component="th" scope="row">
+        {isAvailableProfessionSkill(skill) && (
+          <>
+            <Tooltip title={t('Professional skill')}>
+              <IconButton
+                aria-label="set-professional"
+                onClick={() => handleSetUpProfessionalSkill(skill)}
+                disabled={!isProfessional && currentProfessionalSkills >= maxProfessionalSkills}
+                color="primary"
+              >
+                {isProfessional ? <TurnedInIcon /> : <TurnedInNotIcon />}
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t('Knack skill')}>
+              <IconButton
+                aria-label="set-knack"
+                onClick={() => handleSetUpKnackSkill(skill)}
+                color="primary"
+                disabled={!isKnack && currentKnackSkills >= maxKnackSkills}
+              >
+                {isKnack ? <StarIcon /> : <StarBorderIcon />}
+              </IconButton>
+            </Tooltip>
+          </>
+        )}
       </TableCell>
       <TableCell align="left">{getStatistics(skill)}</TableCell>
       <TableCell align="right">{skill.development?.join(' / ') || '-'}</TableCell>
@@ -213,17 +276,6 @@ const CharacterViewSkillsEntry: FC<{
               </IconButton>
             )}
           </Box>
-          <Stack direction="row" spacing={2}>
-            {isAvailableProfessionSkill(skill) && (
-              <IconButton
-                aria-label="set-professional"
-                onClick={() => handleSetUpProfessionalSkill(skill)}
-                color="primary"
-              >
-                <StarBorderIcon />
-              </IconButton>
-            )}
-          </Stack>
         </Stack>
       </TableCell>
     </TableRow>
