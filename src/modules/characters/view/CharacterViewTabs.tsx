@@ -11,6 +11,7 @@ import CharacterViewStats from './CharacterViewStats';
 import CharacterViewStatsChart from './CharacterViewStatsChart';
 import CharacterViewTraits from './CharacterViewTraits';
 import CharacterSkillTable from './skills/CharacterSkillTable';
+import CharacterViewSkills from './skills/CharacterViewSkills';
 
 function CustomTabPanel(props: { children?: ReactNode; value: number; index: number }) {
   const { children, value, index, ...other } = props;
@@ -78,7 +79,7 @@ const CharacterViewTabs: FC<{
         <CharacterViewResistances character={character} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={3}>
-        <CharacterSkillTable character={character} setCharacter={setCharacter} profession={profession} />
+        <CharacterViewSkills character={character} setCharacter={setCharacter} profession={profession} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={4}>
         <CharacterViewTraits character={character} setCharacter={setCharacter} />
