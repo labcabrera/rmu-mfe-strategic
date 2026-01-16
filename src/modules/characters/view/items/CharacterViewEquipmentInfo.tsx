@@ -68,7 +68,7 @@ const CharacterViewEquipmentInfo: React.FC<{
           />
           <TextCard
             value={getLabelManeuverPenalty()}
-            subtitle={t('Maneuver penalty')}
+            subtitle={t('Armor penalty')}
             image={`/static/images/generic/maneuver-penalty.png`}
             color={character.equipment.maneuverPenalty < 0 ? 'red' : undefined}
             minWidth={300}

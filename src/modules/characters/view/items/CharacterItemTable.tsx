@@ -144,17 +144,11 @@ const CharacterItemTable: FC<{
                     open={Boolean(anchorEl) && menuItemId === item.id}
                     onClose={handleCloseMenu}
                   >
-                    <MenuItem onClick={() => handleToggleCarried(item.id, !!item.carried)}>
-                      <ListItemIcon>
-                        {item.carried ? <BlockIcon fontSize="small" /> : <AssignmentTurnedInIcon fontSize="small" />}
-                      </ListItemIcon>
-                      {item.carried ? t('noCarry') : t('carry')}
-                    </MenuItem>
                     <MenuItem onClick={() => handleDelete(item.id)}>
                       <ListItemIcon>
                         <DeleteIcon fontSize="small" />
                       </ListItemIcon>
-                      {t('delete')}
+                      {t('Delete')}
                     </MenuItem>
                   </Menu>
                 </TableCell>
