@@ -17,12 +17,12 @@ import {
   Typography,
 } from '@mui/material';
 import { t } from 'i18next';
-import { useError } from '../../../ErrorContext';
-import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../api/character';
-import { Character, CharacterSkill } from '../../api/character.dto';
-import { Profession } from '../../api/professions';
-import { AddSkill } from '../../api/skill.dto';
-import CharacterAddSkillDialog from './CharacterViewAddSkillDialog';
+import { useError } from '../../../../ErrorContext';
+import { addSkill, levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../../api/character';
+import { Character, CharacterSkill } from '../../../api/character.dto';
+import { Profession } from '../../../api/professions';
+import { AddSkill } from '../../../api/skill.dto';
+import AddSkillDialog from './AddSkillDialog';
 
 const CharacterSkillTable: FC<{
   character: Character;
@@ -91,7 +91,7 @@ const CharacterSkillTable: FC<{
             ))}
           </TableBody>
         </Table>
-        <CharacterAddSkillDialog
+        <AddSkillDialog
           open={openAddSkillDialog}
           character={undefined}
           onClose={() => setOpenAddSkillDialog(false)}

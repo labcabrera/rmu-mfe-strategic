@@ -3,7 +3,6 @@ import { Box, Grid, Tab, Tabs } from '@mui/material';
 import { Character } from '../../api/character.dto';
 import { Profession } from '../../api/professions';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import CharacterSkillTable from './CharacterSkillTable';
 import CharacterViewAttacks from './CharacterViewAttacks';
 import CharacterViewInfo from './CharacterViewInfo';
 import CharacterViewItems from './CharacterViewItems';
@@ -11,6 +10,7 @@ import CharacterViewResistances from './CharacterViewResistances';
 import CharacterViewStats from './CharacterViewStats';
 import CharacterViewStatsChart from './CharacterViewStatsChart';
 import CharacterViewTraits from './CharacterViewTraits';
+import CharacterSkillTable from './skills/CharacterSkillTable';
 
 function CustomTabPanel(props: { children?: ReactNode; value: number; index: number }) {
   const { children, value, index, ...other } = props;

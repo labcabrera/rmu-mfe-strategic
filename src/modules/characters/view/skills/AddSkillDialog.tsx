@@ -12,14 +12,14 @@ import {
   Typography,
 } from '@mui/material';
 import { t } from 'i18next';
-import { useError } from '../../../ErrorContext';
-import { Character } from '../../api/character.dto';
-import { fetchSkills } from '../../api/skill';
-import { fetchSkillCategories } from '../../api/skill-category';
-import { SkillCategory } from '../../api/skill-category.dto';
-import { AddSkill, Skill } from '../../api/skill.dto';
+import { useError } from '../../../../ErrorContext';
+import { Character } from '../../../api/character.dto';
+import { fetchSkills } from '../../../api/skill';
+import { fetchSkillCategories } from '../../../api/skill-category';
+import { SkillCategory } from '../../../api/skill-category.dto';
+import { AddSkill, Skill } from '../../../api/skill.dto';
 
-const CharacterAddSkillDialog: FC<{
+const AddSkillDialog: FC<{
   open: boolean;
   character: Character;
   onClose: () => void;
@@ -154,4 +154,4 @@ const emptyFormData: SkillFormData = {
   skillId: null,
 };
 
-export default CharacterAddSkillDialog;
+export default AddSkillDialog;
