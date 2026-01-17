@@ -18,6 +18,7 @@ import { fetchSkills } from '../../../api/skill';
 import { fetchSkillCategories } from '../../../api/skill-category';
 import { SkillCategory } from '../../../api/skill-category.dto';
 import { AddSkill, Skill } from '../../../api/skill.dto';
+import AddSkillSpecialization from './AddSkillSpecialization';
 
 const AddSkillDialog: FC<{
   open: boolean;
@@ -47,8 +48,10 @@ const AddSkillDialog: FC<{
       .catch((error) => showError(error.message));
   };
 
-  //TODO check if skill had specialization
   const hasSkill = (skill: Skill): boolean => {
+    if (skill.specialization) {
+      return false;
+    }
     return character.skills?.some((s) => s.skillId === skill.id) ?? false;
   };
 
@@ -125,31 +128,48 @@ const AddSkillDialog: FC<{
             <Typography variant="subtitle1" sx={{ mb: 1 }}>
               {t('skill')}
             </Typography>
-            <Box sx={{ display: 'flex' }}>
-              <ToggleButtonGroup
-                orientation="vertical"
-                value={selectedSkill?.id ?? null}
-                exclusive
-                onChange={(_event, newSkillId) => {
-                  const skill = filteredSkills.find((s) => s.id === newSkillId) ?? null;
-                  setSelectedSkill(skill);
-                }}
-                fullWidth
-                size="small"
-                aria-label="skills"
-              >
-                {filteredSkills.map((s) => (
-                  <ToggleButton key={s.id} value={s.id} aria-label={s.id} sx={{ justifyContent: 'flex-start' }}>
-                    {t(s.id)}
-                  </ToggleButton>
-                ))}
-              </ToggleButtonGroup>
-            </Box>
+            {selectedCategoryId ? (
+              <Box sx={{ display: 'flex' }}>
+                <ToggleButtonGroup
+                  orientation="vertical"
+                  value={selectedSkill?.id ?? null}
+                  exclusive
+                  onChange={(_event, newSkillId) => {
+                    const skill = filteredSkills.find((s) => s.id === newSkillId) ?? null;
+                    setSelectedSkill(skill);
+                  }}
+                  fullWidth
+                  size="small"
+                  aria-label="skills"
+                >
+                  {filteredSkills.map((s) => (
+                    <ToggleButton key={s.id} value={s.id} aria-label={s.id} sx={{ justifyContent: 'flex-start' }}>
+                      {t(s.id)}
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
+              </Box>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                {t('select-category-first')}
+              </Typography>
+            )}
           </Grid>
           <Grid size={4}>
             <Typography variant="subtitle1" sx={{ mb: 1 }}>
               {t('specialization')}
             </Typography>
+            {selectedSkill ? (
+              <AddSkillSpecialization
+                skill={selectedSkill}
+                specialization={selectedSpecialization}
+                setSpecialization={setSelectedSpecialization}
+              />
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                {t('select-skill-first')}
+              </Typography>
+            )}
             <pre>{JSON.stringify(selectedSkill, null, 2)}</pre>
           </Grid>
         </Grid>
@@ -162,16 +182,6 @@ const AddSkillDialog: FC<{
       </DialogActions>
     </Dialog>
   );
-};
-
-interface SkillFormData {
-  categoryId: string | null;
-  skillId: string | null;
-}
-
-const emptyFormData: SkillFormData = {
-  categoryId: null,
-  skillId: null,
 };
 
 export default AddSkillDialog;

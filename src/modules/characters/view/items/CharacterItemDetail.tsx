@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { Box, CardMedia, Divider, Grid, Typography, List, ListItem, ListItemText } from '@mui/material';
 import { t } from 'i18next';
-import { CharacterItem } from '../../api/character.dto';
+import { CharacterItem } from '../../../api/character.dto';
 
 const CharacterItemDetail: FC<{ item?: CharacterItem }> = ({ item }) => {
   if (!item) return null;

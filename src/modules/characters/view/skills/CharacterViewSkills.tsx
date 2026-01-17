@@ -62,7 +62,10 @@ const CharacterViewSkills: FC<{
                 <Grid size={2} key={s.skillId}>
                   <Card variant="outlined">
                     <CardContent>
-                      <Typography variant="subtitle1">{t(s.skillId)}</Typography>
+                      <Typography variant="subtitle1">
+                        {t(s.skillId)}
+                        {s.specialization ? ` (${s.specialization})` : ''}
+                      </Typography>
                       <Typography variant="h6" color="textPrimary">
                         {s.totalBonus}
                       </Typography>
