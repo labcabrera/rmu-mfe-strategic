@@ -27,7 +27,7 @@ const AddSkillDialog: FC<{
 }> = ({ open, character, onClose, onSkillAdded }) => {
   const { showError } = useError();
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
-  const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
+  const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const [selectedSpecialization, setSelectedSpecialization] = useState<string | null>(null);
 
   const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
@@ -62,13 +62,13 @@ const AddSkillDialog: FC<{
   };
 
   const onAddSkill = async () => {
-    if (!selectedSkillId) {
+    if (!selectedSkill) {
       showError('Please select a skill');
       return;
     }
     try {
       const skill = {
-        skillId: selectedSkillId,
+        skillId: selectedSkill.id,
         specialization: selectedSpecialization,
         ranks: 0,
       } as AddSkill;
@@ -80,7 +80,7 @@ const AddSkillDialog: FC<{
   };
 
   const handleClose = () => {
-    setSelectedSkillId(null);
+    setSelectedSkill(null);
     setSelectedSpecialization(null);
     onClose();
   };
@@ -99,7 +99,7 @@ const AddSkillDialog: FC<{
       <DialogTitle>{t('add-skill')}</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 1 }}>
-          <Grid size={5}>
+          <Grid size={4}>
             <Typography variant="subtitle1" sx={{ mb: 1 }}>
               {t('category')}
             </Typography>
@@ -121,16 +121,19 @@ const AddSkillDialog: FC<{
               </ToggleButtonGroup>
             </Box>
           </Grid>
-          <Grid size={7}>
+          <Grid size={4}>
             <Typography variant="subtitle1" sx={{ mb: 1 }}>
               {t('skill')}
             </Typography>
             <Box sx={{ display: 'flex' }}>
               <ToggleButtonGroup
                 orientation="vertical"
-                value={selectedSkillId}
+                value={selectedSkill?.id ?? null}
                 exclusive
-                onChange={(_event, newSkillId) => setSelectedSkillId(newSkillId)}
+                onChange={(_event, newSkillId) => {
+                  const skill = filteredSkills.find((s) => s.id === newSkillId) ?? null;
+                  setSelectedSkill(skill);
+                }}
                 fullWidth
                 size="small"
                 aria-label="skills"
@@ -143,11 +146,17 @@ const AddSkillDialog: FC<{
               </ToggleButtonGroup>
             </Box>
           </Grid>
+          <Grid size={4}>
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>
+              {t('specialization')}
+            </Typography>
+            <pre>{JSON.stringify(selectedSkill, null, 2)}</pre>
+          </Grid>
         </Grid>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>{t('close')}</Button>
-        <Button onClick={onAddSkill} variant="contained" disabled={!selectedSkillId}>
+        <Button onClick={onAddSkill} variant="contained" disabled={!selectedSkill}>
           {t('add')}
         </Button>
       </DialogActions>
