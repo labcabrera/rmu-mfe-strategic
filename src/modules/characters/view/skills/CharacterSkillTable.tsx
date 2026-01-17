@@ -101,13 +101,13 @@ const CharacterViewSkillsEntry: FC<{
   const { showError } = useError();
 
   const handleLevelUp = () => {
-    levelUpSkill(character.id, skill.skillId)
+    levelUpSkill(character.id, skill.skillId, skill.specialization)
       .then((updated) => setCharacter(updated))
       .catch((error: any) => showError(error.message));
   };
 
   const handleLevelDown = () => {
-    levelDownSkill(character.id, skill.skillId)
+    levelDownSkill(character.id, skill.skillId, skill.specialization)
       .then((updated) => setCharacter(updated))
       .catch((error: any) => showError(error.message));
   };
@@ -147,7 +147,7 @@ const CharacterViewSkillsEntry: FC<{
   };
 
   const handleDeleteSkill = (skillObj: CharacterSkill) => {
-    deleteSkill(character.id, skillObj.skillId)
+    deleteSkill(character.id, skillObj.skillId, skillObj.specialization)
       .then((updated) => setCharacter(updated))
       .catch((error: any) => showError(error.message));
   };

@@ -80,8 +80,13 @@ export async function addSkill(characterId: string, data: AddSkill): Promise<Cha
   return await response.json();
 }
 
-export async function deleteSkill(characterId: string, skillId: string): Promise<any> {
-  const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/skills/${skillId}`;
+export async function deleteSkill(
+  characterId: string,
+  skillId: string,
+  specialization: string | undefined
+): Promise<any> {
+  const specializationQuery = specialization ? `?specialization=${specialization}` : '';
+  const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/skills/${skillId}${specializationQuery}`;
   const response = await fetch(url, {
     method: 'DELETE',
     headers: {
@@ -94,8 +99,13 @@ export async function deleteSkill(characterId: string, skillId: string): Promise
   return await response.json();
 }
 
-export async function levelUpSkill(characterId: string, skillId: string): Promise<any> {
-  const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/skills/${skillId}/level-up`;
+export async function levelUpSkill(
+  characterId: string,
+  skillId: string,
+  specialization: string | undefined
+): Promise<Character> {
+  const specializationQuery = specialization ? `?specialization=${specialization}` : '';
+  const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/skills/${skillId}/level-up${specializationQuery}`;
   const response = await fetch(url, {
     method: 'PATCH',
     headers: {
@@ -108,8 +118,13 @@ export async function levelUpSkill(characterId: string, skillId: string): Promis
   return await response.json();
 }
 
-export async function levelDownSkill(characterId: string, skillId: string): Promise<any> {
-  const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/skills/${skillId}/level-down`;
+export async function levelDownSkill(
+  characterId: string,
+  skillId: string,
+  specialization: string | undefined
+): Promise<any> {
+  const specializationQuery = specialization ? `?specialization=${specialization}` : '';
+  const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/skills/${skillId}/level-down${specializationQuery}`;
   const response = await fetch(url, {
     method: 'PATCH',
     headers: {
@@ -137,7 +152,11 @@ export async function setUpProfessionalSkill(characterId: string, skillId: strin
   return await response.json();
 }
 
-export async function addItem(characterId: string, data: AddItemDto): Promise<Character> {
+export async function addItem(
+  characterId: string,
+  data: AddItemDto,
+  specialization: string | undefined
+): Promise<Character> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/items`;
   const response = await fetch(url, {
     method: 'POST',

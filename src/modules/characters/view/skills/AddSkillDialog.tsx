@@ -1,4 +1,5 @@
 import React, { useState, useEffect, FC } from 'react';
+import EditSquareIcon from '@mui/icons-material/EditSquare';
 import {
   Button,
   Dialog,
@@ -55,13 +56,14 @@ const AddSkillDialog: FC<{
     return character.skills?.some((s) => s.skillId === skill.id) ?? false;
   };
 
-  //TODO check if skill had specialization
   const filterSkills = () => {
     const notSelectedSkills = skills.filter((s) => !hasSkill(s));
     setFilteredCategories(skillCategories.filter((c) => notSelectedSkills.some((s) => s.categoryId === c.id)));
     setFilteredSkills(
       notSelectedSkills.filter((s) => (selectedCategoryId ? s.categoryId === selectedCategoryId : true))
     );
+    setSelectedSkill(null);
+    setSelectedSpecialization(null);
   };
 
   const onAddSkill = async () => {
@@ -86,6 +88,12 @@ const AddSkillDialog: FC<{
     setSelectedSkill(null);
     setSelectedSpecialization(null);
     onClose();
+  };
+
+  const addSkillDisabled = () => {
+    if (!selectedSkill) return true;
+    if (selectedSkill.specialization && !selectedSpecialization) return true;
+    return false;
   };
 
   useEffect(() => {
@@ -145,38 +153,37 @@ const AddSkillDialog: FC<{
                   {filteredSkills.map((s) => (
                     <ToggleButton key={s.id} value={s.id} aria-label={s.id} sx={{ justifyContent: 'flex-start' }}>
                       {t(s.id)}
+                      {s.specialization && <EditSquareIcon sx={{ ml: 1, fontSize: '0.8em' }} />}
                     </ToggleButton>
                   ))}
                 </ToggleButtonGroup>
               </Box>
             ) : (
               <Typography variant="body2" color="text.secondary">
-                {t('select-category-first')}
+                {t('select-skill-category-first')}
               </Typography>
             )}
           </Grid>
           <Grid size={4}>
-            <Typography variant="subtitle1" sx={{ mb: 1 }}>
-              {t('specialization')}
-            </Typography>
-            {selectedSkill ? (
-              <AddSkillSpecialization
-                skill={selectedSkill}
-                specialization={selectedSpecialization}
-                setSpecialization={setSelectedSpecialization}
-              />
-            ) : (
-              <Typography variant="body2" color="text.secondary">
-                {t('select-skill-first')}
-              </Typography>
+            {selectedSkill && selectedSkill.specialization && (
+              <>
+                <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                  {t('specialization')}
+                </Typography>
+
+                <AddSkillSpecialization
+                  skill={selectedSkill}
+                  specialization={selectedSpecialization}
+                  setSpecialization={setSelectedSpecialization}
+                />
+              </>
             )}
-            <pre>{JSON.stringify(selectedSkill, null, 2)}</pre>
           </Grid>
         </Grid>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>{t('close')}</Button>
-        <Button onClick={onAddSkill} variant="contained" disabled={!selectedSkill}>
+        <Button onClick={onAddSkill} variant="contained" disabled={addSkillDisabled()}>
           {t('add')}
         </Button>
       </DialogActions>
