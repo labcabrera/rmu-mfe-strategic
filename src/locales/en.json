@@ -311,7 +311,10 @@
   "lotr-cave-troll": "Cave troll",
   "lotr-wood-elf": "Wood elf",
 
+  "cleric": "Cleric",
   "fighter": "Fighter",
+  "laborer": "Laborer",
   "ranger": "Ranger",
-  "rogue": "Rogue"
+  "rogue": "Rogue",
+  "scholar": "Scholar"
 }

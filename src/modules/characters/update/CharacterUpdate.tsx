@@ -17,7 +17,7 @@ const CharacterUpdate: React.FC = () => {
   const location = useLocation();
   const { showError } = useError();
   const { characterId } = useParams<{ characterId: string }>();
-  const [character, setCharacter] = useState<Character | null>();
+  const [character, setCharacter] = useState<Character | null>(null);
   const [faction, setFaction] = useState<Faction | null>(null);
   const [strategicGame, setStrategicGame] = useState<StrategicGame | null>(null);
   const [formData, setFormData] = useState<UpdateCharacterDto | null>(null);
@@ -27,7 +27,7 @@ const CharacterUpdate: React.FC = () => {
       fetchStrategicGame(character.gameId)
         .then((game: StrategicGame) => setStrategicGame(game))
         .catch((err) => showError(err.message));
-      fetchFaction(character.factionId)
+      fetchFaction(character.faction.id)
         .then((faction: Faction) => setFaction(faction))
         .catch((err) => showError(err.message));
       setFormData({
@@ -62,7 +62,7 @@ const CharacterUpdate: React.FC = () => {
       <CharacterUpdateActions character={character} formData={formData} game={strategicGame} faction={faction} />
       <Grid container spacing={5}>
         <Grid size={2}>
-          <RaceAvatar raceName={character.info.raceName} size={300} />
+          <RaceAvatar imageUrl={character.imageUrl} raceName={character.info.race.name} size={300} />
           <CharacterUpdateResume formData={formData} setFormData={setFormData} />
         </Grid>
         <Grid size={7}>
