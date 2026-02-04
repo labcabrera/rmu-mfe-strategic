@@ -183,7 +183,7 @@ const CharacterViewSkillsEntry: FC<{
   };
 
   return (
-    <TableRow key={skill.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+    <TableRow key={skill.skillId} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
       <TableCell component="th" scope="row">
         {t(skill.skillId)}
       </TableCell>

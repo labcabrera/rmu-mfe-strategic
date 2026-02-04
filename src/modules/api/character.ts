@@ -244,6 +244,19 @@ export async function levelUpCharacter(characterId: string, force: boolean): Pro
   return await response.json();
 }
 
+export async function addCharacterXP(characterId: string, xp: number): Promise<Character> {
+  const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/xp`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ xp }),
+  });
+  if (response.status !== 200) {
+    throw await buildErrorFromResponse(response, url);
+  }
+  return await response.json();
+}
+
 export async function addTrait(characterId: string, addTraitDto: AddTraitDto): Promise<Character> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/characters/${characterId}/traits`;
   const response = await fetch(url, {

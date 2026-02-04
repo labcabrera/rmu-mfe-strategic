@@ -12,6 +12,9 @@ export interface Character {
   experience: CharacterExperience;
   statistics: CharacterStatistics;
   resistances: CharacterResistance[];
+  hp: CharacterHP;
+  movement: CharacterMovement;
+  initiative: CharacterInitiative;
   defense: CharacterDefense;
   skills: CharacterSkill[];
   items: CharacterItem[];
@@ -67,6 +70,24 @@ export interface CharacterInfo {
   realmType: string;
   height: number;
   weight: number;
+}
+
+export interface CharacterMovement {
+  baseMovementRate: number;
+  strideRacialBonus: number;
+  strideQuBonus: number;
+}
+
+export interface CharacterInitiative {
+  baseBonus: number;
+  customBonus: number;
+  penaltyBonus: number;
+  totalBonus: number;
+}
+
+export interface CharacterHP {
+  max: number;
+  current: number;
 }
 
 export interface CharacterRoleplay {

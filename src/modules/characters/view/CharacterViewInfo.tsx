@@ -11,7 +11,7 @@ const CharacterViewInfo: FC<{
   const getArmorType = () => {
     const armor = character.defense.armor;
     if (!armor) return null;
-    if (armor.at) return t(armor.at);
+    if (armor.at) return t(`${armor.at}`);
     return `${armor.headAt} / ${armor.bodyAt} / ${armor.armsAt} / ${armor.legsAt}`;
   };
 

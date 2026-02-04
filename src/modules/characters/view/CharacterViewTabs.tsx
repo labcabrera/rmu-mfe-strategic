@@ -9,8 +9,8 @@ import CharacterViewResistances from './CharacterViewResistances';
 import CharacterViewStats from './CharacterViewStats';
 import CharacterViewStatsChart from './CharacterViewStatsChart';
 import CharacterViewTraits from './CharacterViewTraits';
+import CharacterViewExperience from './CharacterViewXp';
 import CharacterViewItems from './items/CharacterViewItems';
-import CharacterSkillTable from './skills/CharacterSkillTable';
 import CharacterViewSkills from './skills/CharacterViewSkills';
 
 function CustomTabPanel(props: { children?: ReactNode; value: number; index: number }) {
@@ -59,7 +59,8 @@ const CharacterViewTabs: FC<{
           <Tab label="Traits" {...a11yProps(4)} />
           <Tab label="Items" {...a11yProps(5)} />
           <Tab label="Attacks" {...a11yProps(6)} />
-          <Tab label="Debug" {...a11yProps(7)} />
+          <Tab label="XP" {...a11yProps(7)} />
+          <Tab label="Debug" {...a11yProps(8)} />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
@@ -91,6 +92,9 @@ const CharacterViewTabs: FC<{
         <CharacterViewAttacks character={character} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={7}>
+        <CharacterViewExperience character={character} setCharacter={setCharacter} />
+      </CustomTabPanel>
+      <CustomTabPanel value={value} index={8}>
         <pre>Character: {JSON.stringify(character, null, 2)}</pre>
         <pre>Profession: {JSON.stringify(profession, null, 2)}</pre>
       </CustomTabPanel>
