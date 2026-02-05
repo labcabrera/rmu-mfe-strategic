@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Grid, Tooltip } from '@mui/material';
+import { Box, Grid, Tooltip, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { Character } from '../../../api/character.dto';
 import NumericCard from '../../../shared/cards/NumericCard';
@@ -44,20 +44,42 @@ const CharacterViewEquipmentInfo: React.FC<{
               minWidth={300}
             />
           </Tooltip>
-          <Tooltip title={'Carried weight (Carried allowance)'}>
-            <TextCard
-              value={getLabelWeight()}
-              subtitle={t('carried-weight')}
-              image={`/static/images/generic/carried-weight.png`}
-              minWidth={300}
-            />
+          <Tooltip
+            title={
+              <React.Fragment>
+                <Typography color="inherit">Carried weight (Allowance)</Typography>
+                <Typography color="inherit">WA: 15% + 2 x Strength Modifier</Typography>
+              </React.Fragment>
+            }
+            arrow
+          >
+            <span>
+              <TextCard
+                value={getLabelWeight()}
+                subtitle={t('carried-weight')}
+                image={`/static/images/generic/carried-weight.png`}
+                minWidth={300}
+              />
+            </span>
           </Tooltip>
-          <NumericCard
-            value={character.equipment.encumbrancePenalty}
-            subtitle={t('weight-penalty')}
-            image={`/static/images/generic/weight-penalty.png`}
-            minWidth={300}
-          />
+          <Tooltip
+            title={
+              <React.Fragment>
+                <Typography color="inherit">Encumbrance penalty</Typography>
+                <Typography color="inherit">EP = Load (%) – WA (%)</Typography>
+              </React.Fragment>
+            }
+            arrow
+          >
+            <span>
+              <NumericCard
+                value={character.equipment.encumbrancePenalty}
+                subtitle={t('Encumbrance penalty')}
+                image={`/static/images/generic/weight-penalty.png`}
+                minWidth={300}
+              />
+            </span>
+          </Tooltip>
         </Box>
         <Box display="flex" flexDirection="row" flexWrap="wrap" gap={1}>
           <TextCard
@@ -66,13 +88,25 @@ const CharacterViewEquipmentInfo: React.FC<{
             image={`/static/images/generic/maneuver-penalty.png`}
             minWidth={300}
           />
-          <TextCard
-            value={getLabelManeuverPenalty()}
-            subtitle={t('Armor penalty')}
-            image={`/static/images/generic/maneuver-penalty.png`}
-            color={character.equipment.maneuverPenalty < 0 ? 'red' : undefined}
-            minWidth={300}
-          />
+          <Tooltip
+            title={
+              <React.Fragment>
+                <Typography color="inherit">Maneuver penalty</Typography>
+                <Typography color="inherit">Penalty = Armor Penalty + Armor Skill</Typography>
+              </React.Fragment>
+            }
+            arrow
+          >
+            <span>
+              <TextCard
+                value={getLabelManeuverPenalty()}
+                subtitle={t('Armor penalty')}
+                image={`/static/images/generic/maneuver-penalty.png`}
+                color={character.equipment.maneuverPenalty < 0 ? 'red' : undefined}
+                minWidth={300}
+              />
+            </span>
+          </Tooltip>
           <NumericCard
             value={character.equipment.rangedPenalty}
             subtitle={t('ranged-penalty')}
