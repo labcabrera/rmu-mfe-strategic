@@ -1,8 +1,9 @@
+import { getAuthHeaders } from '../services/auth-token-service';
 import { buildErrorFromResponse } from './api-errors';
 
 export async function fetchCharacterSizes(): Promise<any> {
   const url = `${process.env.RMU_API_CORE_URL}/character-sizes`;
-  const response = await fetch(url, { method: 'GET' });
+  const response = await fetch(url, { method: 'GET', headers: getAuthHeaders() });
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }

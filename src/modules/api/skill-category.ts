@@ -1,9 +1,10 @@
+import { getAuthHeaders } from '../services/auth-token-service';
 import { buildErrorFromResponse } from './api-errors';
 import { SkillCategory } from './skill-category.dto';
 
 export async function fetchSkillCategories(): Promise<SkillCategory[]> {
   const url = `${process.env.RMU_API_CORE_URL}/skill-categories?page=0&size=100`;
-  const response = await fetch(url, { method: 'GET' });
+  const response = await fetch(url, { method: 'GET', headers: getAuthHeaders() });
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }
