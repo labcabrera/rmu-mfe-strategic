@@ -1,11 +1,11 @@
-/* eslint-disable no-unused-vars */
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import Dotenv from 'dotenv-webpack';
 import HtmlWebPackPlugin from 'html-webpack-plugin';
 import { createRequire } from 'module';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import webpack, { Configuration } from 'webpack';
+import webpack from 'webpack';
+import type { Configuration } from 'webpack';
 
 const ModuleFederationPlugin = (webpack as any).container.ModuleFederationPlugin as any;
 const requireC = createRequire(import.meta.url);
@@ -16,7 +16,8 @@ const printCompilationMessage = requireC('./compilation.config.js');
 
 export default (_: any, argv: any): Configuration & { devServer?: any } => ({
   output: {
-    publicPath: process.env.RMU_MFE_STRATEGIC_PUBLIC_PATH || 'http://localhost:8082/',
+    // publicPath: process.env.RMU_MFE_STRATEGIC_PUBLIC_PATH || 'http://localhost:8082/',
+    publicPath: process.env.RMU_MFE_STRATEGIC_PUBLIC_PATH || 'https://strategic.labcabrera.com/',
   },
 
   resolve: {
