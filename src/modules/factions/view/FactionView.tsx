@@ -56,6 +56,7 @@ const FactionView: FC = () => {
           <FactionViewCharacters faction={faction} characters={characters} />
         </Grid>
       </Grid>
+      {/* <pre>{JSON.stringify(faction, null, 2)}</pre> */}
     </>
   );
 };

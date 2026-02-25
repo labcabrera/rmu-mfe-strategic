@@ -4,8 +4,6 @@ import { Faction } from '../../api/faction.dto';
 import { defaultFactionImage } from '../../services/image-service';
 import CardListItem from './CardListItem';
 
-const imageBaseUrl = process.env.RMU_MFE_ASSETS!;
-
 const FactionCard: FC<{
   faction: Faction;
 }> = ({ faction }) => {
@@ -16,7 +14,7 @@ const FactionCard: FC<{
   };
 
   const getImage = () => {
-    return faction.imageUrl ? `${imageBaseUrl}${faction.imageUrl}` : defaultFactionImage;
+    return faction.imageUrl ? faction.imageUrl : defaultFactionImage;
   };
 
   if (!faction) return <p>Loading...</p>;
