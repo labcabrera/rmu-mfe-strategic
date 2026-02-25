@@ -28,6 +28,7 @@ import { Character, CharacterItem } from '../../../api/character.dto';
 import AddButton from '../../../shared/buttons/AddButton';
 
 const IMG_SIZE = 60;
+const imageBaseUrl = process.env.RMU_MFE_ASSETS!;
 
 const CharacterItemTable: FC<{
   character: Character;
@@ -99,7 +100,7 @@ const CharacterItemTable: FC<{
                 <TableCell sx={{ width: '72px' }}>
                   <Avatar
                     variant="square"
-                    src={`/static/images/items/${item.itemTypeId}.png`}
+                    src={`${imageBaseUrl}images/items/${item.itemTypeId}.png`}
                     alt={item.name}
                     sx={{
                       width: IMG_SIZE,

@@ -4,6 +4,8 @@ import { t } from 'i18next';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import NumericCard from '../../shared/cards/NumericCard';
 
+const imageBaseUrl = process.env.RMU_MFE_ASSETS!;
+
 const StrategicGameViewAttributes: FC<{
   strategicGame: StrategicGame;
 }> = ({ strategicGame }) => {
@@ -17,25 +19,25 @@ const StrategicGameViewAttributes: FC<{
           <NumericCard
             value={strategicGame.options.experienceMultiplier}
             subtitle={t('experience-multiplier')}
-            image={`/static/images/generic/experience.png`}
+            image={`${imageBaseUrl}images/generic/experience.png`}
             applyColor={false}
           />
           <NumericCard
             value={strategicGame.options.fatigueMultiplier}
             subtitle={t('fatigue-multiplier')}
-            image={`/static/images/generic/stat-co.png`}
+            image={`${imageBaseUrl}images/generic/stat-co.png`}
             applyColor={false}
           />
           <NumericCard
             value={strategicGame.options.boardScaleMultiplier}
             subtitle={t('board-scale-multiplier')}
-            image={`/static/images/generic/realm.png`}
+            image={`${imageBaseUrl}images/generic/realm.png`}
             applyColor={false}
           />
           <NumericCard
             value={strategicGame.options.letality}
             subtitle={t('letality')}
-            image={`/static/images/generic/physical.png`}
+            image={`${imageBaseUrl}images/generic/physical.png`}
           />
         </Box>
       </Grid>
@@ -47,37 +49,37 @@ const StrategicGameViewAttributes: FC<{
           <NumericCard
             value={strategicGame.powerLevel.baseDevPoints}
             subtitle={t('base-dev-points')}
-            image={`/static/images/generic/trait-combat.png`}
+            image={`${imageBaseUrl}images/generic/trait-combat.png`}
             applyColor={false}
           />
           <NumericCard
             value={strategicGame.powerLevel.statRandomMin}
             subtitle={t('stat-random-min')}
-            image={`/static/images/generic/stat-st.png`}
+            image={`${imageBaseUrl}images/generic/stat-st.png`}
             applyColor={false}
           />
           <NumericCard
             value={strategicGame.powerLevel.statBoostPotential}
             subtitle={t('stat-boost-potential')}
-            image={`/static/images/generic/stat-st.png`}
+            image={`${imageBaseUrl}images/generic/stat-st.png`}
             applyColor={false}
           />
           <NumericCard
             value={strategicGame.powerLevel.statBoostTemporary}
             subtitle={t('stat-boost-temporary')}
-            image={`/static/images/generic/stat-st.png`}
+            image={`${imageBaseUrl}images/generic/stat-st.png`}
             applyColor={false}
           />
           <NumericCard
             value={strategicGame.powerLevel.statCreationBoost}
             subtitle={t('stat-creation-boosts')}
-            image={`/static/images/generic/stat-st.png`}
+            image={`${imageBaseUrl}images/generic/stat-st.png`}
             applyColor={false}
           />
           <NumericCard
             value={strategicGame.powerLevel.statCreationSwap}
             subtitle={t('stat-creation-swaps')}
-            image={`/static/images/generic/stat-st.png`}
+            image={`${imageBaseUrl}images/generic/stat-st.png`}
             applyColor={false}
           />
         </Box>

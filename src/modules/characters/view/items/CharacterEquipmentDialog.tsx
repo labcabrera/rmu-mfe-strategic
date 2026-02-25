@@ -15,6 +15,8 @@ import { t } from 'i18next';
 import { equipItem, unequipItem } from '../../../api/character';
 import { Character, CharacterItem } from '../../../api/character.dto';
 
+const imageBaseUrl = process.env.RMU_MFE_ASSETS!;
+
 const CharacterEquipmentDialog: FC<{
   open: boolean;
   onClose: () => void;
@@ -81,7 +83,7 @@ const CharacterEquipmentDialog: FC<{
         <Stack direction="row" alignItems="center">
           <CardMedia
             component="img"
-            image="/static/images/items/no-item.png"
+            image={`${imageBaseUrl}images/items/no-item.png`}
             sx={{ width: 40, height: 40, verticalAlign: 'middle', marginRight: 1 }}
           />
           <Typography variant="h6" component="div">
@@ -104,7 +106,7 @@ const CharacterEquipmentDialog: FC<{
           >
             <CardMedia
               component="img"
-              image={'/static/images/items/no-item.png'}
+              image={`${imageBaseUrl}images/items/no-item.png`}
               alt={t('none')}
               sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 1 }}
             />
@@ -128,7 +130,7 @@ const CharacterEquipmentDialog: FC<{
                 <Tooltip title={item.name} arrow>
                   <CardMedia
                     component="img"
-                    image={`/static/images/items/${item.itemTypeId}.png`}
+                    image={`${imageBaseUrl}images/items/${item.itemTypeId}.png`}
                     alt={item.name}
                     sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 1 }}
                   />

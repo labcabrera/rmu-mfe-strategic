@@ -4,6 +4,7 @@ import { t } from 'i18next';
 import { Character, CharacterItem } from '../../../api/character.dto';
 import CharacterEquipmentDialog from './CharacterEquipmentDialog';
 
+const imageBaseUrl = process.env.RMU_MFE_ASSETS!;
 const slots = ['mainHand', 'offHand', 'head', 'body', 'arms', 'legs'];
 const SLOT_SIZE = 150;
 
@@ -56,7 +57,11 @@ const CharacterViewEquipment: FC<{
               <Tooltip title={item ? item.name : t('no-item-equipped')} arrow>
                 <CardMedia
                   component="img"
-                  image={item ? `/static/images/items/${item.itemTypeId}.png` : '/static/images/items/no-item.png'}
+                  image={
+                    item
+                      ? `${imageBaseUrl}images/items/${item.itemTypeId}.png`
+                      : `${imageBaseUrl}images/items/no-item.png`
+                  }
                   alt={item ? item.name : t('empty')}
                   sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 1 }}
                 />
