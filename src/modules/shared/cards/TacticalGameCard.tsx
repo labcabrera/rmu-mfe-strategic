@@ -4,6 +4,8 @@ import { t } from 'i18next';
 import { TacticalGame } from '../../api/tactical-games';
 import CardListItem from './CardListItem';
 
+const imageBaseUrl = process.env.RMU_MFE_ASSETS!;
+
 const TacticalGameCard: FC<{
   tacticalGame: TacticalGame;
 }> = ({ tacticalGame }) => {
@@ -19,7 +21,7 @@ const TacticalGameCard: FC<{
     <CardListItem
       title={tacticalGame.name}
       subtitle={t(tacticalGame.descrtiption)}
-      image="/static/images/generic/realm.png"
+      image={tacticalGame.imageUrl ? tacticalGame.imageUrl : `${imageBaseUrl}images/generic/tactical.png`}
       onClick={handleRealmClick}
     />
   );
