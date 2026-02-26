@@ -28,7 +28,10 @@ export default (_env: unknown, argv: { mode?: string }): Configuration => {
   dotenv.config({ path: path.resolve(__dirname, `.env.${mode}`) });
 
   // const publicPath = 'http://localhost:8082/';
-  const publicPath = process.env.RMU_MFE_STRATEGIC_PUBLIC_PATH;
+  // Use environment variable when provided, otherwise let webpack determine
+  // chunk loading base automatically so chunks are requested relative to
+  // the loaded remote entry (prevents hard-coded localhost URLs in prod).
+  const publicPath = process.env.RMU_MFE_STRATEGIC_PUBLIC_PATH || 'auto';
   const mfeShellRemote = 'shell@https://labcabrera.com/main.js';
 
   return {

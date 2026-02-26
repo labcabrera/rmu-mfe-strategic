@@ -8,6 +8,8 @@ import NumericCard from '../../shared/cards/NumericCard';
 import TextCard from '../../shared/cards/TextCard';
 import NumericInput from '../../shared/inputs/NumericInput';
 
+const imageBaseUrl = process.env.RMU_MFE_ASSETS!;
+
 const CharacterViewExperience: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character>>;
@@ -40,7 +42,7 @@ const CharacterViewExperience: FC<{
             <NumericCard
               value={character.experience.availableLevel}
               subtitle={t('level')}
-              image={`/static/images/generic/experience.png`}
+              image={`${imageBaseUrl}images/generic/experience.png`}
               applyColor={false}
             />
             <Badge
@@ -51,14 +53,14 @@ const CharacterViewExperience: FC<{
               <NumericCard
                 value={character.experience.level}
                 subtitle={t('current-level')}
-                image={`/static/images/generic/experience.png`}
+                image={`${imageBaseUrl}images/generic/experience.png`}
                 applyColor={false}
               />
             </Badge>
             <NumericCard
               value={character.experience.xp}
               subtitle={t('xp')}
-              image={`/static/images/generic/experience.png`}
+              image={`${imageBaseUrl}images/generic/experience.png`}
               applyColor={false}
               applyFormat={true}
             />
@@ -70,7 +72,7 @@ const CharacterViewExperience: FC<{
               <TextCard
                 value={`${character.experience.availableDevelopmentPoints} / ${character.experience.developmentPoints}`}
                 subtitle={t('development-points')}
-                image={`/static/images/generic/trait-combat.png`}
+                image={`${imageBaseUrl}images/generic/trait-combat.png`}
               />
             </Badge>
           </Box>
