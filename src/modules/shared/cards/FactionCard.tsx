@@ -22,7 +22,7 @@ const FactionCard: FC<{
   return (
     <CardListItem
       title={faction.name}
-      subtitle={faction.shortDescription}
+      subtitle={faction.shortDescription || ''}
       image={getImage()}
       onClick={handleFactionClick}
     />

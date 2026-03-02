@@ -26,7 +26,7 @@ const FactionView: FC = () => {
       fetchStrategicGame(faction.gameId)
         .then((data: StrategicGame) => setGame(data))
         .catch((err) => showError(err.message));
-      fetchCharacters(`factionId==${faction.id}`, 0, 100)
+      fetchCharacters(`faction.id==${faction.id}`, 0, 100)
         .then((data: Character[]) => setCharacters(data))
         .catch((err) => showError(err.message));
     }
@@ -48,15 +48,14 @@ const FactionView: FC = () => {
     <>
       <FactionViewActions faction={faction} setFaction={setFaction} strategicGame={game} />
       <Grid container spacing={12}>
-        <Grid size={2}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <FactionViewResume faction={faction} setFaction={setFaction} game={game} />
         </Grid>
-        <Grid size={10}>
+        <Grid size={{ xs: 12, md: 9 }}>
           <FactionViewAttributes faction={faction} />
           <FactionViewCharacters faction={faction} characters={characters} />
         </Grid>
       </Grid>
-      {/* <pre>{JSON.stringify(faction, null, 2)}</pre> */}
     </>
   );
 };

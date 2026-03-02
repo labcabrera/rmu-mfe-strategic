@@ -2,7 +2,7 @@ export interface Skill {
   id: string;
   categoryId: string;
   bonus: string[];
-  specializations: string[];
+  specialization: string | null;
 }
 
 export interface AddSkill {

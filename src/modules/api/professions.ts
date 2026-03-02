@@ -1,3 +1,4 @@
+import { getAuthHeaders } from '../services/auth-token-service';
 import { buildErrorFromResponse } from './api-errors';
 
 export interface Profession {
@@ -10,7 +11,7 @@ export interface Profession {
 
 export async function fetchProfession(id: string): Promise<Profession> {
   const url = `${process.env.RMU_API_CORE_URL}/professions/${id}`;
-  const response = await fetch(url, { method: 'GET' });
+  const response = await fetch(url, { method: 'GET', headers: getAuthHeaders() });
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }
@@ -19,7 +20,7 @@ export async function fetchProfession(id: string): Promise<Profession> {
 
 export async function fetchProfessions(): Promise<Profession[]> {
   const url = `${process.env.RMU_API_CORE_URL}/professions`;
-  const response = await fetch(url, { method: 'GET' });
+  const response = await fetch(url, { method: 'GET', headers: getAuthHeaders() });
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }

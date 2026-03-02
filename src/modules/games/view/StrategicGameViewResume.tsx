@@ -11,8 +11,8 @@ import ImageSelectorDialog from '../../shared/images/ImageSelectorDialog';
 
 const StrategicGameViewResume: FC<{
   strategicGame: StrategicGame;
-  setGame: Dispatch<SetStateAction<StrategicGame>>;
-}> = ({ strategicGame, setGame }) => {
+  setStrategicGame: Dispatch<SetStateAction<StrategicGame>>;
+}> = ({ strategicGame, setStrategicGame: setGame }) => {
   const { showError } = useError();
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
 

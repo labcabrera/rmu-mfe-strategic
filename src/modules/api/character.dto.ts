@@ -1,23 +1,44 @@
+import { NamedId } from './shared-model';
+
 export const STATS = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
 
 export interface Character {
   id: string;
   gameId: string;
-  factionId: string;
+  faction: NamedId;
   name: string;
   info: CharacterInfo;
   roleplay: CharacterRoleplay;
   experience: CharacterExperience;
   statistics: CharacterStatistics;
   resistances: CharacterResistance[];
+  hp: CharacterHP;
+  movement: CharacterMovement;
+  initiative: CharacterInitiative;
+  defense: CharacterDefense;
   skills: CharacterSkill[];
   items: CharacterItem[];
   equipment: CharacterEquipment;
   traits: CharacterTrait[];
-  [key: string]: any;
+  description: string | undefined;
+  imageUrl: string | undefined;
 }
 
 export interface CreateCharacterDto extends Omit<Character, 'id'> {}
+
+export interface CharacterDefense {
+  defensiveBonus: number;
+  armor: CharacterArmor;
+}
+
+export interface CharacterArmor {
+  at: number | undefined;
+  racialAtBonus: number | undefined;
+  headAt: number | undefined;
+  bodyAt: number | undefined;
+  armsAt: number | undefined;
+  legsAt: number | undefined;
+}
 
 export interface AddTraitDto {
   traitId: string;
@@ -43,13 +64,30 @@ export interface UpdateCharacterDto {
 }
 
 export interface CharacterInfo {
-  raceId: string;
-  raceName: string;
+  race: NamedId;
   professionId: string;
   sizeId: string;
   realmType: string;
   height: number;
   weight: number;
+}
+
+export interface CharacterMovement {
+  baseMovementRate: number;
+  strideRacialBonus: number;
+  strideQuBonus: number;
+}
+
+export interface CharacterInitiative {
+  baseBonus: number;
+  customBonus: number;
+  penaltyBonus: number;
+  totalBonus: number;
+}
+
+export interface CharacterHP {
+  max: number;
+  current: number;
 }
 
 export interface CharacterRoleplay {
@@ -119,12 +157,17 @@ export interface CharacterItem {
   armor?: ArmorInfo;
   info: any;
   amount?: number;
+  carried: boolean;
+}
+
+export interface WeaponMode {
+  type: string;
 }
 
 export interface WeaponInfo {
   fumble: string;
   sizeAdjustment: string;
-  requiredHands: number;
+  modes: WeaponMode[];
 }
 
 export interface ArmorInfo {

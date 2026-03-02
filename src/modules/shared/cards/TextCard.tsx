@@ -1,6 +1,9 @@
 import React, { FC } from 'react';
 import { Card, CardContent, CardMedia, Typography } from '@mui/material';
 
+const red = '#ffab91';
+const green = '#a5d6a7';
+
 const TextCard: FC<{
   value: string;
   subtitle: string;
@@ -10,6 +13,7 @@ const TextCard: FC<{
   height?: number;
   imageSize?: number;
   grayscale?: number;
+  color?: 'red' | 'green' | undefined;
   valueVariant?: 'h5' | 'h6' | 'subtitle1' | 'subtitle2' | 'body1' | 'body2';
   onClick?: () => void;
 }> = ({
@@ -21,6 +25,7 @@ const TextCard: FC<{
   height = 70,
   imageSize = 70,
   grayscale = 0.5,
+  color,
   valueVariant = 'h6',
   onClick,
 }) => {
@@ -60,6 +65,7 @@ const TextCard: FC<{
           sx={{
             mt: 2,
             overflow: 'hidden',
+            color: color === 'red' ? red : color === 'green' ? green : 'text.primary',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
             width: '100%',

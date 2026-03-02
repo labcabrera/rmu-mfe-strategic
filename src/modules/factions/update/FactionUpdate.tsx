@@ -25,17 +25,15 @@ const FactionUpdate: FC = () => {
   return (
     <>
       <FactionUpdateActions formData={formData} strategicGame={strategicGame} faction={faction} />
-      <Grid container spacing={5}>
-        <Grid size={2}>
+      <Grid container spacing={1}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <FactionAvatar faction={faction} size={300} />
           <FactionUpdateResume formData={formData} setFormData={setFormData} />
         </Grid>
-        <Grid size={7}>
+        <Grid size={{ xs: 12, md: 9 }}>
           <FactionUpdateAttributes formData={formData} setFormData={setFormData} />
         </Grid>
       </Grid>
-      {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
-      {/* <pre>{JSON.stringify(faction, null, 2)}</pre> */}
     </>
   );
 };

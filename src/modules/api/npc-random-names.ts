@@ -1,3 +1,4 @@
+import { getAuthHeaders } from '../services/auth-token-service';
 import { buildErrorFromResponse } from './api-errors';
 
 export async function fetchRandomName(race: string): Promise<string> {
@@ -10,7 +11,7 @@ export async function fetchRandomName(race: string): Promise<string> {
     requestRace = 'sindar';
   }
   const url = `${process.env.RMU_API_NPC_NAMES_URL}/random-names/${requestRace}`;
-  const response = await fetch(url, { method: 'GET' });
+  const response = await fetch(url, { method: 'GET', headers: getAuthHeaders() });
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }

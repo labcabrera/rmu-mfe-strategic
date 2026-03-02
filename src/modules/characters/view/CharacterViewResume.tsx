@@ -15,8 +15,7 @@ const CharacterViewResume: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character>>;
   strategicGame: StrategicGame;
-  faction: Faction;
-}> = ({ character, setCharacter, strategicGame, faction }) => {
+}> = ({ character, setCharacter, strategicGame }) => {
   const { showError } = useError();
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
 
@@ -36,7 +35,7 @@ const CharacterViewResume: FC<{
     <>
       <RaceAvatar
         imageUrl={character.imageUrl}
-        raceName={character.info.raceName}
+        raceName={character.info.race.name}
         size={300}
         onClick={() => setImageDialogOpen(true)}
       />
@@ -49,16 +48,16 @@ const CharacterViewResume: FC<{
         </Typography>
       )}
       <Typography variant="body1" sx={{ mt: 2 }}>
-        {character.info.raceName} - {t(character.info.professionId)} - {character.experience.availableLevel}
+        {character.info.race.name} - {t(character.info.professionId)} - {character.experience.availableLevel}
       </Typography>
       <Typography variant="body1" sx={{ mt: 2 }}>
-        <Link component={RouterLink} color="inherit" to={`/strategic/factions/view/${faction.id}`}>
+        <Link component={RouterLink} color="inherit" to={`/strategic/factions/view/${character.faction.id}`}>
           {strategicGame.name}
         </Link>
       </Typography>
       <Typography variant="body1" sx={{ mt: 2 }}>
-        <Link component={RouterLink} color="inherit" to={`/strategic/factions/view/${faction.id}`}>
-          {faction.name}
+        <Link component={RouterLink} color="inherit" to={`/strategic/factions/view/${character.faction.id}`}>
+          {character.faction.name}
         </Link>
       </Typography>
       <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>

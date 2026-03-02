@@ -1,9 +1,10 @@
+import { getAuthHeaders } from '../services/auth-token-service';
 import { buildErrorFromResponse } from './api-errors';
 import { Realm } from './realm.dto';
 
 export async function fetchRealms(): Promise<Realm[]> {
   const url = `${process.env.RMU_API_CORE_URL}/realms`;
-  const response = await fetch(url, { method: 'GET' });
+  const response = await fetch(url, { method: 'GET', headers: getAuthHeaders() });
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }
@@ -13,7 +14,7 @@ export async function fetchRealms(): Promise<Realm[]> {
 
 export async function fetchRealm(realmId: string): Promise<Realm> {
   const url = `${process.env.RMU_API_CORE_URL}/realms/${realmId}`;
-  const response = await fetch(url, { method: 'GET' });
+  const response = await fetch(url, { method: 'GET', headers: getAuthHeaders() });
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }

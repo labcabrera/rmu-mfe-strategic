@@ -1,14 +1,35 @@
 import React, { useState, useEffect, FC } from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid } from '@mui/material';
+import {
+  Box,
+  Button,
+  CardMedia,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Grid,
+  Tooltip,
+} from '@mui/material';
 import { t } from 'i18next';
-import { useError } from '../../../ErrorContext';
-import { AddItemDto } from '../../api/character.dto';
-import { fetchItems, Item } from '../../api/items';
-import TextCard from '../../shared/cards/TextCard';
+import { useError } from '../../../../ErrorContext';
+import { AddItemDto } from '../../../api/character.dto';
+import { fetchItems, Item } from '../../../api/items';
 import CharacterViewAddItemDialogForm from './CharacterViewAddItemDialogForm';
 
 const categories = ['weapon', 'armor', 'shield', 'clothes', 'ammunition', 'tools', 'food'];
 const armorSubcategories = ['head', 'body', 'arms', 'legs'];
+const weaponSubcategories = [
+  'melee-weapon@blade',
+  'melee-weapon@greater-blade',
+  // 'melee-weapon@chain',
+  'melee-weapon@hafted',
+  'melee-weapon@greater-hafted',
+  'melee-weapon@pole-arm',
+  'melee-weapon@exotic',
+  'ranged-weapon@bow',
+  'ranged-weapon@crossbow',
+];
 
 const CharacterAddItemDialog: FC<{
   open: boolean;
@@ -23,6 +44,8 @@ const CharacterAddItemDialog: FC<{
   const [formData, setFormData] = useState<AddItemDto | null>(null);
   const [items, setItems] = useState<Item[]>([]);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+
+  const IMAGE_SIZE = 100;
 
   const handleClose = () => {
     setFormData(null);
@@ -42,7 +65,9 @@ const CharacterAddItemDialog: FC<{
 
   const bindItems = (category: string | null, subcategory: string | null) => {
     let rsql = `category==${category}`;
-    if (category === 'armor' && selectedSubcategory) {
+    if (category === 'weapon' && subcategory) {
+      rsql += `;weapon.skillId==${subcategory}`;
+    } else if (category === 'armor' && selectedSubcategory) {
       rsql += `;armor.slot==${selectedSubcategory}`;
     }
     fetchItems(rsql, 0, 100)
@@ -63,10 +88,6 @@ const CharacterAddItemDialog: FC<{
     } as AddItemDto);
   };
 
-  const getItemDetail = (item: Item) => {
-    return `${item.info?.cost?.average || '0'}g`;
-  };
-
   useEffect(() => {
     if (selectedSubcategory) {
       bindItems(selectedCategory, selectedSubcategory);
@@ -80,6 +101,10 @@ const CharacterAddItemDialog: FC<{
         setSelectedSubcategory(null);
         setItems([]);
         setSubcategories(armorSubcategories);
+      } else if (selectedCategory === 'weapon') {
+        setSelectedSubcategory(null);
+        setItems([]);
+        setSubcategories(weaponSubcategories);
       } else {
         setSubcategories([]);
         bindItems(selectedCategory, null);
@@ -98,44 +123,55 @@ const CharacterAddItemDialog: FC<{
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth>
       <DialogTitle>{t('add-item')}</DialogTitle>
-      <DialogContent sx={{ minHeight: '700px' }}>
+      <DialogContent sx={{ minHeight: '800px' }}>
         <Grid container spacing={1}>
           <Grid size={12}>
             <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
               {categories.map((category) => (
-                <TextCard
-                  key={category}
-                  value={t(category)}
-                  subtitle=""
-                  onClick={() => setSelectedCategory(category)}
-                  image={`/static/images/items/category-${category}.png`}
-                  maxWidth={190}
-                  minWidth={190}
-                  height={70}
-                  imageSize={70}
-                  grayscale={selectedCategory === category ? 0 : 1}
-                  valueVariant="body1"
-                />
+                <>
+                  <Tooltip key={category} title={category} arrow>
+                    <CardMedia
+                      key={category}
+                      component="img"
+                      image={`/static/images/items/category-${category}.png`}
+                      alt={t(category)}
+                      onClick={() => setSelectedCategory(category)}
+                      sx={{
+                        width: IMAGE_SIZE,
+                        height: IMAGE_SIZE,
+                        objectFit: 'cover',
+                        cursor: 'pointer',
+                        border: selectedCategory === category ? '2px solid' : 'none',
+                        borderColor: 'success.main',
+                      }}
+                    />
+                  </Tooltip>
+                </>
               ))}
             </Box>
           </Grid>
+          <Divider />
           {subcategories && subcategories.length > 0 && (
             <Grid size={12}>
               <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
                 {subcategories.map((subcategory) => (
-                  <TextCard
-                    key={subcategory}
-                    value={t(subcategory)}
-                    subtitle=""
-                    onClick={() => setSelectedSubcategory(subcategory)}
-                    image={`/static/images/generic/slot-${subcategory}.png`}
-                    maxWidth={190}
-                    minWidth={190}
-                    height={70}
-                    imageSize={70}
-                    grayscale={selectedSubcategory === subcategory ? 0 : 1}
-                    valueVariant="body1"
-                  />
+                  <Tooltip key={subcategory} title={subcategory} arrow>
+                    <CardMedia
+                      key={subcategory}
+                      component="img"
+                      image={`/static/images/items/category-${subcategory}.png`}
+                      alt={t(subcategory)}
+                      onClick={() => setSelectedSubcategory(subcategory)}
+                      sx={{
+                        width: IMAGE_SIZE,
+                        height: IMAGE_SIZE,
+                        objectFit: 'cover',
+                        cursor: 'pointer',
+                        border: selectedSubcategory === subcategory ? '2px solid' : 'none',
+                        borderColor: 'success.main',
+                      }}
+                    />
+                  </Tooltip>
                 ))}
               </Box>
             </Grid>
@@ -144,19 +180,23 @@ const CharacterAddItemDialog: FC<{
           <Grid size={12}>
             <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
               {items.map((item) => (
-                <TextCard
-                  key={item.id}
-                  value={t(item.id)}
-                  subtitle={getItemDetail(item)}
-                  onClick={() => loadItem(item)}
-                  image={`/static/images/items/${item.id}.png`}
-                  maxWidth={300}
-                  minWidth={300}
-                  height={70}
-                  imageSize={70}
-                  grayscale={0}
-                  valueVariant="body1"
-                />
+                <Tooltip title={t(item.id)} arrow>
+                  <CardMedia
+                    key={item.id}
+                    component="img"
+                    image={`/static/images/items/${item.id}.png`}
+                    alt={t(item.id)}
+                    onClick={() => loadItem(item)}
+                    sx={{
+                      width: IMAGE_SIZE,
+                      height: IMAGE_SIZE,
+                      objectFit: 'cover',
+                      cursor: 'pointer',
+                      border: selectedItem && selectedItem.id === item.id ? '2px solid' : 'none',
+                      borderColor: 'success.main',
+                    }}
+                  />
+                </Tooltip>
               ))}
             </Box>
           </Grid>

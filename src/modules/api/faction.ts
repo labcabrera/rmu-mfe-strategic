@@ -1,9 +1,10 @@
+import { getAuthHeaders, mergeJsonHeaders } from '../services/auth-token-service';
 import { buildErrorFromResponse } from './api-errors';
 import { CreateFactionDto, Faction, UpdateFactionDto } from './faction.dto';
 
 export async function fetchFaction(factionId: string): Promise<Faction> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/factions/${factionId}`;
-  const response = await fetch(url, { method: 'GET' });
+  const response = await fetch(url, { method: 'GET', headers: getAuthHeaders() });
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }
@@ -12,7 +13,7 @@ export async function fetchFaction(factionId: string): Promise<Faction> {
 
 export async function fetchFactions(rsql: string, page: number, size: number): Promise<Faction[]> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/factions?q=${rsql}&page=${page}&size=${size}`;
-  const response = await fetch(url, { method: 'GET' });
+  const response = await fetch(url, { method: 'GET', headers: getAuthHeaders() });
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }
@@ -24,7 +25,7 @@ export async function createFaction(data: CreateFactionDto): Promise<Faction> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/factions`;
   const response = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: mergeJsonHeaders(),
     body: JSON.stringify(data),
   });
   if (response.status !== 201) {
@@ -37,7 +38,7 @@ export async function updateFaction(factionId: string, data: UpdateFactionDto): 
   const url = `${process.env.RMU_API_STRATEGIC_URL}/factions/${factionId}`;
   const response = await fetch(url, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    headers: mergeJsonHeaders(),
     body: JSON.stringify(data),
   });
   if (response.status !== 200) {
@@ -48,7 +49,7 @@ export async function updateFaction(factionId: string, data: UpdateFactionDto): 
 
 export async function deleteFaction(factionId: string): Promise<void> {
   const url = `${process.env.RMU_API_STRATEGIC_URL}/factions/${factionId}`;
-  const response = await fetch(url, { method: 'DELETE' });
+  const response = await fetch(url, { method: 'DELETE', headers: getAuthHeaders() });
   if (response.status !== 204) {
     throw await buildErrorFromResponse(response, url);
   }
@@ -60,7 +61,7 @@ export async function addFactionXP(factionId: string, amount: number): Promise<F
   const response = await fetch(url, {
     method: 'POST',
     body: JSON.stringify(body),
-    headers: { 'Content-Type': 'application/json' },
+    headers: mergeJsonHeaders(),
   });
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
@@ -74,7 +75,7 @@ export async function addFactionGold(factionId: string, amount: number): Promise
   const response = await fetch(url, {
     method: 'POST',
     body: JSON.stringify(body),
-    headers: { 'Content-Type': 'application/json' },
+    headers: mergeJsonHeaders(),
   });
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);

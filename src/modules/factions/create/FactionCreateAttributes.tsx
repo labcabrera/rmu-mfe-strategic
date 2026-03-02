@@ -1,5 +1,5 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
-import { Typography } from '@mui/material';
+import { TextField } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { t } from 'i18next';
 import { CreateFactionDto } from '../../api/faction.dto';
@@ -10,14 +10,28 @@ const FactionCreateAttributes: FC<{
   setFormData: Dispatch<SetStateAction<CreateFactionDto>>;
 }> = ({ formData, setFormData }) => {
   return (
-    <Grid container spacing={2} sx={{ ml: 5 }}>
+    <Grid container spacing={1}>
       <Grid size={12}>
-        <Typography component="h6" color="primary">
-          {t('options')}
-        </Typography>
+        <TextField
+          label={t('faction-name')}
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          error={!formData.name}
+          fullWidth
+        />
       </Grid>
-      <Grid size={12}></Grid>
-      <Grid size={3}>
+      <Grid size={12}>
+        <TextField
+          label={t('description')}
+          name="description"
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          fullWidth
+          multiline
+          maxRows={12}
+        />
+      </Grid>
+      <Grid size={12}>
         <NumericInput
           label={t('available-gold')}
           name="availableGold"
@@ -26,8 +40,7 @@ const FactionCreateAttributes: FC<{
           maxFractionDigits={2}
         />
       </Grid>
-      <Grid size={12}></Grid>
-      <Grid size={3}>
+      <Grid size={12}>
         <NumericInput
           label={t('available-xp')}
           name="availableXP"

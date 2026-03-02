@@ -1,11 +1,11 @@
 import React, { FC, Dispatch, SetStateAction } from 'react';
 import { Box, Chip, Grid, Stack, TextField, Typography } from '@mui/material';
 import { t } from 'i18next';
-import { AddItemDto } from '../../api/character.dto';
-import { Item } from '../../api/items';
-import NumericCard from '../../shared/cards/NumericCard';
-import TextCard from '../../shared/cards/TextCard';
-import NumericInput from '../../shared/inputs/NumericInput';
+import { AddItemDto } from '../../../api/character.dto';
+import { Item } from '../../../api/items';
+import NumericCard from '../../../shared/cards/NumericCard';
+import TextCard from '../../../shared/cards/TextCard';
+import NumericInput from '../../../shared/inputs/NumericInput';
 
 const CharacterViewAddItemDialogForm: FC<{
   formData: AddItemDto;
@@ -74,17 +74,17 @@ const CharacterViewAddItemDialogForm: FC<{
             <TextCard
               value={`${item.info.cost.min || ''}g`}
               subtitle="Min cost"
-              image={`/static/images/items/gold-coin.png`}
+              image={`/static/images/generic/coins.png`}
             />
             <TextCard
               value={`${item.info.cost.average || ''}g`}
               subtitle="Average cost"
-              image={`/static/images/items/gold-coin.png`}
+              image={`/static/images/generic/coins.png`}
             />
             <TextCard
               value={`${item.info.cost.max || ''}g`}
               subtitle="Max cost"
-              image={`/static/images/items/gold-coin.png`}
+              image={`/static/images/generic/coins.png`}
             />
             {item.info && item.info.weight && (
               <NumericCard

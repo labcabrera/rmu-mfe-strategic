@@ -6,6 +6,8 @@ import { t } from 'i18next';
 import { Faction } from '../../api/faction.dto';
 import NumericCard from '../../shared/cards/NumericCard';
 
+const imageBaseUrl = process.env.RMU_MFE_ASSETS!;
+
 const FactionViewAttributes: FC<{
   faction: Faction;
 }> = ({ faction }) => {
@@ -19,13 +21,13 @@ const FactionViewAttributes: FC<{
           <NumericCard
             value={faction.management.availableGold}
             subtitle={t('available-gold')}
-            image={`/static/images/items/gold-coin.png`}
+            image={`${imageBaseUrl}images/generic/coins.png`}
             applyColor={false}
           />
           <NumericCard
             value={faction.management.availableXP}
             subtitle={t('available-xp')}
-            image={`/static/images/generic/experience.png`}
+            image={`${imageBaseUrl}images/generic/experience.png`}
             applyColor={false}
             applyFormat={true}
           />

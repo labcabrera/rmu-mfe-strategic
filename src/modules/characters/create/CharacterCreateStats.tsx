@@ -89,7 +89,7 @@ const CharacterCreateStats: FC<{
           <SyncIcon />
         </IconButton>
       </Typography>
-      <Table sx={{ minWidth: 650 }} aria-label="stats table">
+      <Table sx={{ minWidth: 650 }} aria-label="stats table" size="small">
         <TableHead>
           <TableRow>
             <TableCell align="left">Stat</TableCell>

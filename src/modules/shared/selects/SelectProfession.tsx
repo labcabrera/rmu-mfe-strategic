@@ -12,6 +12,8 @@ const SelectProfession: React.FC<{
 }> = ({ value, onChange, required = true }) => {
   const { showError } = useError();
   const [professions, setProfessions] = useState<Profession[]>([]);
+  const isValueEmpty = value === undefined || value === null || value === '';
+  const error = required && isValueEmpty;
 
   const handleProfessionChange = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedValue = event.target.value;
@@ -25,9 +27,6 @@ const SelectProfession: React.FC<{
       .catch((err) => showError(err));
   }, [showError]);
 
-  const isValueEmpty = value === undefined || value === null || value === '';
-  const hasError = required && isValueEmpty;
-
   return (
     <TextField
       select
@@ -36,7 +35,8 @@ const SelectProfession: React.FC<{
       variant="standard"
       onChange={handleProfessionChange}
       fullWidth
-      error={hasError}
+      error={error}
+      helperText={error && t('Profession is required')}
     >
       {professions.map((option) => (
         <MenuItem key={option.id} value={option.id}>

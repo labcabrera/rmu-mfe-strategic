@@ -1,3 +1,4 @@
+import { getAuthHeaders } from '../services/auth-token-service';
 import { buildErrorFromResponse } from './api-errors';
 
 export interface Item {
@@ -39,7 +40,7 @@ export interface ItemInfo {
 
 export async function fetchItems(rsql: string, page: number, size: number): Promise<Item[]> {
   const url = `${process.env.RMU_API_ITEMS_URL}/items?q=${rsql}&page=${page}&size=${size}`;
-  const response = await fetch(url, { method: 'GET' });
+  const response = await fetch(url, { method: 'GET', headers: getAuthHeaders() });
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }

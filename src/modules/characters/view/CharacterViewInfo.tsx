@@ -5,13 +5,15 @@ import { Character, STATS } from '../../api/character.dto';
 import NumericCard from '../../shared/cards/NumericCard';
 import TextCard from '../../shared/cards/TextCard';
 
+const imageBaseUrl = process.env.RMU_MFE_ASSETS!;
+
 const CharacterViewInfo: FC<{
   character: Character;
 }> = ({ character }) => {
   const getArmorType = () => {
     const armor = character.defense.armor;
     if (!armor) return null;
-    if (armor.at) return t(armor.at);
+    if (armor.at) return t(`${armor.at}`);
     return `${armor.headAt} / ${armor.bodyAt} / ${armor.armsAt} / ${armor.legsAt}`;
   };
 
@@ -20,9 +22,9 @@ const CharacterViewInfo: FC<{
       case 'disease':
       case 'poison':
       case 'fear':
-        return `/static/images/generic/${resistance}.png`;
+        return `${imageBaseUrl}images/generic/${resistance}.png`;
       default:
-        return `/static/images/generic/trait.png`;
+        return `${imageBaseUrl}images/generic/trait.png`;
     }
   };
 
@@ -39,28 +41,28 @@ const CharacterViewInfo: FC<{
             <TextCard
               value={t(character.info.realmType)}
               subtitle={t('realm')}
-              image={`/static/images/generic/realm.png`}
+              image={`${imageBaseUrl}images/generic/realm.png`}
             />
             <TextCard
               value={t(`size-${character.info.sizeId}`)}
               subtitle={t('size')}
-              image={`/static/images/generic/race-size.png`}
+              image={`${imageBaseUrl}images/generic/race-size.png`}
             />
             <TextCard
               value={`${character.info.height}'`}
               subtitle={t('height')}
-              image={`/static/images/generic/character-height.png`}
+              image={`${imageBaseUrl}images/generic/character-height.png`}
             />
             <TextCard
               value={`${character.info.weight} lbs`}
               subtitle={t('weight')}
-              image={`/static/images/generic/character-weight.png`}
+              image={`${imageBaseUrl}images/generic/character-weight.png`}
             />
             <Badge color="error" badgeContent={character.hp.max} invisible={character.hp.max > 0}>
               <TextCard
                 value={`${character.hp.current} / ${character.hp.max}`}
                 subtitle={t('hit-points')}
-                image={`/static/images/generic/hp.png`}
+                image={`${imageBaseUrl}images/generic/hp.png`}
               />
             </Badge>
           </Box>
@@ -78,14 +80,14 @@ const CharacterViewInfo: FC<{
               <NumericCard
                 value={character.experience.level}
                 subtitle={t('current-level')}
-                image={`/static/images/generic/experience.png`}
+                image={`${imageBaseUrl}images/generic/experience.png`}
                 applyColor={false}
               />
             </Badge>
             <NumericCard
               value={character.experience.xp}
               subtitle={t('xp')}
-              image={`/static/images/generic/experience.png`}
+              image={`${imageBaseUrl}images/generic/experience.png`}
               applyColor={false}
               applyFormat={true}
             />
@@ -97,7 +99,7 @@ const CharacterViewInfo: FC<{
               <TextCard
                 value={`${character.experience.availableDevelopmentPoints} / ${character.experience.developmentPoints}`}
                 subtitle={t('development-points')}
-                image={`/static/images/generic/trait-combat.png`}
+                image={`${imageBaseUrl}images/generic/trait-combat.png`}
               />
             </Badge>
           </Box>
@@ -112,7 +114,7 @@ const CharacterViewInfo: FC<{
                 key={stat}
                 value={character.statistics[stat].totalBonus}
                 subtitle={t(stat)}
-                image={`/static/images/generic/stat-${stat}.png`}
+                image={`${imageBaseUrl}images/generic/stat-${stat}.png`}
               />
             ))}
           </Box>
@@ -125,9 +127,13 @@ const CharacterViewInfo: FC<{
             <NumericCard
               value={character.defense.defensiveBonus}
               subtitle={t('defensive-bonus')}
-              image={`/static/images/generic/defensive-bonus.png`}
+              image={`${imageBaseUrl}images/generic/defensive-bonus.png`}
             />
-            <TextCard value={getArmorType()} subtitle={t('armor-type')} image={`/static/images/generic/armor.png`} />
+            <TextCard
+              value={getArmorType()}
+              subtitle={t('armor-type')}
+              image={`${imageBaseUrl}images/generic/armor.png`}
+            />
           </Box>
         </Grid>
         <Grid size={12}>
@@ -138,18 +144,18 @@ const CharacterViewInfo: FC<{
             <TextCard
               value={`${character.movement.baseMovementRate}' /rnd`}
               subtitle={t('base-movement-rate')}
-              image={`/static/images/generic/stride-bonus.png`}
+              image={`${imageBaseUrl}images/generic/stride-bonus.png`}
             />
             <NumericCard
               value={character.movement.strideRacialBonus}
               subtitle={t('stride-racial-bonus')}
-              image={`/static/images/generic/stride-bonus.png`}
+              image={`${imageBaseUrl}images/generic/stride-bonus.png`}
               applyColor={false}
             />
             <NumericCard
               value={character.movement.strideQuBonus}
               subtitle={t('stride-stat-bonus')}
-              image={`/static/images/generic/stride-bonus.png`}
+              image={`${imageBaseUrl}images/generic/stride-bonus.png`}
               applyColor={false}
             />
           </Box>
@@ -162,13 +168,13 @@ const CharacterViewInfo: FC<{
             <NumericCard
               value={character.initiative.totalBonus}
               subtitle={t('initiative-total-bonus')}
-              image={`/static/images/generic/initiative.png`}
+              image={`${imageBaseUrl}images/generic/initiative.png`}
               applyColor={false}
             />
             <NumericCard
               value={character.initiative.baseBonus}
               subtitle={t('initiative-base-bonus')}
-              image={`/static/images/generic/initiative.png`}
+              image={`${imageBaseUrl}images/generic/initiative.png`}
               applyColor={false}
             />
           </Box>

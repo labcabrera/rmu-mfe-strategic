@@ -1,3 +1,4 @@
+import { getAuthHeaders } from '../services/auth-token-service';
 import { buildErrorFromResponse } from './api-errors';
 
 export interface TacticalGame {
@@ -8,7 +9,7 @@ export interface TacticalGame {
 
 export async function fetchTacticalGames(rsql: string, page: number, size: number): Promise<TacticalGame[]> {
   const url = `${process.env.RMU_API_TACTICAL_URL}/tactical-games?q=${rsql}&page=${page}&size=${size}`;
-  const response = await fetch(url, { method: 'GET' });
+  const response = await fetch(url, { method: 'GET', headers: getAuthHeaders() });
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
   }
