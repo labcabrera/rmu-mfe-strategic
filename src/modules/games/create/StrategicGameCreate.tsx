@@ -8,7 +8,6 @@ import { defaultStrategicGameImage } from '../../services/image-service';
 import GenericAvatar from '../../shared/avatars/GenericAvatar';
 import StrategicGameCreateActions from './StrategicGameCreateActions';
 import StrategicGameCreateAttributes from './StrategicGameCreateAttributes';
-import StrategicGameCreateResume from './StrategicGameCreateResume';
 
 const StrategicGameCreate: FC = () => {
   const { showError } = useError();
@@ -36,15 +35,13 @@ const StrategicGameCreate: FC = () => {
     <>
       <StrategicGameCreateActions formData={formData} isValid={isValid} />
       <Grid container spacing={5}>
-        <Grid size={2}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <GenericAvatar imageUrl={defaultStrategicGameImage} size={300} />
-          <StrategicGameCreateResume formData={formData} setFormData={setFormData} realms={realms} />
         </Grid>
-        <Grid size={10}>
-          <StrategicGameCreateAttributes formData={formData} setFormData={setFormData} />
+        <Grid size={{ xs: 12, md: 9 }}>
+          <StrategicGameCreateAttributes formData={formData} setFormData={setFormData} realms={realms} />
         </Grid>
       </Grid>
-      {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
     </>
   );
 };

@@ -15,16 +15,9 @@ const FactionUpdateResume: React.FC<{
   };
 
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={1}>
       <Grid size={12}>
-        <TextField
-          label={t('name')}
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          variant="standard"
-          fullWidth
-        />
+        <TextField label={t('name')} name="name" value={formData.name} onChange={handleChange} fullWidth />
       </Grid>
       <Grid size={12}>
         <TextField
@@ -32,7 +25,6 @@ const FactionUpdateResume: React.FC<{
           name="shortDescription"
           value={formData.shortDescription}
           onChange={handleChange}
-          variant="standard"
           fullWidth
         />
       </Grid>
@@ -42,7 +34,6 @@ const FactionUpdateResume: React.FC<{
           name="description"
           value={formData.description}
           onChange={handleChange}
-          variant="standard"
           fullWidth
           multiline
           rows={12}

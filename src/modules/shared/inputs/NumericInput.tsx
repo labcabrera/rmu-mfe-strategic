@@ -145,7 +145,7 @@ export function NumericInput({
       autoFocus={autoFocus}
       className={className}
       fullWidth
-      variant="standard"
+      size="small"
       error={error}
       sx={{
         '& input': {

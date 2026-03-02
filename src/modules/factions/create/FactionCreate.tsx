@@ -6,6 +6,7 @@ import { useError } from '../../../ErrorContext';
 import { CreateFactionDto, EMPTY_FACTION } from '../../api/faction.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
+import { imageBaseUrl } from '../../services/config';
 import GenericAvatar from '../../shared/avatars/GenericAvatar';
 import FactionCreateActions from './FactionCreateActions';
 import FactionCreateAttributes from './FactionCreateAttributes';
@@ -44,33 +45,14 @@ const FactionCreate: FC = () => {
   return (
     <>
       <FactionCreateActions formData={formData} strategicGame={strategicGame} isValid={isValid} />
-      <Grid container spacing={5} sx={{ mb: 5 }}>
-        <Grid size={2}>
-          <GenericAvatar imageUrl="/static/images/avatars/avatar-001.png" size={300} />
-          <TextField
-            label={t('faction-name')}
-            variant="standard"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            error={!formData.name}
-            fullWidth
-          />
-          <TextField
-            label={t('description')}
-            variant="standard"
-            name="description"
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            fullWidth
-            multiline
-            maxRows={12}
-          />
+      <Grid container spacing={1}>
+        <Grid size={{ xs: 12, md: 3 }}>
+          <GenericAvatar imageUrl={`${imageBaseUrl}images/avatars/avatar-001.png`} size={300} />
         </Grid>
-        <Grid size={7}>
+        <Grid size={{ xs: 12, md: 7 }}>
           <FactionCreateAttributes formData={formData} setFormData={setFormData} />
         </Grid>
       </Grid>
-      {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
     </>
   );
 };

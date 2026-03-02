@@ -19,7 +19,7 @@ const StrategicGameView: React.FC = () => {
   const location = useLocation();
   const { showError } = useError();
   const { gameId } = useParams<{ gameId?: string }>();
-  const [strategicGame, setStrategicGame] = useState<StrategicGame | null>(location.state?.strategicGame || null);
+  const [strategicGame, setStrategicGame] = useState<StrategicGame>(location.state?.strategicGame || null);
   const [factions, setFactions] = useState<Faction[]>([]);
   const [tacticalGames, setTacticalGames] = useState<TacticalGame[]>([]);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
@@ -51,10 +51,10 @@ const StrategicGameView: React.FC = () => {
     <>
       <StrategicGameViewActions strategicGame={strategicGame} setStrategicGame={setStrategicGame} />
       <Grid container spacing={5}>
-        <Grid size={2}>
-          <StrategicGameViewResume strategicGame={strategicGame} setGame={setStrategicGame} />
+        <Grid size={{ xs: 12, md: 3 }}>
+          <StrategicGameViewResume strategicGame={strategicGame} setStrategicGame={setStrategicGame} />
         </Grid>
-        <Grid size={9}>
+        <Grid size={{ xs: 12, md: 9 }}>
           <StrategicGameViewAttributes strategicGame={strategicGame} />
           <StrategicGameViewFactions strategicGame={strategicGame} factions={factions} />
           <StrategicGameViewTacticalGames strategicGame={strategicGame} tacticalGames={tacticalGames} />

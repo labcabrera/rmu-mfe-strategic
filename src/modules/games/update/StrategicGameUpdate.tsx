@@ -7,7 +7,6 @@ import { StrategicGame, UpdateStrategicGameDto } from '../../api/strategic-game.
 import StrategicGameAvatar from '../../shared/avatars/StrategicGameAvatar';
 import StrategicGameUpdateActions from './StrategicGameUpdateActions';
 import StrategicGameUpdateAttributes from './StrategicGameUpdateAttributes';
-import StrategicGameUpdateResume from './StrategicGameUpdateResume';
 
 const StrategicGameUpdate: FC = () => {
   const location = useLocation();
@@ -55,15 +54,13 @@ const StrategicGameUpdate: FC = () => {
     <>
       <StrategicGameUpdateActions strategicGame={strategicGame} formData={formData} isValid={isValid} />
       <Grid container spacing={5}>
-        <Grid size={2}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <StrategicGameAvatar strategicGame={strategicGame} size={300} />
-          <StrategicGameUpdateResume formData={formData} setFormData={setFormData} />
         </Grid>
-        <Grid size={7}>
+        <Grid size={{ xs: 12, md: 9 }}>
           <StrategicGameUpdateAttributes formData={formData} setFormData={setFormData} />
         </Grid>
       </Grid>
-      {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
     </>
   );
 };

@@ -42,10 +42,10 @@ const CharacterView: FC = () => {
     <>
       <CharacterViewActions character={character} setCharacter={setCharacter} game={strategicGame} />
       <Grid container spacing={5}>
-        <Grid size={2}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <CharacterViewResume character={character} setCharacter={setCharacter} strategicGame={strategicGame} />
         </Grid>
-        <Grid size={10}>
+        <Grid size={{ xs: 12, md: 9 }}>
           <CharacterViewTabs
             character={character}
             setCharacter={setCharacter}

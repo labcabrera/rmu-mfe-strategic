@@ -7,7 +7,7 @@ import StrategicGameCard from '../../shared/cards/StrategicGameCard';
 import StrategicGameListActions from './StrategicGameListActions';
 import StrategicGameListResume from './StrategicGameListResume';
 
-const pageSize = 12;
+const pageSize = 24;
 
 const StrategicGameList: FC = () => {
   const { showError } = useError();
@@ -38,11 +38,8 @@ const StrategicGameList: FC = () => {
   return (
     <>
       <StrategicGameListActions />
-      <Grid container spacing={2} mb={2} alignItems="flex-start">
-        <Grid size={2}>
-          <StrategicGameListResume />
-        </Grid>
-        <Grid size={10}>
+      <Grid container spacing={1} mb={1} alignItems="flex-start">
+        <Grid size={12}>
           <>
             <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
               {strategicGames.map((game) => (
@@ -58,6 +55,9 @@ const StrategicGameList: FC = () => {
               <Pagination count={totalPages} page={page + 1} onChange={onPageChange} color="primary" />
             </Box>
           </>
+        </Grid>
+        <Grid size={12}>
+          <StrategicGameListResume />
         </Grid>
       </Grid>
     </>

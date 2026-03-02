@@ -1,24 +1,13 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import UploadIcon from '@mui/icons-material/Upload';
-import {
-  Box,
-  Button,
-  Stack,
-  Link,
-  Breadcrumbs,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Chip,
-} from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacter, deleteCharacter, levelUpCharacter } from '../../api/character';
 import { Character } from '../../api/character.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
+import RmuBreadcrumbs from '../../shared/breadcrumbs/RmuBreadcrumbs';
 import DeleteButton from '../../shared/buttons/DeleteButton';
 import EditButton from '../../shared/buttons/EditButton';
 import RefreshButton from '../../shared/buttons/RefreshButton';
@@ -34,6 +23,12 @@ const CharacterViewActions: FC<{
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
   const levelUpAvailable = character.experience.level < character.experience.availableLevel;
+  const breadcrumbs = [
+    { name: t('strategic'), link: '/strategic' },
+    { name: t('games'), link: '/strategic/games' },
+    { name: game.name, link: `/strategic/games/view/${game.id}` },
+    { name: character.faction.name, link: `/strategic/factions/view/${character.faction.id}` },
+  ];
 
   const onRefresh = () => {
     fetchCharacter(character.id)
@@ -73,43 +68,16 @@ const CharacterViewActions: FC<{
 
   return (
     <>
-      <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center" sx={{ minHeight: 80 }}>
-        <Box>
-          <Breadcrumbs aria-label="breadcrumb">
-            <Link underline="hover" color="primary" href="/">
-              {t('home')}
-            </Link>
-            <Link underline="hover" component={RouterLink} color="primary" to="/strategic/games">
-              {t('strategic')}
-            </Link>
-            <Link underline="hover" component={RouterLink} color="primary" to="/strategic/games">
-              {t('games')}
-            </Link>
-            <Link underline="hover" component={RouterLink} color="primary" to={`/strategic/games/view/${game.id}`}>
-              {game.name}
-            </Link>
-            <Link
-              underline="hover"
-              component={RouterLink}
-              color="primary"
-              to={`/strategic/factions/view/${character.faction.id}`}
-            >
-              {character.faction.name}
-            </Link>
-            <span>{character.name}</span>
-          </Breadcrumbs>
-        </Box>
-        <Stack direction="row" spacing={2} alignItems={'center'}>
-          {levelUpAvailable && (
-            <Button onClick={() => onLevelUp(false)} startIcon={<UploadIcon />} variant="outlined" color="primary">
-              {t('level-up')}
-            </Button>
-          )}
-          <RefreshButton onClick={onRefresh} />
-          <EditButton onClick={onEdit} />
-          <DeleteButton onClick={() => setDeleteDialogOpen(true)} />
-        </Stack>
-      </Stack>
+      <RmuBreadcrumbs items={breadcrumbs}>
+        {levelUpAvailable && (
+          <Button onClick={() => onLevelUp(false)} startIcon={<UploadIcon />} variant="outlined" color="primary">
+            {t('level-up')}
+          </Button>
+        )}
+        <RefreshButton onClick={onRefresh} />
+        <EditButton onClick={onEdit} />
+        <DeleteButton onClick={() => setDeleteDialogOpen(true)} />
+      </RmuBreadcrumbs>
       <DeleteDialog
         message={`Are you sure you want to delete ${character.name} character? This action cannot be undone.`}
         onDelete={handleDialogDelete}

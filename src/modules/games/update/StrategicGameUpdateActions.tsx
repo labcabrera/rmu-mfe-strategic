@@ -1,13 +1,10 @@
 import React, { FC } from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import Box from '@mui/material/Box';
-import Breadcrumbs from '@mui/material/Breadcrumbs';
-import Link from '@mui/material/Link';
-import Stack from '@mui/material/Stack';
+import { useNavigate } from 'react-router-dom';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { updateStrategicGame } from '../../api/strategic-game';
 import { StrategicGame, UpdateStrategicGameDto } from '../../api/strategic-game.dto';
+import RmuBreadcrumbs from '../../shared/breadcrumbs/RmuBreadcrumbs';
 import CancelButton from '../../shared/buttons/CancelButton';
 import SaveButton from '../../shared/buttons/SaveButton';
 
@@ -18,6 +15,12 @@ const StrategicGameUpdateActions: FC<{
 }> = ({ strategicGame, formData, isValid }) => {
   const navigate = useNavigate();
   const { showError } = useError();
+  const breadcrumbs = [
+    { name: t('strategic'), link: '/strategic' },
+    { name: t('games'), link: '/strategic/games' },
+    { name: strategicGame.name, link: `/strategic/games/view/${strategicGame.id}` },
+    { name: t('edit') },
+  ];
 
   const onUpdateGame = async () => {
     updateStrategicGame(strategicGame.id, formData)
@@ -30,35 +33,10 @@ const StrategicGameUpdateActions: FC<{
   };
 
   return (
-    <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center" sx={{ minHeight: 80 }}>
-      <Box>
-        <Breadcrumbs aria-label="breadcrumb">
-          <Link color="primary" underline="hover" href="/">
-            {t('home')}
-          </Link>
-          <Link component={RouterLink} color="primary" underline="hover" to="/strategic/games">
-            {t('strategic')}
-          </Link>
-          <Link component={RouterLink} color="primary" underline="hover" to="/strategic/games">
-            {t('games')}
-          </Link>
-          <Link
-            component={RouterLink}
-            color="primary"
-            underline="hover"
-            to={`/strategic/games/view/${strategicGame.id}`}
-            state={{ strategicGame }}
-          >
-            {strategicGame.name}
-          </Link>
-          <span>{t('edit')}</span>
-        </Breadcrumbs>
-      </Box>
-      <Stack spacing={2} direction="row">
-        <CancelButton onClick={onCancel} />
-        <SaveButton onClick={onUpdateGame} />
-      </Stack>
-    </Stack>
+    <RmuBreadcrumbs items={breadcrumbs}>
+      <CancelButton onClick={onCancel} />
+      <SaveButton onClick={onUpdateGame} />
+    </RmuBreadcrumbs>
   );
 };
 

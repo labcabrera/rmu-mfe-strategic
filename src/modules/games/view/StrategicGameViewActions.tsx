@@ -1,13 +1,10 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import Box from '@mui/material/Box';
-import Breadcrumbs from '@mui/material/Breadcrumbs';
-import Link from '@mui/material/Link';
-import Stack from '@mui/material/Stack';
+import { useNavigate } from 'react-router-dom';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchStrategicGame, deleteStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
+import RmuBreadcrumbs from '../../shared/breadcrumbs/RmuBreadcrumbs';
 import DeleteButton from '../../shared/buttons/DeleteButton';
 import EditButton from '../../shared/buttons/EditButton';
 import RefreshButton from '../../shared/buttons/RefreshButton';
@@ -15,18 +12,22 @@ import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 
 const StrategicGameViewActions: FC<{
   strategicGame: StrategicGame;
-  setStrategicGame?: Dispatch<SetStateAction<StrategicGame | null>>;
+  setStrategicGame: Dispatch<SetStateAction<StrategicGame>>;
 }> = ({ strategicGame, setStrategicGame }) => {
   const navigate = useNavigate();
   const { showError } = useError();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const breadcrumbs = [
+    { name: t('strategic'), link: '/strategic' },
+    { name: t('games'), link: '/strategic/games' },
+  ];
 
   if (!strategicGame) return <p>Loading...</p>;
 
   const onRefresh = () => {
     fetchStrategicGame(strategicGame.id)
       .then((data) => setStrategicGame(data))
-      .catch((err) => showError(err.message));
+      .catch((err: Error) => showError(err.message));
   };
 
   const onEdit = () => {
@@ -36,33 +37,17 @@ const StrategicGameViewActions: FC<{
   const onDelete = () => {
     deleteStrategicGame(strategicGame.id)
       .then(() => navigate('/strategic/games'))
-      .catch((err) => showError(err.message));
+      .catch((err: Error) => showError(err.message));
     setDeleteDialogOpen(false);
   };
 
   return (
     <>
-      <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center" sx={{ minHeight: 80 }}>
-        <Box>
-          <Breadcrumbs aria-label="breadcrumb">
-            <Link underline="hover" color="primary" href="/">
-              {t('home')}
-            </Link>
-            <Link component={RouterLink} underline="hover" color="primary" to="/strategic/games">
-              {t('strategic')}
-            </Link>
-            <Link component={RouterLink} underline="hover" color="primary" to="/strategic/games">
-              {t('games')}
-            </Link>
-            <span>{strategicGame.name}</span>
-          </Breadcrumbs>
-        </Box>
-        <Stack direction="row" spacing={2}>
-          <RefreshButton onClick={onRefresh} />
-          <EditButton onClick={onEdit} />
-          <DeleteButton onClick={() => setDeleteDialogOpen(true)} />
-        </Stack>
-      </Stack>
+      <RmuBreadcrumbs items={breadcrumbs}>
+        <RefreshButton onClick={onRefresh} />
+        <EditButton onClick={onEdit} />
+        <DeleteButton onClick={() => setDeleteDialogOpen(true)} />
+      </RmuBreadcrumbs>
       <DeleteDialog
         message={`Are you sure you want to delete ${strategicGame.name} game? All factions and characters will be eliminated. This action cannot be undone.`}
         onDelete={onDelete}
