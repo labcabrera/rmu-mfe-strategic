@@ -26,13 +26,7 @@ interface Configuration extends WebpackConfiguration {
 export default (_env: unknown, argv: { mode?: string }): Configuration => {
   const mode = argv.mode || 'development';
   dotenv.config({ path: path.resolve(__dirname, `.env.${mode}`) });
-
-  // const publicPath = 'http://localhost:8082/';
-  // Use environment variable when provided, otherwise let webpack determine
-  // chunk loading base automatically so chunks are requested relative to
-  // the loaded remote entry (prevents hard-coded localhost URLs in prod).
   const publicPath = process.env.RMU_MFE_STRATEGIC_PUBLIC_PATH || 'auto';
-  const mfeShellRemote = 'shell@https://labcabrera.com/main.js';
 
   return {
     output: {
@@ -122,9 +116,6 @@ export default (_env: unknown, argv: { mode?: string }): Configuration => {
       new (webpack as any).container.ModuleFederationPlugin({
         name: 'strategic',
         filename: 'strategic-app.js',
-        remotes: {
-          host: mfeShellRemote,
-        },
         exposes: {
           './StrategicApp': './src/App.tsx',
         },
