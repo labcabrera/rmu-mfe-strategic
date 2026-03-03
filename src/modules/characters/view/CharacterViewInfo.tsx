@@ -71,7 +71,12 @@ const CharacterViewInfo: FC<{
           />
         </Grid>
         <Grid size={{ xs: 12, md: 2 }}>
-          <Badge color="error" badgeContent={character.hp.max} invisible={character.hp.max > 0}>
+          <Badge
+            color="error"
+            badgeContent={character.hp.max}
+            invisible={character.hp.max > 0}
+            sx={{ display: 'block' }}
+          >
             <RmuTextCard
               value={`${character.hp.current} / ${character.hp.max}`}
               subtitle={t('hit-points')}
@@ -90,6 +95,7 @@ const CharacterViewInfo: FC<{
             color="success"
             badgeContent={`+${character.experience.availableLevel - character.experience.level}`}
             invisible={character.experience.availableLevel <= character.experience.level}
+            sx={{ display: 'block' }}
           >
             <RmuTextCard
               value={character.experience.level}
@@ -113,6 +119,7 @@ const CharacterViewInfo: FC<{
             color="success"
             badgeContent={`+${character.experience.availableDevelopmentPoints}`}
             invisible={character.experience.availableDevelopmentPoints < 1}
+            sx={{ display: 'block' }}
           >
             <RmuTextCard
               value={`${character.experience.availableDevelopmentPoints} / ${character.experience.developmentPoints}`}
