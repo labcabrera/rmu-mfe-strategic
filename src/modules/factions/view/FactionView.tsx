@@ -13,6 +13,7 @@ import AddButton from '../../shared/buttons/AddButton';
 import CategorySeparator from '../../shared/display/CategorySeparator';
 import FactionViewActions from './FactionViewActions';
 import FactionViewAttributes from './FactionViewAttributes';
+import FactionViewCharactersTable from './FactionViewCharacterTable';
 import FactionViewCharacters from './FactionViewCharacters';
 import FactionViewResume from './FactionViewResume';
 
@@ -66,6 +67,7 @@ const FactionView: FC = () => {
             <AddButton onClick={onCharacterCreate} />
           </CategorySeparator>
           <FactionViewCharacters faction={faction} characters={characters} />
+          <FactionViewCharactersTable characters={characters} />
         </Grid>
       </Grid>
     </>
