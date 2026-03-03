@@ -28,7 +28,7 @@ const NotFound: FC = () => (
 const App: FC = () => {
   return (
     <ErrorProvider>
-      <Box sx={{ p: 5 }}>
+      <Box sx={{ p: 1 }}>
         <Routes>
           <Route path="/" element={<StrategicGameList />} />
           <Route path="/games" element={<StrategicGameList />} />
