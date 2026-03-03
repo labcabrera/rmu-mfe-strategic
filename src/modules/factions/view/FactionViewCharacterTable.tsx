@@ -45,10 +45,11 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
           <TableRow>
             <TableCell>{t('name')}</TableCell>
             <TableCell>{t('race')}</TableCell>
+            <TableCell>{t('level')}</TableCell>
             <TableCell>{t('profession')}</TableCell>
             <TableCell>{t('attacks')}</TableCell>
+            <TableCell>{t('DB')}</TableCell>
             <TableCell>{t('armor')}</TableCell>
-            <TableCell align="right">{t('level')}</TableCell>
             <TableCell align="right">HP</TableCell>
           </TableRow>
         </TableHead>
@@ -63,16 +64,17 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
               <TableCell>
                 <Tooltip title={c.description || ''}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Avatar src={c.imageUrl} alt={c.name} sx={{ width: 32, height: 32 }} />
+                    <Avatar src={c.imageUrl} alt={c.name} sx={{ width: 32, height: 32 }} variant="square" />
                     <Typography variant="body2">{c.name}</Typography>
                   </div>
                 </Tooltip>
               </TableCell>
               <TableCell>{c.info?.race?.name}</TableCell>
+              <TableCell align="right">{c.experience?.level ?? '-'}</TableCell>
               <TableCell>{t(c.info?.professionId || '')}</TableCell>
               <TableCell>{getAttackDescription(c)}</TableCell>
+              <TableCell>{c.defense.defensiveBonus}</TableCell>
               <TableCell>{getArmorDescription(c)}</TableCell>
-              <TableCell align="right">{c.experience?.level ?? '-'}</TableCell>
               <TableCell align="right">{c.hp ? `${c.hp.current}/${c.hp.max}` : '-'}</TableCell>
             </TableRow>
           ))}
