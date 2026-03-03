@@ -64,7 +64,7 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
               <TableCell>
                 <Tooltip title={c.description || ''}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Avatar src={c.imageUrl} alt={c.name} sx={{ width: 32, height: 32 }} variant="square" />
+                    <Avatar src={c.imageUrl} alt={c.name} sx={{ width: 45, height: 45 }} variant="square" />
                     <Typography variant="body2">{c.name}</Typography>
                   </div>
                 </Tooltip>

@@ -19,6 +19,7 @@ export interface Character {
   skills: CharacterSkill[];
   items: CharacterItem[];
   equipment: CharacterEquipment;
+  attacks: CharacterAttack[];
   traits: CharacterTrait[];
   description: string | undefined;
   imageUrl: string | undefined;
@@ -213,4 +214,16 @@ export interface AddItemDto {
   weightPercent?: number;
   strength?: number;
   cost?: number;
+}
+
+export interface CharacterAttack {
+  attackName: string;
+  attackTable: string;
+  sizeAdjustment: number;
+  fumbleTable: string;
+  fumble: number;
+  weaponFumble: number;
+  bo: number;
+  type: string;
+  defaultAttack: boolean;
 }

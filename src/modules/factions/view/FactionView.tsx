@@ -1,6 +1,9 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import TableRowsIcon from '@mui/icons-material/TableRows';
+import ViewListIcon from '@mui/icons-material/ViewList';
 import { Grid } from '@mui/material';
+import { Box, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacters } from '../../api/character';
@@ -17,6 +20,8 @@ import FactionViewCharactersTable from './FactionViewCharacterTable';
 import FactionViewCharacters from './FactionViewCharacters';
 import FactionViewResume from './FactionViewResume';
 
+const STORAGE_KEY = 'faction-display-character-table';
+
 const FactionView: FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,6 +30,22 @@ const FactionView: FC = () => {
   const [faction, setFaction] = useState<Faction | null>(null);
   const [game, setGame] = useState<StrategicGame | null>(null);
   const [characters, setCharacters] = useState<Character[]>([]);
+  const [displayCharacterTable, setDisplayCharacterTable] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(STORAGE_KEY) === 'true';
+    } catch (e) {
+      return false;
+    }
+  });
+
+  const handleViewModeChange = (_e: any, val: string | null) => {
+    if (val === null) return;
+    const table = val === 'table';
+    setDisplayCharacterTable(table);
+    try {
+      localStorage.setItem(STORAGE_KEY, table ? 'true' : 'false');
+    } catch (err) {}
+  };
 
   const onCharacterCreate = () => {
     navigate(`/strategic/characters/create?gameId=${faction!.gameId}&factionId=${faction!.id}`, { state: { faction } });
@@ -57,17 +78,36 @@ const FactionView: FC = () => {
     <>
       <FactionViewActions faction={faction} setFaction={setFaction} strategicGame={game} />
       <Grid container spacing={1}>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={{ xs: 12, md: 12, sm: 12, lg: 2 }}>
           <FactionViewResume faction={faction} setFaction={setFaction} game={game} />
         </Grid>
-        <Grid size={{ xs: 12, md: 8 }}>
+        <Grid size={{ xs: 12, md: 12, sm: 12, lg: 8 }}>
           <CategorySeparator text={t('faction')} />
           <FactionViewAttributes faction={faction} />
           <CategorySeparator text={t('characters')}>
-            <AddButton onClick={onCharacterCreate} />
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+              <AddButton onClick={onCharacterCreate} />
+              <ToggleButtonGroup
+                value={displayCharacterTable ? 'table' : 'list'}
+                exclusive
+                size="small"
+                onChange={handleViewModeChange}
+                aria-label="view-mode"
+              >
+                <ToggleButton value="list" aria-label="list">
+                  <ViewListIcon fontSize="small" />
+                </ToggleButton>
+                <ToggleButton value="table" aria-label="table">
+                  <TableRowsIcon fontSize="small" />
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
           </CategorySeparator>
-          <FactionViewCharacters faction={faction} characters={characters} />
-          <FactionViewCharactersTable characters={characters} />
+          {displayCharacterTable ? (
+            <FactionViewCharactersTable characters={characters} />
+          ) : (
+            <FactionViewCharacters faction={faction} characters={characters} />
+          )}
         </Grid>
       </Grid>
     </>
