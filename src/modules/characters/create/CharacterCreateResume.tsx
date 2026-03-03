@@ -69,16 +69,8 @@ const CharacterCreateResume: FC<{
     }));
   };
 
-  const onFactionChange = (faction: string) => {
-    setFormData({ ...formData, factionId: faction });
-  };
-
   const onNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prevState) => ({ ...prevState, name: e.target.value }));
-  };
-
-  const onGameChange = (gameId: string, gameInfo: any) => {
-    setFormData((prevState) => ({ ...prevState, gameId: gameId }));
   };
 
   const updateField = (field: string, value: any) => {
@@ -91,7 +83,7 @@ const CharacterCreateResume: FC<{
   if (!races) return <p>Loading...</p>;
 
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={1} mt={5}>
       <Grid size={12}>
         <NameTextField
           label={t('name')}
@@ -99,12 +91,6 @@ const CharacterCreateResume: FC<{
           onChange={onNameChange}
           generateRandomRaceValue={formData.info.raceName}
         />
-      </Grid>
-      <Grid size={12}>
-        <SelectGame value={formData.gameId} onChange={onGameChange} />
-      </Grid>
-      <Grid size={12}>
-        <SelectFaction value={formData.factionId} onChange={onFactionChange} factions={factions} />
       </Grid>
       <Grid size={12}>
         <SelectRace label={t('race')} value={formData.info.raceId} onChange={onRaceChange} races={races} />

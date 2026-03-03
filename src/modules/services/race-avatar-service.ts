@@ -1,28 +1,30 @@
+import { imageBaseUrl } from './config';
+
 const raceImageMap: Record<string, string> = {
-  noldor: '/static/images/races/generic-high-elf-01.png',
-  sindar: '/static/images/races/generic-grey-elf-01.png',
-  silvan: '/static/images/races/generic-elf-03.png',
-  elf: '/static/images/races/generic-elf-01.png',
-  dúnedain: '/static/images/races/generic-high-human-01.png',
-  dunedain: '/static/images/races/generic-high-human-01.png',
-  numenorean: '/static/images/races/generic-dark-human-01.png',
-  uruk: '/static/images/races/generic-high-orc-01.png',
-  olog: '/static/images/races/generic-war-troll-01.png',
-  snaga: '/static/images/races/generic-lesser-orc-01.png',
-  orc: '/static/images/races/generic-orc-01.png',
-  gondor: '/static/images/races/generic-human-02.png',
-  rohirrim: '/static/images/races/generic-horse-human-01.png',
-  easterlings: '/static/images/races/generic-east-human-01.png',
-  haradrim: '/static/images/races/generic-desert-human-01.png',
-  druedain: '/static/images/races/generic-wood-human-01.png',
-  human: '/static/images/races/generic-human-01.png',
-  troll: '/static/images/races/generic-troll-01.png',
-  longbeard: '/static/images/races/generic-dwarf-01.png',
-  dwarf: '/static/images/races/generic-dwarf-01.png',
-  hobbit: '/static/images/races/generic-halfling-01.png',
+  noldor: `${imageBaseUrl}images/races/generic-high-elf-01.png`,
+  sindar: `${imageBaseUrl}images/races/generic-grey-elf-01.png`,
+  silvan: `${imageBaseUrl}images/races/generic-elf-03.png`,
+  elf: `${imageBaseUrl}images/races/generic-elf-01.png`,
+  dúnedain: `${imageBaseUrl}images/races/generic-high-human-01.png`,
+  dunedain: `${imageBaseUrl}images/races/generic-high-human-01.png`,
+  numenorean: `${imageBaseUrl}images/races/generic-dark-human-01.png`,
+  uruk: `${imageBaseUrl}images/races/generic-high-orc-01.png`,
+  olog: `${imageBaseUrl}images/races/generic-war-troll-01.png`,
+  snaga: `${imageBaseUrl}images/races/generic-lesser-orc-01.png`,
+  orc: `${imageBaseUrl}images/races/generic-orc-01.png`,
+  gondor: `${imageBaseUrl}images/races/generic-human-02.png`,
+  rohirrim: `${imageBaseUrl}images/races/generic-horse-human-01.png`,
+  easterlings: `${imageBaseUrl}images/races/generic-east-human-01.png`,
+  haradrim: `${imageBaseUrl}images/races/generic-desert-human-01.png`,
+  druedain: `${imageBaseUrl}images/races/generic-wood-human-01.png`,
+  human: `${imageBaseUrl}images/races/generic-human-01.png`,
+  troll: `${imageBaseUrl}images/races/generic-troll-01.png`,
+  longbeard: `${imageBaseUrl}images/races/generic-dwarf-01.png`,
+  dwarf: `${imageBaseUrl}images/races/generic-dwarf-01.png`,
+  hobbit: `${imageBaseUrl}images/races/generic-halfling-01.png`,
 };
 
-const defaultImage = '/static/images/races/unknown.png';
+const defaultImage = `${imageBaseUrl}images/races/unknown.png`;
 
 export const resolveRaceImage = (raceName: string): string => {
   if (!raceName) {

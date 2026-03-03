@@ -1,6 +1,8 @@
 import React, { useState, useEffect, FC } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Box, Grid, Paper } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Box, Grid, Paper, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { CreateCharacterDto } from '../../api/character.dto';
 import { fetchFactions } from '../../api/faction';
@@ -13,6 +15,8 @@ import { StrategicGame } from '../../api/strategic-game.dto';
 import { CHARACTER_CREATION_TEMPLATE } from '../../data/character-create';
 import { randomizeStats } from '../../services/randomize-stats';
 import RaceAvatar from '../../shared/avatars/RaceAvatar';
+import RefreshButton from '../../shared/buttons/RefreshButton';
+import CategorySeparator from '../../shared/display/CategorySeparator';
 import CharacterViewStatsChart from '../view/CharacterViewStatsChart';
 import CharacterCreateActions from './CharacterCreateActions';
 import CharacterCreateAttributes from './CharacterCreateAttributes';
@@ -128,14 +132,14 @@ const CharacterCreate: FC = () => {
     }
   }, [factionId]);
 
-  if (!game || !formData) return <div>Loading...</div>;
+  if (!game || !formData || !faction) return <div>Loading...</div>;
 
   return (
     <>
       <CharacterCreateActions formData={formData} game={game} faction={faction} isValid={isValid} />
 
       <Grid container spacing={1}>
-        <Grid size={2}>
+        <Grid size={{ xs: 12, md: 2 }}>
           <RaceAvatar raceName={formData.info.raceName} size={300} />
           <CharacterCreateResume
             formData={formData}
@@ -147,6 +151,10 @@ const CharacterCreate: FC = () => {
         </Grid>
 
         <Grid size={10}>
+          <CategorySeparator text={t('stats')}>
+            <RefreshButton onClick={onRandomStats} />
+          </CategorySeparator>
+
           <Grid container spacing={1}>
             <Grid size={6}>
               <CharacterCreateStats
@@ -188,9 +196,14 @@ const CharacterCreate: FC = () => {
               )}
             </Grid>
           </Grid>
+          <Accordion sx={{ mt: 5 }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>debug</AccordionSummary>
+            <AccordionDetails>
+              <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{JSON.stringify(formData, null, 2)}</pre>
+            </AccordionDetails>
+          </Accordion>
         </Grid>
       </Grid>
-      <pre>{JSON.stringify(formData, null, 2)}</pre>
     </>
   );
 };

@@ -19,11 +19,10 @@ const SelectRealmType: FC<{
       select
       label={t('realm-type')}
       value={value || ''}
-      variant="standard"
+      size="small"
       fullWidth
       onChange={onChange}
       error={error}
-      helperText={error && t('Realm type is required')}
     >
       {categories.map((c) => (
         <MenuItem key={c} value={c}>

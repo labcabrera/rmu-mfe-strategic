@@ -24,11 +24,10 @@ const SelectFaction: FC<{
       select
       label={label}
       value={value === undefined || value === null || races.length === 0 ? '' : value}
-      variant="standard"
       fullWidth
+      size="small"
       onChange={handleChange}
       error={error}
-      helperText={error && t('Race is required')}
     >
       {races.map((option) => (
         <MenuItem key={option.id} value={option.id}>
