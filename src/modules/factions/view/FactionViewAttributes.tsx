@@ -1,37 +1,30 @@
 import React, { FC } from 'react';
-import { Box } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
 import { t } from 'i18next';
 import { Faction } from '../../api/faction.dto';
-import NumericCard from '../../shared/cards/NumericCard';
-
-const imageBaseUrl = process.env.RMU_MFE_ASSETS!;
+import { imageBaseUrl } from '../../services/config';
+import RmuTextCard from '../../shared/cards/RmuTextCard';
 
 const FactionViewAttributes: FC<{
   faction: Faction;
 }> = ({ faction }) => {
   return (
-    <Grid container spacing={2}>
-      <Grid size={12}>
-        <Typography variant="h6" color="primary" sx={{ mb: 2 }}>
-          {t('strategic-game-options')}
-        </Typography>
-        <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
-          <NumericCard
-            value={faction.management.availableGold}
-            subtitle={t('available-gold')}
-            image={`${imageBaseUrl}images/generic/coins.png`}
-            applyColor={false}
-          />
-          <NumericCard
-            value={faction.management.availableXP}
-            subtitle={t('available-xp')}
-            image={`${imageBaseUrl}images/generic/experience.png`}
-            applyColor={false}
-            applyFormat={true}
-          />
-        </Box>
+    <Grid container spacing={1}>
+      <Grid size={{ xs: 12, md: 2 }}>
+        <RmuTextCard
+          value={new Intl.NumberFormat('en-EN').format(faction.management.availableGold)}
+          subtitle={t('available-gold')}
+          image={`${imageBaseUrl}images/generic/coins.png`}
+          grayscale={0.7}
+        />
+      </Grid>
+      <Grid size={{ xs: 12, md: 2 }}>
+        <RmuTextCard
+          value={new Intl.NumberFormat('en-EN').format(faction.management.availableXP)}
+          subtitle={t('available-xp')}
+          image={`${imageBaseUrl}images/generic/experience.png`}
+          grayscale={0.7}
+        />
       </Grid>
     </Grid>
   );

@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
+import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacters } from '../../api/character';
 import { Character } from '../../api/character.dto';
@@ -8,18 +9,25 @@ import { fetchFaction } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
+import AddButton from '../../shared/buttons/AddButton';
+import CategorySeparator from '../../shared/display/CategorySeparator';
 import FactionViewActions from './FactionViewActions';
 import FactionViewAttributes from './FactionViewAttributes';
 import FactionViewCharacters from './FactionViewCharacters';
 import FactionViewResume from './FactionViewResume';
 
 const FactionView: FC = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const { showError } = useError();
   const { factionId } = useParams<{ factionId: string }>();
   const [faction, setFaction] = useState<Faction | null>(null);
   const [game, setGame] = useState<StrategicGame | null>(null);
   const [characters, setCharacters] = useState<Character[]>([]);
+
+  const onCharacterCreate = () => {
+    navigate(`/strategic/characters/create?gameId=${faction!.gameId}&factionId=${faction!.id}`, { state: { faction } });
+  };
 
   useEffect(() => {
     if (faction) {
@@ -47,12 +55,16 @@ const FactionView: FC = () => {
   return (
     <>
       <FactionViewActions faction={faction} setFaction={setFaction} strategicGame={game} />
-      <Grid container spacing={12}>
-        <Grid size={{ xs: 12, md: 3 }}>
+      <Grid container spacing={1}>
+        <Grid size={{ xs: 12, md: 2 }}>
           <FactionViewResume faction={faction} setFaction={setFaction} game={game} />
         </Grid>
-        <Grid size={{ xs: 12, md: 9 }}>
+        <Grid size={{ xs: 12, md: 8 }}>
+          <CategorySeparator text={t('faction')} />
           <FactionViewAttributes faction={faction} />
+          <CategorySeparator text={t('characters')}>
+            <AddButton onClick={onCharacterCreate} />
+          </CategorySeparator>
           <FactionViewCharacters faction={faction} characters={characters} />
         </Grid>
       </Grid>
