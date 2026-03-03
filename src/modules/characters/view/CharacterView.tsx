@@ -14,7 +14,7 @@ import CharacterViewTabs from './CharacterViewTabs';
 const CharacterView: FC = () => {
   const location = useLocation();
   const { characterId } = useParams<{ characterId: string }>();
-  const [character, setCharacter] = useState<Character | null>(null);
+  const [character, setCharacter] = useState<Character>();
   const [strategicGame, setStrategicGame] = useState<StrategicGame | null>(null);
   const [profession, setProfession] = useState<Profession | null>(null);
   const { showError } = useError();
@@ -31,18 +31,20 @@ const CharacterView: FC = () => {
   }, [character, showError]);
 
   useEffect(() => {
-    fetchCharacter(characterId)
-      .then((data) => setCharacter(data))
-      .catch((err) => showError(err.message));
+    if (characterId) {
+      fetchCharacter(characterId)
+        .then((data) => setCharacter(data))
+        .catch((err) => showError(err.message));
+    }
   }, [location.state, characterId, showError]);
 
-  if (!character || !strategicGame) return <div>Loading...</div>;
+  if (!character || !setCharacter || !strategicGame) return <div>Loading...</div>;
 
   return (
     <>
       <CharacterViewActions character={character} setCharacter={setCharacter} game={strategicGame} />
       <Grid container spacing={5}>
-        <Grid size={{ xs: 12, md: 3 }}>
+        <Grid size={{ xs: 12, md: 2 }}>
           <CharacterViewResume character={character} setCharacter={setCharacter} strategicGame={strategicGame} />
         </Grid>
         <Grid size={{ xs: 12, md: 9 }}>
