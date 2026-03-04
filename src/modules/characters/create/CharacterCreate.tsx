@@ -1,7 +1,8 @@
 import React, { useState, useEffect, FC } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box, Grid, Paper, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import OutboundIcon from '@mui/icons-material/Outbound';
+import { Grid, Accordion, AccordionSummary, AccordionDetails, IconButton, Box, Button } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { CreateCharacterDto } from '../../api/character.dto';
@@ -20,6 +21,7 @@ import CategorySeparator from '../../shared/display/CategorySeparator';
 import CharacterViewStatsChart from '../view/CharacterViewStatsChart';
 import CharacterCreateActions from './CharacterCreateActions';
 import CharacterCreateAttributes from './CharacterCreateAttributes';
+import CharacterCreateBoostOptionsDialog from './CharacterCreateBoostOptionsDialog';
 import CharacterCreateProfessionalSkills from './CharacterCreateProfessionalSkills';
 import CharacterCreateResume from './CharacterCreateResume';
 import CharacterCreateSkillCosts from './CharacterCreateSkillCosts';
@@ -62,6 +64,7 @@ const CharacterCreate: FC = () => {
   const [boosts, setBoosts] = useState<number>(game?.powerLevel.statCreationBoost || 2);
   const [swaps, setSwaps] = useState<number>(game?.powerLevel.statCreationSwap || 2);
   const [isValid, setIsValid] = useState<boolean>(false);
+  const [boostDialogOpen, setBoostDialogOpen] = useState<boolean>(false);
 
   const onRandomStats = () => {
     randomizeStats(setFormData, setStatBonusFormData);
@@ -76,7 +79,6 @@ const CharacterCreate: FC = () => {
     if (!formData.info?.raceId) valid = false;
     if (!formData.info?.professionId) valid = false;
     if (!formData.info?.realmType) valid = false;
-    if (!formData.factionId) valid = false;
     if (!formData.info?.weight) valid = false;
     setIsValid(valid);
   };
@@ -152,7 +154,12 @@ const CharacterCreate: FC = () => {
 
         <Grid size={10}>
           <CategorySeparator text={t('stats')}>
-            <RefreshButton onClick={onRandomStats} />
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <RefreshButton onClick={onRandomStats} />
+              <IconButton onClick={() => setBoostDialogOpen(true)} color="primary">
+                <OutboundIcon />
+              </IconButton>
+            </Box>
           </CategorySeparator>
 
           <Grid container spacing={1}>
@@ -166,6 +173,7 @@ const CharacterCreate: FC = () => {
             <Grid size={3} sx={{ display: 'flex', alignItems: 'flex-start' }}>
               <CharacterViewStatsChart stats={formData.statistics} />
             </Grid>
+
             <Grid size={3}>
               <CharacterCreateSortCombat items={formData.weaponDevelopment || []} onChange={handleWeaponOrderChange} />
             </Grid>
@@ -196,12 +204,20 @@ const CharacterCreate: FC = () => {
               )}
             </Grid>
           </Grid>
+
           <Accordion sx={{ mt: 5 }}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>debug</AccordionSummary>
             <AccordionDetails>
               <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{JSON.stringify(formData, null, 2)}</pre>
             </AccordionDetails>
           </Accordion>
+          <CharacterCreateBoostOptionsDialog
+            open={boostDialogOpen}
+            onClose={() => setBoostDialogOpen(false)}
+            strategicGame={game}
+            formData={formData}
+            setFormData={setFormData}
+          />
         </Grid>
       </Grid>
     </>
