@@ -1,8 +1,6 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import SyncIcon from '@mui/icons-material/Sync';
-import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import Typography from '@mui/material/Typography';
+import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { t } from 'i18next';
 import { CreateCharacterDto, STATS } from '../../api/character.dto';
 import { StatBonusFormData } from './CharacterCreate';
@@ -78,42 +76,33 @@ const CharacterStats: FC<{
 
 const CharacterCreateStats: FC<{
   formData: CreateCharacterDto;
-  onRandomStats?: () => void;
   statBonusFormData: StatBonusFormData;
-}> = ({ formData, onRandomStats, statBonusFormData }) => {
+}> = ({ formData, statBonusFormData }) => {
   return (
-    <>
-      <Typography variant="h6" color="primary">
-        {t('statistics')}
-        <IconButton onClick={onRandomStats}>
-          <SyncIcon />
-        </IconButton>
-      </Typography>
-      <Table sx={{ minWidth: 650 }} aria-label="stats table" size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell align="left">Stat</TableCell>
-            <TableCell align="right">{t('potential')}</TableCell>
-            <TableCell align="right">{t('potential-bonus')}</TableCell>
-            <TableCell align="right">{t('temporary')}</TableCell>
-            <TableCell align="right">{t('temporary-bonus')}</TableCell>
-            <TableCell align="right">{t('racial')}</TableCell>
-            <TableCell align="right">{t('total')}</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {STATS.map((key) => (
-            <CharacterStats
-              key={key}
-              statKey={key}
-              statName={t(key)}
-              formData={formData}
-              statBonusFormData={statBonusFormData}
-            />
-          ))}
-        </TableBody>
-      </Table>
-    </>
+    <Table sx={{ minWidth: 650 }} aria-label="stats table" size="small">
+      <TableHead>
+        <TableRow>
+          <TableCell align="left">Stat</TableCell>
+          <TableCell align="right">{t('potential')}</TableCell>
+          <TableCell align="right">{t('potential-bonus')}</TableCell>
+          <TableCell align="right">{t('temporary')}</TableCell>
+          <TableCell align="right">{t('temporary-bonus')}</TableCell>
+          <TableCell align="right">{t('racial')}</TableCell>
+          <TableCell align="right">{t('total')}</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {STATS.map((key) => (
+          <CharacterStats
+            key={key}
+            statKey={key}
+            statName={t(key)}
+            formData={formData}
+            statBonusFormData={statBonusFormData}
+          />
+        ))}
+      </TableBody>
+    </Table>
   );
 };
 

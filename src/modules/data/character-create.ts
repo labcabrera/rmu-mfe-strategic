@@ -126,5 +126,5 @@ export const CHARACTER_CREATION_TEMPLATE: CreateCharacterDto = {
       itemTypeId: 'dagger',
     },
   ],
-  description: 'Lorem ipsum',
+  description: '',
 };

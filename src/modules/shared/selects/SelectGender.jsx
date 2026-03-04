@@ -1,11 +1,10 @@
-/* eslint-disable react/prop-types */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
+import { t } from 'i18next';
 
 const SelectGender = ({ value, onChange, required = false }) => {
-  const { t } = useTranslation();
   const categories = ['male', 'female', 'other'];
 
   const handleChange = (e) => {
@@ -17,10 +16,10 @@ const SelectGender = ({ value, onChange, required = false }) => {
       select
       label={t('gender')}
       value={value}
-      variant="standard"
       required={required}
       fullWidth
       onChange={handleChange}
+      size="small"
     >
       {categories.map((c) => (
         <MenuItem key={c} value={c}>

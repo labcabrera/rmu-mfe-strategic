@@ -1,7 +1,16 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import UploadIcon from '@mui/icons-material/Upload';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+} from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacter, deleteCharacter, levelUpCharacter } from '../../api/character';
@@ -10,6 +19,7 @@ import { StrategicGame } from '../../api/strategic-game.dto';
 import RmuBreadcrumbs from '../../shared/breadcrumbs/RmuBreadcrumbs';
 import DeleteButton from '../../shared/buttons/DeleteButton';
 import EditButton from '../../shared/buttons/EditButton';
+import LevelUpButton from '../../shared/buttons/LevelUpButton';
 import RefreshButton from '../../shared/buttons/RefreshButton';
 import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 
@@ -69,21 +79,19 @@ const CharacterViewActions: FC<{
   return (
     <>
       <RmuBreadcrumbs items={breadcrumbs}>
-        {levelUpAvailable && (
-          <Button onClick={() => onLevelUp(false)} startIcon={<UploadIcon />} variant="outlined" color="primary">
-            {t('level-up')}
-          </Button>
-        )}
+        {levelUpAvailable && <LevelUpButton onClick={() => onLevelUp(false)} color="success" />}
         <RefreshButton onClick={onRefresh} />
         <EditButton onClick={onEdit} />
         <DeleteButton onClick={() => setDeleteDialogOpen(true)} />
       </RmuBreadcrumbs>
+
       <DeleteDialog
         message={`Are you sure you want to delete ${character.name} character? This action cannot be undone.`}
         onDelete={handleDialogDelete}
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
       />
+
       <Dialog
         open={levelUpDialogOpen}
         onClose={() => setLevelUpDialogOpen(false)}
