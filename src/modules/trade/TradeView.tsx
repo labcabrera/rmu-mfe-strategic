@@ -1,11 +1,11 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Button, Grid, MenuItem, Paper, TextField, Typography } from '@mui/material';
-import { t } from 'i18next';
+import { Grid } from '@mui/material';
 import { useError } from '../../ErrorContext';
 import { fetchCharacter } from '../api/character';
 import { Character } from '../api/character.dto';
 import TradeViewActions from './TradeViewActions';
+import TradeViewItemSearch from './TradeViewItemSearch';
 import TradeViewOptions from './TradeViewOptions';
 
 const TradeView: FC = () => {
@@ -40,7 +40,7 @@ const TradeView: FC = () => {
 
       <Grid container spacing={1}>
         <Grid size={{ xs: 12, md: 2 }}>Resume</Grid>
-        <Grid size={{ xs: 12, md: 8 }}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <TradeViewOptions
             character={character}
             setCharacter={setCharacter}
@@ -48,6 +48,7 @@ const TradeView: FC = () => {
             setFormData={setFormData}
           />
         </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>{formData?.option === 'buy' && <TradeViewItemSearch />}</Grid>
         <Grid size={12}>
           <pre>{JSON.stringify(formData, null, 2)}</pre>
         </Grid>

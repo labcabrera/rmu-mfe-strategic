@@ -1,10 +1,9 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Grid, MenuItem, TextField, ButtonGroup, Button } from '@mui/material';
+import React, { Dispatch, FC, SetStateAction } from 'react';
+import { Grid, ButtonGroup, Button } from '@mui/material';
 import { t } from 'i18next';
 import { Character } from '../api/character.dto';
 
-const options = ['sell', 'buy'];
+const options = ['buy', 'sell'];
 
 const communicationOptions = ['normal', 'poor', 'excelent'];
 
