@@ -31,6 +31,13 @@ const CharacterViewInfo: FC<{
     }
   };
 
+  const getLevelText = () => {
+    if (character.experience.availableLevel > character.experience.level) {
+      return `${character.experience.level} (${character.experience.availableLevel - character.experience.level})`;
+    }
+    return `${character.experience.level}`;
+  };
+
   if (!character) return <div>Loading...</div>;
 
   return (
@@ -98,7 +105,7 @@ const CharacterViewInfo: FC<{
             sx={{ display: 'block' }}
           >
             <RmuTextCard
-              value={character.experience.level}
+              value={getLevelText()}
               subtitle={t('current-level')}
               image={`${imageBaseUrl}images/generic/experience.png`}
               applyColor={false}
