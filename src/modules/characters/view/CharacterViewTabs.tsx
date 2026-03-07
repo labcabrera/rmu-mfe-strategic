@@ -65,7 +65,7 @@ const CharacterViewTabs: FC<{
       </Box>
 
       <CustomTabPanel value={value} index={0}>
-        <CharacterViewInfo character={character} />
+        <CharacterViewInfo character={character} strategicGame={strategicGame} />
       </CustomTabPanel>
 
       <CustomTabPanel value={value} index={1}>

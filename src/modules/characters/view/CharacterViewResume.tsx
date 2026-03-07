@@ -13,7 +13,7 @@ const defaultCharacterImage = `${imageBaseUrl}images/npcs/unknown.png`;
 
 const CharacterViewResume: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>>;
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   strategicGame: StrategicGame;
 }> = ({ character, setCharacter, strategicGame }) => {
   const { showError } = useError();
@@ -38,23 +38,10 @@ const CharacterViewResume: FC<{
         {character.name}
       </Typography>
       {character.experience.availableDevelopmentPoints > 0 && (
-        <Typography variant="body1" color="primary" sx={{ mt: 2 }}>
-          {`+${character.experience.availableDevelopmentPoints} unspent dev points`}
+        <Typography variant="body1" color="success" sx={{ mt: 2 }}>
+          {`${character.experience.availableDevelopmentPoints} unspent dev points`}
         </Typography>
       )}
-      <Typography variant="body1" sx={{ mt: 2 }}>
-        {character.info.race.name} - {t(character.info.professionId)} - {character.experience.availableLevel}
-      </Typography>
-      <Typography variant="body1" sx={{ mt: 2 }}>
-        <Link component={RouterLink} color="inherit" to={`/strategic/factions/view/${character.faction.id}`}>
-          {strategicGame.name}
-        </Link>
-      </Typography>
-      <Typography variant="body1" sx={{ mt: 2 }}>
-        <Link component={RouterLink} color="inherit" to={`/strategic/factions/view/${character.faction.id}`}>
-          {character.faction.name}
-        </Link>
-      </Typography>
       <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
         {character.description}
       </Typography>

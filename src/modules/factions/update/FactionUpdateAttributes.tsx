@@ -63,6 +63,15 @@ const FactionUpdateAttributes: React.FC<{
       </Grid>
       <Grid size={12}>
         <TextField
+          label={t('Short description')}
+          name="shortDescription"
+          value={formData.shortDescription}
+          onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
+          fullWidth
+        />
+      </Grid>
+      <Grid size={12}>
+        <TextField
           label={t('description')}
           name="description"
           value={formData.description}

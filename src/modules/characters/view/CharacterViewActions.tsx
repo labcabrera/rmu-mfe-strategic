@@ -25,7 +25,7 @@ import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 
 const CharacterViewActions: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>>;
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   game: StrategicGame;
 }> = ({ character, setCharacter, game }) => {
   const navigate = useNavigate();
@@ -34,10 +34,8 @@ const CharacterViewActions: FC<{
   const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
   const levelUpAvailable = character.experience.level < character.experience.availableLevel;
   const breadcrumbs = [
-    { name: t('strategic'), link: '/strategic' },
-    { name: t('games'), link: '/strategic/games' },
-    { name: game.name, link: `/strategic/games/view/${game.id}` },
-    { name: character.faction.name, link: `/strategic/factions/view/${character.faction.id}` },
+    { name: t('Strategic'), link: '/strategic' },
+    { name: t('Game'), link: `/strategic/games/view/${game.id}` },
   ];
 
   const onRefresh = () => {

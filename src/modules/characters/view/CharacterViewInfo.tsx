@@ -1,7 +1,9 @@
-import React, { FC } from 'react';
+import React, { FC, use } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Badge, Box, Grid, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { Character, STATS } from '../../api/character.dto';
+import { StrategicGame } from '../../api/strategic-game.dto';
 import { imageBaseUrl } from '../../services/config';
 import NumericCard from '../../shared/cards/NumericCard';
 import RmuTextCard from '../../shared/cards/RmuTextCard';
@@ -11,8 +13,11 @@ import CategorySeparator from '../../shared/display/CategorySeparator';
 const grayscale = 0.7;
 
 const CharacterViewInfo: FC<{
+  strategicGame: StrategicGame;
   character: Character;
-}> = ({ character }) => {
+}> = ({ character, strategicGame }) => {
+  const navigate = useNavigate();
+
   const getArmorType = (): string => {
     const armor = character.defense.armor;
     if (!armor) return '';
@@ -38,10 +43,64 @@ const CharacterViewInfo: FC<{
     return `${character.experience.level}`;
   };
 
-  if (!character) return <div>Loading...</div>;
+  if (!character || !strategicGame) return <div>Loading...</div>;
 
   return (
     <>
+      <CategorySeparator text={t('Character')} />
+      <Grid container spacing={1} columns={10}>
+        <Grid size={{ xs: 12, md: 2 }}>
+          <RmuTextCard
+            value={strategicGame.name}
+            subtitle={t('Game')}
+            image={strategicGame.imageUrl}
+            onClick={() => navigate(`/strategic/games/view/${strategicGame.id}`)}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 2 }}>
+          <RmuTextCard
+            value={character.faction.name}
+            subtitle={t('Faction')}
+            image={`${imageBaseUrl}images/generic/race-size.png`}
+            onClick={() => navigate(`/strategic/factions/view/${character.faction.id}`)}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 2 }}>
+          <RmuTextCard
+            value={character.info.race.name}
+            subtitle={t('Race')}
+            image={`${imageBaseUrl}images/generic/race-size.png`}
+            onClick={() => navigate(`/core/races/view/${character.info.race.id}`)}
+            grayscale={grayscale}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 2 }}>
+          <RmuTextCard
+            value={t(character.info.professionId)}
+            subtitle={t('Profession')}
+            image={`${imageBaseUrl}images/generic/race-size.png`}
+            onClick={() => navigate(`/core/professions/view/${character.info.professionId}`)}
+            grayscale={grayscale}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 2 }}>
+          <Badge
+            color="success"
+            badgeContent={`+${character.experience.availableLevel - character.experience.level}`}
+            invisible={character.experience.availableLevel <= character.experience.level}
+            sx={{ display: 'block' }}
+          >
+            <RmuTextCard
+              value={getLevelText()}
+              subtitle={t('Level')}
+              image={`${imageBaseUrl}images/generic/experience.png`}
+              applyColor={false}
+              grayscale={grayscale}
+            />
+          </Badge>
+        </Grid>
+      </Grid>
+
       <CategorySeparator text={t('general')} />
 
       <Grid container spacing={1} columns={10}>
@@ -97,22 +156,6 @@ const CharacterViewInfo: FC<{
       <CategorySeparator text={t('experience')} />
 
       <Grid container spacing={1} columns={10}>
-        <Grid size={{ xs: 12, md: 2 }}>
-          <Badge
-            color="success"
-            badgeContent={`+${character.experience.availableLevel - character.experience.level}`}
-            invisible={character.experience.availableLevel <= character.experience.level}
-            sx={{ display: 'block' }}
-          >
-            <RmuTextCard
-              value={getLevelText()}
-              subtitle={t('current-level')}
-              image={`${imageBaseUrl}images/generic/experience.png`}
-              applyColor={false}
-              grayscale={grayscale}
-            />
-          </Badge>
-        </Grid>
         <Grid size={{ xs: 12, md: 2 }}>
           <RmuTextCard
             value={character.experience.xp}

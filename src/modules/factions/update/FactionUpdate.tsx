@@ -6,7 +6,6 @@ import { StrategicGame } from '../../api/strategic-game.dto';
 import EditableAvatar from '../../shared/avatars/EditableAvatar';
 import FactionUpdateActions from './FactionUpdateActions';
 import FactionUpdateAttributes from './FactionUpdateAttributes';
-import FactionUpdateResume from './FactionUpdateResume';
 
 const FactionUpdate: FC = () => {
   const location = useLocation();
@@ -20,6 +19,7 @@ const FactionUpdate: FC = () => {
     },
     shortDescription: faction?.shortDescription || '',
     description: faction?.description || '',
+    imageUrl: faction?.imageUrl || '',
   });
 
   const onImageUpdated = (newImageUrl: string) => {
@@ -32,7 +32,6 @@ const FactionUpdate: FC = () => {
       <Grid container spacing={1}>
         <Grid size={{ xs: 12, md: 2 }}>
           <EditableAvatar imageUrl={formData.imageUrl || ''} onImageChange={onImageUpdated} />
-          <FactionUpdateResume formData={formData} setFormData={setFormData} />
         </Grid>
         <Grid size={{ xs: 12, md: 8 }}>
           <FactionUpdateAttributes formData={formData} setFormData={setFormData} />

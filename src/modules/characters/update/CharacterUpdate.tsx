@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
 import { useError } from '../../../ErrorContext';
@@ -11,16 +11,19 @@ import { StrategicGame } from '../../api/strategic-game.dto';
 import EditableAvatar from '../../shared/avatars/EditableAvatar';
 import CharacterUpdateActions from './CharacterUpdateActions';
 import CharacterUpdateAttributes from './CharacterUpdateAttributes';
-import CharacterUpdateResume from './CharacterUpdateResume';
 
-const CharacterUpdate: React.FC = () => {
+const CharacterUpdate: FC = () => {
   const location = useLocation();
   const { showError } = useError();
   const { characterId } = useParams<{ characterId: string }>();
-  const [character, setCharacter] = useState<Character | null>(null);
-  const [faction, setFaction] = useState<Faction | null>(null);
-  const [strategicGame, setStrategicGame] = useState<StrategicGame | null>(null);
-  const [formData, setFormData] = useState<UpdateCharacterDto | null>(null);
+  const [character, setCharacter] = useState<Character | null>();
+  const [faction, setFaction] = useState<Faction>();
+  const [strategicGame, setStrategicGame] = useState<StrategicGame>();
+  const [formData, setFormData] = useState<UpdateCharacterDto>();
+
+  const onImageChange = (image: string) => {
+    setFormData({ ...formData, imageUrl: image });
+  };
 
   useEffect(() => {
     if (character) {
@@ -55,20 +58,14 @@ const CharacterUpdate: React.FC = () => {
     }
   }, [location.state, characterId, showError]);
 
-  if (!character || !strategicGame || !faction) return <div>Loading...</div>;
+  if (!character || !strategicGame || !faction || !formData) return <div>Loading...</div>;
 
   return (
     <>
       <CharacterUpdateActions character={character} formData={formData} game={strategicGame} faction={faction} />
       <Grid container spacing={5}>
         <Grid size={2}>
-          <EditableAvatar
-            imageUrl={character.imageUrl || ''}
-            onImageChange={() => {
-              alert('todo');
-            }}
-          />
-          <CharacterUpdateResume formData={formData} setFormData={setFormData} />
+          <EditableAvatar imageUrl={character.imageUrl || ''} onImageChange={onImageChange} />
         </Grid>
         <Grid size={7}>
           <CharacterUpdateAttributes formData={formData} setFormData={setFormData} />

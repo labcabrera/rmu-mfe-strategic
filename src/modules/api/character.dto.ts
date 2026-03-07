@@ -62,6 +62,7 @@ export interface UpdateCharacterDto {
         age: number | undefined;
       }
     | undefined;
+  imageUrl: string | undefined;
 }
 
 export interface CharacterInfo {
