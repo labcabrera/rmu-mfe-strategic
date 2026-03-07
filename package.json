@@ -2,7 +2,7 @@
   "name": "rmu-mfe-strategic",
   "version": "0.7.0",
   "scripts": {
-    "build": "rm -r dist && webpack --mode production",
+    "build": "rm -rf dist && webpack --mode production",
     "build:dev": "webpack --mode development",
     "build:start": "cd dist && PORT=8082 npx serve",
     "start": "webpack serve --mode development",
