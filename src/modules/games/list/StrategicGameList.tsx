@@ -40,8 +40,7 @@ const StrategicGameList: FC = () => {
   return (
     <>
       <StrategicGameListActions />
-
-      <Grid container spacing={1} mb={1} alignItems="flex-start">
+      <Grid container spacing={1}>
         <Grid size={2} sx={{ display: { xs: 'none', md: 'block' } }}>
           <StrategicGameListResume />
         </Grid>
@@ -49,9 +48,8 @@ const StrategicGameList: FC = () => {
         <Grid size={{ xs: 12, md: 8 }}>
           <Grid container spacing={1}>
             {strategicGames.map((game) => (
-              <Grid key={game.id} size={{ xs: 12, md: 4 }}>
+              <Grid key={game.id} size={{ xs: 12, md: 3 }}>
                 <RmuTextCard
-                  size="medium"
                   value={game.name}
                   subtitle={game.realmName}
                   image={game.imageUrl || undefined}

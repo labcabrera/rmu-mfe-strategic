@@ -35,10 +35,10 @@ const StrategicGameCreate: FC = () => {
     <>
       <StrategicGameCreateActions formData={formData} isValid={isValid} />
       <Grid container spacing={5}>
-        <Grid size={{ xs: 12, md: 3 }}>
+        <Grid size={{ xs: 12, md: 2 }}>
           <GenericAvatar imageUrl={defaultStrategicGameImage} size={300} />
         </Grid>
-        <Grid size={{ xs: 12, md: 9 }}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <StrategicGameCreateAttributes formData={formData} setFormData={setFormData} realms={realms} />
         </Grid>
       </Grid>

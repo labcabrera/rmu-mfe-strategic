@@ -17,7 +17,6 @@ import StrategicGameEdit from './modules/games/update/StrategicGameUpdate';
 import StrategicGameView from './modules/games/view/StrategicGameView';
 import TradeView from './modules/trade/TradeView';
 
-//TODO provisional component
 const NotFound: FC = () => (
   <div>
     <h2>Not found</h2>
@@ -28,7 +27,7 @@ const NotFound: FC = () => (
 const App: FC = () => {
   return (
     <ErrorProvider>
-      <Box sx={{ p: 1 }}>
+      <Box padding={2}>
         <Routes>
           <Route path="/" element={<StrategicGameList />} />
           <Route path="/games" element={<StrategicGameList />} />

@@ -1,4 +1,4 @@
-const imageBaseUrl = process.env.RMU_MFE_ASSETS!;
+import { imageBaseUrl } from './config';
 
 export const defaultStrategicGameImage = `${imageBaseUrl}images/generic/strategic.png`;
 export const defaultFactionImage = `${imageBaseUrl}images/avatars/avatar-001.png`;
