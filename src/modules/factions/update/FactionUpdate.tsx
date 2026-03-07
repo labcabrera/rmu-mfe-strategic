@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Grid } from '@mui/material';
 import { Faction, UpdateFactionDto } from '../../api/faction.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
+import EditableAvatar from '../../shared/avatars/EditableAvatar';
 import FactionAvatar from '../../shared/avatars/FactionAvatar';
 import FactionUpdateActions from './FactionUpdateActions';
 import FactionUpdateAttributes from './FactionUpdateAttributes';
@@ -27,7 +28,12 @@ const FactionUpdate: FC = () => {
       <FactionUpdateActions formData={formData} strategicGame={strategicGame} faction={faction} />
       <Grid container spacing={1}>
         <Grid size={{ xs: 12, md: 3 }}>
-          <FactionAvatar faction={faction} size={300} />
+          <EditableAvatar
+            imageUrl={''}
+            onImageChange={function (newImageUrl: string): void {
+              throw new Error('Function not implemented.');
+            }}
+          />
           <FactionUpdateResume formData={formData} setFormData={setFormData} />
         </Grid>
         <Grid size={{ xs: 12, md: 9 }}>

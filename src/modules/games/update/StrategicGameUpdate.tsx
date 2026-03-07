@@ -4,7 +4,7 @@ import { Grid } from '@mui/material';
 import { useError } from '../../../ErrorContext';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame, UpdateStrategicGameDto } from '../../api/strategic-game.dto';
-import StrategicGameAvatar from '../../shared/avatars/StrategicGameAvatar';
+import EditableAvatar from '../../shared/avatars/EditableAvatar';
 import StrategicGameUpdateActions from './StrategicGameUpdateActions';
 import StrategicGameUpdateAttributes from './StrategicGameUpdateAttributes';
 
@@ -55,7 +55,12 @@ const StrategicGameUpdate: FC = () => {
       <StrategicGameUpdateActions strategicGame={strategicGame} formData={formData} isValid={isValid} />
       <Grid container spacing={5}>
         <Grid size={{ xs: 12, md: 3 }}>
-          <StrategicGameAvatar strategicGame={strategicGame} size={300} />
+          <EditableAvatar
+            imageUrl={strategicGame.imageUrl || ''}
+            onImageChange={function (newImageUrl: string): void {
+              throw new Error('Function not implemented.');
+            }}
+          />
         </Grid>
         <Grid size={{ xs: 12, md: 9 }}>
           <StrategicGameUpdateAttributes formData={formData} setFormData={setFormData} />

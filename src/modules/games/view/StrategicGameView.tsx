@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Add } from '@mui/icons-material';
 import { Grid } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
@@ -9,10 +8,8 @@ import { Faction } from '../../api/faction.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { fetchTacticalGames, TacticalGame } from '../../api/tactical-games';
-import { getGenericImages } from '../../services/image-service';
 import AddButton from '../../shared/buttons/AddButton';
 import CategorySeparator from '../../shared/display/CategorySeparator';
-import ImageSelectorDialog from '../../shared/images/ImageSelectorDialog';
 import StrategicGameViewActions from './StrategicGameViewActions';
 import StrategicGameViewAttributes from './StrategicGameViewAttributes';
 import StrategicGameViewFactions from './StrategicGameViewFactions';
@@ -83,12 +80,6 @@ const StrategicGameView: React.FC = () => {
           <StrategicGameViewTacticalGames strategicGame={strategicGame} tacticalGames={tacticalGames} />
         </Grid>
       </Grid>
-      <ImageSelectorDialog
-        open={imageDialogOpen}
-        images={getGenericImages()}
-        onClose={() => setImageDialogOpen(false)}
-        onSelect={() => {}}
-      />
     </>
   );
 };

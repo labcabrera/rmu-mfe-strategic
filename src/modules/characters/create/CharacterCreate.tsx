@@ -15,6 +15,7 @@ import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { CHARACTER_CREATION_TEMPLATE } from '../../data/character-create';
 import { randomizeStats } from '../../services/randomize-stats';
+import EditableAvatar from '../../shared/avatars/EditableAvatar';
 import RaceAvatar from '../../shared/avatars/RaceAvatar';
 import RefreshButton from '../../shared/buttons/RefreshButton';
 import CategorySeparator from '../../shared/display/CategorySeparator';
@@ -140,7 +141,10 @@ const CharacterCreate: FC = () => {
 
       <Grid container spacing={1}>
         <Grid size={{ xs: 12, md: 2 }}>
-          <RaceAvatar raceName={formData.info.raceName} size={300} />
+          <EditableAvatar
+            imageUrl={formData.imageUrl || ''}
+            onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl })}
+          />
           <CharacterCreateResume
             formData={formData}
             setFormData={setFormData}

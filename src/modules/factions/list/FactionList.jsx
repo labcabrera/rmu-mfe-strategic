@@ -4,8 +4,8 @@ import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import Snackbar from '@mui/material/Snackbar';
 import { fetchFactions } from '../../api/faction';
+import RmuTextCard from '../../shared/cards/RmuTextCard';
 import FactionListActions from './FactionListActions';
-import FactionListItem from './FactionListItem';
 
 const FactionList = () => {
   const { showError } = useError();
@@ -20,11 +20,13 @@ const FactionList = () => {
   return (
     <>
       <FactionListActions />
-      <List>
+      <Grid container spacing={1}>
         {factions?.map((item) => (
-          <FactionListItem key={item.id} strategicGame={item} />
+          <Grid size={12} key={item.id}>
+            <RmuTextCard title={item.name} subtitle={item.description} onClick={() => alert('todo')} />
+          </Grid>
         ))}
-      </List>
+      </Grid>
     </>
   );
 };

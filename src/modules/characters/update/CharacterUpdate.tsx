@@ -8,7 +8,7 @@ import { fetchFaction } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import RaceAvatar from '../../shared/avatars/RaceAvatar';
+import EditableAvatar from '../../shared/avatars/EditableAvatar';
 import CharacterUpdateActions from './CharacterUpdateActions';
 import CharacterUpdateAttributes from './CharacterUpdateAttributes';
 import CharacterUpdateResume from './CharacterUpdateResume';
@@ -62,7 +62,12 @@ const CharacterUpdate: React.FC = () => {
       <CharacterUpdateActions character={character} formData={formData} game={strategicGame} faction={faction} />
       <Grid container spacing={5}>
         <Grid size={2}>
-          <RaceAvatar imageUrl={character.imageUrl} raceName={character.info.race.name} size={300} />
+          <EditableAvatar
+            imageUrl={character.imageUrl || ''}
+            onImageChange={() => {
+              alert('todo');
+            }}
+          />
           <CharacterUpdateResume formData={formData} setFormData={setFormData} />
         </Grid>
         <Grid size={7}>

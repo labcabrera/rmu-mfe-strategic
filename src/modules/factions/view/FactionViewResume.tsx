@@ -5,9 +5,7 @@ import { useError } from '../../../ErrorContext';
 import { updateFaction } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import { getGenericImages } from '../../services/image-service';
-import FactionAvatar from '../../shared/avatars/FactionAvatar';
-import ImageSelectorDialog from '../../shared/images/ImageSelectorDialog';
+import EditableAvatar from '../../shared/avatars/EditableAvatar';
 
 const FactionViewResume: FC<{
   faction: Faction;
@@ -31,7 +29,7 @@ const FactionViewResume: FC<{
 
   return (
     <>
-      <FactionAvatar faction={faction} size={300} onClick={() => setImageDialogOpen(true)} />
+      <EditableAvatar imageUrl={faction.imageUrl || ''} onImageChange={onImageUpdated} />
       <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
         {faction.name}
       </Typography>

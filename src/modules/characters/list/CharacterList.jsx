@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import List from '@mui/material/List';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacters } from '../../api/character';
-import CharacterListItem from '../../shared/list-items/CharacterListItem';
+import RmuTextCard from '../../shared/cards/RmuTextCard';
 import CharacterListActions from './CharacterListActions';
 
 const CharacterList = () => {
@@ -18,11 +18,13 @@ const CharacterList = () => {
   return (
     <>
       <CharacterListActions />
-      <List>
+      <Grid container spacing={1}>
         {characters?.map((item) => (
-          <CharacterListItem key={item.id} character={item} />
+          <Grid size={12} key={item.id}>
+            <RmuTextCard title={item.name} subtitle={item.description} onClick={() => alert('todo')} />
+          </Grid>
         ))}
-      </List>
+      </Grid>
     </>
   );
 };

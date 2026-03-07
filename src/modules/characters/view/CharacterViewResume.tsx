@@ -5,11 +5,11 @@ import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { updateCharacter } from '../../api/character';
 import { Character } from '../../api/character.dto';
-import { Faction } from '../../api/faction.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import { getGenericImages } from '../../services/image-service';
-import RaceAvatar from '../../shared/avatars/RaceAvatar';
-import ImageSelectorDialog from '../../shared/images/ImageSelectorDialog';
+import { imageBaseUrl } from '../../services/config';
+import EditableAvatar from '../../shared/avatars/EditableAvatar';
+
+const defaultCharacterImage = `${imageBaseUrl}images/npcs/unknown.png`;
 
 const CharacterViewResume: FC<{
   character: Character;
@@ -33,12 +33,7 @@ const CharacterViewResume: FC<{
 
   return (
     <>
-      <RaceAvatar
-        imageUrl={character.imageUrl}
-        raceName={character.info.race.name}
-        size={300}
-        onClick={() => setImageDialogOpen(true)}
-      />
+      <EditableAvatar imageUrl={character.imageUrl || defaultCharacterImage} onImageChange={onImageUpdated} />
       <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
         {character.name}
       </Typography>
@@ -63,12 +58,6 @@ const CharacterViewResume: FC<{
       <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
         {character.description}
       </Typography>
-      <ImageSelectorDialog
-        open={imageDialogOpen}
-        images={getGenericImages()}
-        onClose={() => setImageDialogOpen(false)}
-        onSelect={onImageUpdated}
-      />
     </>
   );
 };
