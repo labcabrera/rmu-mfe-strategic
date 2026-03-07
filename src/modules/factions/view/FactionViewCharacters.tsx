@@ -21,7 +21,6 @@ const FactionViewCharacters: FC<{
       {characters.map((character) => (
         <Grid key={character.id} size={{ xs: 12, md: 3 }}>
           <RmuTextCard
-            size="medium"
             value={character.name}
             subtitle={`${character.info.race.name} - ${t(character.info.professionId)} - ${character.experience.availableLevel}`}
             image={character.imageUrl}

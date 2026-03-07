@@ -4,7 +4,6 @@ import { Grid } from '@mui/material';
 import { Faction, UpdateFactionDto } from '../../api/faction.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import EditableAvatar from '../../shared/avatars/EditableAvatar';
-import FactionAvatar from '../../shared/avatars/FactionAvatar';
 import FactionUpdateActions from './FactionUpdateActions';
 import FactionUpdateAttributes from './FactionUpdateAttributes';
 import FactionUpdateResume from './FactionUpdateResume';
@@ -23,20 +22,19 @@ const FactionUpdate: FC = () => {
     description: faction?.description || '',
   });
 
+  const onImageUpdated = (newImageUrl: string) => {
+    setFormData({ ...formData, imageUrl: newImageUrl });
+  };
+
   return (
     <>
       <FactionUpdateActions formData={formData} strategicGame={strategicGame} faction={faction} />
       <Grid container spacing={1}>
-        <Grid size={{ xs: 12, md: 3 }}>
-          <EditableAvatar
-            imageUrl={''}
-            onImageChange={function (newImageUrl: string): void {
-              throw new Error('Function not implemented.');
-            }}
-          />
+        <Grid size={{ xs: 12, md: 2 }}>
+          <EditableAvatar imageUrl={formData.imageUrl || ''} onImageChange={onImageUpdated} />
           <FactionUpdateResume formData={formData} setFormData={setFormData} />
         </Grid>
-        <Grid size={{ xs: 12, md: 9 }}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <FactionUpdateAttributes formData={formData} setFormData={setFormData} />
         </Grid>
       </Grid>

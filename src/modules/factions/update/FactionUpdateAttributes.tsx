@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Typography } from '@mui/material';
+import { Grid, TextField, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { UpdateFactionDto } from '../../api/faction.dto';
 import NumericInput from '../../shared/inputs/NumericInput';
@@ -23,10 +23,15 @@ const FactionUpdateAttributes: React.FC<{
   return (
     <Grid container spacing={2}>
       <Grid size={12}>
-        <Typography variant="h6" color="primary">
-          {t('faction-information')}
-        </Typography>
+        <TextField
+          label={t('name')}
+          name="name"
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          fullWidth
+        />
       </Grid>
+
       <Grid size={12}>
         <NumericInput
           label={t('available-xp')}
@@ -45,6 +50,26 @@ const FactionUpdateAttributes: React.FC<{
           integer
           min={0}
           onChange={(e) => handleManagementChange('availableGold', e)}
+        />
+      </Grid>
+      <Grid size={12}>
+        <TextField
+          label={t('short-description')}
+          name="shortDescription"
+          value={formData.shortDescription}
+          onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
+          fullWidth
+        />
+      </Grid>
+      <Grid size={12}>
+        <TextField
+          label={t('description')}
+          name="description"
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          fullWidth
+          multiline
+          rows={12}
         />
       </Grid>
     </Grid>

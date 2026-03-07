@@ -21,17 +21,6 @@ const FactionCreateAttributes: FC<{
         />
       </Grid>
       <Grid size={12}>
-        <TextField
-          label={t('description')}
-          name="description"
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          fullWidth
-          multiline
-          maxRows={12}
-        />
-      </Grid>
-      <Grid size={12}>
         <NumericInput
           label={t('available-gold')}
           name="availableGold"
@@ -47,6 +36,26 @@ const FactionCreateAttributes: FC<{
           value={formData.management.availableXP}
           onChange={(e) => setFormData({ ...formData, management: { ...formData.management, availableXP: e } })}
           integer
+        />
+      </Grid>
+      <Grid size={12}>
+        <TextField
+          label={t('Short description')}
+          name="sort-description"
+          value={formData.shortDescription}
+          onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
+          fullWidth
+        />
+      </Grid>
+      <Grid size={12}>
+        <TextField
+          label={t('description')}
+          name="description"
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          fullWidth
+          multiline
+          maxRows={12}
         />
       </Grid>
     </Grid>

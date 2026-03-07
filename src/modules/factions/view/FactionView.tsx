@@ -2,8 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import ViewListIcon from '@mui/icons-material/ViewList';
-import { Grid } from '@mui/material';
-import { Box, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Box, ToggleButton, ToggleButtonGroup, Grid } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacters } from '../../api/character';
@@ -13,6 +12,7 @@ import { Faction } from '../../api/faction.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import AddButton from '../../shared/buttons/AddButton';
+import RmuTextCard from '../../shared/cards/RmuTextCard';
 import CategorySeparator from '../../shared/display/CategorySeparator';
 import FactionViewActions from './FactionViewActions';
 import FactionViewAttributes from './FactionViewAttributes';
@@ -82,6 +82,17 @@ const FactionView: FC = () => {
           <FactionViewResume faction={faction} setFaction={setFaction} game={game} />
         </Grid>
         <Grid size={{ xs: 12, md: 12, sm: 12, lg: 8 }}>
+          <CategorySeparator text={t('Strategic game')} />
+          <Grid container spacing={1}>
+            <Grid size={{ xs: 12, md: 3 }}>
+              <RmuTextCard
+                value={game.name}
+                subtitle={t('Strategic game')}
+                image={game.imageUrl}
+                onClick={() => navigate(`/strategic/games/view/${game.id}`, { state: { strategicGame: game } })}
+              />
+            </Grid>
+          </Grid>
           <CategorySeparator text={t('faction')} />
           <FactionViewAttributes faction={faction} />
           <CategorySeparator text={t('characters')}>

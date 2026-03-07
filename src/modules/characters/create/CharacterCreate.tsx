@@ -14,9 +14,9 @@ import { Race } from '../../api/race.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { CHARACTER_CREATION_TEMPLATE } from '../../data/character-create';
+import { imageBaseUrl } from '../../services/config';
 import { randomizeStats } from '../../services/randomize-stats';
 import EditableAvatar from '../../shared/avatars/EditableAvatar';
-import RaceAvatar from '../../shared/avatars/RaceAvatar';
 import RefreshButton from '../../shared/buttons/RefreshButton';
 import CategorySeparator from '../../shared/display/CategorySeparator';
 import CharacterViewStatsChart from '../view/CharacterViewStatsChart';
@@ -27,6 +27,8 @@ import CharacterCreateResume from './CharacterCreateResume';
 import CharacterCreateSkillCosts from './CharacterCreateSkillCosts';
 import { CharacterCreateSortCombat } from './CharacterCreateSortCombat';
 import CharacterCreateStats from './CharacterCreateStats';
+
+const defaultImage = `${imageBaseUrl}images/races/unknown-alt.png`;
 
 export interface StatBonus {
   potential: number;
@@ -108,7 +110,7 @@ const CharacterCreate: FC = () => {
 
   useEffect(() => {
     if (game) {
-      fetchRaces(`realmId==${game.realmId}`, 0, 100)
+      fetchRaces(`realm.id==${game.realmId}`, 0, 100)
         .then((data) => setRaces(data))
         .catch((err) => showError(err.message));
     }
@@ -142,7 +144,7 @@ const CharacterCreate: FC = () => {
       <Grid container spacing={1}>
         <Grid size={{ xs: 12, md: 2 }}>
           <EditableAvatar
-            imageUrl={formData.imageUrl || ''}
+            imageUrl={formData.imageUrl || defaultImage}
             onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl })}
           />
           <CharacterCreateResume

@@ -9,21 +9,15 @@ import { StrategicGame } from '../../api/strategic-game.dto';
 import RmuTextCard from '../../shared/cards/RmuTextCard';
 
 const StrategicGameViewFactions: FC<{
-  strategicGame: StrategicGame;
   factions: Faction[];
-}> = ({ strategicGame, factions }) => {
+}> = ({ factions }) => {
   const navigate = useNavigate();
-
-  const onCreateFaction = () => {
-    navigate(`/strategic/factions/create?gameId=${strategicGame.id}`, { state: { strategicGame } });
-  };
 
   return (
     <Grid container spacing={1}>
       {factions.map((faction) => (
         <Grid key={faction.id} size={{ xs: 12, md: 3 }}>
           <RmuTextCard
-            size="medium"
             value={faction.name}
             subtitle={faction.shortDescription}
             image={faction.imageUrl}

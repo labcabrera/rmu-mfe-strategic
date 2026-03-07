@@ -1,15 +1,16 @@
 import React, { FC, use, useEffect, useState } from 'react';
 import { useSearchParams, useLocation } from 'react-router-dom';
-import { Grid, TextField } from '@mui/material';
-import { t } from 'i18next';
+import { Grid } from '@mui/material';
 import { useError } from '../../../ErrorContext';
 import { CreateFactionDto, EMPTY_FACTION } from '../../api/faction.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { imageBaseUrl } from '../../services/config';
-import GenericAvatar from '../../shared/avatars/GenericAvatar';
+import EditableAvatar from '../../shared/avatars/EditableAvatar';
 import FactionCreateActions from './FactionCreateActions';
 import FactionCreateAttributes from './FactionCreateAttributes';
+
+const defaultImage = `${imageBaseUrl}images/avatars/avatar-001.png`;
 
 const FactionCreate: FC = () => {
   const location = useLocation();
@@ -46,10 +47,13 @@ const FactionCreate: FC = () => {
     <>
       <FactionCreateActions formData={formData} strategicGame={strategicGame} isValid={isValid} />
       <Grid container spacing={1}>
-        <Grid size={{ xs: 12, md: 3 }}>
-          <GenericAvatar imageUrl={`${imageBaseUrl}images/avatars/avatar-001.png`} size={300} />
+        <Grid size={{ xs: 12, md: 2 }}>
+          <EditableAvatar
+            imageUrl={formData.imageUrl || defaultImage}
+            onImageChange={(newImageUrl) => setFormData({ ...formData, imageUrl: newImageUrl })}
+          />
         </Grid>
-        <Grid size={{ xs: 12, md: 7 }}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <FactionCreateAttributes formData={formData} setFormData={setFormData} />
         </Grid>
       </Grid>

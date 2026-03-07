@@ -22,7 +22,7 @@ const FactionViewActions: FC<{
   const breadcrumbs = [
     { name: t('strategic'), link: '/strategic' },
     { name: t('games'), link: '/strategic/games' },
-    { name: strategicGame.name, link: `/strategic/games/view/${strategicGame.id}` },
+    { name: t('Faction') },
   ];
 
   if (!faction || !strategicGame) return <p>Loading...</p>;

@@ -10,7 +10,7 @@ const FactionViewAttributes: FC<{
 }> = ({ faction }) => {
   return (
     <Grid container spacing={1}>
-      <Grid size={{ xs: 12, md: 2 }}>
+      <Grid size={{ xs: 12, md: 3 }}>
         <RmuTextCard
           value={new Intl.NumberFormat('en-EN').format(faction.management.availableGold)}
           subtitle={t('available-gold')}
@@ -18,7 +18,7 @@ const FactionViewAttributes: FC<{
           grayscale={0.7}
         />
       </Grid>
-      <Grid size={{ xs: 12, md: 2 }}>
+      <Grid size={{ xs: 12, md: 3 }}>
         <RmuTextCard
           value={new Intl.NumberFormat('en-EN').format(faction.management.availableXP)}
           subtitle={t('available-xp')}

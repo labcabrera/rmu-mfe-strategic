@@ -1,6 +1,5 @@
 import React, { FC, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import { Link, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import { useError } from '../../../ErrorContext';
 import { updateFaction } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
@@ -13,16 +12,11 @@ const FactionViewResume: FC<{
   game: StrategicGame;
 }> = ({ faction, setFaction, game }) => {
   const { showError } = useError();
-  const [imageDialogOpen, setImageDialogOpen] = useState(false);
 
   const onImageUpdated = (imageId: string) => {
     updateFaction(faction.id, { ...faction, imageUrl: imageId })
-      .then(() => {
-        setFaction({ ...faction, imageUrl: imageId });
-      })
-      .catch((error: Error) => {
-        showError(error.message);
-      });
+      .then(() => setFaction({ ...faction, imageUrl: imageId }))
+      .catch((error: Error) => showError(error.message));
   };
 
   if (!faction || !game) return <div>Loading...</div>;
@@ -33,20 +27,9 @@ const FactionViewResume: FC<{
       <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
         {faction.name}
       </Typography>
-      <Typography variant="body1" sx={{ mt: 2 }}>
-        <Link component={RouterLink} color="inherit" to={`/strategic/games/view/${game.id}`}>
-          {game.name}
-        </Link>
-      </Typography>
       <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
         {faction.description}
       </Typography>
-      <ImageSelectorDialog
-        open={imageDialogOpen}
-        images={getGenericImages()}
-        onClose={() => setImageDialogOpen(false)}
-        onSelect={onImageUpdated}
-      />
     </>
   );
 };
