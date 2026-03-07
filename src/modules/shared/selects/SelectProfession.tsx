@@ -32,11 +32,10 @@ const SelectProfession: React.FC<{
       select
       label={t('profession')}
       value={professions.length === 0 || isValueEmpty ? '' : value}
-      variant="standard"
       onChange={handleProfessionChange}
       fullWidth
+      size="small"
       error={error}
-      helperText={error && t('Profession is required')}
     >
       {professions.map((option) => (
         <MenuItem key={option.id} value={option.id}>

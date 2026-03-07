@@ -1,88 +1,49 @@
 import React, { FC } from 'react';
-import { Box, Grid, Typography } from '@mui/material';
+import { Grid } from '@mui/material';
 import { t } from 'i18next';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import NumericCard from '../../shared/cards/NumericCard';
+import { imageBaseUrl } from '../../services/config';
+import RmuTextCard from '../../shared/cards/RmuTextCard';
 
-const imageBaseUrl = process.env.RMU_MFE_ASSETS!;
+const grayscale = 0.7;
 
 const StrategicGameViewAttributes: FC<{
   strategicGame: StrategicGame;
 }> = ({ strategicGame }) => {
   return (
-    <Grid container spacing={2}>
-      <Grid size={12}>
-        <Typography variant="h6" color="primary" sx={{ mb: 2 }}>
-          {t('strategic-game-options')}
-        </Typography>
-        <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
-          <NumericCard
-            value={strategicGame.options.experienceMultiplier}
-            subtitle={t('experience-multiplier')}
-            image={`${imageBaseUrl}images/generic/experience.png`}
-            applyColor={false}
-          />
-          <NumericCard
-            value={strategicGame.options.fatigueMultiplier}
-            subtitle={t('fatigue-multiplier')}
-            image={`${imageBaseUrl}images/generic/stat-co.png`}
-            applyColor={false}
-          />
-          <NumericCard
-            value={strategicGame.options.boardScaleMultiplier}
-            subtitle={t('board-scale-multiplier')}
-            image={`${imageBaseUrl}images/generic/realm.png`}
-            applyColor={false}
-          />
-          <NumericCard
-            value={strategicGame.options.letality}
-            subtitle={t('letality')}
-            image={`${imageBaseUrl}images/generic/physical.png`}
-          />
-        </Box>
+    <Grid container spacing={1}>
+      <Grid size={{ xs: 12, md: 2 }}>
+        <RmuTextCard
+          value={strategicGame.options.experienceMultiplier}
+          subtitle={t('experience-multiplier')}
+          image={`${imageBaseUrl}images/generic/experience.png`}
+          grayscale={grayscale}
+        />
       </Grid>
-      <Grid size={12}>
-        <Typography variant="h6" color="primary" sx={{ mb: 2 }}>
-          {t('power-level')}
-        </Typography>
-        <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
-          <NumericCard
-            value={strategicGame.powerLevel.baseDevPoints}
-            subtitle={t('base-dev-points')}
-            image={`${imageBaseUrl}images/generic/trait-combat.png`}
-            applyColor={false}
-          />
-          <NumericCard
-            value={strategicGame.powerLevel.statRandomMin}
-            subtitle={t('stat-random-min')}
-            image={`${imageBaseUrl}images/generic/stat-st.png`}
-            applyColor={false}
-          />
-          <NumericCard
-            value={strategicGame.powerLevel.statBoostPotential}
-            subtitle={t('stat-boost-potential')}
-            image={`${imageBaseUrl}images/generic/stat-st.png`}
-            applyColor={false}
-          />
-          <NumericCard
-            value={strategicGame.powerLevel.statBoostTemporary}
-            subtitle={t('stat-boost-temporary')}
-            image={`${imageBaseUrl}images/generic/stat-st.png`}
-            applyColor={false}
-          />
-          <NumericCard
-            value={strategicGame.powerLevel.statCreationBoost}
-            subtitle={t('stat-creation-boosts')}
-            image={`${imageBaseUrl}images/generic/stat-st.png`}
-            applyColor={false}
-          />
-          <NumericCard
-            value={strategicGame.powerLevel.statCreationSwap}
-            subtitle={t('stat-creation-swaps')}
-            image={`${imageBaseUrl}images/generic/stat-st.png`}
-            applyColor={false}
-          />
-        </Box>
+      <Grid size={{ xs: 12, md: 2 }}>
+        <RmuTextCard
+          value={strategicGame.options.fatigueMultiplier}
+          subtitle={t('fatigue-multiplier')}
+          image={`${imageBaseUrl}images/generic/stat-co.png`}
+          grayscale={grayscale}
+        />
+      </Grid>
+      <Grid size={{ xs: 12, md: 2 }}>
+        <RmuTextCard
+          value={strategicGame.options.boardScaleMultiplier}
+          subtitle={t('board-scale-multiplier')}
+          image={`${imageBaseUrl}images/generic/realm.png`}
+          grayscale={grayscale}
+          applyColor={false}
+        />
+      </Grid>
+      <Grid size={{ xs: 12, md: 2 }}>
+        <RmuTextCard
+          value={strategicGame.options.letality}
+          subtitle={t('letality')}
+          image={`${imageBaseUrl}images/generic/physical.png`}
+          grayscale={grayscale}
+        />
       </Grid>
     </Grid>
   );

@@ -20,34 +20,29 @@ export const CharacterCreateSortCombat: FC<{
   };
 
   return (
-    <>
-      <Typography variant="h6" gutterBottom color="primary" sx={{ mt: 5 }}>
-        {t('combat-development-order')}
-      </Typography>
-      <List>
-        {order.map((item, i) => (
-          <ListItem
-            key={item}
-            secondaryAction={
-              <Box>
-                <IconButton aria-label="Subir" size="small" onClick={() => moveItem(i, 'up')} disabled={i === 0}>
-                  <ArrowUpwardIcon fontSize="small" />
-                </IconButton>
-                <IconButton
-                  aria-label="Bajar"
-                  size="small"
-                  onClick={() => moveItem(i, 'down')}
-                  disabled={i === order.length - 1}
-                >
-                  <ArrowDownwardIcon fontSize="small" />
-                </IconButton>
-              </Box>
-            }
-          >
-            <ListItemText primary={t(item)} />
-          </ListItem>
-        ))}
-      </List>
-    </>
+    <List>
+      {order.map((item, i) => (
+        <ListItem
+          key={item}
+          secondaryAction={
+            <Box>
+              <IconButton aria-label="up" size="small" onClick={() => moveItem(i, 'up')} disabled={i === 0}>
+                <ArrowUpwardIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                aria-label="down"
+                size="small"
+                onClick={() => moveItem(i, 'down')}
+                disabled={i === order.length - 1}
+              >
+                <ArrowDownwardIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          }
+        >
+          <ListItemText primary={t(item)} />
+        </ListItem>
+      ))}
+    </List>
   );
 };

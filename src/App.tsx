@@ -3,7 +3,6 @@ import { Route, Routes } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import { ErrorProvider } from './ErrorContext';
 import './i18n';
-import './index.css';
 import CharacterCreate from './modules/characters/create/CharacterCreate';
 import CharacterList from './modules/characters/list/CharacterList';
 import CharacterUpdate from './modules/characters/update/CharacterUpdate';
@@ -16,8 +15,8 @@ import StrategicGameCreate from './modules/games/create/StrategicGameCreate';
 import StrategicGameList from './modules/games/list/StrategicGameList';
 import StrategicGameEdit from './modules/games/update/StrategicGameUpdate';
 import StrategicGameView from './modules/games/view/StrategicGameView';
+import TradeView from './modules/trade/TradeView';
 
-//TODO provisional component
 const NotFound: FC = () => (
   <div>
     <h2>Not found</h2>
@@ -28,7 +27,7 @@ const NotFound: FC = () => (
 const App: FC = () => {
   return (
     <ErrorProvider>
-      <Box sx={{ p: 5 }}>
+      <Box padding={2}>
         <Routes>
           <Route path="/" element={<StrategicGameList />} />
           <Route path="/games" element={<StrategicGameList />} />
@@ -43,6 +42,7 @@ const App: FC = () => {
           <Route path="/characters/view/:characterId" element={<CharacterView />} />
           <Route path="/characters/create" element={<CharacterCreate />} />
           <Route path="/characters/edit/:characterId" element={<CharacterUpdate />} />
+          <Route path="/characters/trade/:characterId" element={<TradeView />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Box>

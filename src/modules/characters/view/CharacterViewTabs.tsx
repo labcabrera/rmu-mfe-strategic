@@ -63,9 +63,11 @@ const CharacterViewTabs: FC<{
           <Tab label="Debug" {...a11yProps(8)} />
         </Tabs>
       </Box>
+
       <CustomTabPanel value={value} index={0}>
-        <CharacterViewInfo character={character} />
+        <CharacterViewInfo character={character} strategicGame={strategicGame} />
       </CustomTabPanel>
+
       <CustomTabPanel value={value} index={1}>
         <Grid container spacing={1}>
           <Grid size={6}>
@@ -76,24 +78,31 @@ const CharacterViewTabs: FC<{
           </Grid>
         </Grid>
       </CustomTabPanel>
+
       <CustomTabPanel value={value} index={2}>
         <CharacterViewResistances character={character} />
       </CustomTabPanel>
+
       <CustomTabPanel value={value} index={3}>
         <CharacterViewSkills character={character} setCharacter={setCharacter} profession={profession} />
       </CustomTabPanel>
+
       <CustomTabPanel value={value} index={4}>
         <CharacterViewTraits character={character} setCharacter={setCharacter} />
       </CustomTabPanel>
+
       <CustomTabPanel value={value} index={5}>
         <CharacterViewItems character={character} setCharacter={setCharacter} />
       </CustomTabPanel>
+
       <CustomTabPanel value={value} index={6}>
         <CharacterViewAttacks character={character} />
       </CustomTabPanel>
+
       <CustomTabPanel value={value} index={7}>
         <CharacterViewExperience character={character} setCharacter={setCharacter} />
       </CustomTabPanel>
+
       <CustomTabPanel value={value} index={8}>
         <pre>Character: {JSON.stringify(character, null, 2)}</pre>
         <pre>Profession: {JSON.stringify(profession, null, 2)}</pre>

@@ -19,9 +19,8 @@ const FactionUpdateActions: FC<{
   const { showError } = useError();
   const breadcrumbs = [
     { name: t('strategic'), link: '/strategic' },
-    { name: t('games'), link: '/strategic/games' },
-    { name: strategicGame.name, link: `/strategic/games/view/${strategicGame.id}` },
-    { name: faction.name, link: `/strategic/factions/view/${faction.id}` },
+    { name: t('Faction'), link: `/strategic/factions/view/${faction.id}` },
+    { name: t('Edit') },
   ];
 
   if (!faction || !strategicGame) return <p>Loading...</p>;

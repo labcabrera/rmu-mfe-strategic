@@ -19,11 +19,7 @@ const FactionViewActions: FC<{
   const navigate = useNavigate();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { showError } = useError();
-  const breadcrumbs = [
-    { name: t('strategic'), link: '/strategic' },
-    { name: t('games'), link: '/strategic/games' },
-    { name: strategicGame.name, link: `/strategic/games/view/${strategicGame.id}` },
-  ];
+  const breadcrumbs = [{ name: t('strategic'), link: '/strategic' }, { name: t('Faction') }];
 
   if (!faction || !strategicGame) return <p>Loading...</p>;
 

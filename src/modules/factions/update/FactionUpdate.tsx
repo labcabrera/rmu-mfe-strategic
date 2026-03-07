@@ -3,10 +3,9 @@ import { useLocation } from 'react-router-dom';
 import { Grid } from '@mui/material';
 import { Faction, UpdateFactionDto } from '../../api/faction.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import FactionAvatar from '../../shared/avatars/FactionAvatar';
+import EditableAvatar from '../../shared/avatars/EditableAvatar';
 import FactionUpdateActions from './FactionUpdateActions';
 import FactionUpdateAttributes from './FactionUpdateAttributes';
-import FactionUpdateResume from './FactionUpdateResume';
 
 const FactionUpdate: FC = () => {
   const location = useLocation();
@@ -20,17 +19,21 @@ const FactionUpdate: FC = () => {
     },
     shortDescription: faction?.shortDescription || '',
     description: faction?.description || '',
+    imageUrl: faction?.imageUrl || '',
   });
+
+  const onImageUpdated = (newImageUrl: string) => {
+    setFormData({ ...formData, imageUrl: newImageUrl });
+  };
 
   return (
     <>
       <FactionUpdateActions formData={formData} strategicGame={strategicGame} faction={faction} />
       <Grid container spacing={1}>
-        <Grid size={{ xs: 12, md: 3 }}>
-          <FactionAvatar faction={faction} size={300} />
-          <FactionUpdateResume formData={formData} setFormData={setFormData} />
+        <Grid size={{ xs: 12, md: 2 }}>
+          <EditableAvatar imageUrl={formData.imageUrl || ''} onImageChange={onImageUpdated} />
         </Grid>
-        <Grid size={{ xs: 12, md: 9 }}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <FactionUpdateAttributes formData={formData} setFormData={setFormData} />
         </Grid>
       </Grid>

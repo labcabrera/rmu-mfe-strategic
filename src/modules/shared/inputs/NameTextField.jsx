@@ -28,12 +28,11 @@ const NameTextField = ({ label, value, onChange, required = true, generateRandom
   return (
     <TextField
       label={label}
-      variant="standard"
       value={value}
       onChange={onChange}
       fullWidth
+      size="small"
       error={error}
-      helperText={error && t('Name is required')}
       slotProps={{
         input: {
           endAdornment: (

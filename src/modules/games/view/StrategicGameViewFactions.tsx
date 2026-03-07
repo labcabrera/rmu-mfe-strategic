@@ -6,35 +6,26 @@ import Typography from '@mui/material/Typography';
 import { t } from 'i18next';
 import { Faction } from '../../api/faction.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import AddButton from '../../shared/buttons/AddButton';
-import FactionCard from '../../shared/cards/FactionCard';
+import RmuTextCard from '../../shared/cards/RmuTextCard';
 
 const StrategicGameViewFactions: FC<{
-  strategicGame: StrategicGame;
   factions: Faction[];
-}> = ({ strategicGame, factions }) => {
+}> = ({ factions }) => {
   const navigate = useNavigate();
 
-  const onCreateFaction = () => {
-    navigate(`/strategic/factions/create?gameId=${strategicGame.id}`, { state: { strategicGame } });
-  };
-
   return (
-    <Grid container spacing={2} sx={{ mt: 5 }}>
+    <Grid container spacing={1}>
+      {factions.map((faction) => (
+        <Grid key={faction.id} size={{ xs: 12, md: 3 }}>
+          <RmuTextCard
+            value={faction.name}
+            subtitle={faction.shortDescription}
+            image={faction.imageUrl}
+            onClick={() => navigate(`/strategic/factions/view/${faction.id}`, { state: { faction } })}
+          />
+        </Grid>
+      ))}
       <Grid size={12}>
-        <Box display="flex" alignItems="center">
-          <Typography variant="h6" color="primary" display="inline">
-            {t('factions')}
-          </Typography>
-          <AddButton onClick={onCreateFaction} />
-        </Box>
-      </Grid>
-      <Grid size={12}>
-        <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
-          {factions.map((faction) => (
-            <FactionCard key={faction.id} faction={faction} />
-          ))}
-        </Box>
         {factions.length === 0 && <Typography variant="body1">{t('not-found-factions')}</Typography>}
       </Grid>
     </Grid>

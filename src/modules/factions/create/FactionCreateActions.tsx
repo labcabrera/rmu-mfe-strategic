@@ -20,7 +20,7 @@ const FactionCreateActions: FC<{
     { name: t('strategic'), link: '/strategic' },
     { name: t('games'), link: '/strategic/games' },
     { name: strategicGame.name, link: `/strategic/games/view/${strategicGame.id}` },
-    { name: t('factions'), link: `/strategic/games/view/${strategicGame.id}/factions` },
+    { name: t('Create faction') },
   ];
 
   const onCreate = () => {

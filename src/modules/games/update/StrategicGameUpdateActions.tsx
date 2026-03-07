@@ -16,10 +16,9 @@ const StrategicGameUpdateActions: FC<{
   const navigate = useNavigate();
   const { showError } = useError();
   const breadcrumbs = [
-    { name: t('strategic'), link: '/strategic' },
-    { name: t('games'), link: '/strategic/games' },
-    { name: strategicGame.name, link: `/strategic/games/view/${strategicGame.id}` },
-    { name: t('edit') },
+    { name: t('Strategic'), link: '/strategic' },
+    { name: t('Game'), link: `/strategic/games/view/${strategicGame.id}` },
+    { name: t('Edit') },
   ];
 
   const onUpdateGame = async () => {

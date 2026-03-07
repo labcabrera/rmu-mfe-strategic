@@ -5,15 +5,15 @@ import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { updateCharacter } from '../../api/character';
 import { Character } from '../../api/character.dto';
-import { Faction } from '../../api/faction.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import { getGenericImages } from '../../services/image-service';
-import RaceAvatar from '../../shared/avatars/RaceAvatar';
-import ImageSelectorDialog from '../../shared/images/ImageSelectorDialog';
+import { imageBaseUrl } from '../../services/config';
+import EditableAvatar from '../../shared/avatars/EditableAvatar';
+
+const defaultCharacterImage = `${imageBaseUrl}images/npcs/unknown.png`;
 
 const CharacterViewResume: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>>;
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   strategicGame: StrategicGame;
 }> = ({ character, setCharacter, strategicGame }) => {
   const { showError } = useError();
@@ -33,42 +33,18 @@ const CharacterViewResume: FC<{
 
   return (
     <>
-      <RaceAvatar
-        imageUrl={character.imageUrl}
-        raceName={character.info.race.name}
-        size={300}
-        onClick={() => setImageDialogOpen(true)}
-      />
+      <EditableAvatar imageUrl={character.imageUrl || defaultCharacterImage} onImageChange={onImageUpdated} />
       <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
         {character.name}
       </Typography>
       {character.experience.availableDevelopmentPoints > 0 && (
-        <Typography variant="body1" color="primary" sx={{ mt: 2 }}>
-          {`+${character.experience.availableDevelopmentPoints} unspent dev points`}
+        <Typography variant="body1" color="success" sx={{ mt: 2 }}>
+          {`${character.experience.availableDevelopmentPoints} unspent dev points`}
         </Typography>
       )}
-      <Typography variant="body1" sx={{ mt: 2 }}>
-        {character.info.race.name} - {t(character.info.professionId)} - {character.experience.availableLevel}
-      </Typography>
-      <Typography variant="body1" sx={{ mt: 2 }}>
-        <Link component={RouterLink} color="inherit" to={`/strategic/factions/view/${character.faction.id}`}>
-          {strategicGame.name}
-        </Link>
-      </Typography>
-      <Typography variant="body1" sx={{ mt: 2 }}>
-        <Link component={RouterLink} color="inherit" to={`/strategic/factions/view/${character.faction.id}`}>
-          {character.faction.name}
-        </Link>
-      </Typography>
       <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
         {character.description}
       </Typography>
-      <ImageSelectorDialog
-        open={imageDialogOpen}
-        images={getGenericImages()}
-        onClose={() => setImageDialogOpen(false)}
-        onSelect={onImageUpdated}
-      />
     </>
   );
 };

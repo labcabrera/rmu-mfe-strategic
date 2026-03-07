@@ -5,9 +5,10 @@ import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { updateStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import { getGenericImages } from '../../services/image-service';
-import StrategicGameAvatar from '../../shared/avatars/StrategicGameAvatar';
-import ImageSelectorDialog from '../../shared/images/ImageSelectorDialog';
+import { imageBaseUrl } from '../../services/config';
+import EditableAvatar from '../../shared/avatars/EditableAvatar';
+
+const defaultGameImage = `${imageBaseUrl}images/generic/strategic.png`;
 
 const StrategicGameViewResume: FC<{
   strategicGame: StrategicGame;
@@ -19,17 +20,17 @@ const StrategicGameViewResume: FC<{
   const onImageUpdated = (imageId: string) => {
     console.log(`Image selected: ${imageId}`);
     updateStrategicGame(strategicGame.id, { ...strategicGame, imageUrl: imageId })
-      .then(() => {
-        setGame({ ...strategicGame, imageUrl: imageId });
-      })
-      .catch((error: Error) => {
-        showError(error.message);
-      });
+      .then(() => setGame({ ...strategicGame, imageUrl: imageId }))
+      .catch((error: Error) => showError(error.message));
   };
 
   return (
     <>
-      <StrategicGameAvatar strategicGame={strategicGame} size={300} onClick={() => setImageDialogOpen(true)} />
+      <EditableAvatar
+        imageUrl={strategicGame.imageUrl || defaultGameImage}
+        onImageChange={onImageUpdated}
+        variant="circular"
+      />
       <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
         {t(strategicGame.name)}
       </Typography>
@@ -46,12 +47,6 @@ const StrategicGameViewResume: FC<{
       <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
         {strategicGame.description}
       </Typography>
-      <ImageSelectorDialog
-        open={imageDialogOpen}
-        images={getGenericImages()}
-        onClose={() => setImageDialogOpen(false)}
-        onSelect={onImageUpdated}
-      />
     </>
   );
 };

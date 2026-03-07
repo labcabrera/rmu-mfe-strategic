@@ -1,28 +1,38 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
+import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchFactions } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { fetchTacticalGames, TacticalGame } from '../../api/tactical-games';
-import { getGenericImages } from '../../services/image-service';
-import ImageSelectorDialog from '../../shared/images/ImageSelectorDialog';
+import AddButton from '../../shared/buttons/AddButton';
+import CategorySeparator from '../../shared/display/CategorySeparator';
 import StrategicGameViewActions from './StrategicGameViewActions';
 import StrategicGameViewAttributes from './StrategicGameViewAttributes';
 import StrategicGameViewFactions from './StrategicGameViewFactions';
+import StrategicGameViewPowerLevel from './StrategicGameViewPowerLevel';
 import StrategicGameViewResume from './StrategicGameViewResume';
 import StrategicGameViewTacticalGames from './StrategicGameViewTacticalGames';
 
 const StrategicGameView: React.FC = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const { showError } = useError();
   const { gameId } = useParams<{ gameId?: string }>();
   const [strategicGame, setStrategicGame] = useState<StrategicGame>(location.state?.strategicGame || null);
   const [factions, setFactions] = useState<Faction[]>([]);
   const [tacticalGames, setTacticalGames] = useState<TacticalGame[]>([]);
-  const [imageDialogOpen, setImageDialogOpen] = useState(false);
+
+  const onCreateFaction = () => {
+    navigate(`/strategic/factions/create?gameId=${strategicGame.id}`, { state: { strategicGame } });
+  };
+
+  const onCreateTacticalGame = () => {
+    navigate(`/tactical/games/create?strategicGame=${strategicGame.id}`);
+  };
 
   useEffect(() => {
     if (strategicGame) {
@@ -50,22 +60,25 @@ const StrategicGameView: React.FC = () => {
   return (
     <>
       <StrategicGameViewActions strategicGame={strategicGame} setStrategicGame={setStrategicGame} />
-      <Grid container spacing={5}>
-        <Grid size={{ xs: 12, md: 3 }}>
+      <Grid container spacing={1}>
+        <Grid size={{ xs: 12, md: 2 }}>
           <StrategicGameViewResume strategicGame={strategicGame} setStrategicGame={setStrategicGame} />
         </Grid>
-        <Grid size={{ xs: 12, md: 9 }}>
+        <Grid size={{ xs: 12, md: 8 }}>
+          <CategorySeparator text={t('options')} />
           <StrategicGameViewAttributes strategicGame={strategicGame} />
-          <StrategicGameViewFactions strategicGame={strategicGame} factions={factions} />
-          <StrategicGameViewTacticalGames strategicGame={strategicGame} tacticalGames={tacticalGames} />
+          <CategorySeparator text={t('power-level')} />
+          <StrategicGameViewPowerLevel strategicGame={strategicGame} />
+          <CategorySeparator text={t('factions')}>
+            <AddButton onClick={onCreateFaction} />
+          </CategorySeparator>
+          <StrategicGameViewFactions factions={factions} />
+          <CategorySeparator text={t('tactical-games')}>
+            <AddButton onClick={onCreateTacticalGame} />
+          </CategorySeparator>
+          <StrategicGameViewTacticalGames tacticalGames={tacticalGames} />
         </Grid>
       </Grid>
-      <ImageSelectorDialog
-        open={imageDialogOpen}
-        images={getGenericImages()}
-        onClose={() => setImageDialogOpen(false)}
-        onSelect={() => {}}
-      />
     </>
   );
 };

@@ -9,16 +9,11 @@ const CharacterCreateProfessionalSkills: FC<{
   const skillsTranslated = profession.professionalSkills.map((skill) => t(skill)).sort();
 
   return (
-    <>
-      <Typography variant="h6" color="primary" gutterBottom sx={{ mt: 2 }}>
-        {t('professional-skills')}
-      </Typography>
-      <Grid container spacing={1}>
-        {skillsTranslated.map((skill, index) => (
-          <Chip key={index} label={skill} />
-        ))}
-      </Grid>
-    </>
+    <Grid container spacing={1}>
+      {skillsTranslated.map((skill, index) => (
+        <Chip key={index} label={skill} />
+      ))}
+    </Grid>
   );
 };
 

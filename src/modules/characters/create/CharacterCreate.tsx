@@ -1,6 +1,9 @@
 import React, { useState, useEffect, FC } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Box, Grid, Paper } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import OutboundIcon from '@mui/icons-material/Outbound';
+import { Grid, Accordion, AccordionSummary, AccordionDetails, IconButton, Box, Button, TextField } from '@mui/material';
+import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { CreateCharacterDto } from '../../api/character.dto';
 import { fetchFactions } from '../../api/faction';
@@ -11,17 +14,21 @@ import { Race } from '../../api/race.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { CHARACTER_CREATION_TEMPLATE } from '../../data/character-create';
+import { imageBaseUrl } from '../../services/config';
 import { randomizeStats } from '../../services/randomize-stats';
-import RaceAvatar from '../../shared/avatars/RaceAvatar';
+import EditableAvatar from '../../shared/avatars/EditableAvatar';
+import RefreshButton from '../../shared/buttons/RefreshButton';
+import CategorySeparator from '../../shared/display/CategorySeparator';
 import CharacterViewStatsChart from '../view/CharacterViewStatsChart';
 import CharacterCreateActions from './CharacterCreateActions';
-import CharacterCreateAttributes from './CharacterCreateAttributes';
+import CharacterCreateBoostOptionsDialog from './CharacterCreateBoostOptionsDialog';
 import CharacterCreateProfessionalSkills from './CharacterCreateProfessionalSkills';
 import CharacterCreateResume from './CharacterCreateResume';
 import CharacterCreateSkillCosts from './CharacterCreateSkillCosts';
 import { CharacterCreateSortCombat } from './CharacterCreateSortCombat';
 import CharacterCreateStats from './CharacterCreateStats';
-import CharacterCreateStatsActions from './CharacterCreateStatsActions';
+
+const defaultImage = `${imageBaseUrl}images/races/unknown-alt.png`;
 
 export interface StatBonus {
   potential: number;
@@ -58,6 +65,7 @@ const CharacterCreate: FC = () => {
   const [boosts, setBoosts] = useState<number>(game?.powerLevel.statCreationBoost || 2);
   const [swaps, setSwaps] = useState<number>(game?.powerLevel.statCreationSwap || 2);
   const [isValid, setIsValid] = useState<boolean>(false);
+  const [boostDialogOpen, setBoostDialogOpen] = useState<boolean>(false);
 
   const onRandomStats = () => {
     randomizeStats(setFormData, setStatBonusFormData);
@@ -72,7 +80,6 @@ const CharacterCreate: FC = () => {
     if (!formData.info?.raceId) valid = false;
     if (!formData.info?.professionId) valid = false;
     if (!formData.info?.realmType) valid = false;
-    if (!formData.factionId) valid = false;
     if (!formData.info?.weight) valid = false;
     setIsValid(valid);
   };
@@ -103,7 +110,7 @@ const CharacterCreate: FC = () => {
 
   useEffect(() => {
     if (game) {
-      fetchRaces(`realmId==${game.realmId}`, 0, 100)
+      fetchRaces(`realm.id==${game.realmId}`, 0, 100)
         .then((data) => setRaces(data))
         .catch((err) => showError(err.message));
     }
@@ -128,15 +135,18 @@ const CharacterCreate: FC = () => {
     }
   }, [factionId]);
 
-  if (!game || !formData) return <div>Loading...</div>;
+  if (!game || !formData || !faction) return <div>Loading...</div>;
 
   return (
     <>
       <CharacterCreateActions formData={formData} game={game} faction={faction} isValid={isValid} />
 
       <Grid container spacing={1}>
-        <Grid size={2}>
-          <RaceAvatar raceName={formData.info.raceName} size={300} />
+        <Grid size={{ xs: 12, md: 2 }}>
+          <EditableAvatar
+            imageUrl={formData.imageUrl || defaultImage}
+            onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl })}
+          />
           <CharacterCreateResume
             formData={formData}
             setFormData={setFormData}
@@ -146,51 +156,70 @@ const CharacterCreate: FC = () => {
           />
         </Grid>
 
-        <Grid size={10}>
+        <Grid size={{ xs: 12, md: 8 }}>
+          <CategorySeparator text={t('stats')}>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <RefreshButton onClick={onRandomStats} />
+              <IconButton onClick={() => setBoostDialogOpen(true)} color="primary">
+                <OutboundIcon />
+              </IconButton>
+            </Box>
+          </CategorySeparator>
+
           <Grid container spacing={1}>
-            <Grid size={6}>
-              <CharacterCreateStats
-                formData={formData}
-                onRandomStats={onRandomStats}
-                statBonusFormData={statBonusFormData}
-              />
+            <Grid size={5}>
+              <CharacterCreateStats formData={formData} statBonusFormData={statBonusFormData} />
             </Grid>
-            <Grid size={3} sx={{ display: 'flex', alignItems: 'flex-start' }}>
+            <Grid size={5} sx={{ display: 'flex', alignItems: 'flex-start' }}>
               <CharacterViewStatsChart stats={formData.statistics} />
             </Grid>
-            <Grid size={3}>
-              <CharacterCreateSortCombat items={formData.weaponDevelopment || []} onChange={handleWeaponOrderChange} />
-            </Grid>
-            <Grid size={6}>
-              <CharacterCreateStatsActions
-                strategicGame={game}
-                formData={formData}
-                setFormData={setFormData}
-                setStatBonusFormData={setStatBonusFormData}
-                boosts={boosts}
-                setBoosts={setBoosts}
-                swaps={swaps}
-                setSwaps={setSwaps}
-              />
-              <CharacterCreateAttributes
-                formData={formData}
-                setFormData={setFormData}
-                setProfession={setProfession}
-                factions={factions}
-              />
-            </Grid>
-            <Grid size={6}>
-              {profession && (
-                <>
-                  <CharacterCreateSkillCosts profession={profession} />
-                  <CharacterCreateProfessionalSkills profession={profession} />
-                </>
-              )}
-            </Grid>
           </Grid>
+
+          <CategorySeparator text={t('weapon-development-order')} />
+          <Grid size={12}>
+            <CharacterCreateSortCombat items={formData.weaponDevelopment || []} onChange={handleWeaponOrderChange} />
+          </Grid>
+
+          {profession && (
+            <Grid size={12}>
+              <>
+                <CategorySeparator text={t('skill-development-costs')} />
+                <CharacterCreateSkillCosts profession={profession} />
+                <CategorySeparator text={t('professional-skills')} />
+                <CharacterCreateProfessionalSkills profession={profession} />
+              </>
+            </Grid>
+          )}
+
+          <CategorySeparator text={t('lore')} />
+          <Grid size={12}>
+            <TextField
+              label={t('description')}
+              name="description"
+              value={formData.description}
+              onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+              fullWidth
+              multiline
+              maxRows={4}
+            />
+          </Grid>
+
+          <Accordion sx={{ mt: 5 }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>debug</AccordionSummary>
+            <AccordionDetails>
+              <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{JSON.stringify(formData, null, 2)}</pre>
+            </AccordionDetails>
+          </Accordion>
         </Grid>
       </Grid>
-      <pre>{JSON.stringify(formData, null, 2)}</pre>
+
+      <CharacterCreateBoostOptionsDialog
+        open={boostDialogOpen}
+        onClose={() => setBoostDialogOpen(false)}
+        strategicGame={game}
+        formData={formData}
+        setFormData={setFormData}
+      />
     </>
   );
 };

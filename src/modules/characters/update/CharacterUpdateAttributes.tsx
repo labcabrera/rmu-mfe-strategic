@@ -1,5 +1,5 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
-import { Grid, Typography } from '@mui/material';
+import { Grid, TextField, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { UpdateCharacterDto } from '../../api/character.dto';
 import NumericInput from '../../shared/inputs/NumericInput';
@@ -7,16 +7,21 @@ import SelectGender from '../../shared/selects/SelectGender';
 
 const CharacterUpdateAttributes: FC<{
   formData: UpdateCharacterDto;
-  setFormData: Dispatch<SetStateAction<UpdateCharacterDto>>;
+  setFormData: Dispatch<SetStateAction<UpdateCharacterDto | undefined>>;
 }> = ({ formData, setFormData }) => {
   return (
     <Grid container spacing={2}>
       <Grid size={12}>
-        <Typography component="h6" gutterBottom color="primary">
-          {t('information')}
-        </Typography>
+        <TextField
+          label={t('name')}
+          name="name"
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          error={!formData.name || formData.name.trim() === ''}
+          fullWidth
+        />
       </Grid>
-      <Grid size={4}>
+      <Grid size={{ xs: 12, md: 2 }}>
         <NumericInput
           label={t('height')}
           name="height"
@@ -26,7 +31,7 @@ const CharacterUpdateAttributes: FC<{
           maxFractionDigits={2}
         />
       </Grid>
-      <Grid size={4}>
+      <Grid size={{ xs: 12, md: 2 }}>
         <NumericInput
           label={t('weight')}
           name="weight"
@@ -37,7 +42,7 @@ const CharacterUpdateAttributes: FC<{
         />
       </Grid>
       <Grid size={12}></Grid>
-      <Grid size={4}>
+      <Grid size={{ xs: 12, md: 2 }}>
         <NumericInput
           label={t('age')}
           name="age"
@@ -47,10 +52,21 @@ const CharacterUpdateAttributes: FC<{
           maxFractionDigits={2}
         />
       </Grid>
-      <Grid size={4}>
+      <Grid size={{ xs: 12, md: 2 }}>
         <SelectGender
           value={formData.roleplay?.gender}
           onChange={(gender) => setFormData({ ...formData, roleplay: { ...formData.roleplay, gender } })}
+        />
+      </Grid>
+      <Grid size={12}>
+        <TextField
+          label={t('description')}
+          fullWidth
+          name="description"
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          multiline
+          rows={18}
         />
       </Grid>
     </Grid>

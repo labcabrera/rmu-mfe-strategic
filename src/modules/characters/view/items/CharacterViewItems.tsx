@@ -1,15 +1,16 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import { Card, CardActions, CardContent, CardMedia, Grid, IconButton, Paper, Typography } from '@mui/material';
+import { Button, Card, CardActions, CardContent, CardMedia, Grid, IconButton, Link, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { addItem, deleteItem, updateCarriedStatus } from '../../../api/character';
 import { AddItemDto, Character, CharacterItem } from '../../../api/character.dto';
-import { Faction } from '../../../api/faction.dto';
 import { Item } from '../../../api/items';
 import DeleteButton from '../../../shared/buttons/DeleteButton';
 import DeleteDialog from '../../../shared/dialogs/DeleteDialog';
+import CategorySeparator from '../../../shared/display/CategorySeparator';
 import CharacterViewTransferGold from '../CharacterViewTransferGold';
 import CharacterItemDetail from './CharacterItemDetail';
 import CharacterItemTable from './CharacterItemTable';
@@ -24,6 +25,7 @@ const CharacterViewItems: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character>>;
 }> = ({ character, setCharacter }) => {
+  const navigate = useNavigate();
   const { showError } = useError();
   const [openAddItemDialog, setOpenAddItemDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState<CharacterItem | null>(null);
@@ -36,13 +38,28 @@ const CharacterViewItems: FC<{
 
   return (
     <>
+      <CategorySeparator text={t('equiped-items')}>
+        <Button onClick={() => navigate(`/strategic/characters/trade/${character.id}`)}>Trade</Button>
+        <Button onClick={() => navigate(`/strategic/characters/craft/${character.id}`)}>Craft</Button>
+      </CategorySeparator>
+
       <Grid container spacing={1}>
         <Grid size={12}>
           <CharacterViewEquipment character={character} setCharacter={setCharacter} />
         </Grid>
+      </Grid>
+
+      <CategorySeparator text={t('equipment-info')} />
+
+      <Grid container spacing={1}>
         <Grid size={12} mt={2}>
           <CharacterViewEquipmentInfo character={character} />
         </Grid>
+      </Grid>
+
+      <CategorySeparator text={t('carried-items')} />
+
+      <Grid container spacing={1}>
         <Grid size={12}>
           <Grid container spacing={1}>
             <Grid size={6}>
@@ -70,6 +87,9 @@ const CharacterViewItems: FC<{
           </Grid>
         </Grid>
       </Grid>
+
+      <CategorySeparator text={t('stored-items')} />
+
       <CharacterViewAddItemDialog
         open={openAddItemDialog}
         onClose={() => setOpenAddItemDialog(false)}
