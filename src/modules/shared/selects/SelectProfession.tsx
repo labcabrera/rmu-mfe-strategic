@@ -23,7 +23,7 @@ const SelectProfession: React.FC<{
 
   useEffect(() => {
     fetchProfessions()
-      .then((data) => setProfessions(data))
+      .then((data) => setProfessions(data.content))
       .catch((err) => showError(err));
   }, [showError]);
 

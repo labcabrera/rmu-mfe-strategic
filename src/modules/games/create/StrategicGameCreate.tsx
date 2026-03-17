@@ -6,8 +6,8 @@ import { Realm } from '../../api/realm.dto';
 import { CreateStrategicGameDto, gameCreateTemplate } from '../../api/strategic-game.dto';
 import EditableAvatar from '../../shared/avatars/EditableAvatar';
 import TechnicalInfo from '../../shared/display/TechnicalInfo';
+import StrategicGameForm from '../shared/StrategicGameForm';
 import StrategicGameCreateActions from './StrategicGameCreateActions';
-import StrategicGameCreateAttributes from './StrategicGameCreateAttributes';
 
 const StrategicGameCreate: FC = () => {
   const { showError } = useError();
@@ -42,7 +42,7 @@ const StrategicGameCreate: FC = () => {
           />
         </Grid>
         <Grid size={{ xs: 12, md: 8 }}>
-          <StrategicGameCreateAttributes formData={formData} setFormData={setFormData} realms={realms} />
+          <StrategicGameForm formData={formData} setFormData={setFormData} realms={realms} />
           <TechnicalInfo>
             <pre>{JSON.stringify(formData, null, 2)}</pre>
           </TechnicalInfo>

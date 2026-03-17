@@ -5,8 +5,8 @@ import { useError } from '../../../ErrorContext';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame, UpdateStrategicGameDto } from '../../api/strategic-game.dto';
 import EditableAvatar from '../../shared/avatars/EditableAvatar';
+import StrategicGameForm from '../shared/StrategicGameForm';
 import StrategicGameUpdateActions from './StrategicGameUpdateActions';
-import StrategicGameUpdateAttributes from './StrategicGameUpdateAttributes';
 
 const StrategicGameUpdate: FC = () => {
   const location = useLocation();
@@ -53,8 +53,8 @@ const StrategicGameUpdate: FC = () => {
   return (
     <>
       <StrategicGameUpdateActions strategicGame={strategicGame} formData={formData} isValid={isValid} />
-      <Grid container spacing={5}>
-        <Grid size={{ xs: 12, md: 3 }}>
+      <Grid container spacing={1}>
+        <Grid size={{ xs: 12, md: 2 }}>
           <EditableAvatar
             imageUrl={strategicGame.imageUrl || ''}
             onImageChange={function (newImageUrl: string): void {
@@ -62,8 +62,8 @@ const StrategicGameUpdate: FC = () => {
             }}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 9 }}>
-          <StrategicGameUpdateAttributes formData={formData} setFormData={setFormData} />
+        <Grid size={{ xs: 12, md: 8 }}>
+          <StrategicGameForm formData={formData} setFormData={setFormData} create={false} />
         </Grid>
       </Grid>
     </>

@@ -2,14 +2,15 @@ import React, { Dispatch, FC, SetStateAction } from 'react';
 import { Divider, Grid, TextField, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { Realm } from '../../api/realm.dto';
-import { CreateStrategicGameDto } from '../../api/strategic-game.dto';
+import { CreateStrategicGameDto, UpdateStrategicGameDto } from '../../api/strategic-game.dto';
+import CategorySeparator from '../../shared/display/CategorySeparator';
 import NumericInput from '../../shared/inputs/NumericInput';
 import SelectRealm from '../../shared/selects/SelectRealm';
 
-const StrategicGameCreateAttributes: FC<{
-  formData: CreateStrategicGameDto;
-  setFormData: Dispatch<SetStateAction<CreateStrategicGameDto>>;
-  realms: Realm[];
+const StrategicGameForm: FC<{
+  formData: CreateStrategicGameDto | UpdateStrategicGameDto;
+  setFormData: Dispatch<SetStateAction<CreateStrategicGameDto | UpdateStrategicGameDto | undefined>>;
+  realms?: Realm[];
 }> = ({ formData, setFormData, realms }) => {
   const handleOptionsChange = (field: string, value: number) => {
     setFormData((prevData) => ({
@@ -35,8 +36,8 @@ const StrategicGameCreateAttributes: FC<{
 
   return (
     <>
-      <Grid container spacing={1}>
-        <Grid size={12}>
+      <Grid container spacing={1} columns={10}>
+        <Grid size={10}>
           <TextField
             label={t('strategic-game-name')}
             name="name"
@@ -47,23 +48,22 @@ const StrategicGameCreateAttributes: FC<{
             fullWidth
           />
         </Grid>
-        <Grid size={12}>
-          <SelectRealm
-            realms={realms}
-            value={formData.realmId}
-            onChange={(realmId) => setFormData({ ...formData, realmId })}
-            required
-          />
-        </Grid>
+        {realms && (
+          <Grid size={10}>
+            <SelectRealm
+              realms={realms}
+              value={formData.realmId}
+              onChange={(realmId) => setFormData({ ...formData, realmId })}
+              required
+            />
+          </Grid>
+        )}
       </Grid>
 
-      <Typography variant="body1" color="primary" mt={3}>
-        {t('configuration')}
-      </Typography>
-      <Divider sx={{ mb: 3 }} />
+      <CategorySeparator text={t('Configuration')} />
 
-      <Grid container spacing={1}>
-        <Grid size={{ xs: 12, md: 3 }}>
+      <Grid container spacing={1} columns={10}>
+        <Grid size={{ xs: 10, md: 2 }}>
           <NumericInput
             label={t('experience-multiplier')}
             name="experienceMultiplier"
@@ -73,7 +73,7 @@ const StrategicGameCreateAttributes: FC<{
             allowNegatives={false}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 3 }}>
+        <Grid size={{ xs: 10, md: 2 }}>
           <NumericInput
             label={t('fatigue-multiplier')}
             name="fatigueMultiplier"
@@ -83,7 +83,7 @@ const StrategicGameCreateAttributes: FC<{
             allowNegatives={false}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 3 }}>
+        <Grid size={{ xs: 10, md: 2 }}>
           <NumericInput
             label={t('board-scale-multiplier')}
             name="boardScaleMultiplier"
@@ -93,7 +93,7 @@ const StrategicGameCreateAttributes: FC<{
             allowNegatives={false}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 3 }}>
+        <Grid size={{ xs: 10, md: 2 }}>
           <NumericInput
             label={t('letality')}
             name="letality"
@@ -104,13 +104,10 @@ const StrategicGameCreateAttributes: FC<{
         </Grid>
       </Grid>
 
-      <Typography variant="body1" color="primary" mt={3}>
-        {t('power-level')}
-      </Typography>
-      <Divider sx={{ mb: 3 }} />
+      <CategorySeparator text={t('Power level')} />
 
-      <Grid container spacing={1}>
-        <Grid size={{ xs: 12, md: 3 }}>
+      <Grid container spacing={1} columns={10}>
+        <Grid size={{ xs: 10, md: 2 }}>
           <NumericInput
             label={t('base-dev-points')}
             name="baseDevPoints"
@@ -120,7 +117,7 @@ const StrategicGameCreateAttributes: FC<{
             allowNegatives={false}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 3 }}>
+        <Grid size={{ xs: 10, md: 2 }}>
           <NumericInput
             label={t('stat-random-min')}
             name="statRandomMin"
@@ -130,7 +127,7 @@ const StrategicGameCreateAttributes: FC<{
             allowNegatives={false}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 3 }}>
+        <Grid size={{ xs: 10, md: 2 }}>
           <NumericInput
             label={t('stat-boost-potential')}
             name="statBoostPotential"
@@ -140,7 +137,7 @@ const StrategicGameCreateAttributes: FC<{
             allowNegatives={false}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 3 }}>
+        <Grid size={{ xs: 10, md: 2 }}>
           <NumericInput
             label={t('stat-boost-temporary')}
             name="statBoostTemporary"
@@ -150,7 +147,7 @@ const StrategicGameCreateAttributes: FC<{
             allowNegatives={false}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 3 }}>
+        <Grid size={{ xs: 10, md: 2 }}>
           <NumericInput
             label={t('stat-creation-boosts')}
             name="statCreationBoost"
@@ -160,7 +157,7 @@ const StrategicGameCreateAttributes: FC<{
             allowNegatives={false}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 3 }}>
+        <Grid size={{ xs: 10, md: 2 }}>
           <NumericInput
             label={t('stat-creation-swaps')}
             name="statCreationSwap"
@@ -172,13 +169,10 @@ const StrategicGameCreateAttributes: FC<{
         </Grid>
       </Grid>
 
-      <Typography variant="body1" color="primary" mt={2}>
-        {t('lore')}
-      </Typography>
-      <Divider sx={{ mb: 3 }} />
+      <CategorySeparator text={t('Lore')} />
 
-      <Grid container spacing={1}>
-        <Grid size={12}>
+      <Grid container spacing={1} columns={10}>
+        <Grid size={10}>
           <TextField
             label={t('short-description')}
             name="shortDescription"
@@ -188,7 +182,7 @@ const StrategicGameCreateAttributes: FC<{
             multiline
           />
         </Grid>
-        <Grid size={12}>
+        <Grid size={10}>
           <TextField
             label={t('description')}
             name="description"
@@ -204,4 +198,4 @@ const StrategicGameCreateAttributes: FC<{
   );
 };
 
-export default StrategicGameCreateAttributes;
+export default StrategicGameForm;
