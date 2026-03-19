@@ -162,7 +162,7 @@ const AddSkillDialog: FC<{
               </>
             )}
           </Grid>
-          {<pre>FormData: {JSON.stringify(formData, null, 2)}</pre>}
+          {/* {<pre>FormData: {JSON.stringify(formData, null, 2)}</pre>} */}
         </Grid>
       </DialogContent>
       <DialogActions>

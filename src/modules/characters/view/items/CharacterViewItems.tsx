@@ -23,7 +23,7 @@ const itemCardHeight = 260;
 
 const CharacterViewItems: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>>;
+  setCharacter: Dispatch<SetStateAction<Character>> | undefined;
 }> = ({ character, setCharacter }) => {
   const navigate = useNavigate();
   const { showError } = useError();
@@ -32,9 +32,11 @@ const CharacterViewItems: FC<{
 
   const onItemAdded = (addItemDto: AddItemDto) => {
     addItem(character.id, addItemDto)
-      .then((data) => setCharacter(data))
+      .then((data) => setCharacter!(data))
       .catch((err) => showError(err.message));
   };
+
+  if (!setCharacter) return <p>Loading...</p>;
 
   return (
     <>

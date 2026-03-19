@@ -8,6 +8,7 @@ import { transferFactionGold } from '../../api/character';
 import { Character } from '../../api/character.dto';
 import { fetchFaction } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
+import { imageBaseUrl } from '../../services/config';
 import NumericCard from '../../shared/cards/NumericCard';
 
 const CharacterViewTransferGold: FC<{
@@ -38,7 +39,7 @@ const CharacterViewTransferGold: FC<{
 
   return (
     <Stack direction="row" spacing={1} alignItems="center" mt={2}>
-      <NumericCard value={goldAmount} subtitle={t('Character')} image={`/static/images/generic/coins.png`} />
+      <NumericCard value={goldAmount} subtitle={t('Character')} image={`${imageBaseUrl}images/generic/coins.png`} />
       <Button onClick={() => handleTransfer(1)} variant="outlined" startIcon={<ChevronLeftIcon />}>
         +1G
       </Button>
@@ -54,7 +55,7 @@ const CharacterViewTransferGold: FC<{
       <NumericCard
         value={faction.management.availableGold}
         subtitle={t('Faction')}
-        image={`/static/images/generic/coins.png`}
+        image={`${imageBaseUrl}images/generic/coins.png`}
       />
     </Stack>
   );

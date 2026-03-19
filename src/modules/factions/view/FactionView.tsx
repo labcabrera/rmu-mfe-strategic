@@ -11,6 +11,7 @@ import { fetchFaction } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
+import { gridSizeResume, gridSizeMain } from '../../services/display';
 import AddButton from '../../shared/buttons/AddButton';
 import RmuTextCard from '../../shared/cards/RmuTextCard';
 import CategorySeparator from '../../shared/display/CategorySeparator';
@@ -79,10 +80,10 @@ const FactionView: FC = () => {
     <>
       <FactionViewActions faction={faction} setFaction={setFaction} strategicGame={game} />
       <Grid container spacing={1}>
-        <Grid size={{ xs: 12, md: 12, sm: 12, lg: 2 }}>
+        <Grid size={gridSizeResume}>
           <FactionViewResume faction={faction} setFaction={setFaction} game={game} />
         </Grid>
-        <Grid size={{ xs: 12, md: 12, sm: 12, lg: 10 }}>
+        <Grid size={gridSizeMain}>
           <CategorySeparator text={t('Strategic game')} />
           <Grid container spacing={1}>
             <Grid size={{ xs: 12, md: 3 }}>

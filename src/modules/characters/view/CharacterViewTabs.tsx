@@ -1,4 +1,4 @@
-import React, { useState, SyntheticEvent, ReactNode, FC } from 'react';
+import React, { useState, SyntheticEvent, ReactNode, FC, Dispatch, SetStateAction } from 'react';
 import { Box, Grid, Tab, Tabs } from '@mui/material';
 import { Character } from '../../api/character.dto';
 import { Profession } from '../../api/professions';
@@ -38,7 +38,7 @@ function a11yProps(index: number) {
 
 const CharacterViewTabs: FC<{
   character: Character;
-  setCharacter: React.Dispatch<React.SetStateAction<Character>>;
+  setCharacter: Dispatch<SetStateAction<Character>> | undefined;
   strategicGame: StrategicGame;
   profession: Profession;
 }> = ({ character, setCharacter, strategicGame, profession }) => {

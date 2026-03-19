@@ -7,6 +7,7 @@ import { Character } from '../../api/character.dto';
 import { fetchProfession, Profession } from '../../api/professions';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
+import { gridSizeResume, gridSizeMain } from '../../services/display';
 import CharacterViewActions from './CharacterViewActions';
 import CharacterViewResume from './CharacterViewResume';
 import CharacterViewTabs from './CharacterViewTabs';
@@ -43,11 +44,11 @@ const CharacterView: FC = () => {
   return (
     <>
       <CharacterViewActions character={character} setCharacter={setCharacter} game={strategicGame} />
-      <Grid container spacing={5}>
-        <Grid size={{ xs: 12, md: 2 }}>
+      <Grid container spacing={1}>
+        <Grid size={gridSizeResume}>
           <CharacterViewResume character={character} setCharacter={setCharacter} strategicGame={strategicGame} />
         </Grid>
-        <Grid size={{ xs: 12, md: 9 }}>
+        <Grid size={gridSizeMain}>
           <CharacterViewTabs
             character={character}
             setCharacter={setCharacter}

@@ -5,7 +5,7 @@ import Grid from '@mui/material/Grid';
 import { t } from 'i18next';
 import { Character } from '../../api/character.dto';
 import { Faction } from '../../api/faction.dto';
-import CharacterCard from '../../shared/cards/CharacterCard';
+import { gridSizeCard } from '../../services/display';
 import RmuTextCard from '../../shared/cards/RmuTextCard';
 
 const FactionViewCharacters: FC<{
@@ -19,7 +19,7 @@ const FactionViewCharacters: FC<{
   return (
     <Grid container spacing={1}>
       {characters.map((character) => (
-        <Grid key={character.id} size={{ xs: 12, md: 3 }}>
+        <Grid key={character.id} size={gridSizeCard}>
           <RmuTextCard
             value={character.name}
             subtitle={`${character.info.race.name} - ${t(character.info.professionId)} - ${character.experience.availableLevel}`}

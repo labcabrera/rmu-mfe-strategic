@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Avatar from '@mui/material/Avatar';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
+import { imageBaseUrl } from 'config';
 
 const GoldTextField = ({ value, i18nLabel = 'gold' }) => {
   const { t } = useTranslation();
@@ -24,7 +25,7 @@ const GoldTextField = ({ value, i18nLabel = 'gold' }) => {
         input: {
           startAdornment: (
             <InputAdornment position="start">
-              <Avatar src="/static/images/icons/coins.png" sx={{ width: 25, height: 25 }} />
+              <Avatar src={`${imageBaseUrl}images/icons/coins.png`} sx={{ width: 25, height: 25 }} />
             </InputAdornment>
           ),
         },

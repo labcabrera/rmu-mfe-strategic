@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import { Box, ToggleButtonGroup, ToggleButton } from '@mui/material';
@@ -15,7 +15,7 @@ const STORAGE_KEY = 'character-display-skill-table';
 
 const CharacterViewSkills: FC<{
   character: Character;
-  setCharacter: React.Dispatch<React.SetStateAction<Character>>;
+  setCharacter: Dispatch<SetStateAction<Character>> | undefined;
   profession?: Profession;
 }> = ({ character, setCharacter, profession }) => {
   const [openAddSkillDialog, setOpenAddSkillDialog] = useState(false);

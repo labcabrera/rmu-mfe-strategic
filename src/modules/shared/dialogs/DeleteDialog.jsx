@@ -6,6 +6,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { t } from 'i18next';
 
 const DeleteDialog = ({ message, open, onDelete, onClose }) => {
   return (
@@ -20,8 +21,10 @@ const DeleteDialog = ({ message, open, onDelete, onClose }) => {
         <DialogContentText id="alert-dialog-description">{message}</DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => onClose()}>Cancel</Button>
-        <Button onClick={() => onDelete()}>Delete</Button>
+        <Button onClick={() => onClose()}>{t('Cancel')}</Button>
+        <Button color="error" onClick={() => onDelete()}>
+          {t('Delete')}
+        </Button>
       </DialogActions>
     </Dialog>
   );

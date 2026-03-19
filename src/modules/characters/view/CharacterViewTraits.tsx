@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
@@ -13,7 +13,7 @@ import CharacterViewTraitDialog from './CharacterViewTraitDialog';
 
 const CharacterViewTraits: FC<{
   character: Character;
-  setCharacter: React.Dispatch<React.SetStateAction<Character>>;
+  setCharacter: Dispatch<SetStateAction<Character>> | undefined;
 }> = ({ character, setCharacter }) => {
   const { showError } = useError();
   const [openAddTraitDialog, setOpenAddTraitDialog] = useState(false);

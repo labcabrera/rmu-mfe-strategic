@@ -82,16 +82,16 @@ const CharacterCreateResume: FC<{
   if (!races) return <p>Loading...</p>;
 
   return (
-    <Grid container spacing={2} mt={5}>
+    <Grid container spacing={1} mt={5}>
       <Grid size={12}>
-        <SelectRace label={t('race')} value={formData.info.raceId} onChange={onRaceChange} races={races} />
+        <SelectRace label={t('Race')} value={formData.info.raceId} onChange={onRaceChange} races={races} />
       </Grid>
       <Grid size={12}>
         <SelectProfession value={formData.info.professionId} onChange={onProfessionChange} />
       </Grid>
       <Grid size={12}>
         <NameTextField
-          label={t('name')}
+          label={t('Name')}
           value={formData.name}
           onChange={onNameChange}
           generateRandomRaceValue={formData.info.raceName}

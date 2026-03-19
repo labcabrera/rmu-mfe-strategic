@@ -15,6 +15,7 @@ import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { AddItemDto } from '../../../api/character.dto';
 import { fetchItems, Item } from '../../../api/items';
+import { imageBaseUrl } from '../../../services/config';
 import CharacterViewAddItemDialogForm from './CharacterViewAddItemDialogForm';
 
 const categories = ['weapon', 'armor', 'shield', 'clothes', 'ammunition', 'tools', 'food'];
@@ -22,7 +23,7 @@ const armorSubcategories = ['head', 'body', 'arms', 'legs'];
 const weaponSubcategories = [
   'melee-weapon@blade',
   'melee-weapon@greater-blade',
-  // 'melee-weapon@chain',
+  'melee-weapon@chain',
   'melee-weapon@hafted',
   'melee-weapon@greater-hafted',
   'melee-weapon@pole-arm',
@@ -133,7 +134,7 @@ const CharacterAddItemDialog: FC<{
                     <CardMedia
                       key={category}
                       component="img"
-                      image={`/static/images/items/category-${category}.png`}
+                      image={`${imageBaseUrl}images/items/category-${category}.png`}
                       alt={t(category)}
                       onClick={() => setSelectedCategory(category)}
                       sx={{
@@ -159,7 +160,7 @@ const CharacterAddItemDialog: FC<{
                     <CardMedia
                       key={subcategory}
                       component="img"
-                      image={`/static/images/items/category-${subcategory}.png`}
+                      image={`${imageBaseUrl}images/items/category-${subcategory}.png`}
                       alt={t(subcategory)}
                       onClick={() => setSelectedSubcategory(subcategory)}
                       sx={{
@@ -184,7 +185,7 @@ const CharacterAddItemDialog: FC<{
                   <CardMedia
                     key={item.id}
                     component="img"
-                    image={`/static/images/items/${item.id}.png`}
+                    image={`${imageBaseUrl}images/items/${item.id}.png`}
                     alt={t(item.id)}
                     onClick={() => loadItem(item)}
                     sx={{

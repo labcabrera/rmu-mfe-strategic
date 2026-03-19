@@ -1,8 +1,7 @@
 import React, { useState, useEffect, FC } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import OutboundIcon from '@mui/icons-material/Outbound';
-import { Grid, Accordion, AccordionSummary, AccordionDetails, IconButton, Box, Button, TextField } from '@mui/material';
+import { Grid, IconButton, Box, Button, TextField } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { CreateCharacterDto } from '../../api/character.dto';
@@ -15,6 +14,7 @@ import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { CHARACTER_CREATION_TEMPLATE } from '../../data/character-create';
 import { imageBaseUrl } from '../../services/config';
+import { gridSizeResume, gridSizeMain } from '../../services/display';
 import { randomizeStats } from '../../services/randomize-stats';
 import EditableAvatar from '../../shared/avatars/EditableAvatar';
 import RefreshButton from '../../shared/buttons/RefreshButton';
@@ -144,7 +144,7 @@ const CharacterCreate: FC = () => {
       <CharacterCreateActions formData={formData} game={game} faction={faction} isValid={isValid} />
 
       <Grid container spacing={1}>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeResume}>
           <EditableAvatar
             imageUrl={formData.imageUrl || defaultImage}
             onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl })}
@@ -158,7 +158,7 @@ const CharacterCreate: FC = () => {
           />
         </Grid>
 
-        <Grid size={{ xs: 12, md: 8 }}>
+        <Grid size={gridSizeMain}>
           <CategorySeparator text={t('stats')}>
             <Box sx={{ display: 'flex', gap: 1 }}>
               <RefreshButton onClick={onRandomStats} />

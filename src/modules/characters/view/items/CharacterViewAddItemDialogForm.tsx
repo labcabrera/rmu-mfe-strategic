@@ -3,6 +3,7 @@ import { Box, Chip, Grid, Stack, TextField, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { AddItemDto } from '../../../api/character.dto';
 import { Item } from '../../../api/items';
+import { imageBaseUrl } from '../../../services/config';
 import NumericCard from '../../../shared/cards/NumericCard';
 import TextCard from '../../../shared/cards/TextCard';
 import NumericInput from '../../../shared/inputs/NumericInput';
@@ -74,23 +75,23 @@ const CharacterViewAddItemDialogForm: FC<{
             <TextCard
               value={`${item.info.cost.min || ''}g`}
               subtitle="Min cost"
-              image={`/static/images/generic/coins.png`}
+              image={`${imageBaseUrl}images/generic/coins.png`}
             />
             <TextCard
               value={`${item.info.cost.average || ''}g`}
               subtitle="Average cost"
-              image={`/static/images/generic/coins.png`}
+              image={`${imageBaseUrl}images/generic/coins.png`}
             />
             <TextCard
               value={`${item.info.cost.max || ''}g`}
               subtitle="Max cost"
-              image={`/static/images/generic/coins.png`}
+              image={`${imageBaseUrl}images/generic/coins.png`}
             />
             {item.info && item.info.weight && (
               <NumericCard
                 value={item.info.weight}
                 subtitle="Weight"
-                image={`/static/images/generic/weight-penalty.png`}
+                image={`${imageBaseUrl}images/generic/weight-penalty.png`}
                 applyColor={false}
               />
             )}
@@ -98,14 +99,14 @@ const CharacterViewAddItemDialogForm: FC<{
               <TextCard
                 value={`${item.info.weightPercent}%`}
                 subtitle="Weight"
-                image={`/static/images/generic/weight-penalty.png`}
+                image={`${imageBaseUrl}images/generic/weight-penalty.png`}
               />
             )}
             {item.weapon && item.weapon.attackTable && (
               <NumericCard
                 value={item.weapon.attackTable}
                 subtitle="Attack Table"
-                image={`/static/images/generic/configuration.png`}
+                image={`${imageBaseUrl}images/generic/configuration.png`}
                 applyColor={false}
               />
             )}
@@ -113,7 +114,7 @@ const CharacterViewAddItemDialogForm: FC<{
               <NumericCard
                 value={item.weapon.sizeAdjustment}
                 subtitle="Size adjustment"
-                image={`/static/images/generic/configuration.png`}
+                image={`${imageBaseUrl}images/generic/configuration.png`}
                 applyColor={false}
               />
             )}
@@ -121,7 +122,7 @@ const CharacterViewAddItemDialogForm: FC<{
               <NumericCard
                 value={item.weapon.fumble}
                 subtitle="Fumble"
-                image={`/static/images/generic/configuration.png`}
+                image={`${imageBaseUrl}images/generic/configuration.png`}
                 applyColor={false}
               />
             )}
@@ -129,7 +130,7 @@ const CharacterViewAddItemDialogForm: FC<{
               <NumericCard
                 value={item.weapon.requiredHands}
                 subtitle="Required hands"
-                image={`/static/images/generic/configuration.png`}
+                image={`${imageBaseUrl}images/generic/configuration.png`}
                 applyColor={false}
               />
             )}
@@ -138,23 +139,23 @@ const CharacterViewAddItemDialogForm: FC<{
                 <NumericCard
                   value={item.armor.at}
                   subtitle="Armor type"
-                  image={`/static/images/generic/armor.png`}
+                  image={`${imageBaseUrl}images/generic/armor.png`}
                   applyColor={false}
                 />
                 <NumericCard
                   value={item.armor.maneuver}
                   subtitle="Maneuver penalty"
-                  image={`/static/images/generic/maneuver-penalty.png`}
+                  image={`${imageBaseUrl}images/generic/maneuver-penalty.png`}
                 />
                 <NumericCard
                   value={item.armor.rangedPenalty}
                   subtitle="Ranged penalty"
-                  image={`/static/images/generic/armor-ranged-penalty.png`}
+                  image={`${imageBaseUrl}images/generic/armor-ranged-penalty.png`}
                 />
                 <NumericCard
                   value={item.armor.perception}
                   subtitle="Perception penalty"
-                  image={`/static/images/generic/armor-perception-penalty.png`}
+                  image={`${imageBaseUrl}images/generic/armor-perception-penalty.png`}
                 />
               </>
             )}
@@ -162,7 +163,7 @@ const CharacterViewAddItemDialogForm: FC<{
               <NumericCard
                 value={item.info.strength}
                 subtitle="Strength"
-                image={`/static/images/generic/configuration.png`}
+                image={`${imageBaseUrl}images/generic/configuration.png`}
                 applyColor={false}
               />
             )}
