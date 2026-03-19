@@ -10,6 +10,7 @@ import { StrategicGame } from '../../api/strategic-game.dto';
 import { fetchTacticalGames, TacticalGame } from '../../api/tactical-games';
 import AddButton from '../../shared/buttons/AddButton';
 import CategorySeparator from '../../shared/display/CategorySeparator';
+import TechnicalInfo from '../../shared/display/TechnicalInfo';
 import StrategicGameViewActions from './StrategicGameViewActions';
 import StrategicGameViewAttributes from './StrategicGameViewAttributes';
 import StrategicGameViewFactions from './StrategicGameViewFactions';
@@ -77,6 +78,9 @@ const StrategicGameView: React.FC = () => {
             <AddButton onClick={onCreateTacticalGame} />
           </CategorySeparator>
           <StrategicGameViewTacticalGames tacticalGames={tacticalGames} />
+          <TechnicalInfo>
+            <pre>StrategicGame: {JSON.stringify(strategicGame, null, 2)}</pre>
+          </TechnicalInfo>
         </Grid>
       </Grid>
     </>

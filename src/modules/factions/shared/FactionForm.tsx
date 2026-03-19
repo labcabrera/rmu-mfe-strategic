@@ -2,18 +2,18 @@ import React, { Dispatch, FC, SetStateAction } from 'react';
 import { TextField } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { t } from 'i18next';
-import { CreateFactionDto } from '../../api/faction.dto';
+import { CreateFactionDto, UpdateFactionDto } from '../../api/faction.dto';
 import NumericInput from '../../shared/inputs/NumericInput';
 
-const FactionCreateAttributes: FC<{
-  formData: CreateFactionDto;
-  setFormData: Dispatch<SetStateAction<CreateFactionDto>>;
+const FactionForm: FC<{
+  formData: CreateFactionDto | UpdateFactionDto;
+  setFormData: Dispatch<SetStateAction<CreateFactionDto | UpdateFactionDto>>;
 }> = ({ formData, setFormData }) => {
   return (
     <Grid container spacing={1}>
       <Grid size={12}>
         <TextField
-          label={t('faction-name')}
+          label={t('Faction name')}
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           error={!formData.name}
@@ -22,7 +22,7 @@ const FactionCreateAttributes: FC<{
       </Grid>
       <Grid size={12}>
         <NumericInput
-          label={t('available-gold')}
+          label={t('Gold')}
           name="availableGold"
           value={formData.management.availableGold}
           onChange={(e) => setFormData({ ...formData, management: { ...formData.management, availableGold: e } })}
@@ -31,7 +31,7 @@ const FactionCreateAttributes: FC<{
       </Grid>
       <Grid size={12}>
         <NumericInput
-          label={t('available-xp')}
+          label={t('XP')}
           name="availableXP"
           value={formData.management.availableXP}
           onChange={(e) => setFormData({ ...formData, management: { ...formData.management, availableXP: e } })}
@@ -49,17 +49,17 @@ const FactionCreateAttributes: FC<{
       </Grid>
       <Grid size={12}>
         <TextField
-          label={t('description')}
+          label={t('Description')}
           name="description"
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           fullWidth
           multiline
-          maxRows={12}
+          rows={4}
         />
       </Grid>
     </Grid>
   );
 };
 
-export default FactionCreateAttributes;
+export default FactionForm;

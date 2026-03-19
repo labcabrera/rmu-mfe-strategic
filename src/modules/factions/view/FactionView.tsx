@@ -14,6 +14,7 @@ import { StrategicGame } from '../../api/strategic-game.dto';
 import AddButton from '../../shared/buttons/AddButton';
 import RmuTextCard from '../../shared/cards/RmuTextCard';
 import CategorySeparator from '../../shared/display/CategorySeparator';
+import TechnicalInfo from '../../shared/display/TechnicalInfo';
 import FactionViewActions from './FactionViewActions';
 import FactionViewAttributes from './FactionViewAttributes';
 import FactionViewCharactersTable from './FactionViewCharacterTable';
@@ -81,7 +82,7 @@ const FactionView: FC = () => {
         <Grid size={{ xs: 12, md: 12, sm: 12, lg: 2 }}>
           <FactionViewResume faction={faction} setFaction={setFaction} game={game} />
         </Grid>
-        <Grid size={{ xs: 12, md: 12, sm: 12, lg: 8 }}>
+        <Grid size={{ xs: 12, md: 12, sm: 12, lg: 10 }}>
           <CategorySeparator text={t('Strategic game')} />
           <Grid container spacing={1}>
             <Grid size={{ xs: 12, md: 3 }}>
@@ -119,6 +120,11 @@ const FactionView: FC = () => {
           ) : (
             <FactionViewCharacters faction={faction} characters={characters} />
           )}
+          <Grid size={12} mt={2}>
+            <TechnicalInfo>
+              <pre>Faction: {JSON.stringify(faction, null, 2)}</pre>
+            </TechnicalInfo>
+          </Grid>
         </Grid>
       </Grid>
     </>

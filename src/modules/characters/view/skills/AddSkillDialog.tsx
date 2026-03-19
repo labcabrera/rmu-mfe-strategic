@@ -15,10 +15,12 @@ import {
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { Character } from '../../../api/character.dto';
+import { fetchEnumerations } from '../../../api/enumerations';
 import { fetchSkills } from '../../../api/skill';
 import { fetchSkillCategories } from '../../../api/skill-category';
 import { SkillCategory } from '../../../api/skill-category.dto';
 import { AddSkill, Skill } from '../../../api/skill.dto';
+import RmUSelect from '../../../shared/selects/RmuSelect';
 import AddSkillSpecialization from './AddSkillSpecialization';
 
 const AddSkillDialog: FC<{
@@ -36,6 +38,7 @@ const AddSkillDialog: FC<{
   const [skills, setSkills] = useState<Skill[]>([]);
   const [filteredCategories, setFilteredCategories] = useState<SkillCategory[]>([]);
   const [filteredSkills, setFilteredSkills] = useState<Skill[]>([]);
+  const [specializations, setSpecializations] = useState<string[]>();
 
   const bindSkillCategories = () => {
     fetchSkillCategories()
@@ -95,6 +98,16 @@ const AddSkillDialog: FC<{
     if (selectedSkill.specialization && !selectedSpecialization) return true;
     return false;
   };
+
+  useEffect(() => {
+    if (!selectedSkill || !selectedSkill.specialization) {
+      setSpecializations(undefined);
+    } else {
+      fetchEnumerations(`category==${selectedSkill.specialization}`, 0, 100)
+        .then((response) => setSpecializations(response.content.map((e) => e.key)))
+        .catch((err) => showError(err.message));
+    }
+  }, [selectedSkill]);
 
   useEffect(() => {
     filterSkills();
@@ -165,16 +178,16 @@ const AddSkillDialog: FC<{
             )}
           </Grid>
           <Grid size={4}>
-            {selectedSkill && selectedSkill.specialization && (
+            {selectedSkill && selectedSkill.specialization && specializations && (
               <>
                 <Typography variant="subtitle1" sx={{ mb: 1 }}>
                   {t('specialization')}
                 </Typography>
-
-                <AddSkillSpecialization
-                  skill={selectedSkill}
-                  specialization={selectedSpecialization}
-                  setSpecialization={setSelectedSpecialization}
+                <RmUSelect
+                  value={selectedSpecialization || ''}
+                  label={'Specialization'}
+                  options={specializations}
+                  onChange={(value) => setSelectedSpecialization(value)}
                 />
               </>
             )}

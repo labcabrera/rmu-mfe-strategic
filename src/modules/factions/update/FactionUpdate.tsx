@@ -4,6 +4,7 @@ import { Grid } from '@mui/material';
 import { Faction, UpdateFactionDto } from '../../api/faction.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import EditableAvatar from '../../shared/avatars/EditableAvatar';
+import FactionForm from '../shared/FactionForm';
 import FactionUpdateActions from './FactionUpdateActions';
 import FactionUpdateAttributes from './FactionUpdateAttributes';
 
@@ -34,7 +35,7 @@ const FactionUpdate: FC = () => {
           <EditableAvatar imageUrl={formData.imageUrl || ''} onImageChange={onImageUpdated} />
         </Grid>
         <Grid size={{ xs: 12, md: 8 }}>
-          <FactionUpdateAttributes formData={formData} setFormData={setFormData} />
+          <FactionForm formData={formData} setFormData={setFormData} />
         </Grid>
       </Grid>
     </>

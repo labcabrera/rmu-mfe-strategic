@@ -45,7 +45,7 @@ const StrategicGameList: FC = () => {
           <StrategicGameListResume />
         </Grid>
 
-        <Grid size={{ xs: 12, md: 8 }}>
+        <Grid size={{ xs: 12, md: 10 }}>
           <Grid container spacing={1}>
             {strategicGames.map((game) => (
               <Grid key={game.id} size={{ xs: 12, md: 3 }}>

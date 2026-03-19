@@ -6,7 +6,7 @@ import { imageBaseUrl } from '../../services/config';
 import RmuTextCard from '../../shared/cards/RmuTextCard';
 
 const grayscale = 0.7;
-const gridSize = { xs: 10, md: 2 } as const;
+const gridSize = { xs: 10, md: 3 } as const;
 
 const StrategicGameViewAttributes: FC<{
   strategicGame: StrategicGame;
@@ -36,7 +36,7 @@ const StrategicGameViewAttributes: FC<{
   ];
 
   return (
-    <Grid container spacing={1} columns={10}>
+    <Grid container spacing={1} columns={12}>
       {DATA.map((e, index) => (
         <Grid key={index} size={gridSize}>
           <RmuTextCard
