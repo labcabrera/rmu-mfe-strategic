@@ -25,7 +25,28 @@ export interface Character {
   imageUrl: string | undefined;
 }
 
-export interface CreateCharacterDto extends Omit<Character, 'id'> {}
+export interface CreateCharacterDto {
+  id: string;
+  gameId: string;
+  faction: NamedId;
+  name: string;
+  info: CharacterInfo;
+  roleplay: CharacterRoleplay;
+  level: number;
+  statistics: CharacterStatistics;
+  resistances: CharacterResistance[];
+  hp: CharacterHP;
+  movement: CharacterMovement;
+  initiative: CharacterInitiative;
+  defense: CharacterDefense;
+  skills: CharacterSkill[];
+  items: CharacterItem[];
+  equipment: CharacterEquipment;
+  attacks: CharacterAttack[];
+  traits: CharacterTrait[];
+  description: string | undefined;
+  imageUrl: string | undefined;
+}
 
 export interface CharacterDefense {
   defensiveBonus: number;

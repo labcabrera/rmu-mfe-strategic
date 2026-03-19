@@ -15,7 +15,7 @@ export const CHARACTER_CREATION_TEMPLATE: CreateCharacterDto = {
     gender: 'male',
     age: 20,
   },
-  level: 1,
+  level: null,
   weaponDevelopment: ['melee', 'ranged', 'shield', 'unarmed'],
   statistics: {
     ag: {
@@ -88,10 +88,6 @@ export const CHARACTER_CREATION_TEMPLATE: CreateCharacterDto = {
       ranks: 0,
     },
     {
-      skillId: 'melee-weapon@blade',
-      ranks: 0,
-    },
-    {
       skillId: 'armor-maneuver',
       ranks: 0,
     },
@@ -112,19 +108,10 @@ export const CHARACTER_CREATION_TEMPLATE: CreateCharacterDto = {
       ranks: 0,
     },
     {
-      skillId: 'multiple-attacks',
-      ranks: 0,
-    },
-    {
       skillId: 'medicine',
       ranks: 0,
     },
   ],
-  items: [
-    {
-      name: 'Basic dagger',
-      itemTypeId: 'dagger',
-    },
-  ],
+  items: [],
   description: '',
 };

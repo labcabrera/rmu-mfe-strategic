@@ -19,6 +19,7 @@ import { randomizeStats } from '../../services/randomize-stats';
 import EditableAvatar from '../../shared/avatars/EditableAvatar';
 import RefreshButton from '../../shared/buttons/RefreshButton';
 import CategorySeparator from '../../shared/display/CategorySeparator';
+import TechnicalInfo from '../../shared/display/TechnicalInfo';
 import CharacterViewStatsChart from '../view/CharacterViewStatsChart';
 import CharacterCreateActions from './CharacterCreateActions';
 import CharacterCreateBoostOptionsDialog from './CharacterCreateBoostOptionsDialog';
@@ -81,6 +82,7 @@ const CharacterCreate: FC = () => {
     if (!formData.info?.professionId) valid = false;
     if (!formData.info?.realmType) valid = false;
     if (!formData.info?.weight) valid = false;
+    if (!formData.level) valid = false;
     setIsValid(valid);
   };
 
@@ -204,12 +206,11 @@ const CharacterCreate: FC = () => {
             />
           </Grid>
 
-          <Accordion sx={{ mt: 5 }}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>debug</AccordionSummary>
-            <AccordionDetails>
-              <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{JSON.stringify(formData, null, 2)}</pre>
-            </AccordionDetails>
-          </Accordion>
+          <Grid size={12} mt={2}>
+            <TechnicalInfo>
+              <pre>{JSON.stringify(formData, null, 2)}</pre>
+            </TechnicalInfo>
+          </Grid>
         </Grid>
       </Grid>
 
