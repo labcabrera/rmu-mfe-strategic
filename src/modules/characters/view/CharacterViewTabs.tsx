@@ -51,7 +51,13 @@ const CharacterViewTabs: FC<{
   return (
     <Box sx={{ width: '100%' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          aria-label="Character tabs"
+          variant="scrollable"
+          scrollButtons="auto"
+        >
           <Tab label="Information" {...a11yProps(0)} />
           <Tab label="Stats" {...a11yProps(1)} />
           <Tab label="Resistances" {...a11yProps(2)} />
