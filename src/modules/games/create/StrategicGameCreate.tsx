@@ -4,6 +4,7 @@ import { useError } from '../../../ErrorContext';
 import { fetchRealms } from '../../api/realm';
 import { Realm } from '../../api/realm.dto';
 import { CreateStrategicGameDto, CREATE_GAME_TEMPLATE } from '../../api/strategic-game.dto';
+import { gridSizeResume, gridSizeMain } from '../../services/display';
 import { DEFAULT_REALM_IMAGE } from '../../services/image-service';
 import EditableAvatar from '../../shared/avatars/EditableAvatar';
 import TechnicalInfo from '../../shared/display/TechnicalInfo';
@@ -35,14 +36,14 @@ const StrategicGameCreate: FC = () => {
   return (
     <>
       <StrategicGameCreateActions formData={formData} isValid={isValid} />
-      <Grid container spacing={5}>
-        <Grid size={{ xs: 12, md: 2 }}>
+      <Grid container spacing={1}>
+        <Grid size={gridSizeResume}>
           <EditableAvatar
             imageUrl={formData.imageUrl || DEFAULT_REALM_IMAGE}
             onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl })}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 8 }}>
+        <Grid size={gridSizeMain}>
           <StrategicGameForm formData={formData} setFormData={setFormData} realms={realms} />
           <TechnicalInfo>
             <pre>{JSON.stringify(formData, null, 2)}</pre>

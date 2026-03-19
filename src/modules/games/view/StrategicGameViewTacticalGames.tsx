@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Grid, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { TacticalGame } from '../../api/tactical-games';
+import { gridSizeCard } from '../../services/display';
 import RmuTextCard from '../../shared/cards/RmuTextCard';
 
 const StrategicGameViewTacticalGames: FC<{
@@ -13,7 +14,7 @@ const StrategicGameViewTacticalGames: FC<{
   return (
     <Grid container spacing={1}>
       {tacticalGames.map((tacticalGame) => (
-        <Grid key={tacticalGame.id} size={{ xs: 12, md: 3 }}>
+        <Grid key={tacticalGame.id} size={gridSizeCard}>
           <RmuTextCard
             value={tacticalGame.name}
             subtitle={tacticalGame.shortDescription}

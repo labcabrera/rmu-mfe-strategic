@@ -190,7 +190,7 @@ const StrategicGameForm: FC<{
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             fullWidth
             multiline
-            rows={12}
+            rows={4}
           />
         </Grid>
       </Grid>

@@ -3,10 +3,10 @@ import { Grid } from '@mui/material';
 import { t } from 'i18next';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { imageBaseUrl } from '../../services/config';
+import { gridSizeCard } from '../../services/display';
 import RmuTextCard from '../../shared/cards/RmuTextCard';
 
 const grayscale = 0.7;
-const gridSize = { xs: 12, md: 3 } as const;
 
 const StrategicGameViewPowerLevel: FC<{
   strategicGame: StrategicGame;
@@ -47,7 +47,7 @@ const StrategicGameViewPowerLevel: FC<{
   return (
     <Grid container spacing={1} columns={12}>
       {DATA.map((e, index) => (
-        <Grid key={index} size={gridSize}>
+        <Grid key={index} size={gridSizeCard}>
           <RmuTextCard value={e.value} subtitle={e.subtitle} image={e.image} grayscale={grayscale} />
         </Grid>
       ))}

@@ -4,6 +4,7 @@ import { Grid } from '@mui/material';
 import { useError } from '../../../ErrorContext';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame, UpdateStrategicGameDto } from '../../api/strategic-game.dto';
+import { gridSizeResume, gridSizeMain } from '../../services/display';
 import EditableAvatar from '../../shared/avatars/EditableAvatar';
 import StrategicGameForm from '../shared/StrategicGameForm';
 import StrategicGameUpdateActions from './StrategicGameUpdateActions';
@@ -54,7 +55,7 @@ const StrategicGameUpdate: FC = () => {
     <>
       <StrategicGameUpdateActions strategicGame={strategicGame} formData={formData} isValid={isValid} />
       <Grid container spacing={1}>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeResume}>
           <EditableAvatar
             imageUrl={strategicGame.imageUrl || ''}
             onImageChange={function (newImageUrl: string): void {
@@ -62,7 +63,7 @@ const StrategicGameUpdate: FC = () => {
             }}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 8 }}>
+        <Grid size={gridSizeMain}>
           <StrategicGameForm formData={formData} setFormData={setFormData} create={false} />
         </Grid>
       </Grid>

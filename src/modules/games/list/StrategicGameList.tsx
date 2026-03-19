@@ -4,9 +4,9 @@ import { Grid, Box, Typography, Pagination } from '@mui/material';
 import { useError } from '../../../ErrorContext';
 import { fetchStrategicGamesPaged } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
+import { gridSizeMain, gridSizeResume, gridSizeCard } from '../../services/display';
 import RmuTextCard from '../../shared/cards/RmuTextCard';
 import StrategicGameListActions from './StrategicGameListActions';
-import StrategicGameListResume from './StrategicGameListResume';
 
 const pageSize = 24;
 
@@ -41,14 +41,11 @@ const StrategicGameList: FC = () => {
     <>
       <StrategicGameListActions />
       <Grid container spacing={1}>
-        <Grid size={2} sx={{ display: { xs: 'none', md: 'block' } }}>
-          <StrategicGameListResume />
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 10 }}>
+        <Grid size={gridSizeResume}></Grid>
+        <Grid size={gridSizeMain}>
           <Grid container spacing={1}>
-            {strategicGames.map((game) => (
-              <Grid key={game.id} size={{ xs: 12, md: 3 }}>
+            {strategicGames.map((game, index) => (
+              <Grid key={index} size={gridSizeCard}>
                 <RmuTextCard
                   value={game.name}
                   subtitle={game.realmName}
@@ -68,9 +65,6 @@ const StrategicGameList: FC = () => {
             <Box display="flex" justifyContent="center" mt={5}>
               <Pagination count={totalPages} page={page + 1} onChange={onPageChange} color="primary" />
             </Box>
-          </Grid>
-          <Grid size={12} sx={{ display: { xs: 'block', md: 'none' } }}>
-            <StrategicGameListResume />
           </Grid>
         </Grid>
       </Grid>

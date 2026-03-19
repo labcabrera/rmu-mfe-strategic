@@ -8,6 +8,7 @@ import { Faction } from '../../api/faction.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { fetchTacticalGames, TacticalGame } from '../../api/tactical-games';
+import { gridSizeMain, gridSizeResume } from '../../services/display';
 import AddButton from '../../shared/buttons/AddButton';
 import CategorySeparator from '../../shared/display/CategorySeparator';
 import TechnicalInfo from '../../shared/display/TechnicalInfo';
@@ -62,10 +63,10 @@ const StrategicGameView: React.FC = () => {
     <>
       <StrategicGameViewActions strategicGame={strategicGame} setStrategicGame={setStrategicGame} />
       <Grid container spacing={1}>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeResume}>
           <StrategicGameViewResume strategicGame={strategicGame} setStrategicGame={setStrategicGame} />
         </Grid>
-        <Grid size={{ xs: 12, md: 10 }}>
+        <Grid size={gridSizeMain}>
           <CategorySeparator text={t('options')} />
           <StrategicGameViewAttributes strategicGame={strategicGame} />
           <CategorySeparator text={t('power-level')} />
