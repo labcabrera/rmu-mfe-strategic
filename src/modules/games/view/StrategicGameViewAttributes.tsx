@@ -6,45 +6,48 @@ import { imageBaseUrl } from '../../services/config';
 import RmuTextCard from '../../shared/cards/RmuTextCard';
 
 const grayscale = 0.7;
+const gridSize = { xs: 10, md: 2 } as const;
 
 const StrategicGameViewAttributes: FC<{
   strategicGame: StrategicGame;
 }> = ({ strategicGame }) => {
+  const DATA = [
+    {
+      value: strategicGame.options.experienceMultiplier,
+      subtitle: t('Experience multiplier'),
+      image: `${imageBaseUrl}images/generic/experience.png`,
+    },
+    {
+      value: strategicGame.options.fatigueMultiplier,
+      subtitle: t('Fatigue multiplier'),
+      image: `${imageBaseUrl}images/generic/stat-co.png`,
+    },
+    {
+      value: strategicGame.options.boardScaleMultiplier,
+      subtitle: t('Board scale'),
+      image: `${imageBaseUrl}images/generic/realm.png`,
+      applyColor: false,
+    },
+    {
+      value: strategicGame.options.letality,
+      subtitle: t('Letality'),
+      image: `${imageBaseUrl}images/generic/physical.png`,
+    },
+  ];
+
   return (
-    <Grid container spacing={1}>
-      <Grid size={{ xs: 12, md: 2 }}>
-        <RmuTextCard
-          value={strategicGame.options.experienceMultiplier}
-          subtitle={t('experience-multiplier')}
-          image={`${imageBaseUrl}images/generic/experience.png`}
-          grayscale={grayscale}
-        />
-      </Grid>
-      <Grid size={{ xs: 12, md: 2 }}>
-        <RmuTextCard
-          value={strategicGame.options.fatigueMultiplier}
-          subtitle={t('fatigue-multiplier')}
-          image={`${imageBaseUrl}images/generic/stat-co.png`}
-          grayscale={grayscale}
-        />
-      </Grid>
-      <Grid size={{ xs: 12, md: 2 }}>
-        <RmuTextCard
-          value={strategicGame.options.boardScaleMultiplier}
-          subtitle={t('board-scale-multiplier')}
-          image={`${imageBaseUrl}images/generic/realm.png`}
-          grayscale={grayscale}
-          applyColor={false}
-        />
-      </Grid>
-      <Grid size={{ xs: 12, md: 2 }}>
-        <RmuTextCard
-          value={strategicGame.options.letality}
-          subtitle={t('letality')}
-          image={`${imageBaseUrl}images/generic/physical.png`}
-          grayscale={grayscale}
-        />
-      </Grid>
+    <Grid container spacing={1} columns={10}>
+      {DATA.map((e, index) => (
+        <Grid key={index} size={gridSize}>
+          <RmuTextCard
+            value={e.value}
+            subtitle={e.subtitle}
+            image={e.image}
+            grayscale={grayscale}
+            applyColor={e.applyColor ?? false}
+          />
+        </Grid>
+      ))}
     </Grid>
   );
 };

@@ -1,5 +1,5 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
-import { Divider, Grid, TextField, Typography } from '@mui/material';
+import { Grid, TextField } from '@mui/material';
 import { t } from 'i18next';
 import { Realm } from '../../api/realm.dto';
 import { CreateStrategicGameDto, UpdateStrategicGameDto } from '../../api/strategic-game.dto';

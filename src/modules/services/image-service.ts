@@ -1,5 +1,7 @@
 import { imageBaseUrl } from '../services/config';
 
+export const DEFAULT_REALM_IMAGE = `${imageBaseUrl}images/generic/strategic.png`;
+
 // Note: generate options using the following command in the images/items folder:
 // for f in *; do [ -f "$f" ] || continue; echo "\`\${imageBaseUrl}images/items/$f\`,"; done
 

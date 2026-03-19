@@ -64,7 +64,7 @@ const StrategicGameView: React.FC = () => {
         <Grid size={{ xs: 12, md: 2 }}>
           <StrategicGameViewResume strategicGame={strategicGame} setStrategicGame={setStrategicGame} />
         </Grid>
-        <Grid size={{ xs: 12, md: 8 }}>
+        <Grid size={{ xs: 12, md: 10 }}>
           <CategorySeparator text={t('options')} />
           <StrategicGameViewAttributes strategicGame={strategicGame} />
           <CategorySeparator text={t('power-level')} />

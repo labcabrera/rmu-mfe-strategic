@@ -3,7 +3,8 @@ import { Grid } from '@mui/material';
 import { useError } from '../../../ErrorContext';
 import { fetchRealms } from '../../api/realm';
 import { Realm } from '../../api/realm.dto';
-import { CreateStrategicGameDto, gameCreateTemplate } from '../../api/strategic-game.dto';
+import { CreateStrategicGameDto, CREATE_GAME_TEMPLATE } from '../../api/strategic-game.dto';
+import { DEFAULT_REALM_IMAGE } from '../../services/image-service';
 import EditableAvatar from '../../shared/avatars/EditableAvatar';
 import TechnicalInfo from '../../shared/display/TechnicalInfo';
 import StrategicGameForm from '../shared/StrategicGameForm';
@@ -12,7 +13,7 @@ import StrategicGameCreateActions from './StrategicGameCreateActions';
 const StrategicGameCreate: FC = () => {
   const { showError } = useError();
   const [realms, setRealms] = useState<Realm[]>([]);
-  const [formData, setFormData] = useState<CreateStrategicGameDto>(gameCreateTemplate);
+  const [formData, setFormData] = useState<CreateStrategicGameDto>(CREATE_GAME_TEMPLATE);
   const [isValid, setIsValid] = useState<boolean>(false);
 
   const validateForm = (formData: CreateStrategicGameDto) => {
@@ -37,7 +38,7 @@ const StrategicGameCreate: FC = () => {
       <Grid container spacing={5}>
         <Grid size={{ xs: 12, md: 2 }}>
           <EditableAvatar
-            imageUrl={formData.imageUrl || ''}
+            imageUrl={formData.imageUrl || DEFAULT_REALM_IMAGE}
             onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl })}
           />
         </Grid>
