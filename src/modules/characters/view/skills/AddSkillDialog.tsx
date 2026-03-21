@@ -111,7 +111,7 @@ const AddSkillDialog: FC<{
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle>{t('Add skill')}</DialogTitle>
       <DialogContent>
-        <Grid container spacing={2} sx={{ mt: 1 }}>
+        <Grid container spacing={1} sx={{ mt: 1 }}>
           <Grid size={4}>
             <Typography variant="subtitle1" sx={{ mb: 1 }}>
               {t('Skill category')}

@@ -1,5 +1,16 @@
 import React, { useState, useEffect, FC } from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { fetchTrait } from '../../../api/trait';
@@ -28,9 +39,11 @@ const CharacterViewTraitDialog: FC<{
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle color="primary">{t(trait.name)}</DialogTitle>
       <DialogContent>
-        <Typography variant="body2" color="textSecondary" gutterBottom>
-          {trait.description}
-        </Typography>
+        <Grid container spacing={1} sx={{ mt: 1 }}>
+          <Typography variant="body2" color="textSecondary" gutterBottom>
+            {trait.description}
+          </Typography>
+        </Grid>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{t('close')}</Button>

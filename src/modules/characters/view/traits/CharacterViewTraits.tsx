@@ -8,7 +8,7 @@ import { toRoman } from '../../../services/roman-number-service';
 import AddButton from '../../../shared/buttons/AddButton';
 import DeleteButton from '../../../shared/buttons/DeleteButton';
 import TextCard from '../../../shared/cards/TextCard';
-import CharacterViewAddTraitDialog from '../CharacterViewAddTraitDialog';
+import AddTraitDialog from './AddTraitDialog';
 import CharacterViewTraitDialog from './CharacterViewTraitDialog';
 
 const CharacterViewTraits: FC<{
@@ -76,7 +76,7 @@ const CharacterViewTraits: FC<{
         ))}
         {character.traits.length === 0 && <div>This character has no traits.</div>}
       </Grid>
-      <CharacterViewAddTraitDialog
+      <AddTraitDialog
         open={openAddTraitDialog}
         onClose={() => setOpenAddTraitDialog(false)}
         onTraitAdded={(addTraitDto) => onAddTrait(addTraitDto)}

@@ -1,32 +1,40 @@
-import React, { useState, useEffect, FC, SyntheticEvent } from 'react';
+import React, { ChangeEvent, FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import Autocomplete from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
-import { Skill } from '../../api/skill.dto';
-import { Trait } from '../../api/trait.dto';
+import { MenuItem, TextField } from '@mui/material';
+import { traitCategories } from '../../api/trait.dto';
 
-const SelectTrait: FC<{
-  traits: Trait[];
-  value: string | null | undefined;
+const SelectTraitCategory: FC<{
   label: string;
-  onChange: (trait?: Trait) => void;
-}> = ({ traits, value, onChange, label }) => {
-  const handleChange = (_event: SyntheticEvent, newValue: Trait | null) => {
-    onChange(newValue || undefined);
-  };
-
-  const selectedTrait = traits.find((trait) => trait.id === value) || null;
+  value: string | null;
+  name: string;
+  addAllOption?: boolean;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  required?: boolean;
+}> = ({ label, value, name, onChange, addAllOption = false, required = false }) => {
+  const { t } = useTranslation();
 
   return (
-    <Autocomplete
-      options={traits}
-      getOptionLabel={(option: Trait) => option.name}
-      value={selectedTrait}
-      onChange={handleChange}
-      renderInput={(params) => <TextField {...params} label={label} variant="standard" fullWidth />}
-      isOptionEqualToValue={(option, value) => option.id === value.id}
-    />
+    <TextField
+      select
+      label={label}
+      name={name}
+      value={value === undefined || value === null ? '' : value}
+      fullWidth
+      onChange={onChange}
+      error={required && !value}
+    >
+      {addAllOption ? (
+        <MenuItem>
+          <em>{t('all')}</em>
+        </MenuItem>
+      ) : null}
+      {traitCategories.map((option, index) => (
+        <MenuItem key={index} value={option}>
+          {t(option)}
+        </MenuItem>
+      ))}
+    </TextField>
   );
 };
 
-export default SelectTrait;
+export default SelectTraitCategory;
