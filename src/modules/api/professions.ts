@@ -6,6 +6,8 @@ import { Page } from './common.dto';
 export interface Profession {
   id: string;
   name: string;
+  availableRealmTypes: string[];
+  fixedRealmTypes: string[];
   professionalSkills: string[];
   skillCosts: Record<string, number[]>;
   [key: string]: any;

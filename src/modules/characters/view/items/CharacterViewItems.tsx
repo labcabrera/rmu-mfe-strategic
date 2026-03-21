@@ -2,7 +2,18 @@ import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import { Button, Card, CardActions, CardContent, CardMedia, Grid, IconButton, Link, Typography } from '@mui/material';
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardMedia,
+  Grid,
+  IconButton,
+  Link,
+  Stack,
+  Typography,
+} from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { addItem, deleteItem, updateCarriedStatus } from '../../../api/character';
@@ -41,8 +52,10 @@ const CharacterViewItems: FC<{
   return (
     <>
       <CategorySeparator text={t('equiped-items')}>
-        <Button onClick={() => navigate(`/strategic/characters/trade/${character.id}`)}>Trade</Button>
-        <Button onClick={() => navigate(`/strategic/characters/craft/${character.id}`)}>Craft</Button>
+        <Stack direction="row" spacing={1}>
+          <Button onClick={() => navigate(`/strategic/characters/trade/${character.id}`)}>Trade</Button>
+          <Button onClick={() => navigate(`/strategic/characters/craft/${character.id}`)}>Craft</Button>
+        </Stack>
       </CategorySeparator>
 
       <Grid container spacing={1}>

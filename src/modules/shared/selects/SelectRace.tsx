@@ -1,7 +1,5 @@
 import React, { ChangeEvent, FC } from 'react';
-import MenuItem from '@mui/material/MenuItem';
-import TextField, { TextFieldProps } from '@mui/material/TextField';
-import { t } from 'i18next';
+import { MenuItem, TextField } from '@mui/material';
 import { Race } from '../../api/race.dto';
 
 const SelectFaction: FC<{
@@ -12,7 +10,7 @@ const SelectFaction: FC<{
 }> = ({ label, value, onChange, races }) => {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const race = races.find((r) => r.id === e.target.value);
-    onChange(race);
+    onChange(race!);
   };
 
   const error = value === undefined || value === null || value === '' ? true : false;

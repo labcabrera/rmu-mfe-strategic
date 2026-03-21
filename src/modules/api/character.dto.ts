@@ -30,7 +30,7 @@ export interface CreateCharacterDto {
   gameId: string;
   faction: NamedId;
   name: string;
-  info: CharacterInfo;
+  info: CreateCharacterInfoDto;
   roleplay: CharacterRoleplay;
   level: number;
   statistics: CharacterStatistics;
@@ -44,8 +44,17 @@ export interface CreateCharacterDto {
   equipment: CharacterEquipment;
   attacks: CharacterAttack[];
   traits: CharacterTrait[];
+  weaponDevelopment: string[];
   description: string | undefined;
   imageUrl: string | undefined;
+}
+
+export interface CreateCharacterInfoDto {
+  raceId: string;
+  professionId: string;
+  realmType: string;
+  height: number;
+  weight: number;
 }
 
 export interface CharacterDefense {

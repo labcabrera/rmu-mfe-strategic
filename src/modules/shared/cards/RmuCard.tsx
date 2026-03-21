@@ -1,5 +1,6 @@
 import React, { FC, ReactNode } from 'react';
 import { Card, CardContent, CardMedia } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 const smallImageSize = 70;
 const mediumImageSize = 100;
@@ -11,10 +12,12 @@ const RmuCard: FC<{
   height?: number;
   imageSize?: number;
   size?: 'small' | 'medium';
-  onClick?: () => void;
   children?: ReactNode;
   grayscale?: number;
+  onClick?: () => void;
 }> = ({ image, onClick, size = 'medium', children, grayscale = 0 }) => {
+  const theme = useTheme();
+
   return (
     <Card
       onClick={onClick}
@@ -53,10 +56,9 @@ const RmuCard: FC<{
           flexDirection: 'column',
           justifyContent: 'center',
           ml: 2,
-          // mb: 0,
-          // paddingBottom: 0,
           maxWidth: '100%',
           minWidth: 0,
+          backgroundColor: onClick ? theme.palette.primary.card : theme.palette.background.paper,
         }}
       >
         {children}

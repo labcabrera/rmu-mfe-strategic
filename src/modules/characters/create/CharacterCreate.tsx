@@ -1,7 +1,7 @@
 import React, { useState, useEffect, FC } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import OutboundIcon from '@mui/icons-material/Outbound';
-import { Grid, IconButton, Box, Button, TextField } from '@mui/material';
+import { Grid, IconButton, Box, Button, TextField, Badge } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { CreateCharacterDto } from '../../api/character.dto';
@@ -12,7 +12,7 @@ import { fetchRaces } from '../../api/race';
 import { Race } from '../../api/race.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import { CHARACTER_CREATION_TEMPLATE } from '../../data/character-create';
+import { characterCreationTemplate, defaultStats } from '../../data/character-create';
 import { imageBaseUrl } from '../../services/config';
 import { gridSizeResume, gridSizeMain } from '../../services/display';
 import { randomizeStats } from '../../services/randomize-stats';
@@ -41,28 +41,21 @@ export interface StatBonusFormData {
 }
 
 const CharacterCreate: FC = () => {
+  const { showError } = useError();
+
   const [searchParams] = useSearchParams();
   const gameId = searchParams.get('gameId');
   const factionId = searchParams.get('factionId');
   const [faction, setFaction] = useState<Faction | null>(null);
-  const { showError } = useError();
+
   const [game, setGame] = useState<StrategicGame | null>(null);
+  const [profession, setProfession] = useState<Profession>();
   const [races, setRaces] = useState<Race[]>([]);
+  const [selectedRace, setSelectedRace] = useState<Race>();
+
   const [factions, setFactions] = useState<Faction[]>([]);
-  const [formData, setFormData] = useState<CreateCharacterDto>(CHARACTER_CREATION_TEMPLATE);
-  const [statBonusFormData, setStatBonusFormData] = useState<StatBonusFormData>({
-    ag: { potential: 0, temporary: 0 },
-    co: { potential: 0, temporary: 0 },
-    em: { potential: 0, temporary: 0 },
-    in: { potential: 0, temporary: 0 },
-    me: { potential: 0, temporary: 0 },
-    pr: { potential: 0, temporary: 0 },
-    qu: { potential: 0, temporary: 0 },
-    re: { potential: 0, temporary: 0 },
-    sd: { potential: 0, temporary: 0 },
-    st: { potential: 0, temporary: 0 },
-  });
-  const [profession, setProfession] = useState<Profession | null>(null);
+  const [formData, setFormData] = useState<CreateCharacterDto>(characterCreationTemplate);
+  const [statBonusFormData, setStatBonusFormData] = useState<StatBonusFormData>(defaultStats);
   const [boosts, setBoosts] = useState<number>(game?.powerLevel.statCreationBoost || 2);
   const [swaps, setSwaps] = useState<number>(game?.powerLevel.statCreationSwap || 2);
   const [isValid, setIsValid] = useState<boolean>(false);
@@ -153,8 +146,10 @@ const CharacterCreate: FC = () => {
             formData={formData}
             setFormData={setFormData}
             setProfession={setProfession}
-            factions={factions}
+            selectedRace={selectedRace}
             races={races}
+            setSelectedRace={setSelectedRace}
+            profession={profession}
           />
         </Grid>
 
@@ -162,9 +157,11 @@ const CharacterCreate: FC = () => {
           <CategorySeparator text={t('stats')}>
             <Box sx={{ display: 'flex', gap: 1 }}>
               <RefreshButton onClick={onRandomStats} />
-              <IconButton onClick={() => setBoostDialogOpen(true)} color="primary">
-                <OutboundIcon />
-              </IconButton>
+              <Badge badgeContent={4} color="success">
+                <IconButton onClick={() => setBoostDialogOpen(true)} color="primary">
+                  <OutboundIcon />
+                </IconButton>
+              </Badge>
             </Box>
           </CategorySeparator>
 
