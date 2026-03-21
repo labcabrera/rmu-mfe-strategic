@@ -112,8 +112,14 @@ export async function levelDownSkill(
   return await response.json();
 }
 
-export async function setUpProfessionalSkill(characterId: string, skillId: string, types: string[]): Promise<any> {
-  const url = `${apiStrategicGameUrl}/characters/${characterId}/skills/${skillId}/professional`;
+export async function setUpProfessionalSkill(
+  characterId: string,
+  skillId: string,
+  specialization: string | undefined,
+  types: string[]
+): Promise<any> {
+  const specializationQuery = specialization ? `?specialization=${specialization}` : '';
+  const url = `${apiStrategicGameUrl}/characters/${characterId}/skills/${skillId}/professional${specializationQuery}`;
   const response = await fetch(url, {
     method: 'PUT',
     headers: mergeJsonHeaders(),

@@ -48,16 +48,20 @@ const CharacterSkillTable: FC<{
           }}
         >
           <TableRow>
-            <TableCell align="left">{t('skill')}</TableCell>
+            <TableCell align="left">{t('Skill')}</TableCell>
             <TableCell align="left">Spec</TableCell>
             <TableCell align="left">Prof</TableCell>
             <TableCell align="left">Stats</TableCell>
             <TableCell align="right">Dev</TableCell>
             <TableCell align="right">Ranks</TableCell>
-            <TableCell align="right">Rank bonus</TableCell>
-            <TableCell align="right">Stat</TableCell>
-            <TableCell align="right">Racial</TableCell>
-            <TableCell align="right">Professional</TableCell>
+            <TableCell align="right">
+              <Tooltip title="Rank bonus">
+                <Typography>RB</Typography>
+              </Tooltip>
+            </TableCell>
+            <TableCell align="right">St</TableCell>
+            <TableCell align="right">Rc</TableCell>
+            <TableCell align="right">Pr</TableCell>
             <TableCell align="right">Custom</TableCell>
             <TableCell align="right">Total</TableCell>
             <TableCell align="left">
@@ -124,7 +128,7 @@ const CharacterViewSkillsEntry: FC<{
       //add
       array.push('professional');
     }
-    setUpProfessionalSkill(character.id, skillObj.skillId, array)
+    setUpProfessionalSkill(character.id, skillObj.skillId, skillObj.specialization, array)
       .then((updated) => setCharacter(updated))
       .catch((error: any) => showError(error.message));
   };
@@ -141,7 +145,7 @@ const CharacterViewSkillsEntry: FC<{
       //add
       array.push('knack');
     }
-    setUpProfessionalSkill(character.id, skillObj.skillId, array)
+    setUpProfessionalSkill(character.id, skillObj.skillId, skillObj.specialization, array)
       .then((updated) => setCharacter(updated))
       .catch((error: any) => showError(error.message));
   };
@@ -179,7 +183,7 @@ const CharacterViewSkillsEntry: FC<{
   };
 
   const getStatistics = (skill: CharacterSkill) => {
-    return skill.statistics && skill.statistics.length > 0 ? skill.statistics.join('/').toUpperCase() : '-';
+    return skill.statistics && skill.statistics.length > 0 ? skill.statistics.join('/').toLowerCase() : '-';
   };
 
   return (
@@ -188,7 +192,7 @@ const CharacterViewSkillsEntry: FC<{
         {t(skill.skillId)}
       </TableCell>
       <TableCell component="th" scope="row">
-        {skill.specialization || '-'}
+        {skill.specialization ? t(skill.specialization) : '-'}
       </TableCell>
       <TableCell component="th" scope="row">
         {isAvailableProfessionSkill(skill) && (
