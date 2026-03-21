@@ -26,8 +26,8 @@ const CharacterViewStats: FC<{
           >
             <TableRow>
               <TableCell align="left">Stat</TableCell>
-              <TableCell align="right">{t('potential')}</TableCell>
-              <TableCell align="right">{t('temporary')}</TableCell>
+              <TableCell align="right">{t('potential-short')}</TableCell>
+              <TableCell align="right">{t('temporary-short')}</TableCell>
               <TableCell align="right">{t('bonus')}</TableCell>
               <TableCell align="right">{t('racial')}</TableCell>
               <TableCell align="right">{t('custom')}</TableCell>

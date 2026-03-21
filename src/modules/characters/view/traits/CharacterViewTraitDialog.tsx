@@ -1,9 +1,9 @@
 import React, { useState, useEffect, FC } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 import { t } from 'i18next';
-import { useError } from '../../../ErrorContext';
-import { fetchTrait } from '../../api/trait';
-import { Trait } from '../../api/trait.dto';
+import { useError } from '../../../../ErrorContext';
+import { fetchTrait } from '../../../api/trait';
+import { Trait } from '../../../api/trait.dto';
 
 const CharacterViewTraitDialog: FC<{
   traitId: string | null;
@@ -12,6 +12,7 @@ const CharacterViewTraitDialog: FC<{
 }> = ({ traitId, open, onClose }) => {
   const { showError } = useError();
   const [trait, setTrait] = useState<Trait | null>(null);
+  const [traitCategories, setTraitCategories] = useState<string[]>();
 
   useEffect(() => {
     if (traitId) {

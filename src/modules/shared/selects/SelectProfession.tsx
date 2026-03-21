@@ -22,7 +22,7 @@ const SelectProfession: React.FC<{
   };
 
   useEffect(() => {
-    fetchProfessions()
+    fetchProfessions('', 0, 100)
       .then((data) => setProfessions(data.content))
       .catch((err) => showError(err));
   }, [showError]);
@@ -30,11 +30,10 @@ const SelectProfession: React.FC<{
   return (
     <TextField
       select
-      label={t('profession')}
+      label={t('Profession')}
       value={professions.length === 0 || isValueEmpty ? '' : value}
       onChange={handleProfessionChange}
       fullWidth
-      size="small"
       error={error}
     >
       {professions.map((option) => (

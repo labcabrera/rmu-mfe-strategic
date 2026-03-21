@@ -8,10 +8,10 @@ import CharacterViewInfo from './CharacterViewInfo';
 import CharacterViewResistances from './CharacterViewResistances';
 import CharacterViewStats from './CharacterViewStats';
 import CharacterViewStatsChart from './CharacterViewStatsChart';
-import CharacterViewTraits from './CharacterViewTraits';
 import CharacterViewExperience from './CharacterViewXp';
 import CharacterViewItems from './items/CharacterViewItems';
 import CharacterViewSkills from './skills/CharacterViewSkills';
+import CharacterViewTraits from './traits/CharacterViewTraits';
 
 function CustomTabPanel(props: { children?: ReactNode; value: number; index: number }) {
   const { children, value, index, ...other } = props;

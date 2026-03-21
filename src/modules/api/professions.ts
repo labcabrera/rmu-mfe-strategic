@@ -23,8 +23,8 @@ export async function fetchProfession(id: string): Promise<Profession> {
   return json;
 }
 
-export async function fetchProfessions(): Promise<Page<Profession>> {
-  const url = `${apiCoreUrl}/professions`;
+export async function fetchProfessions(rsql: string, page: number, size: number): Promise<Page<Profession>> {
+  const url = `${apiCoreUrl}/professions?q=${rsql}&page=${page}&size=${size}`;
   const response = await fetch(url, { method: 'GET', headers: getAuthHeaders() });
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);

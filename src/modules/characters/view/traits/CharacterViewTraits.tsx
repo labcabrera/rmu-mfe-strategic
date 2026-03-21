@@ -1,19 +1,19 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import { t } from 'i18next';
-import { useError } from '../../../ErrorContext';
-import { addTrait, deleteTrait } from '../../api/character';
-import { AddTraitDto, Character, CharacterTrait } from '../../api/character.dto';
-import { toRoman } from '../../services/roman-number-service';
-import AddButton from '../../shared/buttons/AddButton';
-import DeleteButton from '../../shared/buttons/DeleteButton';
-import TextCard from '../../shared/cards/TextCard';
-import CharacterViewAddTraitDialog from './CharacterViewAddTraitDialog';
+import { useError } from '../../../../ErrorContext';
+import { addTrait, deleteTrait } from '../../../api/character';
+import { AddTraitDto, Character, CharacterTrait } from '../../../api/character.dto';
+import { toRoman } from '../../../services/roman-number-service';
+import AddButton from '../../../shared/buttons/AddButton';
+import DeleteButton from '../../../shared/buttons/DeleteButton';
+import TextCard from '../../../shared/cards/TextCard';
+import CharacterViewAddTraitDialog from '../CharacterViewAddTraitDialog';
 import CharacterViewTraitDialog from './CharacterViewTraitDialog';
 
 const CharacterViewTraits: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>> | undefined;
+  setCharacter: Dispatch<SetStateAction<Character>>;
 }> = ({ character, setCharacter }) => {
   const { showError } = useError();
   const [openAddTraitDialog, setOpenAddTraitDialog] = useState(false);

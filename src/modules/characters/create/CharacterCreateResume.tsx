@@ -70,10 +70,6 @@ const CharacterCreateResume: FC<{
     }));
   };
 
-  const onNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prevState) => ({ ...prevState, name: e.target.value }));
-  };
-
   if (!races) return <p>Loading...</p>;
 
   return (
@@ -139,7 +135,7 @@ const CharacterCreateResume: FC<{
       </Grid>
       <Grid size={12}>
         <NumericInput
-          label={t('age')}
+          label={t('Age')}
           name="age"
           value={formData.roleplay.age}
           onChange={(value) => setFormData((prev) => ({ ...prev, roleplay: { ...prev.roleplay, age: value! } }))}

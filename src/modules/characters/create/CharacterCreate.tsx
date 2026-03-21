@@ -157,7 +157,7 @@ const CharacterCreate: FC = () => {
           <CategorySeparator text={t('stats')}>
             <Box sx={{ display: 'flex', gap: 1 }}>
               <RefreshButton onClick={onRandomStats} />
-              <Badge badgeContent={4} color="success">
+              <Badge badgeContent={2} color="success">
                 <IconButton onClick={() => setBoostDialogOpen(true)} color="primary">
                   <OutboundIcon />
                 </IconButton>
@@ -174,7 +174,7 @@ const CharacterCreate: FC = () => {
             </Grid>
           </Grid>
 
-          <CategorySeparator text={t('weapon-development-order')} />
+          <CategorySeparator text={t('Weapon development order')} />
           <Grid size={12}>
             <CharacterCreateSortCombat items={formData.weaponDevelopment || []} onChange={handleWeaponOrderChange} />
           </Grid>
@@ -182,9 +182,9 @@ const CharacterCreate: FC = () => {
           {profession && (
             <Grid size={12}>
               <>
-                <CategorySeparator text={t('skill-development-costs')} />
+                <CategorySeparator text={t('Skill development costs')} />
                 <CharacterCreateSkillCosts profession={profession} />
-                <CategorySeparator text={t('professional-skills')} />
+                <CategorySeparator text={t('Professional skills')} />
                 <CharacterCreateProfessionalSkills profession={profession} />
               </>
             </Grid>
@@ -193,7 +193,7 @@ const CharacterCreate: FC = () => {
           <CategorySeparator text={t('lore')} />
           <Grid size={12}>
             <TextField
-              label={t('description')}
+              label={t('Description')}
               name="description"
               value={formData.description}
               onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
