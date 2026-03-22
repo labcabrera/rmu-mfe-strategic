@@ -31,7 +31,8 @@ function remoteUrlsFor(lang: string) {
   return {
     common: `${imageBaseUrl}locales/common_${lang}.json`,
     skills: `${imageBaseUrl}locales/skills_${lang}.json`,
-    items: `${imageBaseUrl}locales/traits_${lang}.json`,
+    traits: `${imageBaseUrl}locales/traits_${lang}.json`,
+    items: `${imageBaseUrl}locales/items_${lang}.json`,
   };
 }
 
@@ -39,15 +40,17 @@ function remoteUrlsFor(lang: string) {
   const lang = getLangFromLocalStorage();
   const urls = remoteUrlsFor(lang);
 
-  const [commonRemote, skillsRemote, itemsRemote] = await Promise.all([
+  const [commonRemote, skillsRemote, itemsRemote, traitsRemote] = await Promise.all([
     fetchJsonOrNull(urls.common),
     fetchJsonOrNull(urls.skills),
+    fetchJsonOrNull(urls.traits),
     fetchJsonOrNull(urls.items),
   ]);
 
   const merged: Record<string, any> = {
     ...(commonRemote || {}),
     ...(skillsRemote || {}),
+    ...(traitsRemote || {}),
     ...(itemsRemote || {}),
   };
 
@@ -56,13 +59,14 @@ function remoteUrlsFor(lang: string) {
 
   if (lang !== 'en') {
     const enUrls = remoteUrlsFor('en');
-    const [enCommon, enSkills, enItems] = await Promise.all([
+    const [enCommon, enSkills, enTraits, enItems] = await Promise.all([
       fetchJsonOrNull(enUrls.common),
       fetchJsonOrNull(enUrls.skills),
+      fetchJsonOrNull(enUrls.traits),
       fetchJsonOrNull(enUrls.items),
     ]);
     resources['en'] = {
-      translation: { ...(enCommon || {}), ...(enSkills || {}), ...(enItems || {}) },
+      translation: { ...(enCommon || {}), ...(enSkills || {}), ...(enTraits || {}), ...(enItems || {}) },
     };
   } else {
     resources['en'] = resources['en'] || { translation: merged };

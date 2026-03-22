@@ -52,7 +52,7 @@ const RmuTextCard: FC<{
         component="div"
         sx={{
           fontSize: '1rem',
-          color: applyColor ? 'primary.main' : 'text.secondary',
+          color: 'text.secondary',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',

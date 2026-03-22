@@ -1,9 +1,9 @@
 import React from 'react';
-import { Box, Grid, Tooltip, Typography } from '@mui/material';
+import { Grid, Tooltip, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { Character } from '../../../api/character.dto';
 import { imageBaseUrl } from '../../../services/config';
-import NumericCard from '../../../shared/cards/NumericCard';
+import { gridSizeCard } from '../../../services/display';
 import RmuTextCard from '../../../shared/cards/RmuTextCard';
 import TextCard from '../../../shared/cards/TextCard';
 
@@ -12,8 +12,6 @@ const grayscale = 0.7;
 const CharacterViewEquipmentInfo: React.FC<{
   character: Character;
 }> = ({ character }) => {
-  if (!character) return <div>Loading...</div>;
-
   const getArmorManeuverSkill = (): number | undefined => {
     return character.skills.find((s) => s.skillId === 'armor-maneuver')?.totalBonus || undefined;
   };
@@ -36,20 +34,22 @@ const CharacterViewEquipmentInfo: React.FC<{
     return `${character.equipment.maneuverPenalty} (${character.equipment.baseManeuverPenalty} + ${getArmorManeuverSkill()})`;
   };
 
+  if (!character) return <div>Loading...</div>;
+
   return (
     <>
       <Grid container spacing={1}>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <Tooltip title={'Armor Type (head / body / arms / legs)'} arrow>
             <RmuTextCard
               value={getArmorType()}
-              subtitle={t('armor-type')}
+              subtitle={t('Armor type')}
               image={`${imageBaseUrl}images/generic/armor.png`}
               grayscale={grayscale}
             />
           </Tooltip>
         </Grid>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <Tooltip
             title={
               <>
@@ -60,16 +60,15 @@ const CharacterViewEquipmentInfo: React.FC<{
             arrow
           >
             <span>
-              <TextCard
+              <RmuTextCard
                 value={getLabelWeight()}
-                subtitle={t('carried-weight')}
+                subtitle={t('Carried weight')}
                 image={`${imageBaseUrl}images/generic/carried-weight.png`}
-                minWidth={300}
               />
             </span>
           </Tooltip>
         </Grid>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <Tooltip
             title={
               <>
@@ -93,14 +92,14 @@ const CharacterViewEquipmentInfo: React.FC<{
       </Grid>
 
       <Grid container spacing={1} mt={1}>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <RmuTextCard
             value={t(`difficulty-${character.equipment.movementBaseDifficulty}`)}
-            subtitle={t('movement-base-difficulty')}
+            subtitle={t('Movement base difficulty')}
             image={`${imageBaseUrl}images/generic/maneuver-penalty.png`}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <Tooltip
             title={
               <>
@@ -120,19 +119,19 @@ const CharacterViewEquipmentInfo: React.FC<{
             </span>
           </Tooltip>
         </Grid>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <RmuTextCard
             value={character.equipment.rangedPenalty || 0}
-            subtitle={t('ranged-penalty')}
+            subtitle={t('Ranged penalty')}
             image={`${imageBaseUrl}images/generic/armor-ranged-penalty.png`}
             grayscale={grayscale}
             applyColor={true}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <RmuTextCard
             value={character.equipment.perceptionPenalty || 0}
-            subtitle={t('perception-penalty')}
+            subtitle={t('Perception penalty')}
             image={`${imageBaseUrl}images/generic/armor-perception-penalty.png`}
             grayscale={grayscale}
             applyColor={true}

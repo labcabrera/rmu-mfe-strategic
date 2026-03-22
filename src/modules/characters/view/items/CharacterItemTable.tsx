@@ -1,9 +1,6 @@
 import React, { FC, useState, Dispatch, SetStateAction } from 'react';
-import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import BlockIcon from '@mui/icons-material/Block';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
 import SwapVerticalCircleIcon from '@mui/icons-material/SwapVerticalCircle';
 import {
   Avatar,
@@ -19,24 +16,21 @@ import {
   TableRow,
   Typography,
   ListItemIcon,
-  Icon,
 } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { updateCarriedStatus, deleteItem } from '../../../api/character';
 import { Character, CharacterItem } from '../../../api/character.dto';
-import AddButton from '../../../shared/buttons/AddButton';
+import { imageBaseUrl } from '../../../services/config';
 
 const IMG_SIZE = 60;
-const imageBaseUrl = process.env.RMU_MFE_ASSETS!;
 
 const CharacterItemTable: FC<{
   character: Character;
   setCharacter?: Dispatch<SetStateAction<Character>>;
   carried?: boolean;
   onItemClick?: (item: CharacterItem) => void;
-  onButtonAddClick?: () => void;
-}> = ({ character, setCharacter, carried, onItemClick, onButtonAddClick }) => {
+}> = ({ character, setCharacter, carried, onItemClick }) => {
   const { showError } = useError();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuItemId, setMenuItemId] = useState<string | null>(null);
@@ -82,9 +76,7 @@ const CharacterItemTable: FC<{
             <TableCell sx={{ width: '80px' }}>{t('amount')}</TableCell>
             <TableCell sx={{ width: '80px' }}>{t('weight')}</TableCell>
             <TableCell sx={{ width: '80px' }}></TableCell>
-            <TableCell align="right" sx={{ width: '80px' }}>
-              <AddButton onClick={() => onButtonAddClick && onButtonAddClick()} />
-            </TableCell>
+            <TableCell align="right" sx={{ width: '80px' }}></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

@@ -13,3 +13,8 @@ export interface Trait {
   tierCost: number | undefined;
   description: string;
 }
+
+export interface DeleteTraitDto {
+  traitId: string;
+  specialization?: string;
+}

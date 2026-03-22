@@ -74,9 +74,9 @@ const CharacterSkillTable: FC<{
           </TableRow>
         </TableHead>
         <TableBody>
-          {character?.skills.map((item) => (
+          {character?.skills.map((item, index) => (
             <CharacterViewSkillsEntry
-              key={item.skillId}
+              key={index}
               skill={item}
               character={character}
               setCharacter={setCharacter}
@@ -187,7 +187,7 @@ const CharacterViewSkillsEntry: FC<{
   };
 
   return (
-    <TableRow key={skill.skillId} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+    <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
       <TableCell component="th" scope="row">
         {t(skill.skillId)}
       </TableCell>
@@ -236,7 +236,6 @@ const CharacterViewSkillsEntry: FC<{
         align="right"
         sx={{
           color: getColor(skill.developmentBonus),
-          fontWeight: 'bold',
         }}
       >
         {skill.developmentBonus}

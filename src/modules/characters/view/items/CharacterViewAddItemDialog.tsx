@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FC } from 'react';
+import React, { useState, useEffect, FC, forwardRef, ReactElement, Ref } from 'react';
 import {
   Box,
   Button,
@@ -9,8 +9,10 @@ import {
   DialogTitle,
   Divider,
   Grid,
+  Slide,
   Tooltip,
 } from '@mui/material';
+import { TransitionProps } from '@mui/material/transitions';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { AddItemDto } from '../../../api/character.dto';
@@ -32,6 +34,15 @@ const weaponSubcategories = [
   'ranged-weapon@crossbow',
 ];
 
+const Transition = forwardRef(function Transition(
+  props: TransitionProps & {
+    children: ReactElement<any, any>;
+  },
+  ref: Ref<unknown>
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 const CharacterAddItemDialog: FC<{
   open: boolean;
   onClose: () => void;
@@ -46,7 +57,7 @@ const CharacterAddItemDialog: FC<{
   const [items, setItems] = useState<Item[]>([]);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 
-  const IMAGE_SIZE = 100;
+  const IMAGE_SIZE = 80;
 
   const handleClose = () => {
     setFormData(null);
@@ -122,12 +133,19 @@ const CharacterAddItemDialog: FC<{
   }, [formData]);
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth>
-      <DialogTitle>{t('add-item')}</DialogTitle>
-      <DialogContent sx={{ minHeight: '800px' }}>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="xl"
+      slots={{
+        transition: Transition,
+      }}
+    >
+      <DialogTitle>{t('Direct buy')}</DialogTitle>
+      <DialogContent>
         <Grid container spacing={1}>
           <Grid size={12}>
-            <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+            <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={1}>
               {categories.map((category) => (
                 <>
                   <Tooltip key={category} title={category} arrow>
@@ -154,7 +172,7 @@ const CharacterAddItemDialog: FC<{
           <Divider />
           {subcategories && subcategories.length > 0 && (
             <Grid size={12}>
-              <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+              <Box mb={1} display="flex" flexDirection="row" flexWrap="wrap" gap={1}>
                 {subcategories.map((subcategory) => (
                   <Tooltip key={subcategory} title={subcategory} arrow>
                     <CardMedia
@@ -179,7 +197,7 @@ const CharacterAddItemDialog: FC<{
           )}
           <Divider />
           <Grid size={12}>
-            <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+            <Box mb={1} display="flex" flexDirection="row" flexWrap="wrap" gap={1}>
               {items.map((item) => (
                 <Tooltip title={t(item.id)} arrow>
                   <CardMedia
@@ -209,9 +227,9 @@ const CharacterAddItemDialog: FC<{
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>{t('cancel')}</Button>
+        <Button onClick={handleClose}>{t('Close')}</Button>
         <Button onClick={handleSave} variant="contained" disabled={!isValid}>
-          {t('add')}
+          {t('Buy')}
         </Button>
       </DialogActions>
     </Dialog>

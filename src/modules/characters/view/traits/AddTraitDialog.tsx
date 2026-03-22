@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FC } from 'react';
+import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
 import {
   Box,
   Button,
@@ -13,19 +13,24 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
-import { AddTraitDto } from '../../../api/character.dto';
+import { addTrait } from '../../../api/character';
+import { AddTraitDto, Character } from '../../../api/character.dto';
 import { fetchTraits } from '../../../api/trait';
 import { Trait, traitCategories } from '../../../api/trait.dto';
+import TechnicalInfo from '../../../shared/display/TechnicalInfo';
 import SelectTraitSpecialization from './SelectTraitSpecialization';
 
 const AddTraitDialog: FC<{
+  character: Character;
+  setCharacter: Dispatch<SetStateAction<Character>>;
   open: boolean;
   onClose: () => void;
-  onTraitAdded: (addTrait: AddTraitDto) => void;
-}> = ({ open, onClose, onTraitAdded }) => {
+}> = ({ character, setCharacter, open, onClose }) => {
   const { showError } = useError();
+  const theme = useTheme();
 
   const [traits, setTraits] = useState<Trait[]>([]);
   const [formData, setFormData] = useState<AddTraitDto>({} as AddTraitDto);
@@ -38,21 +43,17 @@ const AddTraitDialog: FC<{
       .catch((error) => showError(error.message));
   };
 
-  const handleSave = async () => {
-    if (!formData.traitId) {
-      showError('Please select a trait');
-      return;
-    }
-    try {
-      onTraitAdded(formData);
-      handleClose();
-    } catch (error: any) {
-      showError(error.message);
-    }
+  const onAddTrait = () => {
+    addTrait(character.id, formData)
+      .then((updatedCharacter) => {
+        setCharacter(updatedCharacter);
+        reset();
+        onClose();
+      })
+      .catch((err) => showError(err.message));
   };
 
   const handleTraitChange = (trait: Trait) => {
-    console.log('trait', trait);
     setSelectedTrait(trait || null);
     if (trait) {
       setFormData({
@@ -61,13 +62,17 @@ const AddTraitDialog: FC<{
         specialization: undefined,
       });
     } else {
-      setFormData({} as AddTraitDto);
+      reset();
     }
   };
 
-  const handleClose = () => {
-    setFormData({} as AddTraitDto);
+  const onCloseClick = () => {
+    reset();
     onClose();
+  };
+
+  const reset = () => {
+    setFormData({} as AddTraitDto);
   };
 
   useEffect(() => {
@@ -79,7 +84,7 @@ const AddTraitDialog: FC<{
   if (!traits) return <p>Loading...</p>;
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle>{t('add-skill')}</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -96,18 +101,22 @@ const AddTraitDialog: FC<{
               value={selectedTrait}
               options={traits}
               onChange={(e) => handleTraitChange(e)}
-              formatter={(e) => e.id}
+              formatter={(e) => `${t(e.name)} (${e.adquisitionCost})`}
+              colorFormatter={(e) => (e.isTalent === false ? theme.palette.error.main : theme.palette.success.main)}
             />
           </Grid>
           <Grid size={4}>
             <TraitForm trait={selectedTrait} formData={formData} setFormData={setFormData} />
-            <pre>{JSON.stringify(selectedTrait, null, 2)}</pre>
           </Grid>
+          <TechnicalInfo>
+            <pre>Trait: {JSON.stringify(selectedTrait, null, 2)}</pre>
+            <pre>FormData: {JSON.stringify(formData, null, 2)}</pre>
+          </TechnicalInfo>
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>{t('Cancel')}</Button>
-        <Button onClick={handleSave} variant="contained" disabled={false}>
+        <Button onClick={onCloseClick}>{t('Cancel')}</Button>
+        <Button onClick={onAddTrait} variant="contained" disabled={false}>
           {t('Add')}
         </Button>
       </DialogActions>
@@ -120,7 +129,13 @@ const SelectionList: FC<{
   options: any[];
   onChange: (value: any) => void;
   formatter: (value: any) => any;
-}> = ({ value, options, onChange, formatter }) => {
+  colorFormatter?: (value: any) => any | undefined;
+}> = ({ value, options, onChange, formatter, colorFormatter }) => {
+  const getColor = (e: any) => {
+    if (!colorFormatter) return undefined;
+    return colorFormatter(e);
+  };
+
   return (
     <Box sx={{ display: 'flex' }}>
       <ToggleButtonGroup
@@ -132,7 +147,7 @@ const SelectionList: FC<{
         fullWidth
       >
         {options.map((s) => (
-          <ToggleButton key={`option-${s.id}`} value={s} sx={{ justifyContent: 'flex-start' }}>
+          <ToggleButton key={`option-${s.id}`} value={s} sx={{ justifyContent: 'flex-start', color: getColor(s) }}>
             {formatter(s)}
           </ToggleButton>
         ))}
@@ -144,28 +159,38 @@ const SelectionList: FC<{
 const TraitForm: FC<{
   trait: Trait | undefined;
   formData: AddTraitDto;
-  setFormData: any;
+  setFormData: Dispatch<SetStateAction<AddTraitDto>>;
 }> = ({ trait, formData, setFormData }) => {
   if (!trait) return;
 
   return (
     <Grid container spacing={1}>
-      <Grid size={12}>
-        <TextField select label={t('Tier')} value={formData.tier || null} fullWidth>
-          {Array.from({ length: trait.maxTier }, (_, i) => i).map((option, index) => (
-            <MenuItem key={index} value={option + 1}>
-              {option + 1}
-            </MenuItem>
-          ))}
-        </TextField>
-      </Grid>
-      <Grid size={12}>
-        <SelectTraitSpecialization
-          value={formData.specialization}
-          trait={trait}
-          onChange={(e) => setFormData({ ...formData, specialization: e })}
-        />
-      </Grid>
+      {trait.isTierBased && (
+        <Grid size={12}>
+          <TextField
+            select
+            label={t('Tier')}
+            value={formData.tier || null}
+            onChange={(e) => setFormData({ ...formData, tier: Number.parseInt(e.target.value) })}
+            fullWidth
+          >
+            {Array.from({ length: trait.maxTier }, (_, i) => i).map((option, index) => (
+              <MenuItem key={index} value={option + 1}>
+                {option + 1}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+      )}
+      {trait.specialization && (
+        <Grid size={12}>
+          <SelectTraitSpecialization
+            value={formData.specialization}
+            trait={trait}
+            onChange={(e) => setFormData({ ...formData, specialization: e })}
+          />
+        </Grid>
+      )}
       <>
         <Typography variant="body2" color="secondary">
           {trait.description}

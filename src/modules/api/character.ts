@@ -3,6 +3,7 @@ import { apiStrategicGameUrl } from './../services/config';
 import { buildErrorFromResponse } from './api-errors';
 import { AddItemDto, AddTraitDto, Character, CharacterTrait } from './character.dto';
 import { AddSkill } from './skill.dto';
+import { DeleteTraitDto } from './trait.dto';
 
 export async function fetchCharacter(characterId: string): Promise<Character> {
   const url = `${apiStrategicGameUrl}/characters/${characterId}`;
@@ -242,12 +243,12 @@ export async function addTrait(characterId: string, addTraitDto: AddTraitDto): P
   return await response.json();
 }
 
-export async function deleteTrait(characterId: string, characterTrait: CharacterTrait): Promise<Character> {
+export async function deleteTrait(characterId: string, dto: DeleteTraitDto): Promise<Character> {
   const url = `${apiStrategicGameUrl}/characters/${characterId}/traits`;
   const response = await fetch(url, {
     method: 'DELETE',
     headers: mergeJsonHeaders(),
-    body: JSON.stringify({ traitId: characterTrait.traitId, tier: characterTrait.specialization }),
+    body: JSON.stringify(dto),
   });
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);

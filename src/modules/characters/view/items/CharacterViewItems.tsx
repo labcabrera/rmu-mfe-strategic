@@ -2,18 +2,7 @@ import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardMedia,
-  Grid,
-  IconButton,
-  Link,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Button, Card, CardActions, CardContent, CardMedia, Grid, IconButton, Stack, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { addItem, deleteItem, updateCarriedStatus } from '../../../api/character';
@@ -51,60 +40,61 @@ const CharacterViewItems: FC<{
 
   return (
     <>
-      <CategorySeparator text={t('equiped-items')}>
-        <Stack direction="row" spacing={1}>
-          <Button onClick={() => navigate(`/strategic/characters/trade/${character.id}`)}>Trade</Button>
-          <Button onClick={() => navigate(`/strategic/characters/craft/${character.id}`)}>Craft</Button>
-        </Stack>
-      </CategorySeparator>
-
       <Grid container spacing={1}>
+        <Grid size={12}>
+          <CategorySeparator text={t('Equiped')}>
+            <Stack direction="row" spacing={1}>
+              <Button onClick={() => setOpenAddItemDialog(true)}>Direct buy</Button>
+              <Button onClick={() => navigate(`/strategic/characters/trade/${character.id}`)}>Trade</Button>
+              <Button onClick={() => navigate(`/strategic/characters/craft/${character.id}`)}>Craft</Button>
+            </Stack>
+          </CategorySeparator>
+        </Grid>
+
         <Grid size={12}>
           <CharacterViewEquipment character={character} setCharacter={setCharacter} />
         </Grid>
-      </Grid>
 
-      <CategorySeparator text={t('equipment-info')} />
+        <Grid size={12}>
+          <CategorySeparator text={t('equipment-info')} />
+        </Grid>
 
-      <Grid container spacing={1}>
-        <Grid size={12} mt={2}>
+        <Grid size={12}>
           <CharacterViewEquipmentInfo character={character} />
         </Grid>
-      </Grid>
 
-      <CategorySeparator text={t('carried-items')} />
-
-      <Grid container spacing={1}>
         <Grid size={12}>
-          <Grid container spacing={1}>
-            <Grid size={6}>
-              <CharacterItemTable
-                character={character}
-                setCharacter={setCharacter}
-                carried={true}
-                onItemClick={setSelectedItem}
-                onButtonAddClick={() => setOpenAddItemDialog(true)}
-              />
-              <CharacterItemTable
-                character={character}
-                setCharacter={setCharacter}
-                carried={false}
-                onItemClick={setSelectedItem}
-                onButtonAddClick={() => setOpenAddItemDialog(true)}
-              />
-            </Grid>
-            <Grid size={6}>
-              <CharacterItemDetail item={selectedItem!} />
-            </Grid>
-            <Grid size={12}>
-              <CharacterViewTransferGold character={character} setCharacter={setCharacter} />
-            </Grid>
-          </Grid>
+          <CategorySeparator text={t('Carried')} />
         </Grid>
+
+        <Grid size={{ xs: 12, md: 6 }}>
+          <CharacterItemTable
+            character={character}
+            setCharacter={setCharacter}
+            carried={true}
+            onItemClick={setSelectedItem}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 6 }}>
+          <CharacterItemTable
+            character={character}
+            setCharacter={setCharacter}
+            carried={false}
+            onItemClick={setSelectedItem}
+          />
+        </Grid>
+
+        <Grid size={12}>
+          <CharacterItemDetail item={selectedItem!} />
+        </Grid>
+
+        <Grid size={12}>
+          <CharacterViewTransferGold character={character} setCharacter={setCharacter} />
+        </Grid>
+
+        <CategorySeparator text={t('Stored')} />
       </Grid>
-
-      <CategorySeparator text={t('stored-items')} />
-
       <CharacterViewAddItemDialog
         open={openAddItemDialog}
         onClose={() => setOpenAddItemDialog(false)}

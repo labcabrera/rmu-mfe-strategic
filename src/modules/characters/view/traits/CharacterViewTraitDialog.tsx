@@ -1,37 +1,43 @@
-import React, { useState, useEffect, FC } from 'react';
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Grid,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from '@mui/material';
+import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
+import { deleteTrait } from '../../../api/character';
+import { Character, CharacterTrait } from '../../../api/character.dto';
 import { fetchTrait } from '../../../api/trait';
-import { Trait } from '../../../api/trait.dto';
+import { DeleteTraitDto, Trait } from '../../../api/trait.dto';
+import TechnicalInfo from '../../../shared/display/TechnicalInfo';
 
 const CharacterViewTraitDialog: FC<{
-  traitId: string | null;
+  character: Character;
+  setCharacter: Dispatch<SetStateAction<Character>>;
+  characterTrait: CharacterTrait;
   open: boolean;
   onClose: () => void;
-}> = ({ traitId, open, onClose }) => {
+}> = ({ character, setCharacter, characterTrait, open, onClose }) => {
   const { showError } = useError();
   const [trait, setTrait] = useState<Trait | null>(null);
-  const [traitCategories, setTraitCategories] = useState<string[]>();
+
+  const onDeleteTrait = () => {
+    const dto: DeleteTraitDto = {
+      traitId: characterTrait.traitId,
+      specialization: characterTrait.specialization,
+    };
+    deleteTrait(character.id, dto)
+      .then((updatedCharacter) => {
+        setCharacter(updatedCharacter);
+        onClose();
+      })
+      .catch((error) => showError(error.message));
+  };
 
   useEffect(() => {
-    if (traitId) {
-      fetchTrait(traitId)
+    if (characterTrait) {
+      fetchTrait(characterTrait.traitId)
         .then((data) => setTrait(data))
         .catch((error) => showError(error.message));
     }
-  }, [traitId]);
+  }, [characterTrait]);
 
   if (!trait) return null;
 
@@ -44,9 +50,16 @@ const CharacterViewTraitDialog: FC<{
             {trait.description}
           </Typography>
         </Grid>
+        <TechnicalInfo>
+          <pre>CharacterTrait: {JSON.stringify(characterTrait, null, 2)}</pre>
+          <pre>Trait: {JSON.stringify(trait, null, 2)}</pre>
+        </TechnicalInfo>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>{t('close')}</Button>
+        <Button onClick={onDeleteTrait} color="error">
+          {t('Delete')}
+        </Button>
+        <Button onClick={onClose}>{t('Close')}</Button>
       </DialogActions>
     </Dialog>
   );
