@@ -1,6 +1,5 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
-import MenuItem from '@mui/material/MenuItem';
-import TextField from '@mui/material/TextField';
+import { MenuItem, TextField } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchProfessions, Profession } from '../../api/professions';
@@ -34,6 +33,7 @@ const SelectProfession: React.FC<{
       value={professions.length === 0 || isValueEmpty ? '' : value}
       onChange={handleProfessionChange}
       fullWidth
+      size="small"
       error={error}
     >
       {professions.map((option) => (
