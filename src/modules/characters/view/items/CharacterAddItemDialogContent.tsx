@@ -1,25 +1,29 @@
-import React, { useState, useEffect, FC, forwardRef, ReactElement, Ref } from 'react';
-import { Box, CardMedia, Divider, Grid, Slide, Tooltip } from '@mui/material';
+import React, { useState, FC, SetStateAction, Dispatch } from 'react';
+import { Box, CardMedia, Divider, Grid, Tooltip } from '@mui/material';
 import { t } from 'i18next';
-import { useError } from '../../../../ErrorContext';
 import { AddItemDto } from '../../../api/character.dto';
-import { fetchItems, Item, categories, armorSubcategories, weaponSubcategories } from '../../../api/items';
+import { Item, categories } from '../../../api/items';
 import { imageBaseUrl } from '../../../services/config';
 import { itemFilter } from '../../../services/display';
-import CharacterAddItemDialogForm from './CharacterAddItemDialogForm';
 
-const CharacterAddItemDialogContent: FC<{
-  open: boolean;
-  onClose: () => void;
-  onItemAdded: (item: AddItemDto) => void;
-}> = ({ open, onClose, onItemAdded }) => {
-  const { showError } = useError();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
-  const [subcategories, setSubcategories] = useState<string[]>([]);
-  const [isValid, setIsValid] = useState(false);
+const CharacterAddItemDialogSelect: FC<{
+  subcategories: string[];
+  selectedCategory: string | undefined;
+  setSelectedCategory: Dispatch<SetStateAction<string | undefined>>;
+  selectedSubcategory: string | undefined;
+  setSelectedSubcategory: Dispatch<SetStateAction<string | undefined>>;
+  items: Item[];
+  onLoadItem: (item: Item) => void;
+}> = ({
+  subcategories,
+  selectedCategory,
+  setSelectedCategory,
+  selectedSubcategory,
+  setSelectedSubcategory,
+  items,
+  onLoadItem,
+}) => {
   const [formData, setFormData] = useState<AddItemDto>();
-  const [items, setItems] = useState<Item[]>([]);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 
   const IMAGE_SIZE = 80;
@@ -28,63 +32,6 @@ const CharacterAddItemDialogContent: FC<{
     if (!formData) return false;
     return !!formData.name;
   };
-
-  const bindItems = (category: string | null, subcategory: string | null) => {
-    let rsql = `category==${category}`;
-    if (category === 'weapon' && subcategory) {
-      rsql += `;weapon.skillId==${subcategory}`;
-    } else if (category === 'armor' && selectedSubcategory) {
-      rsql += `;armor.slot==${selectedSubcategory}`;
-    }
-    fetchItems(rsql, 0, 100)
-      .then((data) => setItems(data))
-      .catch((err) => showError(err.message));
-  };
-
-  const loadItem = (item: Item) => {
-    setSelectedItem(item);
-    setFormData({
-      itemTypeId: item.id,
-      name: t(item.id),
-      weight: item.info?.weight || null,
-      weightPercent: item.info?.weightPercent || null,
-      strength: item.info?.strength || null,
-      cost: item.info?.cost?.average || null,
-      amount: 1,
-    } as AddItemDto);
-  };
-
-  useEffect(() => {
-    if (selectedSubcategory) {
-      bindItems(selectedCategory, selectedSubcategory);
-    }
-    setFormData(undefined);
-  }, [selectedSubcategory]);
-
-  useEffect(() => {
-    if (selectedCategory) {
-      if (selectedCategory === 'armor') {
-        setSelectedSubcategory(null);
-        setItems([]);
-        setSubcategories(armorSubcategories);
-      } else if (selectedCategory === 'weapon') {
-        setSelectedSubcategory(null);
-        setItems([]);
-        setSubcategories(weaponSubcategories);
-      } else {
-        setSubcategories([]);
-        bindItems(selectedCategory, null);
-      }
-    } else {
-      setItems([]);
-    }
-    setSelectedSubcategory(null);
-    setFormData(undefined);
-  }, [selectedCategory]);
-
-  useEffect(() => {
-    setIsValid(isFormValid());
-  }, [formData]);
 
   return (
     <>
@@ -119,8 +66,8 @@ const CharacterAddItemDialogContent: FC<{
         {subcategories && subcategories.length > 0 && (
           <Grid size={12}>
             <Box mb={1} display="flex" flexDirection="row" flexWrap="wrap" gap={0.2}>
-              {subcategories.map((subcategory) => (
-                <Tooltip key={subcategory} title={subcategory} arrow>
+              {subcategories.map((subcategory, index) => (
+                <Tooltip key={index} title={subcategory} arrow>
                   <CardMedia
                     key={subcategory}
                     component="img"
@@ -145,14 +92,14 @@ const CharacterAddItemDialogContent: FC<{
         <Divider />
         <Grid size={12}>
           <Box mb={1} display="flex" flexDirection="row" flexWrap="wrap" gap={1}>
-            {items.map((item) => (
-              <Tooltip title={t(item.id)} arrow>
+            {items.map((item, index) => (
+              <Tooltip key={index} title={t(item.id)} arrow>
                 <CardMedia
                   key={item.id}
                   component="img"
                   image={`${imageBaseUrl}images/items/${item.id}.png`}
                   alt={t(item.id)}
-                  onClick={() => loadItem(item)}
+                  onClick={() => onLoadItem(item)}
                   sx={{
                     width: IMAGE_SIZE,
                     height: IMAGE_SIZE,
@@ -167,12 +114,9 @@ const CharacterAddItemDialogContent: FC<{
             ))}
           </Box>
         </Grid>
-        <Grid size={12}>
-          {formData && <CharacterAddItemDialogForm formData={formData} setFormData={setFormData} item={selectedItem} />}
-        </Grid>
       </Grid>
     </>
   );
 };
 
-export default CharacterAddItemDialogContent;
+export default CharacterAddItemDialogSelect;

@@ -5,7 +5,8 @@ import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { AddItemDto } from '../../../api/character.dto';
 import { fetchItems, Item, armorSubcategories, weaponSubcategories } from '../../../api/items';
-import CharacterAddItemDialogContent from './CharacterAddItemDialogContent';
+import CharacterAddItemDialogSelect from './CharacterAddItemDialogContent';
+import CharacterAddItemDialogForm from './CharacterAddItemDialogForm';
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
@@ -22,8 +23,8 @@ const CharacterAddItemDialog: FC<{
   onItemAdded: (item: AddItemDto) => void;
 }> = ({ open, onClose, onItemAdded }) => {
   const { showError } = useError();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>();
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>();
   const [subcategories, setSubcategories] = useState<string[]>([]);
   const [isValid, setIsValid] = useState(false);
   const [formData, setFormData] = useState<AddItemDto>();
@@ -58,8 +59,20 @@ const CharacterAddItemDialog: FC<{
       .catch((err) => showError(err.message));
   };
 
+  const loadItem = (item: Item) => {
+    setSelectedItem(item);
+    setFormData({
+      itemTypeId: item.id,
+      name: t(item.id),
+      weight: item.info?.weight || null,
+      weightPercent: item.info?.weightPercent || null,
+      strength: item.info?.strength || null,
+      cost: item.info?.cost?.average || null,
+      amount: 1,
+    } as AddItemDto);
+  };
   useEffect(() => {
-    if (selectedSubcategory) {
+    if (selectedCategory && selectedSubcategory) {
       bindItems(selectedCategory, selectedSubcategory);
     }
     setFormData(undefined);
@@ -68,11 +81,11 @@ const CharacterAddItemDialog: FC<{
   useEffect(() => {
     if (selectedCategory) {
       if (selectedCategory === 'armor') {
-        setSelectedSubcategory(null);
+        setSelectedSubcategory(undefined);
         setItems([]);
         setSubcategories(armorSubcategories);
       } else if (selectedCategory === 'weapon') {
-        setSelectedSubcategory(null);
+        setSelectedSubcategory(undefined);
         setItems([]);
         setSubcategories(weaponSubcategories);
       } else {
@@ -82,7 +95,7 @@ const CharacterAddItemDialog: FC<{
     } else {
       setItems([]);
     }
-    setSelectedSubcategory(null);
+    setSelectedSubcategory(undefined);
     setFormData(undefined);
   }, [selectedCategory]);
 
@@ -95,13 +108,24 @@ const CharacterAddItemDialog: FC<{
       open={open}
       onClose={handleClose}
       maxWidth="xl"
+      fullWidth
       slots={{
         transition: Transition,
       }}
+      sx={{ minHeight: '600px' }}
     >
       <DialogTitle>{t('Direct buy')}</DialogTitle>
       <DialogContent>
-        <CharacterAddItemDialogContent open={open} onClose={onClose} onItemAdded={onItemAdded} />
+        <CharacterAddItemDialogSelect
+          subcategories={subcategories}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          selectedSubcategory={selectedSubcategory}
+          setSelectedSubcategory={setSelectedSubcategory}
+          items={items}
+          onLoadItem={loadItem}
+        />
+        {formData && <CharacterAddItemDialogForm formData={formData} setFormData={setFormData} item={selectedItem} />}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>{t('Close')}</Button>
