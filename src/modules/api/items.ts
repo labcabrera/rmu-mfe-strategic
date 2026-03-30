@@ -1,4 +1,5 @@
 import { getAuthHeaders } from '../services/auth-token-service';
+import { apiItemsUrl } from '../services/config';
 import { buildErrorFromResponse } from './api-errors';
 
 export interface Item {
@@ -39,7 +40,7 @@ export interface ItemInfo {
 }
 
 export async function fetchItems(rsql: string, page: number, size: number): Promise<Item[]> {
-  const url = `${process.env.RMU_API_ITEMS_URL}/items?q=${rsql}&page=${page}&size=${size}`;
+  const url = `${apiItemsUrl}/items?q=${rsql}&page=${page}&size=${size}`;
   const response = await fetch(url, { method: 'GET', headers: getAuthHeaders() });
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);
@@ -47,3 +48,19 @@ export async function fetchItems(rsql: string, page: number, size: number): Prom
   const pageContent = await response.json();
   return pageContent.content as Item[];
 }
+
+export const weaponSubcategories = [
+  'melee-weapon@blade',
+  'melee-weapon@greater-blade',
+  'melee-weapon@chain',
+  'melee-weapon@hafted',
+  'melee-weapon@greater-hafted',
+  'melee-weapon@pole-arm',
+  'melee-weapon@exotic',
+  'ranged-weapon@bow',
+  'ranged-weapon@crossbow',
+];
+
+export const categories = ['weapon', 'armor', 'shield', 'clothes', 'ammunition', 'tools', 'food'];
+
+export const armorSubcategories = ['head', 'body', 'arms', 'legs'];

@@ -184,26 +184,43 @@ export interface CharacterItem {
   id: string;
   name: string;
   itemTypeId: string;
-  category?: string;
+  category: string;
   weapon?: WeaponInfo;
   armor?: ArmorInfo;
-  info: any;
+  info: CharacterItemInfo;
   amount?: number;
   carried: boolean;
 }
 
+export interface CharacterItemInfo {
+  strength: number;
+  length: number;
+  weight: number;
+  cost: number;
+}
+
 export interface WeaponMode {
   type: string;
+  attackTable: string;
+  fumbleTable: string;
+  sizeAdjustment: number;
 }
 
 export interface WeaponInfo {
+  skillId: string;
   fumble: string;
   sizeAdjustment: string;
   modes: WeaponMode[];
 }
 
 export interface ArmorInfo {
+  at: number;
   slot: string;
+  enc: number;
+  maneuver: number;
+  rangedPenalty: number;
+  perception: number;
+  baseDifficulty: string;
 }
 
 export interface Stat {

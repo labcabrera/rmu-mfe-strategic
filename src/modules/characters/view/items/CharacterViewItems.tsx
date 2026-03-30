@@ -12,9 +12,9 @@ import DeleteButton from '../../../shared/buttons/DeleteButton';
 import DeleteDialog from '../../../shared/dialogs/DeleteDialog';
 import CategorySeparator from '../../../shared/display/CategorySeparator';
 import CharacterViewTransferGold from '../CharacterViewTransferGold';
+import CharacterViewAddItemDialog from './CharacterAddItemDialog';
 import CharacterItemDetail from './CharacterItemDetail';
 import CharacterItemTable from './CharacterItemTable';
-import CharacterViewAddItemDialog from './CharacterViewAddItemDialog';
 import CharacterViewEquipment from './CharacterViewEquipment';
 import CharacterViewEquipmentInfo from './CharacterViewEquipmentInfo';
 

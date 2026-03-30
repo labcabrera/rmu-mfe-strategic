@@ -8,9 +8,9 @@ import NumericCard from '../../../shared/cards/NumericCard';
 import TextCard from '../../../shared/cards/TextCard';
 import NumericInput from '../../../shared/inputs/NumericInput';
 
-const CharacterViewAddItemDialogForm: FC<{
+const CharacterAddItemDialogForm: FC<{
   formData: AddItemDto;
-  setFormData: Dispatch<SetStateAction<AddItemDto | null>>;
+  setFormData: Dispatch<SetStateAction<AddItemDto | undefined>>;
   item: Item;
 }> = ({ formData, setFormData, item }) => {
   return (
@@ -174,9 +174,9 @@ const CharacterViewAddItemDialogForm: FC<{
                 Ranges
               </Typography>
               <Stack direction="column" spacing={1} alignItems="left" flex={1}>
-                {item.weapon.ranges.map((range) => (
+                {item.weapon.ranges.map((range, index) => (
                   <Chip
-                    key={range.range}
+                    key={index}
                     label={`From ${range.from} to ${range.to}: ${range.bonus > 0 ? '+' : ''}${range.bonus}`}
                     sx={{ width: 'fit-content' }}
                   />
@@ -191,4 +191,4 @@ const CharacterViewAddItemDialogForm: FC<{
   );
 };
 
-export default CharacterViewAddItemDialogForm;
+export default CharacterAddItemDialogForm;
