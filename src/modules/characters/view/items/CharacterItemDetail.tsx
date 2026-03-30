@@ -1,11 +1,16 @@
-import React, { FC, Fragment } from 'react';
+import React, { Dispatch, FC, Fragment, SetStateAction } from 'react';
 import { Divider, Grid, Typography, Paper, Stack } from '@mui/material';
 import { t } from 'i18next';
-import { CharacterItem } from '../../../api/character.dto';
+import { Character, CharacterItem } from '../../../api/character.dto';
 import CategorySeparator from '../../../shared/display/CategorySeparator';
 import TechnicalInfo from '../../../shared/display/TechnicalInfo';
+import CharacterViewTransferGold from '../CharacterViewTransferGold';
 
-const CharacterItemDetail: FC<{ item?: CharacterItem }> = ({ item }) => {
+const CharacterItemDetail: FC<{
+  character: Character;
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
+  item?: CharacterItem;
+}> = ({ item, character, setCharacter }) => {
   if (!item) return null;
 
   return (
@@ -61,6 +66,13 @@ const CharacterItemDetail: FC<{ item?: CharacterItem }> = ({ item }) => {
               </Grid>
             </>
           )}
+
+          {item.itemTypeId === 'gold-coin' && (
+            <Grid size={12}>
+              <CharacterViewTransferGold character={character} setCharacter={setCharacter} />
+            </Grid>
+          )}
+
           <Grid size={12}>
             <TechnicalInfo>
               <pre>{JSON.stringify(item, null, 2)}</pre>

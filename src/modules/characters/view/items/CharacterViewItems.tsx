@@ -6,15 +6,11 @@ import { useError } from '../../../../ErrorContext';
 import { addItem } from '../../../api/character';
 import { AddItemDto, Character, CharacterItem } from '../../../api/character.dto';
 import CategorySeparator from '../../../shared/display/CategorySeparator';
-import CharacterViewTransferGold from '../CharacterViewTransferGold';
 import CharacterViewAddItemDialog from './CharacterAddItemDialog';
 import CharacterItemDetail from './CharacterItemDetail';
 import CharacterItemTable from './CharacterItemTable';
 import CharacterViewEquipment from './CharacterViewEquipment';
 import CharacterViewEquipmentInfo from './CharacterViewEquipmentInfo';
-
-const itemCardWidth = 120;
-const itemCardHeight = 260;
 
 const CharacterViewItems: FC<{
   character: Character;
@@ -87,14 +83,8 @@ const CharacterViewItems: FC<{
         </Grid>
 
         <Grid size={12}>
-          <CharacterItemDetail item={selectedItem!} />
+          <CharacterItemDetail character={character} setCharacter={setCharacter} item={selectedItem!} />
         </Grid>
-
-        <Grid size={12}>
-          <CharacterViewTransferGold character={character} setCharacter={setCharacter} />
-        </Grid>
-
-        <CategorySeparator text={t('Stored')} />
       </Grid>
       <CharacterViewAddItemDialog
         open={openAddItemDialog}

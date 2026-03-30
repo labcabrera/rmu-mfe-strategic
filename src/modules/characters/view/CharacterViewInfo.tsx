@@ -55,6 +55,7 @@ const CharacterViewInfo: FC<{
             subtitle={t('Game')}
             image={strategicGame.imageUrl}
             onClick={() => navigate(`/strategic/games/view/${strategicGame.id}`)}
+            grayscale={grayscale}
           />
         </Grid>
         <Grid size={{ xs: 12, md: 2 }}>
@@ -63,6 +64,7 @@ const CharacterViewInfo: FC<{
             subtitle={t('Faction')}
             image={`${imageBaseUrl}images/generic/race-size.png`}
             onClick={() => navigate(`/strategic/factions/view/${character.faction.id}`)}
+            grayscale={grayscale}
           />
         </Grid>
         <Grid size={{ xs: 12, md: 2 }}>
