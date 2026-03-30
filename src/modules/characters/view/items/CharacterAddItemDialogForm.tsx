@@ -103,7 +103,7 @@ const CharacterAddItemDialogForm: FC<{
         )}
         {item.weapon && (
           <>
-            <KeyValueEntry label="Skill" value={item.weapon.skillId} />
+            <KeyValueEntry label="Skill" value={t(item.weapon.skillId)} />
             <KeyValueEntry label="Fumble" value={item.weapon.fumble} />
           </>
         )}
@@ -119,7 +119,7 @@ const KeyValueEntry: FC<{ label: string; value: string | number | undefined }> =
         <Typography color="primary" variant="body2">
           {value}
         </Typography>
-        <Typography color="secondary" variant="body2">
+        <Typography color="secondary" variant="caption">
           {label}
         </Typography>
       </Stack>

@@ -3,6 +3,7 @@ import { Divider, Grid, Typography, Paper, Stack } from '@mui/material';
 import { t } from 'i18next';
 import { CharacterItem } from '../../../api/character.dto';
 import CategorySeparator from '../../../shared/display/CategorySeparator';
+import TechnicalInfo from '../../../shared/display/TechnicalInfo';
 
 const CharacterItemDetail: FC<{ item?: CharacterItem }> = ({ item }) => {
   if (!item) return null;
@@ -60,7 +61,11 @@ const CharacterItemDetail: FC<{ item?: CharacterItem }> = ({ item }) => {
               </Grid>
             </>
           )}
-          <pre>{JSON.stringify(item, null, 2)}</pre>
+          <Grid size={12}>
+            <TechnicalInfo>
+              <pre>{JSON.stringify(item, null, 2)}</pre>
+            </TechnicalInfo>
+          </Grid>
         </Grid>
       </Grid>
     </Paper>
@@ -87,7 +92,7 @@ const KeyValueEntry: FC<{ label: string; value: string | number | undefined; app
         <Typography color={color} variant="body2">
           {value}
         </Typography>
-        <Typography color="secondary" variant="body2">
+        <Typography color="secondary" variant="caption">
           {label}
         </Typography>
       </Stack>
