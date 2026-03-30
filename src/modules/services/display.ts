@@ -6,3 +6,5 @@ export const textRed = '#ffab91';
 export const textGreen = '#a5d6a7';
 
 export const itemFilter = 'grayscale(90%) sepia(90%) hue-rotate(0deg) saturate(80%) brightness(1) contrast(0.75)';
+export const itemFilterDisabled =
+  'grayscale(90%) sepia(90%) hue-rotate(0deg) saturate(80%) brightness(0.25) contrast(0.75)';

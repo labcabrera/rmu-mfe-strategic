@@ -1,12 +1,13 @@
 import React, { useState, useEffect, FC, forwardRef, ReactElement, Ref } from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Slide } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Slide } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { AddItemDto } from '../../../api/character.dto';
 import { fetchItems, Item, armorSubcategories, weaponSubcategories } from '../../../api/items';
-import CharacterAddItemDialogSelect from './CharacterAddItemDialogContent';
+import TechnicalInfo from '../../../shared/display/TechnicalInfo';
 import CharacterAddItemDialogForm from './CharacterAddItemDialogForm';
+import CharacterAddItemDialogSelect from './CharacterAddItemDialogSelect';
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
@@ -29,16 +30,19 @@ const CharacterAddItemDialog: FC<{
   const [isValid, setIsValid] = useState(false);
   const [formData, setFormData] = useState<AddItemDto>();
   const [items, setItems] = useState<Item[]>([]);
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Item>();
 
   const handleClose = () => {
     setFormData(undefined);
+    setSelectedCategory(undefined);
+    setSelectedSubcategory(undefined);
+    setSelectedItem(undefined);
     onClose();
   };
 
   const handleSave = async () => {
     onItemAdded(formData!);
-    setSelectedItem(null);
+    setSelectedItem(undefined);
     setFormData(undefined);
   };
 
@@ -68,12 +72,16 @@ const CharacterAddItemDialog: FC<{
       weightPercent: item.info?.weightPercent || null,
       strength: item.info?.strength || null,
       cost: item.info?.cost?.average || null,
+      length: item.info.length,
+      fumble: item.weapon?.fumble || null,
       amount: 1,
     } as AddItemDto);
   };
+
   useEffect(() => {
     if (selectedCategory && selectedSubcategory) {
       bindItems(selectedCategory, selectedSubcategory);
+      setSelectedItem(undefined);
     }
     setFormData(undefined);
   }, [selectedSubcategory]);
@@ -96,6 +104,7 @@ const CharacterAddItemDialog: FC<{
       setItems([]);
     }
     setSelectedSubcategory(undefined);
+    setSelectedItem(undefined);
     setFormData(undefined);
   }, [selectedCategory]);
 
@@ -116,16 +125,31 @@ const CharacterAddItemDialog: FC<{
     >
       <DialogTitle>{t('Direct buy')}</DialogTitle>
       <DialogContent>
-        <CharacterAddItemDialogSelect
-          subcategories={subcategories}
-          selectedCategory={selectedCategory}
-          setSelectedCategory={setSelectedCategory}
-          selectedSubcategory={selectedSubcategory}
-          setSelectedSubcategory={setSelectedSubcategory}
-          items={items}
-          onLoadItem={loadItem}
-        />
-        {formData && <CharacterAddItemDialogForm formData={formData} setFormData={setFormData} item={selectedItem} />}
+        <Grid container spacing={1}>
+          <Grid size={6}>
+            <CharacterAddItemDialogSelect
+              subcategories={subcategories}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+              selectedSubcategory={selectedSubcategory}
+              setSelectedSubcategory={setSelectedSubcategory}
+              selectedItem={selectedItem}
+              items={items}
+              onLoadItem={loadItem}
+            />
+          </Grid>
+          <Grid size={6}>
+            {formData && (
+              <CharacterAddItemDialogForm formData={formData} setFormData={setFormData} item={selectedItem} />
+            )}
+          </Grid>
+          <Grid size={12}>
+            <TechnicalInfo>
+              <pre>FormData: {JSON.stringify(formData, null, 2)}</pre>
+              <pre>Item: {JSON.stringify(selectedItem, null, 2)}</pre>
+            </TechnicalInfo>
+          </Grid>
+        </Grid>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>{t('Close')}</Button>

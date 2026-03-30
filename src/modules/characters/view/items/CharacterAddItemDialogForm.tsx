@@ -1,193 +1,129 @@
 import React, { FC, Dispatch, SetStateAction } from 'react';
-import { Box, Chip, Grid, Stack, TextField, Typography } from '@mui/material';
+import { Grid, Stack, TextField, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { AddItemDto } from '../../../api/character.dto';
 import { Item } from '../../../api/items';
-import { imageBaseUrl } from '../../../services/config';
-import NumericCard from '../../../shared/cards/NumericCard';
-import TextCard from '../../../shared/cards/TextCard';
+import CategorySeparator from '../../../shared/display/CategorySeparator';
 import NumericInput from '../../../shared/inputs/NumericInput';
+
+const inputSize = { xs: 12, md: 4 } as const;
 
 const CharacterAddItemDialogForm: FC<{
   formData: AddItemDto;
   setFormData: Dispatch<SetStateAction<AddItemDto | undefined>>;
-  item: Item;
+  item: Item | undefined;
 }> = ({ formData, setFormData, item }) => {
+  if (!item) return;
   return (
     <>
-      <Grid container spacing={2}>
+      <Grid container spacing={1}>
         <Grid size={12}>
-          <Typography variant="h6">{t(formData.itemTypeId)}</Typography>
+          <CategorySeparator text={t(formData.itemTypeId)} />
         </Grid>
-        <Grid size={4}>
-          <Grid container spacing={2}>
-            <Grid size={6}>
-              <TextField
-                label={t('item-name')}
-                value={formData.name || ''}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                variant="standard"
-                fullWidth
-              />
-            </Grid>
-            <Grid size={6}></Grid>
-            <Grid size={6}>
-              <NumericInput
-                label={t('cost')}
-                value={formData.cost}
-                onChange={(value) => setFormData({ ...formData, cost: value })}
-              />
-            </Grid>
-            <Grid size={6}></Grid>
-            <Grid size={6}>
-              <NumericInput
-                label={t('weight')}
-                value={formData.weight}
-                onChange={(value) => setFormData({ ...formData, weight: value })}
-              />
-            </Grid>
-            <Grid size={6}>
-              <NumericInput
-                label={t('weight-percent')}
-                value={formData.weightPercent}
-                onChange={(value) => setFormData({ ...formData, weightPercent: value })}
-              />
-            </Grid>
-            <Grid size={6}>
-              <NumericInput
-                label={t('strength')}
-                value={formData.strength}
-                onChange={(value) => setFormData({ ...formData, strength: value })}
-              />
-            </Grid>
-            <Grid size={6}>
-              <NumericInput
-                label={t('amount')}
-                value={formData.amount}
-                onChange={(value) => setFormData({ ...formData, amount: value })}
-              />
-            </Grid>
+        <Grid size={12}>
+          <TextField
+            label={t('Item name')}
+            value={formData.name || ''}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            fullWidth
+          />
+        </Grid>
+        <Grid size={inputSize}>
+          <NumericInput
+            label={t('Cost')}
+            value={formData.cost || null}
+            onChange={(value) => setFormData({ ...formData, cost: value || undefined })}
+          />
+        </Grid>
+        <Grid size={inputSize}>
+          <NumericInput
+            label={t('Weight')}
+            value={formData.weight || null}
+            onChange={(value) => setFormData({ ...formData, weight: value || undefined })}
+          />
+        </Grid>
+        {item.category === 'armor' && (
+          <Grid size={inputSize}>
+            <NumericInput
+              label={t('Weight percent')}
+              value={formData.weightPercent || null}
+              onChange={(value) => setFormData({ ...formData, weightPercent: value || undefined })}
+            />
           </Grid>
+        )}
+        <Grid size={inputSize}>
+          <NumericInput
+            label={t('Strength')}
+            value={formData.strength || null}
+            onChange={(value) => setFormData({ ...formData, strength: value || undefined })}
+          />
         </Grid>
-        <Grid size={1}></Grid>
-        <Grid size={7}>
-          <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
-            <TextCard
-              value={`${item.info.cost.min || ''}g`}
-              subtitle="Min cost"
-              image={`${imageBaseUrl}images/generic/coins.png`}
+        {item.info.length && (
+          <Grid size={inputSize}>
+            <NumericInput
+              label={t('Length')}
+              value={formData.length || null}
+              onChange={(value) => setFormData({ ...formData, length: value || undefined })}
             />
-            <TextCard
-              value={`${item.info.cost.average || ''}g`}
-              subtitle="Average cost"
-              image={`${imageBaseUrl}images/generic/coins.png`}
+          </Grid>
+        )}
+        {item.category === 'weapon' && (
+          <Grid size={inputSize}>
+            <NumericInput
+              label={t('Fumble')}
+              value={formData.fumble || null}
+              onChange={(value) => setFormData({ ...formData, fumble: value || undefined })}
             />
-            <TextCard
-              value={`${item.info.cost.max || ''}g`}
-              subtitle="Max cost"
-              image={`${imageBaseUrl}images/generic/coins.png`}
-            />
-            {item.info && item.info.weight && (
-              <NumericCard
-                value={item.info.weight}
-                subtitle="Weight"
-                image={`${imageBaseUrl}images/generic/weight-penalty.png`}
-                applyColor={false}
-              />
-            )}
-            {item.info && item.info.weightPercent && (
-              <TextCard
-                value={`${item.info.weightPercent}%`}
-                subtitle="Weight"
-                image={`${imageBaseUrl}images/generic/weight-penalty.png`}
-              />
-            )}
-            {item.weapon && item.weapon.attackTable && (
-              <NumericCard
-                value={item.weapon.attackTable}
-                subtitle="Attack Table"
-                image={`${imageBaseUrl}images/generic/configuration.png`}
-                applyColor={false}
-              />
-            )}
-            {item.weapon && item.weapon.sizeAdjustment !== undefined && (
-              <NumericCard
-                value={item.weapon.sizeAdjustment}
-                subtitle="Size adjustment"
-                image={`${imageBaseUrl}images/generic/configuration.png`}
-                applyColor={false}
-              />
-            )}
-            {item.weapon && item.weapon.fumble && (
-              <NumericCard
-                value={item.weapon.fumble}
-                subtitle="Fumble"
-                image={`${imageBaseUrl}images/generic/configuration.png`}
-                applyColor={false}
-              />
-            )}
-            {item.weapon && item.weapon.requiredHands && (
-              <NumericCard
-                value={item.weapon.requiredHands}
-                subtitle="Required hands"
-                image={`${imageBaseUrl}images/generic/configuration.png`}
-                applyColor={false}
-              />
-            )}
-            {item.armor && (
-              <>
-                <NumericCard
-                  value={item.armor.at}
-                  subtitle="Armor type"
-                  image={`${imageBaseUrl}images/generic/armor.png`}
-                  applyColor={false}
-                />
-                <NumericCard
-                  value={item.armor.maneuver}
-                  subtitle="Maneuver penalty"
-                  image={`${imageBaseUrl}images/generic/maneuver-penalty.png`}
-                />
-                <NumericCard
-                  value={item.armor.rangedPenalty}
-                  subtitle="Ranged penalty"
-                  image={`${imageBaseUrl}images/generic/armor-ranged-penalty.png`}
-                />
-                <NumericCard
-                  value={item.armor.perception}
-                  subtitle="Perception penalty"
-                  image={`${imageBaseUrl}images/generic/armor-perception-penalty.png`}
-                />
-              </>
-            )}
-            {item.info && item.info.strength && (
-              <NumericCard
-                value={item.info.strength}
-                subtitle="Strength"
-                image={`${imageBaseUrl}images/generic/configuration.png`}
-                applyColor={false}
-              />
-            )}
-          </Box>
-          {item.weapon && item.weapon.ranges && item.weapon.ranges.length > 0 && (
-            <>
-              <Typography variant="body1" color="primary" gutterBottom>
-                Ranges
-              </Typography>
-              <Stack direction="column" spacing={1} alignItems="left" flex={1}>
-                {item.weapon.ranges.map((range, index) => (
-                  <Chip
-                    key={index}
-                    label={`From ${range.from} to ${range.to}: ${range.bonus > 0 ? '+' : ''}${range.bonus}`}
-                    sx={{ width: 'fit-content' }}
-                  />
-                ))}
-              </Stack>
-            </>
-          )}
+          </Grid>
+        )}
+        <Grid size={inputSize}>
+          <NumericInput
+            label={t('Amount')}
+            value={formData.amount || null}
+            onChange={(value) => setFormData({ ...formData, amount: value || undefined })}
+          />
         </Grid>
+
+        <Grid size={12}>
+          <CategorySeparator text={t('Item information')} />
+        </Grid>
+
+        <KeyValueEntry label="Min cost" value={item.info.cost?.min || '-'} />
+        <KeyValueEntry label="Avg cost" value={item.info.cost?.average || '-'} />
+        <KeyValueEntry label="Max cost" value={item.info.cost?.max || '-'} />
+        {item.armor && (
+          <>
+            <KeyValueEntry label="AT" value={item.armor.at} />
+            <KeyValueEntry label="Maneuver penalty" value={item.armor.maneuver || 0} />
+            <KeyValueEntry label="Ranged penalty" value={item.armor.rangedPenalty || 0} />
+            <KeyValueEntry label="Perception penalty" value={item.armor.perceptionPenalty || 0} />
+            <KeyValueEntry label="Enc" value={item.armor.enc} />
+            <KeyValueEntry label="Base difficulty" value={item.armor.baseDifficulty} />
+          </>
+        )}
+        {item.weapon && (
+          <>
+            <KeyValueEntry label="Skill" value={item.weapon.skillId} />
+            <KeyValueEntry label="Fumble" value={item.weapon.fumble} />
+          </>
+        )}
       </Grid>
-      {/* <pre>{JSON.stringify(item, null, 2)}</pre> */}
     </>
+  );
+};
+
+const KeyValueEntry: FC<{ label: string; value: string | number | undefined }> = ({ label, value }) => {
+  return (
+    <Grid size={inputSize}>
+      <Stack direction="column">
+        <Typography color="primary" variant="body2">
+          {value}
+        </Typography>
+        <Typography color="secondary" variant="body2">
+          {label}
+        </Typography>
+      </Stack>
+    </Grid>
   );
 };
 

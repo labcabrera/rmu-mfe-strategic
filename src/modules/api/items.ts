@@ -1,16 +1,31 @@
 import { getAuthHeaders } from '../services/auth-token-service';
 import { apiItemsUrl } from '../services/config';
 import { buildErrorFromResponse } from './api-errors';
+import { NamedEntity } from './common.dto';
 
 export interface Item {
   id: string;
-  name: string;
+  realm: NamedEntity;
+  category: string;
+  armor?: ItemArmor;
+  weapon?: ItemWeapon;
+  info: ItemInfo;
   imageUrl?: string;
-  itemTypeId: string;
-  carried?: boolean;
-  info?: ItemInfo;
-  amount?: number;
-  [key: string]: any;
+}
+
+export interface ItemArmor {
+  slot: string;
+  at: number;
+  enc: number;
+  maneuver: number;
+  rangedPenalty: number;
+  perceptionPenalty: number;
+  baseDifficulty: string;
+}
+
+export interface ItemWeapon {
+  skillId: string;
+  fumble: number;
 }
 
 export interface Equipment {
@@ -31,12 +46,18 @@ export interface Armor {
 }
 
 export interface ItemInfo {
-  weightPercent: number;
-  type?: string;
-  weight?: number;
+  cost?: ItemCost;
   length?: number;
+  weight?: number;
+  weightPercent?: number;
   strength?: number;
-  cost: any;
+  productionHours?: number;
+}
+
+export interface ItemCost {
+  min: number;
+  average: number;
+  max: number;
 }
 
 export async function fetchItems(rsql: string, page: number, size: number): Promise<Item[]> {

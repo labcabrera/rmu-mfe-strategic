@@ -259,8 +259,10 @@ export interface AddItemDto {
   itemTypeId: string;
   amount?: number;
   weight?: number;
+  length?: number;
   weightPercent?: number;
   strength?: number;
+  fumble?: number;
   cost?: number;
 }
 

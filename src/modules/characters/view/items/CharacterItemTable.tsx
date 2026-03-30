@@ -23,6 +23,7 @@ import { useError } from '../../../../ErrorContext';
 import { updateCarriedStatus, deleteItem } from '../../../api/character';
 import { Character, CharacterItem } from '../../../api/character.dto';
 import { imageBaseUrl } from '../../../services/config';
+import { itemFilter, itemFilterDisabled } from '../../../services/display';
 
 const IMG_SIZE = 60;
 
@@ -100,7 +101,7 @@ const CharacterItemTable: FC<{
                     sx={{
                       width: IMG_SIZE,
                       height: IMG_SIZE,
-                      filter: !!item.carried ? 'none' : 'grayscale(100%)',
+                      filter: !!item.carried ? itemFilter : itemFilterDisabled,
                     }}
                   />
                 </TableCell>

@@ -1,10 +1,11 @@
-import React, { useState, FC, SetStateAction, Dispatch } from 'react';
-import { Box, CardMedia, Divider, Grid, Tooltip } from '@mui/material';
+import React, { FC, SetStateAction, Dispatch, ReactNode } from 'react';
+import { Box, CardMedia, Divider, Grid, Tooltip, Typography } from '@mui/material';
 import { t } from 'i18next';
-import { AddItemDto } from '../../../api/character.dto';
 import { Item, categories } from '../../../api/items';
 import { imageBaseUrl } from '../../../services/config';
-import { itemFilter } from '../../../services/display';
+import { itemFilter, itemFilterDisabled } from '../../../services/display';
+
+const imageSize = 80;
 
 const CharacterAddItemDialogSelect: FC<{
   subcategories: string[];
@@ -12,6 +13,7 @@ const CharacterAddItemDialogSelect: FC<{
   setSelectedCategory: Dispatch<SetStateAction<string | undefined>>;
   selectedSubcategory: string | undefined;
   setSelectedSubcategory: Dispatch<SetStateAction<string | undefined>>;
+  selectedItem: Item | undefined;
   items: Item[];
   onLoadItem: (item: Item) => void;
 }> = ({
@@ -20,24 +22,17 @@ const CharacterAddItemDialogSelect: FC<{
   setSelectedCategory,
   selectedSubcategory,
   setSelectedSubcategory,
+  selectedItem,
   items,
   onLoadItem,
 }) => {
-  const [formData, setFormData] = useState<AddItemDto>();
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
-
-  const IMAGE_SIZE = 80;
-
-  const isFormValid = () => {
-    if (!formData) return false;
-    return !!formData.name;
-  };
-
   return (
     <>
       <Grid container spacing={1}>
         <Grid size={12}>
-          <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={0.2}>
+          <CustomCategorySeparator text={`Category${selectedCategory ? `: ${t(selectedCategory)}` : ''}`} />
+
+          <Box display="flex" flexDirection="row" flexWrap="wrap" gap={0.2}>
             {categories.map((category) => (
               <>
                 <Tooltip key={category} title={category} arrow>
@@ -48,13 +43,12 @@ const CharacterAddItemDialogSelect: FC<{
                     alt={t(category)}
                     onClick={() => setSelectedCategory(category)}
                     sx={{
-                      width: IMAGE_SIZE,
-                      height: IMAGE_SIZE,
+                      width: imageSize,
+                      height: imageSize,
                       cursor: 'pointer',
-                      border: selectedCategory === category ? '2px solid' : 'none',
                       borderColor: 'success.main',
                       objectFit: 'cover',
-                      filter: itemFilter,
+                      filter: !selectedCategory || selectedCategory === category ? itemFilter : itemFilterDisabled,
                     }}
                   />
                 </Tooltip>
@@ -62,10 +56,12 @@ const CharacterAddItemDialogSelect: FC<{
             ))}
           </Box>
         </Grid>
-        <Divider />
+
         {subcategories && subcategories.length > 0 && (
           <Grid size={12}>
-            <Box mb={1} display="flex" flexDirection="row" flexWrap="wrap" gap={0.2}>
+            <CustomCategorySeparator text={`Category${selectedSubcategory ? `: ${t(selectedSubcategory)}` : ''}`} />
+
+            <Box display="flex" flexDirection="row" flexWrap="wrap" gap={0.2}>
               {subcategories.map((subcategory, index) => (
                 <Tooltip key={index} title={subcategory} arrow>
                   <CardMedia
@@ -75,13 +71,13 @@ const CharacterAddItemDialogSelect: FC<{
                     alt={t(subcategory)}
                     onClick={() => setSelectedSubcategory(subcategory)}
                     sx={{
-                      width: IMAGE_SIZE,
-                      height: IMAGE_SIZE,
+                      width: imageSize,
+                      height: imageSize,
                       objectFit: 'cover',
                       cursor: 'pointer',
-                      border: selectedSubcategory === subcategory ? '2px solid' : 'none',
                       borderColor: 'success.main',
-                      filter: itemFilter,
+                      filter:
+                        !selectedSubcategory || selectedSubcategory === subcategory ? itemFilter : itemFilterDisabled,
                     }}
                   />
                 </Tooltip>
@@ -89,9 +85,9 @@ const CharacterAddItemDialogSelect: FC<{
             </Box>
           </Grid>
         )}
-        <Divider />
         <Grid size={12}>
-          <Box mb={1} display="flex" flexDirection="row" flexWrap="wrap" gap={1}>
+          <CustomCategorySeparator text={t('Items')} />
+          <Box display="flex" flexDirection="row" flexWrap="wrap" gap={0.2}>
             {items.map((item, index) => (
               <Tooltip key={index} title={t(item.id)} arrow>
                 <CardMedia
@@ -101,13 +97,12 @@ const CharacterAddItemDialogSelect: FC<{
                   alt={t(item.id)}
                   onClick={() => onLoadItem(item)}
                   sx={{
-                    width: IMAGE_SIZE,
-                    height: IMAGE_SIZE,
+                    width: imageSize,
+                    height: imageSize,
                     objectFit: 'cover',
                     cursor: 'pointer',
-                    border: selectedItem && selectedItem.id === item.id ? '2px solid' : 'none',
                     borderColor: 'success.main',
-                    filter: itemFilter,
+                    filter: !selectedItem || selectedItem.id === item.id ? itemFilter : itemFilterDisabled,
                   }}
                 />
               </Tooltip>
@@ -116,6 +111,19 @@ const CharacterAddItemDialogSelect: FC<{
         </Grid>
       </Grid>
     </>
+  );
+};
+
+const CustomCategorySeparator: FC<{ text: string; children?: ReactNode }> = ({ text, children }) => {
+  return (
+    <Box mb={1} mt={0}>
+      <Box display="flex" alignItems="center" justifyContent="space-between">
+        <Typography variant="subtitle2" color="text.secondary">
+          {text}
+        </Typography>
+      </Box>
+      <Divider sx={{ mt: 0.5 }} />
+    </Box>
   );
 };
 

@@ -7,3 +7,8 @@ export interface Page<T> {
     totalPages: number;
   };
 }
+
+export interface NamedEntity {
+  id: string;
+  name: string;
+}

@@ -14,8 +14,7 @@ import {
 import { t } from 'i18next';
 import { equipItem, unequipItem } from '../../../api/character';
 import { Character, CharacterItem } from '../../../api/character.dto';
-
-const imageBaseUrl = process.env.RMU_MFE_ASSETS!;
+import { imageBaseUrl } from '../../../services/config';
 
 const CharacterEquipmentDialog: FC<{
   open: boolean;
