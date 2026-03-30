@@ -45,14 +45,8 @@ const CharacterEquipmentDialog: FC<{
       return character.items.filter(
         (e) => e.category === 'shield' || (e.category === 'weapon' && isOneHandedWeapon(e))
       );
-    } else if (s === 'body') {
-      return character.items.filter((e) => isArmorSlot(e, 'body'));
-    } else if (s === 'head') {
-      return character.items.filter((e) => isArmorSlot(e, 'head'));
-    } else if (s === 'arms') {
-      return character.items.filter((e) => isArmorSlot(e, 'arms'));
-    } else if (s === 'legs') {
-      return character.items.filter((e) => isArmorSlot(e, 'legs'));
+    } else if (s === 'body' || s === 'head' || s === 'arms' || s === 'legs') {
+      return character.items.filter((e) => isArmorSlot(e, s));
     }
     return [];
   };

@@ -21,7 +21,7 @@ const CharacterItemDetail: FC<{ item?: CharacterItem }> = ({ item }) => {
 
           <Grid container spacing={1} mb={2}>
             {item.amount && <KeyValueEntry label={t('Amount')} value={item.amount} />}
-            <KeyValueEntry label={t('Weight')} value={`${item.info.weight} lbs`} />
+            {item.info.weight !== 0 && <KeyValueEntry label={t('Weight')} value={`${item.info.weight} lbs`} />}
             {item.info.length && <KeyValueEntry label={t('Length')} value={`${item.info.length}'`} />}
             {item.info.cost && <KeyValueEntry label={t('Weight')} value={item.info.cost} />}
             {item.info.strength && <KeyValueEntry label={t('Strength')} value={item.info.strength} />}

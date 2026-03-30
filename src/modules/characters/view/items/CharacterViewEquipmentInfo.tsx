@@ -5,7 +5,6 @@ import { Character } from '../../../api/character.dto';
 import { imageBaseUrl } from '../../../services/config';
 import { gridSizeCard } from '../../../services/display';
 import RmuTextCard from '../../../shared/cards/RmuTextCard';
-import TextCard from '../../../shared/cards/TextCard';
 
 const grayscale = 0.7;
 
@@ -65,6 +64,7 @@ const CharacterViewEquipmentInfo: React.FC<{
                 subtitle={t('Carried weight')}
                 image={`${imageBaseUrl}images/generic/carried-weight.png`}
                 color={character.equipment.weight > character.equipment.weightAllowance ? 'error' : undefined}
+                grayscale={grayscale}
               />
             </span>
           </Tooltip>
@@ -98,6 +98,7 @@ const CharacterViewEquipmentInfo: React.FC<{
             value={t(`difficulty-${character.equipment.movementBaseDifficulty}`)}
             subtitle={t('Movement base difficulty')}
             image={`${imageBaseUrl}images/generic/maneuver-penalty.png`}
+            grayscale={grayscale}
           />
         </Grid>
         <Grid size={gridSizeCard}>
