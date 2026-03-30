@@ -38,7 +38,7 @@ function a11yProps(index: number) {
 
 const CharacterViewTabs: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>> | undefined;
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   strategicGame: StrategicGame;
   profession: Profession;
 }> = ({ character, setCharacter, strategicGame, profession }) => {

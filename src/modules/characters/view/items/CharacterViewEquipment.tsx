@@ -2,9 +2,9 @@ import React, { FC, useState } from 'react';
 import { Box, CardMedia, Typography, Stack, Tooltip } from '@mui/material';
 import { t } from 'i18next';
 import { Character, CharacterItem } from '../../../api/character.dto';
+import { imageBaseUrl } from '../../../services/config';
 import CharacterEquipmentDialog from './CharacterEquipmentDialog';
 
-const imageBaseUrl = process.env.RMU_MFE_ASSETS!;
 const slots = ['mainHand', 'offHand', 'head', 'body', 'arms', 'legs'];
 const SLOT_SIZE = 150;
 

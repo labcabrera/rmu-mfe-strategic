@@ -13,7 +13,7 @@ import CharacterViewTraitDialog from './CharacterViewTraitDialog';
 
 const CharacterViewTraits: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>>;
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
 }> = ({ character, setCharacter }) => {
   const [openAddTraitDialog, setOpenAddTraitDialog] = useState(false);
   const [openTraitDialog, setOpenTraitDialog] = useState(false);

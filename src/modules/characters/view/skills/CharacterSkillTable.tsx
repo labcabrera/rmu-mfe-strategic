@@ -30,7 +30,7 @@ const maxKnackSkills = 2;
 
 const CharacterSkillTable: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>>;
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   profession?: Profession;
 }> = ({ character, setCharacter, profession }) => {
   const currentKnackSkills = character.skills.filter((s) => s.professional?.includes('knack')).length;

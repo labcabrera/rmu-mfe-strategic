@@ -25,7 +25,7 @@ import SelectTraitSpecialization from './SelectTraitSpecialization';
 
 const AddTraitDialog: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>>;
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   open: boolean;
   onClose: () => void;
 }> = ({ character, setCharacter, open, onClose }) => {

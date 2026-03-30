@@ -13,7 +13,7 @@ import NumericCard from '../../shared/cards/NumericCard';
 
 const CharacterViewTransferGold: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>>;
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
 }> = ({ character, setCharacter }) => {
   const [goldAmount, setGoldAmount] = useState<number>(0);
   const [faction, setFaction] = useState<Faction | null>(null);

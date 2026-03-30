@@ -1,8 +1,6 @@
 import React, { FC } from 'react';
 import { Card, CardContent, CardMedia, Typography } from '@mui/material';
-
-const red = '#ffab91';
-const green = '#a5d6a7';
+import { textRed, textGreen } from '../../services/display';
 
 const NumericCard: FC<{
   value: number;
@@ -31,8 +29,8 @@ const NumericCard: FC<{
 
   const getColor = (): string => {
     if (!applyColor) return 'inherit';
-    if (value > 0) return green;
-    if (value < 0) return red;
+    if (value > 0) return textGreen;
+    if (value < 0) return textRed;
     return 'inherit';
   };
 

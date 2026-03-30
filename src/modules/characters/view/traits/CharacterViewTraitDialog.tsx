@@ -10,7 +10,7 @@ import TechnicalInfo from '../../../shared/display/TechnicalInfo';
 
 const CharacterViewTraitDialog: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>>;
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   characterTrait: CharacterTrait;
   open: boolean;
   onClose: () => void;

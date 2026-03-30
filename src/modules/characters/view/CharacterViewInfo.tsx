@@ -94,7 +94,6 @@ const CharacterViewInfo: FC<{
               value={getLevelText()}
               subtitle={t('Level')}
               image={`${imageBaseUrl}images/generic/experience.png`}
-              applyColor={false}
               grayscale={grayscale}
             />
           </Badge>
@@ -173,7 +172,7 @@ const CharacterViewInfo: FC<{
           >
             <RmuTextCard
               value={`${character.experience.availableDevelopmentPoints} / ${character.experience.developmentPoints}`}
-              subtitle={t('development-points')}
+              subtitle={t('Development points')}
               image={`${imageBaseUrl}images/generic/trait-combat.png`}
               grayscale={grayscale}
             />
@@ -191,7 +190,13 @@ const CharacterViewInfo: FC<{
               value={character.statistics[stat].totalBonus}
               subtitle={t(stat)}
               image={`${imageBaseUrl}images/generic/stat-${stat}.png`}
-              applyColor={true}
+              color={
+                character.statistics[stat].totalBonus === 0
+                  ? undefined
+                  : character.statistics[stat].totalBonus > 0
+                    ? 'success'
+                    : 'error'
+              }
               grayscale={grayscale}
             />
           </Grid>
@@ -204,9 +209,15 @@ const CharacterViewInfo: FC<{
         <Grid size={{ xs: 12, md: 2 }}>
           <RmuTextCard
             value={character.defense.defensiveBonus}
-            subtitle={t('defensive-bonus')}
+            subtitle={t('Defensive bonus')}
             image={`${imageBaseUrl}images/generic/defensive-bonus.png`}
-            applyColor={true}
+            color={
+              character.defense.defensiveBonus === 0
+                ? undefined
+                : character.defense.defensiveBonus > 0
+                  ? 'success'
+                  : 'error'
+            }
             grayscale={grayscale}
           />
         </Grid>
@@ -236,7 +247,6 @@ const CharacterViewInfo: FC<{
             value={character.movement.strideRacialBonus}
             subtitle={t('Stride racial bonus')}
             image={`${imageBaseUrl}images/generic/stride-bonus.png`}
-            applyColor={true}
             grayscale={grayscale}
           />
         </Grid>
@@ -245,7 +255,6 @@ const CharacterViewInfo: FC<{
             value={character.movement.strideQuBonus}
             subtitle={t('Stride stat bonus')}
             image={`${imageBaseUrl}images/generic/stride-bonus.png`}
-            applyColor={true}
             grayscale={grayscale}
           />
         </Grid>
@@ -259,7 +268,6 @@ const CharacterViewInfo: FC<{
             value={character.initiative.totalBonus}
             subtitle={t('Initiative total bonus')}
             image={`${imageBaseUrl}images/generic/initiative.png`}
-            applyColor={true}
             grayscale={grayscale}
           />
         </Grid>
@@ -268,7 +276,6 @@ const CharacterViewInfo: FC<{
             value={character.initiative.baseBonus}
             subtitle={t('Initiative base bonus')}
             image={`${imageBaseUrl}images/generic/initiative.png`}
-            applyColor={true}
             grayscale={grayscale}
           />
         </Grid>
@@ -285,7 +292,7 @@ const CharacterViewInfo: FC<{
               subtitle={t(resistance.resistance)}
               image={getResistanceImage(resistance.resistance)}
               grayscale={grayscale}
-              applyColor={true}
+              color={resistance.totalBonus === 0 ? undefined : resistance.totalBonus > 0 ? 'success' : 'error'}
             />
           </Grid>
         ))}

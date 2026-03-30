@@ -16,6 +16,7 @@ import {
   TableRow,
   Typography,
   ListItemIcon,
+  Stack,
 } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
@@ -27,7 +28,7 @@ const IMG_SIZE = 60;
 
 const CharacterItemTable: FC<{
   character: Character;
-  setCharacter?: Dispatch<SetStateAction<Character>>;
+  setCharacter?: Dispatch<SetStateAction<Character | undefined>>;
   carried?: boolean;
   onItemClick?: (item: CharacterItem) => void;
 }> = ({ character, setCharacter, carried, onItemClick }) => {
@@ -65,18 +66,20 @@ const CharacterItemTable: FC<{
     }
   };
 
+  const getAmount = (item: CharacterItem): string => {
+    return item.amount === 0 || (item.amount && item.amount !== 1) ? ` (${item.amount})` : '';
+  };
+
   return (
     <TableContainer component={Paper} sx={{ mt: 2 }}>
       <Table size="small" sx={{ tableLayout: 'fixed' }}>
         <TableHead>
           <TableRow>
-            <TableCell sx={{ width: '72px' }}>{carried ? t('Carried') : t('Stored')}</TableCell>
-            <TableCell sx={{ width: '240px' }}>{t('name')}</TableCell>
-            <TableCell sx={{ width: '140px' }}>{t('type')}</TableCell>
-            <TableCell sx={{ width: '80px' }}>{t('amount')}</TableCell>
-            <TableCell sx={{ width: '80px' }}>{t('weight')}</TableCell>
-            <TableCell sx={{ width: '80px' }}></TableCell>
-            <TableCell align="right" sx={{ width: '80px' }}></TableCell>
+            <TableCell sx={{ width: '10%' }}>{carried ? t('Carried') : t('Stored')}</TableCell>
+            <TableCell sx={{ width: '60%' }}>{t('Name')}</TableCell>
+            <TableCell sx={{ width: '10%' }}>{t('Weight')}</TableCell>
+            <TableCell sx={{ width: '10%' }} align="right"></TableCell>
+            <TableCell sx={{ width: '10%' }} align="right"></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -89,7 +92,7 @@ const CharacterItemTable: FC<{
                 onClick={() => onItemClick && onItemClick(item)}
                 sx={{ cursor: onItemClick ? 'pointer' : 'default' }}
               >
-                <TableCell sx={{ width: '72px' }}>
+                <TableCell>
                   <Avatar
                     variant="square"
                     src={`${imageBaseUrl}images/items/${item.itemTypeId}.png`}
@@ -101,23 +104,21 @@ const CharacterItemTable: FC<{
                     }}
                   />
                 </TableCell>
-                <TableCell sx={{ width: '240px' }}>
-                  <Typography variant="body2" noWrap>
-                    {item.name}
-                  </Typography>
+                <TableCell>
+                  <Stack direction="column">
+                    <Typography variant="body2" noWrap>
+                      {item.name}
+                      {getAmount(item)}
+                    </Typography>
+                    <Typography variant="body2" color="secondary" noWrap>
+                      <em>{item.name}</em>
+                    </Typography>
+                  </Stack>
                 </TableCell>
-                <TableCell sx={{ width: '140px' }}>
-                  <Typography variant="body2" noWrap>
-                    {t(item.itemTypeId) || ''}
-                  </Typography>
-                </TableCell>
-                <TableCell sx={{ width: '80px' }}>
-                  <Typography variant="body2">{item.amount && item.amount > 1 ? item.amount : ''}</Typography>
-                </TableCell>
-                <TableCell sx={{ width: '80px' }}>
+                <TableCell align="right">
                   <Typography variant="body2">{item.info?.weight ?? ''}</Typography>
                 </TableCell>
-                <TableCell sx={{ width: '80px' }}>
+                <TableCell>
                   <IconButton size="small" color="primary" onClick={() => handleToggleCarried(item.id, !!item.carried)}>
                     <SwapVerticalCircleIcon />
                   </IconButton>

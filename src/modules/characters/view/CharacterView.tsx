@@ -17,7 +17,7 @@ const CharacterView: FC = () => {
   const { characterId } = useParams<{ characterId: string }>();
   const [character, setCharacter] = useState<Character>();
   const [strategicGame, setStrategicGame] = useState<StrategicGame | null>(null);
-  const [profession, setProfession] = useState<Profession | null>(null);
+  const [profession, setProfession] = useState<Profession>();
   const { showError } = useError();
 
   useEffect(() => {
@@ -39,7 +39,7 @@ const CharacterView: FC = () => {
     }
   }, [location.state, characterId, showError]);
 
-  if (!character || !setCharacter || !strategicGame) return <div>Loading...</div>;
+  if (!character || !setCharacter || !strategicGame || !profession) return <div>Loading...</div>;
 
   return (
     <>

@@ -64,6 +64,7 @@ const CharacterViewEquipmentInfo: React.FC<{
                 value={getLabelWeight()}
                 subtitle={t('Carried weight')}
                 image={`${imageBaseUrl}images/generic/carried-weight.png`}
+                color={character.equipment.weight > character.equipment.weightAllowance ? 'error' : undefined}
               />
             </span>
           </Tooltip>
@@ -83,7 +84,7 @@ const CharacterViewEquipmentInfo: React.FC<{
                 value={character.equipment.encumbrancePenalty || 0}
                 subtitle={t('Encumbrance penalty')}
                 image={`${imageBaseUrl}images/generic/weight-penalty.png`}
-                applyColor={true}
+                color={character.equipment.encumbrancePenalty || 0 < 0 ? 'error' : undefined}
                 grayscale={grayscale}
               />
             </span>
@@ -115,6 +116,7 @@ const CharacterViewEquipmentInfo: React.FC<{
                 subtitle={t('Armor penalty')}
                 image={`${imageBaseUrl}images/generic/maneuver-penalty.png`}
                 grayscale={grayscale}
+                color={character.equipment.maneuverPenalty < 0 ? 'error' : undefined}
               />
             </span>
           </Tooltip>
@@ -125,7 +127,7 @@ const CharacterViewEquipmentInfo: React.FC<{
             subtitle={t('Ranged penalty')}
             image={`${imageBaseUrl}images/generic/armor-ranged-penalty.png`}
             grayscale={grayscale}
-            applyColor={true}
+            color={character.equipment.rangedPenalty || 0 < 0 ? 'error' : undefined}
           />
         </Grid>
         <Grid size={gridSizeCard}>
@@ -134,7 +136,7 @@ const CharacterViewEquipmentInfo: React.FC<{
             subtitle={t('Perception penalty')}
             image={`${imageBaseUrl}images/generic/armor-perception-penalty.png`}
             grayscale={grayscale}
-            applyColor={true}
+            color={character.equipment.perceptionPenalty || 0 < 0 ? 'error' : undefined}
           />
         </Grid>
       </Grid>

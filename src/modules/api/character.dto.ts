@@ -170,12 +170,12 @@ export interface CharacterEquipment {
   head: string | undefined;
   arms: string | undefined;
   legs: string | undefined;
-  weight: number | undefined;
-  weightAllowance: number | undefined;
-  encumbrancePenalty?: number;
-  baseManeuverPenalty: number | undefined;
-  maneuverPenalty?: number;
-  rangedPenalty?: number;
+  weight: number;
+  weightAllowance: number;
+  encumbrancePenalty: number;
+  baseManeuverPenalty: number;
+  maneuverPenalty: number;
+  rangedPenalty: number;
   perceptionPenalty?: number;
   movementBaseDifficulty?: string | undefined;
 }

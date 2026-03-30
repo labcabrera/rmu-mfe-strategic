@@ -1,14 +1,12 @@
 import React, { FC } from 'react';
 import { Typography } from '@mui/material';
 import { imageBaseUrl } from '../../services/config';
+import { textRed, textGreen } from '../../services/display';
 import RmuCard from './RmuCard';
-
-const red = '#ffab91';
-const green = '#a5d6a7';
 
 const RmuTextCard: FC<{
   value: string | number;
-  applyColor?: boolean;
+  color?: undefined | 'success' | 'error';
   subtitle: string | undefined;
   image?: string;
   grayscale?: number;
@@ -18,7 +16,7 @@ const RmuTextCard: FC<{
   value,
   subtitle,
   size = 'small',
-  applyColor = false,
+  color,
   image = `${imageBaseUrl}images/generic/configuration.png`,
   grayscale = 0,
   onClick,
@@ -29,14 +27,7 @@ const RmuTextCard: FC<{
         component="div"
         variant="h6"
         sx={{
-          color:
-            applyColor && typeof value === 'number'
-              ? value > 0
-                ? green
-                : value < 0
-                  ? red
-                  : 'text.primary'
-              : undefined,
+          color: color === 'error' ? textRed : color === 'success' ? textGreen : undefined,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',

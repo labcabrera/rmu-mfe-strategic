@@ -23,7 +23,7 @@ const itemCardHeight = 260;
 
 const CharacterViewItems: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>> | undefined;
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
 }> = ({ character, setCharacter }) => {
   const navigate = useNavigate();
   const { showError } = useError();

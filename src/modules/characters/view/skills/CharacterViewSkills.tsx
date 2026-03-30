@@ -15,7 +15,7 @@ const STORAGE_KEY = 'character-display-skill-table';
 
 const CharacterViewSkills: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>> | undefined;
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   profession?: Profession;
 }> = ({ character, setCharacter, profession }) => {
   const [openAddSkillDialog, setOpenAddSkillDialog] = useState(false);
