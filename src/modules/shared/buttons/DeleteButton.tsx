@@ -7,7 +7,7 @@ const DeleteButton: FC<{
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
 }> = ({ onClick, disabled = false }) => (
-  <RmuIconButton onClick={onClick} aria-label="delete" disabled={disabled} Icon={DeleteIcon} />
+  <RmuIconButton onClick={onClick} aria-label="delete" disabled={disabled} icon={DeleteIcon} />
 );
 
 export default DeleteButton;

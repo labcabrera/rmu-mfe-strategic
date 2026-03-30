@@ -4,8 +4,9 @@ import RmuIconButton from './RmuIconButton';
 
 const LevelUpButton: FC<{
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
-}> = ({ onClick }) => {
-  return <RmuIconButton onClick={onClick} ariaLabel="level-up" Icon={ArrowCircleUpIcon} />;
+  color?: 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning' | 'default' | undefined;
+}> = ({ color = 'primary', onClick }) => {
+  return <RmuIconButton onClick={onClick} ariaLabel="level-up" color={color} icon={ArrowCircleUpIcon} />;
 };
 
 export default LevelUpButton;

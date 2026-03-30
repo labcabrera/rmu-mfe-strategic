@@ -45,11 +45,11 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
           <TableRow>
             <TableCell>{t('name')}</TableCell>
             <TableCell>{t('race')}</TableCell>
-            <TableCell>{t('level')}</TableCell>
+            <TableCell align="right">{t('level')}</TableCell>
             <TableCell>{t('profession')}</TableCell>
             <TableCell>{t('attacks')}</TableCell>
             <TableCell>{t('DB')}</TableCell>
-            <TableCell>{t('armor')}</TableCell>
+            <TableCell>{t('AT')}</TableCell>
             <TableCell align="right">HP</TableCell>
           </TableRow>
         </TableHead>

@@ -1,7 +1,5 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
-import UploadIcon from '@mui/icons-material/Upload';
 import {
   Button,
   Dialog,

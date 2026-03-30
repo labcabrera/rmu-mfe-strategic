@@ -6,7 +6,7 @@ const SaveButton: FC<{
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
 }> = ({ onClick, disabled = false }) => (
-  <RmuIconButton onClick={onClick} aria-label="save" disabled={disabled} Icon={SaveIcon} />
+  <RmuIconButton onClick={onClick} aria-label="save" disabled={disabled} icon={SaveIcon} />
 );
 
 export default SaveButton;

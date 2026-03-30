@@ -51,10 +51,12 @@ const CharacterViewEquipmentInfo: React.FC<{
         <Grid size={gridSizeCard}>
           <Tooltip
             title={
-              <>
+              <React.Fragment>
                 <Typography color="inherit">Carried weight (Allowance)</Typography>
-                <Typography color="inherit">WA: 15% + 2 x Strength Modifier</Typography>
-              </>
+                <Typography color="inherit">
+                  <em>WA: 15% + 2 x Strength Modifier</em>
+                </Typography>
+              </React.Fragment>
             }
             arrow
           >
@@ -74,7 +76,9 @@ const CharacterViewEquipmentInfo: React.FC<{
             title={
               <>
                 <Typography color="inherit">Encumbrance penalty</Typography>
-                <Typography color="inherit">EP = Load (%) – WA (%)</Typography>
+                <Typography color="inherit">
+                  <em>EP = Load (%) – WA (%)</em>
+                </Typography>
               </>
             }
             arrow
@@ -106,7 +110,9 @@ const CharacterViewEquipmentInfo: React.FC<{
             title={
               <>
                 <Typography color="inherit">Maneuver penalty</Typography>
-                <Typography color="inherit">Penalty = Armor Penalty + Armor Skill</Typography>
+                <Typography color="inherit">
+                  <em>MP = Armor Penalty + Skill</em>
+                </Typography>
               </>
             }
             arrow

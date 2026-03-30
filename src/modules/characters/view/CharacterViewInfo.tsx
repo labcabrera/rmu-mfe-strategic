@@ -1,6 +1,6 @@
 import React, { FC, use } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Badge, Box, Grid, Typography } from '@mui/material';
+import { Badge, Box, Grid, Tooltip, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { Character, STATS } from '../../api/character.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
@@ -38,7 +38,7 @@ const CharacterViewInfo: FC<{
 
   const getLevelText = () => {
     if (character.experience.availableLevel > character.experience.level) {
-      return `${character.experience.level} (${character.experience.availableLevel - character.experience.level})`;
+      return `${character.experience.level} (${character.experience.availableLevel})`;
     }
     return `${character.experience.level}`;
   };
@@ -237,12 +237,25 @@ const CharacterViewInfo: FC<{
 
       <Grid container spacing={1} columns={10}>
         <Grid size={{ xs: 12, md: 2 }}>
-          <RmuTextCard
-            value={`${character.movement.baseMovementRate}' /rnd`}
-            subtitle={t('Base movement rate')}
-            image={`${imageBaseUrl}images/generic/stride-bonus.png`}
-            grayscale={grayscale}
-          />
+          <Tooltip
+            title={
+              <React.Fragment>
+                <Typography color="inherit">
+                  <em>BMR = 20' + Qu/2 + Stride bonus</em>
+                </Typography>
+              </React.Fragment>
+            }
+            arrow
+          >
+            <div>
+              <RmuTextCard
+                value={`${character.movement.baseMovementRate}' /rnd`}
+                subtitle={t('Base movement rate')}
+                image={`${imageBaseUrl}images/generic/stride-bonus.png`}
+                grayscale={grayscale}
+              />
+            </div>
+          </Tooltip>
         </Grid>
         <Grid size={{ xs: 12, md: 2 }}>
           <RmuTextCard

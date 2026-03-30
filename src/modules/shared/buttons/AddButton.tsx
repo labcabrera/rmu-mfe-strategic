@@ -6,7 +6,7 @@ const AddButton: FC<{
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
 }> = ({ onClick, disabled = false }) => (
-  <RmuIconButton onClick={onClick} ariaLabel="add" Icon={AddCircleIcon} disabled={disabled} />
+  <RmuIconButton onClick={onClick} ariaLabel="add" icon={AddCircleIcon} disabled={disabled} />
 );
 
 export default AddButton;

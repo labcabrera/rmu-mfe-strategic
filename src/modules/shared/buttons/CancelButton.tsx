@@ -6,7 +6,7 @@ const CancelButton: FC<{
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
 }> = ({ onClick, disabled = false }) => (
-  <RmuIconButton onClick={onClick} aria-label="cancel" disabled={disabled} Icon={CancelIcon} />
+  <RmuIconButton onClick={onClick} aria-label="cancel" disabled={disabled} icon={CancelIcon} />
 );
 
 export default CancelButton;

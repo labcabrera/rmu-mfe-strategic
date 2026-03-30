@@ -49,19 +49,56 @@ const CharacterSkillTable: FC<{
         >
           <TableRow>
             <TableCell align="left">{t('Skill')}</TableCell>
-            <TableCell align="left">Spec</TableCell>
-            <TableCell align="left">Prof</TableCell>
-            <TableCell align="left">Stats</TableCell>
-            <TableCell align="right">Dev</TableCell>
-            <TableCell align="right">Ranks</TableCell>
-            <TableCell align="right">
-              <Tooltip title="Rank bonus">
-                <Typography>RB</Typography>
+            <TableCell align="left">
+              <Tooltip title={t('Specializacion')}>
+                <Typography variant="body2">
+                  <b>Spec</b>
+                </Typography>
               </Tooltip>
             </TableCell>
-            <TableCell align="right">St</TableCell>
-            <TableCell align="right">Rc</TableCell>
-            <TableCell align="right">Pr</TableCell>
+            <TableCell align="left">Stats</TableCell>
+            <TableCell align="right">
+              <Tooltip title={t('Development cost')}>
+                <Typography variant="body2">
+                  <b>Dev</b>
+                </Typography>
+              </Tooltip>
+            </TableCell>
+            <TableCell align="right">
+              <Tooltip title={t('Developed ranks')}>
+                <Typography variant="body2">
+                  <b>{t('Ranks')}</b>
+                </Typography>
+              </Tooltip>
+            </TableCell>
+            <TableCell align="right">
+              <Tooltip title={t('Rank bonus')}>
+                <Typography variant="body2">
+                  <b>Rank</b>
+                </Typography>
+              </Tooltip>
+            </TableCell>
+            <TableCell align="right">
+              <Tooltip title={t('Stat bonus')}>
+                <Typography variant="body2">
+                  <b>Stat</b>
+                </Typography>
+              </Tooltip>
+            </TableCell>
+            <TableCell align="right">
+              <Tooltip title={t('Racial bonus')}>
+                <Typography variant="body2">
+                  <b>Racial</b>
+                </Typography>
+              </Tooltip>
+            </TableCell>
+            <TableCell align="right">
+              <Tooltip title={t('Profession bonus')}>
+                <Typography variant="body2">
+                  <b>Proffesion</b>
+                </Typography>
+              </Tooltip>
+            </TableCell>
             <TableCell align="right">Custom</TableCell>
             <TableCell align="right">Total</TableCell>
             <TableCell align="left">
@@ -194,32 +231,6 @@ const CharacterViewSkillsEntry: FC<{
       <TableCell component="th" scope="row">
         {skill.specialization ? t(skill.specialization) : '-'}
       </TableCell>
-      <TableCell component="th" scope="row">
-        {isAvailableProfessionSkill(skill) && (
-          <>
-            <Tooltip title={t('Professional skill')}>
-              <IconButton
-                aria-label="set-professional"
-                onClick={() => handleSetUpProfessionalSkill(skill)}
-                disabled={!isProfessional && currentProfessionalSkills >= maxProfessionalSkills}
-                color="primary"
-              >
-                {isProfessional ? <TurnedInIcon /> : <TurnedInNotIcon />}
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t('Knack skill')}>
-              <IconButton
-                aria-label="set-knack"
-                onClick={() => handleSetUpKnackSkill(skill)}
-                color="primary"
-                disabled={!isKnack && currentKnackSkills >= maxKnackSkills}
-              >
-                {isKnack ? <StarIcon /> : <StarBorderIcon />}
-              </IconButton>
-            </Tooltip>
-          </>
-        )}
-      </TableCell>
       <TableCell align="left">{getStatistics(skill)}</TableCell>
       <TableCell align="right">{skill.development?.join(' / ') || '-'}</TableCell>
       <TableCell align="right">
@@ -282,6 +293,30 @@ const CharacterViewSkillsEntry: FC<{
               <IconButton onClick={() => handleDeleteSkill(skill)} color="primary">
                 <DeleteForeverIcon />
               </IconButton>
+            )}
+            {isAvailableProfessionSkill(skill) && (
+              <>
+                <Tooltip title={t('Professional skill')}>
+                  <IconButton
+                    aria-label="set-professional"
+                    onClick={() => handleSetUpProfessionalSkill(skill)}
+                    disabled={!isProfessional && currentProfessionalSkills >= maxProfessionalSkills}
+                    color="primary"
+                  >
+                    {isProfessional ? <TurnedInIcon /> : <TurnedInNotIcon />}
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={t('Knack skill')}>
+                  <IconButton
+                    aria-label="set-knack"
+                    onClick={() => handleSetUpKnackSkill(skill)}
+                    color="primary"
+                    disabled={!isKnack && currentKnackSkills >= maxKnackSkills}
+                  >
+                    {isKnack ? <StarIcon /> : <StarBorderIcon />}
+                  </IconButton>
+                </Tooltip>
+              </>
             )}
           </Box>
         </Stack>
