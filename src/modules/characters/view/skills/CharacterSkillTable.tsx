@@ -93,7 +93,7 @@ const CharacterSkillTable: FC<{
 
 const CharacterViewSkillsEntry: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>>;
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   skill: CharacterSkill;
   profession?: Profession;
   currentKnackSkills: number;
@@ -254,7 +254,12 @@ const CharacterViewSkillsEntry: FC<{
       <TableCell align="right" sx={{ color: getColor(skill.professionalBonus) }}>
         {skill.professionalBonus}
       </TableCell>
-      <TableCell align="right">{skill.customBonus}</TableCell>
+      <TableCell
+        align="right"
+        sx={{ color: skill.customBonus === 0 ? undefined : skill.customBonus > 0 ? 'success.main' : 'error.main' }}
+      >
+        {skill.customBonus}
+      </TableCell>
       <TableCell
         align="right"
         sx={{

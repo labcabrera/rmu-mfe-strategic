@@ -6,6 +6,7 @@ import { Profession } from '../../api/professions';
 import { Race } from '../../api/race.dto';
 import NameTextField from '../../shared/inputs/NameTextField';
 import NumericInput from '../../shared/inputs/NumericInput';
+import RmuSelect from '../../shared/selects/RmuSelect';
 import SelectGender from '../../shared/selects/SelectGender';
 import SelectProfession from '../../shared/selects/SelectProfession';
 import SelectRace from '../../shared/selects/SelectRace';
@@ -104,6 +105,7 @@ const CharacterCreateResume: FC<{
           onChange={(value) => setFormData((prev) => ({ ...prev, level: value! }))}
           integer
           allowNegatives={false}
+          error={!formData.level}
         />
       </Grid>
       <Grid size={12}>
@@ -126,8 +128,10 @@ const CharacterCreateResume: FC<{
         />
       </Grid>
       <Grid size={12}>
-        <SelectGender
+        <RmuSelect
           value={formData.roleplay.gender}
+          label={t('Gender')}
+          options={['male', 'female', 'other']}
           onChange={(value: string) =>
             setFormData((prev) => ({ ...prev, roleplay: { ...prev.roleplay, gender: value } }))
           }

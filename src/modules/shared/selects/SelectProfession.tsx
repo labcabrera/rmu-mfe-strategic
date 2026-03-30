@@ -1,5 +1,5 @@
-import React, { useState, useEffect, ChangeEvent } from 'react';
-import { MenuItem, TextField } from '@mui/material';
+import React, { useState, useEffect, ChangeEvent, useMemo } from 'react';
+import { TextField, Autocomplete } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchProfessions, Profession } from '../../api/professions';
@@ -14,11 +14,7 @@ const SelectProfession: React.FC<{
   const isValueEmpty = value === undefined || value === null || value === '';
   const error = required && isValueEmpty;
 
-  const handleProfessionChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const selectedValue = event.target.value;
-    const profession = professions.find((e) => e.id === selectedValue);
-    onChange(selectedValue, profession);
-  };
+  const selectedProfession = useMemo(() => professions.find((p) => p.id === value) ?? null, [professions, value]);
 
   useEffect(() => {
     fetchProfessions('', 0, 100)
@@ -27,21 +23,17 @@ const SelectProfession: React.FC<{
   }, [showError]);
 
   return (
-    <TextField
-      select
-      label={t('Profession')}
-      value={professions.length === 0 || isValueEmpty ? '' : value}
-      onChange={handleProfessionChange}
+    <Autocomplete
+      options={professions}
+      getOptionLabel={(option) => (option ? t(option.id) || option.name || '' : '')}
+      value={selectedProfession}
+      onChange={(_event, newValue) => onChange(newValue?.id ?? '', newValue ?? undefined)}
+      isOptionEqualToValue={(option, val) => option.id === val.id}
       fullWidth
       size="small"
-      error={error}
-    >
-      {professions.map((option) => (
-        <MenuItem key={option.id} value={option.id}>
-          {t(option.id)}
-        </MenuItem>
-      ))}
-    </TextField>
+      renderInput={(params) => <TextField {...params} label={t('Profession')} error={error} required={required} />}
+      noOptionsText={t('No options')}
+    />
   );
 };
 

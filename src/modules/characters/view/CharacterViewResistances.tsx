@@ -1,7 +1,8 @@
 import React, { FC } from 'react';
-import { Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { t } from 'i18next';
 import { Character } from '../../api/character.dto';
+import CategorySeparator from '../../shared/display/CategorySeparator';
 
 const CharacterViewResistances: FC<{
   character: Character;
@@ -14,9 +15,7 @@ const CharacterViewResistances: FC<{
 
   return (
     <>
-      <Typography variant="h6" color="primary">
-        {t('resistances')}
-      </Typography>
+      <CategorySeparator text={t('Resistances')} />
       <Paper sx={{ width: 'fit-content', padding: 2 }}>
         <Table sx={{ minWidth: 650, maxWidth: 800 }} aria-label="stats table">
           <TableHead

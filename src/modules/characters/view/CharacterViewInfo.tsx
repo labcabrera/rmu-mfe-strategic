@@ -269,6 +269,13 @@ const CharacterViewInfo: FC<{
             subtitle={t('Initiative total bonus')}
             image={`${imageBaseUrl}images/generic/initiative.png`}
             grayscale={grayscale}
+            color={
+              character.initiative.totalBonus === 0
+                ? undefined
+                : character.initiative.totalBonus > 0
+                  ? 'success'
+                  : 'error'
+            }
           />
         </Grid>
         <Grid size={{ xs: 12, md: 2 }}>
@@ -277,6 +284,28 @@ const CharacterViewInfo: FC<{
             subtitle={t('Initiative base bonus')}
             image={`${imageBaseUrl}images/generic/initiative.png`}
             grayscale={grayscale}
+            color={
+              character.initiative.baseBonus === 0
+                ? undefined
+                : character.initiative.baseBonus > 0
+                  ? 'success'
+                  : 'error'
+            }
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 2 }}>
+          <RmuTextCard
+            value={character.initiative.customBonus}
+            subtitle={t('Initiative custom bonus')}
+            image={`${imageBaseUrl}images/generic/initiative.png`}
+            grayscale={grayscale}
+            color={
+              character.initiative.customBonus === 0
+                ? undefined
+                : character.initiative.customBonus > 0
+                  ? 'success'
+                  : 'error'
+            }
           />
         </Grid>
       </Grid>
