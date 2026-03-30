@@ -9,9 +9,11 @@ import CharacterViewTransferGold from '../CharacterViewTransferGold';
 const CharacterItemDetail: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
-  item?: CharacterItem;
-}> = ({ item, character, setCharacter }) => {
-  if (!item) return null;
+  itemId?: string | undefined;
+}> = ({ itemId, character, setCharacter }) => {
+  if (!itemId) return null;
+
+  const item = character.items.find((i) => i.id == itemId)!;
 
   return (
     <Paper sx={{ padding: 2 }}>

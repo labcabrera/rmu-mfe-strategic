@@ -19,7 +19,7 @@ const CharacterViewItems: FC<{
   const navigate = useNavigate();
   const { showError } = useError();
   const [openAddItemDialog, setOpenAddItemDialog] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<CharacterItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<CharacterItem>();
 
   const onItemAdded = (addItemDto: AddItemDto) => {
     addItem(character.id, addItemDto)
@@ -36,7 +36,7 @@ const CharacterViewItems: FC<{
           <CategorySeparator text={t('Equiped')}>
             <Stack direction="row" spacing={1}>
               <Button variant="outlined" onClick={() => setOpenAddItemDialog(true)}>
-                {t('Direct buy')}
+                {t('Buy')}
               </Button>
               <Button variant="outlined" onClick={() => navigate(`/strategic/characters/trade/${character.id}`)}>
                 {t('Trade')}
@@ -53,7 +53,7 @@ const CharacterViewItems: FC<{
         </Grid>
 
         <Grid size={12}>
-          <CategorySeparator text={t('equipment-info')} />
+          <CategorySeparator text={t('Equipment info')} />
         </Grid>
 
         <Grid size={12}>
@@ -83,7 +83,11 @@ const CharacterViewItems: FC<{
         </Grid>
 
         <Grid size={12}>
-          <CharacterItemDetail character={character} setCharacter={setCharacter} item={selectedItem!} />
+          <CharacterItemDetail
+            character={character}
+            setCharacter={setCharacter}
+            itemId={selectedItem?.id || undefined}
+          />
         </Grid>
       </Grid>
       <CharacterViewAddItemDialog
