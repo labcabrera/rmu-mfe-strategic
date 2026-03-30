@@ -7,7 +7,7 @@ import RefreshButton from '../../shared/buttons/RefreshButton';
 
 const StrategicGameListActions: FC = () => {
   const navigate = useNavigate();
-  const breadcrumbs = [{ name: t('strategic'), link: '/strategic' }, { name: t('games') }];
+  const breadcrumbs = [{ name: t('Strategic'), link: '/strategic' }, { name: t('Games') }];
 
   const onCreateNewGame = () => {
     navigate('/strategic/games/create');

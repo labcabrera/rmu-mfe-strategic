@@ -28,7 +28,7 @@ const FactionViewCharacters: FC<{
           />
         </Grid>
       ))}
-      <Grid size={12}>{characters.length === 0 && <p>{t('not-found-characters')}</p>}</Grid>
+      <Grid size={12}>{characters.length === 0 && <p>{t('No characters have been created')}</p>}</Grid>
     </Grid>
   );
 };

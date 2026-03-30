@@ -39,11 +39,11 @@ const StrategicGameForm: FC<{
       <Grid container spacing={1} columns={10}>
         <Grid size={10}>
           <TextField
-            label={t('strategic-game-name')}
+            label={t('Name')}
             name="name"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            error={formData.name.trim() === ''}
+            error={!formData.name}
             autoFocus
             fullWidth
           />
@@ -65,17 +65,17 @@ const StrategicGameForm: FC<{
       <Grid container spacing={1} columns={10}>
         <Grid size={{ xs: 10, md: 2 }}>
           <NumericInput
-            label={t('experience-multiplier')}
+            label={t('Experience multiplier')}
             name="experienceMultiplier"
             value={formData.options.experienceMultiplier}
-            onChange={(e) => handleOptionsChange('experienceMultiplier', e)}
+            onChange={(e) => setFormData({ ...formData, options: { ...formData.options, experienceMultiplier: e } })}
             maxFractionDigits={2}
             allowNegatives={false}
           />
         </Grid>
         <Grid size={{ xs: 10, md: 2 }}>
           <NumericInput
-            label={t('fatigue-multiplier')}
+            label={t('Fatigue multiplier')}
             name="fatigueMultiplier"
             value={formData.options.fatigueMultiplier}
             onChange={(e) => handleOptionsChange('fatigueMultiplier', e)}
@@ -85,7 +85,7 @@ const StrategicGameForm: FC<{
         </Grid>
         <Grid size={{ xs: 10, md: 2 }}>
           <NumericInput
-            label={t('board-scale-multiplier')}
+            label={t('Board scale multiplier')}
             name="boardScaleMultiplier"
             value={formData.options.boardScaleMultiplier}
             onChange={(e) => handleOptionsChange('boardScaleMultiplier', e)}
@@ -95,7 +95,7 @@ const StrategicGameForm: FC<{
         </Grid>
         <Grid size={{ xs: 10, md: 2 }}>
           <NumericInput
-            label={t('letality')}
+            label={t('Letality')}
             name="letality"
             value={formData.options.letality}
             onChange={(e) => handleOptionsChange('letality', e)}
@@ -109,7 +109,7 @@ const StrategicGameForm: FC<{
       <Grid container spacing={1} columns={10}>
         <Grid size={{ xs: 10, md: 2 }}>
           <NumericInput
-            label={t('base-dev-points')}
+            label={t('Base dev points')}
             name="baseDevPoints"
             value={formData.powerLevel.baseDevPoints}
             onChange={(e) => handlePowerLevelChange('baseDevPoints', e)}
@@ -119,7 +119,7 @@ const StrategicGameForm: FC<{
         </Grid>
         <Grid size={{ xs: 10, md: 2 }}>
           <NumericInput
-            label={t('stat-random-min')}
+            label={t('Stat random min')}
             name="statRandomMin"
             value={formData.powerLevel.statRandomMin}
             onChange={(e) => handlePowerLevelChange('statRandomMin', e)}
@@ -129,7 +129,7 @@ const StrategicGameForm: FC<{
         </Grid>
         <Grid size={{ xs: 10, md: 2 }}>
           <NumericInput
-            label={t('stat-boost-potential')}
+            label={t('Stat boost potential')}
             name="statBoostPotential"
             value={formData.powerLevel.statBoostPotential}
             onChange={(e) => handlePowerLevelChange('statBoostPotential', e)}
@@ -139,7 +139,7 @@ const StrategicGameForm: FC<{
         </Grid>
         <Grid size={{ xs: 10, md: 2 }}>
           <NumericInput
-            label={t('stat-boost-temporary')}
+            label={t('Stat boost temporary')}
             name="statBoostTemporary"
             value={formData.powerLevel.statBoostTemporary}
             onChange={(e) => handlePowerLevelChange('statBoostTemporary', e)}
@@ -149,7 +149,7 @@ const StrategicGameForm: FC<{
         </Grid>
         <Grid size={{ xs: 10, md: 2 }}>
           <NumericInput
-            label={t('stat-creation-boosts')}
+            label={t('Stat creation boosts')}
             name="statCreationBoost"
             value={formData.powerLevel.statCreationBoost}
             onChange={(e) => handlePowerLevelChange('statCreationBoost', e)}
@@ -159,7 +159,7 @@ const StrategicGameForm: FC<{
         </Grid>
         <Grid size={{ xs: 10, md: 2 }}>
           <NumericInput
-            label={t('stat-creation-swaps')}
+            label={t('Stat creation swaps')}
             name="statCreationSwap"
             value={formData.powerLevel.statCreationSwap}
             onChange={(e) => handlePowerLevelChange('statCreationSwap', e)}
@@ -174,7 +174,7 @@ const StrategicGameForm: FC<{
       <Grid container spacing={1} columns={10}>
         <Grid size={10}>
           <TextField
-            label={t('short-description')}
+            label={t('Short description')}
             name="shortDescription"
             value={formData.shortDescription}
             onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
@@ -184,7 +184,7 @@ const StrategicGameForm: FC<{
         </Grid>
         <Grid size={10}>
           <TextField
-            label={t('description')}
+            label={t('Description')}
             name="description"
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}

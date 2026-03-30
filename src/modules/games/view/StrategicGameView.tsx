@@ -67,15 +67,15 @@ const StrategicGameView: React.FC = () => {
           <StrategicGameViewResume strategicGame={strategicGame} setStrategicGame={setStrategicGame} />
         </Grid>
         <Grid size={gridSizeMain}>
-          <CategorySeparator text={t('options')} />
+          <CategorySeparator text={t('Pptions')} />
           <StrategicGameViewAttributes strategicGame={strategicGame} />
-          <CategorySeparator text={t('power-level')} />
+          <CategorySeparator text={t('Power level')} />
           <StrategicGameViewPowerLevel strategicGame={strategicGame} />
-          <CategorySeparator text={t('factions')}>
+          <CategorySeparator text={t('Factions')}>
             <AddButton onClick={onCreateFaction} />
           </CategorySeparator>
           <StrategicGameViewFactions factions={factions} />
-          <CategorySeparator text={t('tactical-games')}>
+          <CategorySeparator text={t('Tactical games')}>
             <AddButton onClick={onCreateTacticalGame} />
           </CategorySeparator>
           <StrategicGameViewTacticalGames tacticalGames={tacticalGames} />

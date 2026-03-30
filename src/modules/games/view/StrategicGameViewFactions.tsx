@@ -25,7 +25,11 @@ const StrategicGameViewFactions: FC<{
         </Grid>
       ))}
       <Grid size={12}>
-        {factions.length === 0 && <Typography variant="body1">{t('not-found-factions')}</Typography>}
+        {factions.length === 0 && (
+          <Typography variant="body1" color="secondary">
+            <em>{t('No factions have been created')}</em>
+          </Typography>
+        )}
       </Grid>
     </Grid>
   );

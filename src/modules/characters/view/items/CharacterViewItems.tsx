@@ -44,9 +44,15 @@ const CharacterViewItems: FC<{
         <Grid size={12}>
           <CategorySeparator text={t('Equiped')}>
             <Stack direction="row" spacing={1}>
-              <Button onClick={() => setOpenAddItemDialog(true)}>Direct buy</Button>
-              <Button onClick={() => navigate(`/strategic/characters/trade/${character.id}`)}>Trade</Button>
-              <Button onClick={() => navigate(`/strategic/characters/craft/${character.id}`)}>Craft</Button>
+              <Button variant="outlined" onClick={() => setOpenAddItemDialog(true)}>
+                {t('Direct buy')}
+              </Button>
+              <Button variant="outlined" onClick={() => navigate(`/strategic/characters/trade/${character.id}`)}>
+                {t('Trade')}
+              </Button>
+              <Button variant="outlined" onClick={() => navigate(`/strategic/characters/craft/${character.id}`)}>
+                {t('Craft')}
+              </Button>
             </Stack>
           </CategorySeparator>
         </Grid>

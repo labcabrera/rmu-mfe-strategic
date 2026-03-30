@@ -11,7 +11,7 @@ import { fetchFaction } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import { gridSizeResume, gridSizeMain } from '../../services/display';
+import { gridSizeResume, gridSizeMain, gridSizeCard } from '../../services/display';
 import AddButton from '../../shared/buttons/AddButton';
 import RmuTextCard from '../../shared/cards/RmuTextCard';
 import CategorySeparator from '../../shared/display/CategorySeparator';
@@ -86,7 +86,7 @@ const FactionView: FC = () => {
         <Grid size={gridSizeMain}>
           <CategorySeparator text={t('Strategic game')} />
           <Grid container spacing={1}>
-            <Grid size={{ xs: 12, md: 3 }}>
+            <Grid size={gridSizeCard}>
               <RmuTextCard
                 value={game.name}
                 subtitle={t('Strategic game')}
@@ -95,9 +95,12 @@ const FactionView: FC = () => {
               />
             </Grid>
           </Grid>
-          <CategorySeparator text={t('faction')} />
+
+          <CategorySeparator text={t('Faction')} />
+
           <FactionViewAttributes faction={faction} />
-          <CategorySeparator text={t('characters')}>
+
+          <CategorySeparator text={t('Characters')}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
               <AddButton onClick={onCharacterCreate} />
               <ToggleButtonGroup

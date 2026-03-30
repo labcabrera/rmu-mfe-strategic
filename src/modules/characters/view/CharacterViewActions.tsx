@@ -35,7 +35,8 @@ const CharacterViewActions: FC<{
   const levelUpAvailable = character.experience.level < character.experience.availableLevel;
   const breadcrumbs = [
     { name: t('Strategic'), link: '/strategic' },
-    { name: t('Game'), link: `/strategic/games/view/${game.id}` },
+    { name: t('Faction'), link: `/strategic/factions/view/${character.faction.id}` },
+    { name: t('Character') },
   ];
 
   const onRefresh = () => {

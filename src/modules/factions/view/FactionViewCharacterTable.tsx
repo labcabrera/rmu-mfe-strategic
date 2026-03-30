@@ -80,7 +80,7 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
           ))}
           {characters.length === 0 && (
             <TableRow>
-              <TableCell colSpan={7}>{t('not-found-characters')}</TableCell>
+              <TableCell colSpan={7}>{t('No characters have been created')}</TableCell>
             </TableRow>
           )}
         </TableBody>

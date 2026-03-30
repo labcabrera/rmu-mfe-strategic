@@ -26,7 +26,11 @@ const StrategicGameViewTacticalGames: FC<{
         </Grid>
       ))}
       <Grid size={12}>
-        {tacticalGames.length === 0 && <Typography variant="body1">{t('not-found-tactical-games')}</Typography>}
+        {tacticalGames.length === 0 && (
+          <Typography variant="body1" color="secondary">
+            <em>{t('No tactical games have been created')}</em>
+          </Typography>
+        )}
       </Grid>
     </Grid>
   );

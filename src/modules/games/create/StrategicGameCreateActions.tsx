@@ -15,9 +15,9 @@ const StrategicGameCreateActions: React.FC<{
   const navigate = useNavigate();
   const { showError } = useError();
   const breadcrumbs = [
-    { name: t('strategic'), link: '/strategic' },
-    { name: t('games'), link: '/strategic/games' },
-    { name: t('create') },
+    { name: t('Strategic'), link: '/strategic' },
+    { name: t('Games'), link: '/strategic/games' },
+    { name: t('Create') },
   ];
 
   const createGame = () => {
