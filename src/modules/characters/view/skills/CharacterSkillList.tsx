@@ -3,6 +3,7 @@ import { Grid, Typography } from '@mui/material';
 import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { Character } from '../../../api/character.dto';
+import { defaultImage } from '../../../services/image-service';
 
 const CharacterSkillList: FC<{ character: Character }> = ({ character }) => {
   const skills = character?.skills || [];
@@ -15,7 +16,7 @@ const CharacterSkillList: FC<{ character: Character }> = ({ character }) => {
             <RmuTextCard
               value={t(s.skillId)}
               subtitle={`${s.specialization || ''}${s.specialization ? ' • ' : ''}Ranks: ${s.ranks} • Total: ${s.totalBonus ?? 0}`}
-              image={''}
+              image={defaultImage}
             />
           </Grid>
         ))}

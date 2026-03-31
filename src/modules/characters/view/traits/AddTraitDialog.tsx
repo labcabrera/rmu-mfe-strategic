@@ -85,7 +85,7 @@ const AddTraitDialog: FC<{
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
-      <DialogTitle>{t('add-skill')}</DialogTitle>
+      <DialogTitle>{t('Add trait')}</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 1 }}>
           <Grid size={4}>
