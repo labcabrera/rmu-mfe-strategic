@@ -1,11 +1,11 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Grid, Box, Typography, Pagination } from '@mui/material';
+import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
 import { fetchStrategicGamesPaged } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { gridSizeMain, gridSizeResume, gridSizeCard } from '../../services/display';
-import RmuTextCard from '../../shared/cards/RmuTextCard';
 import StrategicGameListActions from './StrategicGameListActions';
 
 const pageSize = 24;
@@ -49,7 +49,7 @@ const StrategicGameList: FC = () => {
                 <RmuTextCard
                   value={game.name}
                   subtitle={game.realmName}
-                  image={game.imageUrl || undefined}
+                  image={game.imageUrl || ''}
                   onClick={() => navigate(`/strategic/games/view/${game.id}`, { state: { game } })}
                 />
               </Grid>

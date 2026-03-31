@@ -1,14 +1,11 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { Button, Stack, Box, Grid, Badge } from '@mui/material';
+import { CategorySeparator, RmuTextCard, NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { addCharacterXP } from '../../api/character';
 import { Character } from '../../api/character.dto';
 import { imageBaseUrl } from '../../services/config';
-import NumericCard from '../../shared/cards/NumericCard';
-import RmuTextCard from '../../shared/cards/RmuTextCard';
-import CategorySeparator from '../../shared/display/CategorySeparator';
-import NumericInput from '../../shared/inputs/NumericInput';
 
 const CharacterViewExperience: FC<{
   character: Character;
@@ -37,7 +34,7 @@ const CharacterViewExperience: FC<{
       <Grid container spacing={2} mt={2}>
         <Grid size={12}>
           <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
-            <NumericCard
+            <RmuTextCard
               value={character.experience.availableLevel}
               subtitle={t('Level')}
               image={`${imageBaseUrl}images/generic/experience.png`}
@@ -48,19 +45,18 @@ const CharacterViewExperience: FC<{
               badgeContent={`+${character.experience.availableLevel - character.experience.level}`}
               invisible={character.experience.availableLevel <= character.experience.level}
             >
-              <NumericCard
+              <RmuTextCard
                 value={character.experience.level}
                 subtitle={t('Current level')}
                 image={`${imageBaseUrl}images/generic/experience.png`}
                 applyColor={false}
               />
             </Badge>
-            <NumericCard
+            <RmuTextCard
               value={character.experience.xp}
               subtitle={t('XP')}
               image={`${imageBaseUrl}images/generic/experience.png`}
               applyColor={false}
-              applyFormat={true}
             />
             <Badge
               color="success"

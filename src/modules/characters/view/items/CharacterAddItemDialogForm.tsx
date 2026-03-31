@@ -1,10 +1,9 @@
 import React, { FC, Dispatch, SetStateAction } from 'react';
 import { Grid, Stack, TextField, Typography } from '@mui/material';
+import { CategorySeparator, NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { AddItemDto } from '../../../api/character.dto';
 import { Item } from '../../../api/items';
-import CategorySeparator from '../../../shared/display/CategorySeparator';
-import NumericInput from '../../../shared/inputs/NumericInput';
 
 const inputSize = { xs: 12, md: 4 } as const;
 

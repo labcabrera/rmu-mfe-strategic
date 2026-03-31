@@ -1,13 +1,13 @@
 import React, { FC, use, useEffect, useState } from 'react';
 import { useSearchParams, useLocation } from 'react-router-dom';
 import { Grid } from '@mui/material';
+import { EditableAvatar, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
 import { CreateFactionDto, EMPTY_FACTION } from '../../api/faction.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { imageBaseUrl } from '../../services/config';
-import EditableAvatar from '../../shared/avatars/EditableAvatar';
-import TechnicalInfo from '../../shared/display/TechnicalInfo';
+import { getAvatarImages } from '../../services/image-service';
 import FactionForm from '../shared/FactionForm';
 import FactionCreateActions from './FactionCreateActions';
 
@@ -52,6 +52,7 @@ const FactionCreate: FC = () => {
           <EditableAvatar
             imageUrl={formData.imageUrl || defaultImage}
             onImageChange={(newImageUrl) => setFormData({ ...formData, imageUrl: newImageUrl })}
+            images={getAvatarImages()}
           />
         </Grid>
         <Grid size={{ xs: 12, md: 8 }}>

@@ -1,9 +1,7 @@
 import React, { FC } from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { AddButton, RefreshButton, RmuBreadcrumbs } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
-import RmuBreadcrumbs from '../../shared/breadcrumbs/RmuBreadcrumbs';
-import AddButton from '../../shared/buttons/AddButton';
-import RefreshButton from '../../shared/buttons/RefreshButton';
 
 const StrategicGameListActions: FC = () => {
   const navigate = useNavigate();

@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 import { Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { CategorySeparator } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { Character } from '../../api/character.dto';
-import CategorySeparator from '../../shared/display/CategorySeparator';
 
 const CharacterViewResistances: FC<{
   character: Character;

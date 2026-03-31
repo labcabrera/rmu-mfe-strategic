@@ -1,12 +1,12 @@
 import React, { FC, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Grid } from '@mui/material';
+import { EditableAvatar } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { Faction, UpdateFactionDto } from '../../api/faction.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import EditableAvatar from '../../shared/avatars/EditableAvatar';
+import { getAvatarImages } from '../../services/image-service';
 import FactionForm from '../shared/FactionForm';
 import FactionUpdateActions from './FactionUpdateActions';
-import FactionUpdateAttributes from './FactionUpdateAttributes';
 
 const FactionUpdate: FC = () => {
   const location = useLocation();
@@ -32,7 +32,11 @@ const FactionUpdate: FC = () => {
       <FactionUpdateActions formData={formData} strategicGame={strategicGame} faction={faction} />
       <Grid container spacing={1}>
         <Grid size={{ xs: 12, md: 2 }}>
-          <EditableAvatar imageUrl={formData.imageUrl || ''} onImageChange={onImageUpdated} />
+          <EditableAvatar
+            imageUrl={formData.imageUrl || ''}
+            onImageChange={onImageUpdated}
+            images={getAvatarImages()}
+          />
         </Grid>
         <Grid size={{ xs: 12, md: 8 }}>
           <FactionForm formData={formData} setFormData={setFormData} />

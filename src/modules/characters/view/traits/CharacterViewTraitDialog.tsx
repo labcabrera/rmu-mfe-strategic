@@ -1,12 +1,12 @@
 import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography } from '@mui/material';
+import { TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { deleteTrait } from '../../../api/character';
 import { Character, CharacterTrait } from '../../../api/character.dto';
 import { fetchTrait } from '../../../api/trait';
 import { DeleteTraitDto, Trait } from '../../../api/trait.dto';
-import TechnicalInfo from '../../../shared/display/TechnicalInfo';
 
 const CharacterViewTraitDialog: FC<{
   character: Character;

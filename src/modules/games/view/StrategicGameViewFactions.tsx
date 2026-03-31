@@ -2,10 +2,10 @@ import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Grid } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { Faction } from '../../api/faction.dto';
 import { gridSizeCard } from '../../services/display';
-import RmuTextCard from '../../shared/cards/RmuTextCard';
 
 const StrategicGameViewFactions: FC<{
   factions: Faction[];
@@ -19,7 +19,7 @@ const StrategicGameViewFactions: FC<{
           <RmuTextCard
             value={faction.name}
             subtitle={faction.shortDescription}
-            image={faction.imageUrl}
+            image={faction.imageUrl || ''}
             onClick={() => navigate(`/strategic/factions/view/${faction.id}`, { state: { faction } })}
           />
         </Grid>

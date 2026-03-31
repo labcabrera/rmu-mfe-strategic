@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
 import { Grid } from '@mui/material';
+import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { imageBaseUrl } from '../../services/config';
 import { gridSizeCard } from '../../services/display';
-import RmuTextCard from '../../shared/cards/RmuTextCard';
 
 const grayscale = 0.7;
 const gridSize = { xs: 10, md: 3 } as const;

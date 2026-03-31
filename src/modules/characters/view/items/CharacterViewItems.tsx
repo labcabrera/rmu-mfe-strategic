@@ -1,11 +1,11 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Grid, Stack } from '@mui/material';
+import { CategorySeparator } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { addItem } from '../../../api/character';
 import { AddItemDto, Character, CharacterItem } from '../../../api/character.dto';
-import CategorySeparator from '../../../shared/display/CategorySeparator';
 import CharacterViewAddItemDialog from './CharacterAddItemDialog';
 import CharacterItemDetail from './CharacterItemDetail';
 import CharacterItemTable from './CharacterItemTable';

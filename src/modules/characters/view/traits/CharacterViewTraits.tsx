@@ -1,13 +1,11 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { Box, Grid, Stack, Typography } from '@mui/material';
+import { CategorySeparator, AddButton, RmuCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { Character, CharacterTrait } from '../../../api/character.dto';
 import { imageBaseUrl } from '../../../services/config';
 import { gridSizeCard } from '../../../services/display';
 import { toRoman } from '../../../services/roman-number-service';
-import AddButton from '../../../shared/buttons/AddButton';
-import RmuCard from '../../../shared/cards/RmuCard';
-import CategorySeparator from '../../../shared/display/CategorySeparator';
 import AddTraitDialog from './AddTraitDialog';
 import CharacterViewTraitDialog from './CharacterViewTraitDialog';
 
@@ -41,7 +39,6 @@ const CharacterViewTraits: FC<{
             {character.traits.map((trait, index) => (
               <Grid size={gridSizeCard} key={index}>
                 <RmuCard
-                  size="small"
                   key={index}
                   image={
                     trait.isTalent

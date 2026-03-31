@@ -10,17 +10,19 @@ import {
   IconButton,
   Tooltip,
 } from '@mui/material';
+import {
+  RmuBreadcrumbs,
+  RefreshButton,
+  EditButton,
+  DeleteButton,
+  DeleteDialog,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacter, deleteCharacter, levelUpCharacter } from '../../api/character';
 import { Character } from '../../api/character.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import RmuBreadcrumbs from '../../shared/breadcrumbs/RmuBreadcrumbs';
-import DeleteButton from '../../shared/buttons/DeleteButton';
-import EditButton from '../../shared/buttons/EditButton';
 import LevelUpButton from '../../shared/buttons/LevelUpButton';
-import RefreshButton from '../../shared/buttons/RefreshButton';
-import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 
 const CharacterViewActions: FC<{
   character: Character;

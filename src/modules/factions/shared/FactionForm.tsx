@@ -1,9 +1,9 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { TextField } from '@mui/material';
 import Grid from '@mui/material/Grid';
+import { NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { CreateFactionDto, UpdateFactionDto } from '../../api/faction.dto';
-import NumericInput from '../../shared/inputs/NumericInput';
 
 const FactionForm: FC<{
   formData: CreateFactionDto | UpdateFactionDto;

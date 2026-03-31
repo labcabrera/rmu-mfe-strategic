@@ -2,6 +2,7 @@ import React, { useState, useEffect, FC } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import OutboundIcon from '@mui/icons-material/Outbound';
 import { Grid, IconButton, Box, Button, TextField, Badge } from '@mui/material';
+import { CategorySeparator, EditableAvatar, RefreshButton, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { CreateCharacterDto } from '../../api/character.dto';
@@ -15,11 +16,8 @@ import { StrategicGame } from '../../api/strategic-game.dto';
 import { characterCreationTemplate, defaultStats } from '../../data/character-create';
 import { imageBaseUrl } from '../../services/config';
 import { gridSizeResume, gridSizeMain } from '../../services/display';
+import { getAvatarImages } from '../../services/image-service';
 import { randomizeStats } from '../../services/randomize-stats';
-import EditableAvatar from '../../shared/avatars/EditableAvatar';
-import RefreshButton from '../../shared/buttons/RefreshButton';
-import CategorySeparator from '../../shared/display/CategorySeparator';
-import TechnicalInfo from '../../shared/display/TechnicalInfo';
 import CharacterViewStatsChart from '../view/CharacterViewStatsChart';
 import CharacterCreateActions from './CharacterCreateActions';
 import CharacterCreateBoostOptionsDialog from './CharacterCreateBoostOptionsDialog';
@@ -141,6 +139,7 @@ const CharacterCreate: FC = () => {
           <EditableAvatar
             imageUrl={formData.imageUrl || defaultImage}
             onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl })}
+            images={getAvatarImages()}
           />
           <CharacterCreateResume
             formData={formData}

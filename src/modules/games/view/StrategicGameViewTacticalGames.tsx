@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Grid, Typography } from '@mui/material';
+import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { TacticalGame } from '../../api/tactical-games';
 import { gridSizeCard } from '../../services/display';
-import RmuTextCard from '../../shared/cards/RmuTextCard';
 
 const StrategicGameViewTacticalGames: FC<{
   tacticalGames: TacticalGame[];

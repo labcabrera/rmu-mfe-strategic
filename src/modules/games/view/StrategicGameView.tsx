@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
+import { CategorySeparator, AddButton, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchFactions } from '../../api/faction';
@@ -9,9 +10,6 @@ import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { fetchTacticalGames, TacticalGame } from '../../api/tactical-games';
 import { gridSizeMain, gridSizeResume } from '../../services/display';
-import AddButton from '../../shared/buttons/AddButton';
-import CategorySeparator from '../../shared/display/CategorySeparator';
-import TechnicalInfo from '../../shared/display/TechnicalInfo';
 import StrategicGameViewActions from './StrategicGameViewActions';
 import StrategicGameViewAttributes from './StrategicGameViewAttributes';
 import StrategicGameViewFactions from './StrategicGameViewFactions';

@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import { Box, ToggleButton, ToggleButtonGroup, Grid } from '@mui/material';
+import { CategorySeparator, RmuTextCard, AddButton, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacters } from '../../api/character';
@@ -12,10 +13,6 @@ import { Faction } from '../../api/faction.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { gridSizeResume, gridSizeMain, gridSizeCard } from '../../services/display';
-import AddButton from '../../shared/buttons/AddButton';
-import RmuTextCard from '../../shared/cards/RmuTextCard';
-import CategorySeparator from '../../shared/display/CategorySeparator';
-import TechnicalInfo from '../../shared/display/TechnicalInfo';
 import FactionViewActions from './FactionViewActions';
 import FactionViewAttributes from './FactionViewAttributes';
 import FactionViewCharactersTable from './FactionViewCharacterTable';
@@ -90,7 +87,7 @@ const FactionView: FC = () => {
               <RmuTextCard
                 value={game.name}
                 subtitle={t('Strategic game')}
-                image={game.imageUrl}
+                image={game.imageUrl || ''}
                 onClick={() => navigate(`/strategic/games/view/${game.id}`, { state: { strategicGame: game } })}
               />
             </Grid>

@@ -1,11 +1,11 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
+import { EditableAvatar } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame, UpdateStrategicGameDto } from '../../api/strategic-game.dto';
 import { gridSizeResume, gridSizeMain } from '../../services/display';
-import EditableAvatar from '../../shared/avatars/EditableAvatar';
 import StrategicGameForm from '../shared/StrategicGameForm';
 import StrategicGameUpdateActions from './StrategicGameUpdateActions';
 
@@ -57,10 +57,9 @@ const StrategicGameUpdate: FC = () => {
       <Grid container spacing={1}>
         <Grid size={gridSizeResume}>
           <EditableAvatar
-            imageUrl={strategicGame.imageUrl || ''}
-            onImageChange={function (newImageUrl: string): void {
-              throw new Error('Function not implemented.');
-            }}
+            imageUrl={formData.imageUrl || ''}
+            onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl: imageUrl })}
+            images={[]}
           />
         </Grid>
         <Grid size={gridSizeMain}>

@@ -1,12 +1,13 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { Link as RouterLink, useLocation, useParams } from 'react-router-dom';
 import { Link, Typography } from '@mui/material';
+import { EditableAvatar } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { updateStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { imageBaseUrl } from '../../services/config';
-import EditableAvatar from '../../shared/avatars/EditableAvatar';
+import { getAvatarImages } from '../../services/image-service';
 
 const defaultGameImage = `${imageBaseUrl}images/generic/strategic.png`;
 
@@ -29,7 +30,7 @@ const StrategicGameViewResume: FC<{
       <EditableAvatar
         imageUrl={strategicGame.imageUrl || defaultGameImage}
         onImageChange={onImageUpdated}
-        variant="circular"
+        images={getAvatarImages()}
       />
       <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
         {t(strategicGame.name)}

@@ -1,10 +1,9 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { Grid, TextField } from '@mui/material';
+import { CategorySeparator, NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { Realm } from '../../api/realm.dto';
 import { CreateStrategicGameDto, UpdateStrategicGameDto } from '../../api/strategic-game.dto';
-import CategorySeparator from '../../shared/display/CategorySeparator';
-import NumericInput from '../../shared/inputs/NumericInput';
 import SelectRealm from '../../shared/selects/SelectRealm';
 
 const StrategicGameForm: FC<{

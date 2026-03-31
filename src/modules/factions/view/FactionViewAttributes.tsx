@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
 import Grid from '@mui/material/Grid';
+import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { Faction } from '../../api/faction.dto';
 import { imageBaseUrl } from '../../services/config';
-import RmuTextCard from '../../shared/cards/RmuTextCard';
 
 const FactionViewAttributes: FC<{
   faction: Faction;

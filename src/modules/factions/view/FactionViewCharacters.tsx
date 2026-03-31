@@ -1,12 +1,11 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box } from '@mui/material';
 import Grid from '@mui/material/Grid';
+import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { Character } from '../../api/character.dto';
 import { Faction } from '../../api/faction.dto';
 import { gridSizeCard } from '../../services/display';
-import RmuTextCard from '../../shared/cards/RmuTextCard';
 
 const FactionViewCharacters: FC<{
   faction: Faction;

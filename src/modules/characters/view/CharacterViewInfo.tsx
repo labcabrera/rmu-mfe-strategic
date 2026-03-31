@@ -1,14 +1,11 @@
 import React, { FC, use } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge, Box, Grid, Tooltip, Typography } from '@mui/material';
+import { CategorySeparator, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { Character, STATS } from '../../api/character.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { imageBaseUrl } from '../../services/config';
-import NumericCard from '../../shared/cards/NumericCard';
-import RmuTextCard from '../../shared/cards/RmuTextCard';
-import TextCard from '../../shared/cards/TextCard';
-import CategorySeparator from '../../shared/display/CategorySeparator';
 
 const grayscale = 0.7;
 
@@ -53,7 +50,7 @@ const CharacterViewInfo: FC<{
           <RmuTextCard
             value={strategicGame.name}
             subtitle={t('Game')}
-            image={strategicGame.imageUrl}
+            image={strategicGame.imageUrl || ''}
             onClick={() => navigate(`/strategic/games/view/${strategicGame.id}`)}
             grayscale={grayscale}
           />

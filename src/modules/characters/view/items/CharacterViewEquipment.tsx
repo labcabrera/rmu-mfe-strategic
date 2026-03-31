@@ -1,9 +1,9 @@
 import React, { FC, useState } from 'react';
-import { Box, CardMedia, Typography, Stack, Tooltip } from '@mui/material';
+import { Box, CardMedia, Stack, Tooltip } from '@mui/material';
 import { t } from 'i18next';
 import { Character, CharacterItem } from '../../../api/character.dto';
 import { imageBaseUrl } from '../../../services/config';
-import { itemFilter, itemFilterDisabled } from '../../../services/display';
+import { itemFilter } from '../../../services/display';
 import CharacterEquipmentDialog from './CharacterEquipmentDialog';
 
 const slots = ['mainHand', 'offHand', 'head', 'body', 'arms', 'legs'];

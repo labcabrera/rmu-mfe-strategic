@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
+import { EditableAvatar, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacter } from '../../api/character';
 import { Character, UpdateCharacterDto } from '../../api/character.dto';
@@ -8,7 +9,8 @@ import { fetchFaction } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import EditableAvatar from '../../shared/avatars/EditableAvatar';
+import { gridSizeResume, gridSizeMain } from '../../services/display';
+import { getAvatarImages } from '../../services/image-service';
 import CharacterUpdateActions from './CharacterUpdateActions';
 import CharacterUpdateAttributes from './CharacterUpdateAttributes';
 
@@ -63,16 +65,21 @@ const CharacterUpdate: FC = () => {
   return (
     <>
       <CharacterUpdateActions character={character} formData={formData} game={strategicGame} faction={faction} />
-      <Grid container spacing={5}>
-        <Grid size={2}>
-          <EditableAvatar imageUrl={character.imageUrl || ''} onImageChange={onImageChange} />
+      <Grid container spacing={1}>
+        <Grid size={gridSizeResume}>
+          <EditableAvatar
+            imageUrl={character.imageUrl || ''}
+            onImageChange={onImageChange}
+            images={getAvatarImages()}
+          />
         </Grid>
-        <Grid size={7}>
+        <Grid size={gridSizeMain}>
           <CharacterUpdateAttributes formData={formData} setFormData={setFormData} />
+          <TechnicalInfo>
+            <pre>FormData: {JSON.stringify(formData, null, 2)}</pre>
+          </TechnicalInfo>
         </Grid>
       </Grid>
-      {/* <pre>formData: {JSON.stringify(formData, null, 2)}</pre>
-      <pre>character: {JSON.stringify(character, null, 2)}</pre> */}
     </>
   );
 };

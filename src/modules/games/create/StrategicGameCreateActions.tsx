@@ -1,12 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { RmuBreadcrumbs, CancelButton, SaveButton } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { createStrategicGame } from '../../api/strategic-game';
 import { CreateStrategicGameDto } from '../../api/strategic-game.dto';
-import RmuBreadcrumbs from '../../shared/breadcrumbs/RmuBreadcrumbs';
-import CancelButton from '../../shared/buttons/CancelButton';
-import SaveButton from '../../shared/buttons/SaveButton';
 
 const StrategicGameCreateActions: React.FC<{
   formData: CreateStrategicGameDto;

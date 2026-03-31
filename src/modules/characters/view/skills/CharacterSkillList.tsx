@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 import { Grid, Typography } from '@mui/material';
+import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { Character } from '../../../api/character.dto';
-import RmuTextCard from '../../../shared/cards/RmuTextCard';
 
 const CharacterSkillList: FC<{ character: Character }> = ({ character }) => {
   const skills = character?.skills || [];
@@ -13,11 +13,9 @@ const CharacterSkillList: FC<{ character: Character }> = ({ character }) => {
         {skills.map((s) => (
           <Grid key={`${s.skillId}-${s.specialization ?? '0'}`} size={{ xs: 12, md: 3 }}>
             <RmuTextCard
-              size="medium"
               value={t(s.skillId)}
-              subtitle={`${s.specialization || ''}${s.specialization ? ' • ' : ''}Ranks: ${s.ranks} • Total: ${
-                s.totalBonus ?? 0
-              }`}
+              subtitle={`${s.specialization || ''}${s.specialization ? ' • ' : ''}Ranks: ${s.ranks} • Total: ${s.totalBonus ?? 0}`}
+              image={''}
             />
           </Grid>
         ))}

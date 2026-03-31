@@ -2,6 +2,7 @@ import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Button, Stack } from '@mui/material';
+import { NumericInput, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { transferFactionGold } from '../../api/character';
@@ -9,7 +10,6 @@ import { Character } from '../../api/character.dto';
 import { fetchFaction } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
 import { imageBaseUrl } from '../../services/config';
-import NumericCard from '../../shared/cards/NumericCard';
 
 const CharacterViewTransferGold: FC<{
   character: Character;
@@ -39,7 +39,7 @@ const CharacterViewTransferGold: FC<{
 
   return (
     <Stack direction="row" spacing={1} alignItems="center" mt={2}>
-      <NumericCard value={goldAmount} subtitle={t('Character')} image={`${imageBaseUrl}images/generic/coins.png`} />
+      <RmuTextCard value={goldAmount} subtitle={t('Character')} image={`${imageBaseUrl}images/generic/coins.png`} />
       <Button onClick={() => handleTransfer(1)} variant="outlined" startIcon={<ChevronLeftIcon />}>
         +1G
       </Button>
@@ -52,7 +52,7 @@ const CharacterViewTransferGold: FC<{
       <Button onClick={() => handleTransfer(-1)} variant="outlined" endIcon={<ChevronRightIcon />}>
         -1G
       </Button>
-      <NumericCard
+      <RmuTextCard
         value={faction.management.availableGold}
         subtitle={t('Faction')}
         image={`${imageBaseUrl}images/generic/coins.png`}

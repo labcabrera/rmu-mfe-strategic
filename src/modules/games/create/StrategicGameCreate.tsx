@@ -1,13 +1,12 @@
 import React, { FC, useEffect, useState } from 'react';
 import { Grid } from '@mui/material';
+import { EditableAvatar, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
 import { fetchRealms } from '../../api/realm';
 import { Realm } from '../../api/realm.dto';
 import { CreateStrategicGameDto, CREATE_GAME_TEMPLATE } from '../../api/strategic-game.dto';
 import { gridSizeResume, gridSizeMain } from '../../services/display';
-import { DEFAULT_REALM_IMAGE } from '../../services/image-service';
-import EditableAvatar from '../../shared/avatars/EditableAvatar';
-import TechnicalInfo from '../../shared/display/TechnicalInfo';
+import { DEFAULT_REALM_IMAGE, getAvatarImages } from '../../services/image-service';
 import StrategicGameForm from '../shared/StrategicGameForm';
 import StrategicGameCreateActions from './StrategicGameCreateActions';
 
@@ -41,6 +40,7 @@ const StrategicGameCreate: FC = () => {
           <EditableAvatar
             imageUrl={formData.imageUrl || DEFAULT_REALM_IMAGE}
             onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl })}
+            images={getAvatarImages()}
           />
         </Grid>
         <Grid size={gridSizeMain}>

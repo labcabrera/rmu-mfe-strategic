@@ -1,9 +1,8 @@
 import React, { Dispatch, FC, Fragment, SetStateAction } from 'react';
 import { Divider, Grid, Typography, Paper, Stack } from '@mui/material';
+import { CategorySeparator, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { Character, CharacterItem } from '../../../api/character.dto';
-import CategorySeparator from '../../../shared/display/CategorySeparator';
-import TechnicalInfo from '../../../shared/display/TechnicalInfo';
 import CharacterViewTransferGold from '../CharacterViewTransferGold';
 
 const CharacterItemDetail: FC<{
