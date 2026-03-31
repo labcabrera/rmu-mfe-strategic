@@ -6,7 +6,7 @@ import { addCharacterXP } from '../../api/character';
 import { Character } from '../../api/character.dto';
 import { imageBaseUrl } from '../../services/config';
 import NumericCard from '../../shared/cards/NumericCard';
-import TextCard from '../../shared/cards/TextCard';
+import RmuTextCard from '../../shared/cards/RmuTextCard';
 import CategorySeparator from '../../shared/display/CategorySeparator';
 import NumericInput from '../../shared/inputs/NumericInput';
 
@@ -67,7 +67,7 @@ const CharacterViewExperience: FC<{
               badgeContent={`+${character.experience.availableDevelopmentPoints}`}
               invisible={character.experience.availableDevelopmentPoints < 1}
             >
-              <TextCard
+              <RmuTextCard
                 value={`${character.experience.availableDevelopmentPoints} / ${character.experience.developmentPoints}`}
                 subtitle={t('Development points')}
                 image={`${imageBaseUrl}images/generic/trait-combat.png`}

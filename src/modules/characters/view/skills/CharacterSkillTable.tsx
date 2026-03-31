@@ -1,7 +1,9 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
+import CropSquareIcon from '@mui/icons-material/CropSquare';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import SquareIcon from '@mui/icons-material/Square';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import TurnedInIcon from '@mui/icons-material/TurnedIn';
@@ -68,6 +70,13 @@ const CharacterSkillTable: FC<{
               <Tooltip title={t('Developed ranks')}>
                 <Typography variant="body2">
                   <b>{t('Ranks')}</b>
+                </Typography>
+              </Tooltip>
+            </TableCell>
+            <TableCell align="left">
+              <Tooltip title={t('Developed ranks')}>
+                <Typography variant="body2">
+                  <b>{t('Dev Ranks')}</b>
                 </Typography>
               </Tooltip>
             </TableCell>
@@ -237,11 +246,19 @@ const CharacterViewSkillsEntry: FC<{
         <Typography variant="body2" display="inline">
           {skill.ranks}
         </Typography>
-        {skill.ranksDeveloped > 0 && (
-          <Typography variant="body2" display="inline" color="success">
-            {` (↑${skill.ranksDeveloped})`}
-          </Typography>
-        )}
+      </TableCell>
+      <TableCell align="right">
+        <Stack direction="row" spacing={0}>
+          {Array.from({ length: 3 }, (_, idx) => idx + 1).map((rank) => (
+            <Box key={rank} component="span" sx={{ display: 'inline-flex', mx: 0, p: 0 }}>
+              {rank <= skill.ranksDeveloped ? (
+                <SquareIcon sx={{ mx: 0, p: 0 }} fontSize="small" />
+              ) : (
+                <CropSquareIcon sx={{ mx: 0, p: 0 }} fontSize="small" />
+              )}
+            </Box>
+          ))}
+        </Stack>
       </TableCell>
       <TableCell
         align="right"

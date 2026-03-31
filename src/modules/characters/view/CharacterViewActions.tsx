@@ -8,6 +8,7 @@ import {
   DialogContentText,
   DialogTitle,
   IconButton,
+  Tooltip,
 } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';

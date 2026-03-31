@@ -1,6 +1,6 @@
 import React, { FC, MouseEvent } from 'react';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { useTheme, useMediaQuery } from '@mui/material';
+import { useTheme, useMediaQuery, Tooltip } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 
 type Props = {
@@ -9,6 +9,7 @@ type Props = {
   ariaLabel?: string;
   disabled?: boolean;
   color?: 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning' | 'default' | undefined;
+  tooltip?: string;
 };
 
 const RmuIconButton: FC<Props> = ({
@@ -17,6 +18,7 @@ const RmuIconButton: FC<Props> = ({
   ariaLabel = 'action',
   color = 'primary',
   disabled = false,
+  tooltip,
 }) => {
   const theme = useTheme();
   const isSmDown = useMediaQuery(theme.breakpoints.down('sm'));
@@ -25,9 +27,11 @@ const RmuIconButton: FC<Props> = ({
   const IconComp = icon as React.ElementType;
 
   return (
-    <IconButton onClick={onClick} aria-label={ariaLabel} size={btnSize} color={color} disabled={disabled}>
-      <IconComp fontSize={iconFontSize} />
-    </IconButton>
+    <Tooltip title={tooltip}>
+      <IconButton onClick={onClick} aria-label={ariaLabel} size={btnSize} color={color} disabled={disabled}>
+        <IconComp fontSize={iconFontSize} />
+      </IconButton>
+    </Tooltip>
   );
 };
 

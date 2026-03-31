@@ -15,6 +15,8 @@ const CharacterItemDetail: FC<{
 
   const item = character.items.find((i) => i.id == itemId)!;
 
+  if (!item) return null;
+
   return (
     <Paper sx={{ padding: 2 }}>
       <Grid container spacing={1}>

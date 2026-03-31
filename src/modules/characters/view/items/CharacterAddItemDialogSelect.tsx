@@ -35,7 +35,7 @@ const CharacterAddItemDialogSelect: FC<{
           <Box display="flex" flexDirection="row" flexWrap="wrap" gap={0.2}>
             {categories.map((category) => (
               <>
-                <Tooltip key={category} title={category} arrow>
+                <Tooltip key={category} title={t(category)} arrow>
                   <CardMedia
                     key={category}
                     component="img"
@@ -63,7 +63,7 @@ const CharacterAddItemDialogSelect: FC<{
 
             <Box display="flex" flexDirection="row" flexWrap="wrap" gap={0.2}>
               {subcategories.map((subcategory, index) => (
-                <Tooltip key={index} title={subcategory} arrow>
+                <Tooltip key={index} title={t(subcategory)} arrow>
                   <CardMedia
                     key={subcategory}
                     component="img"
