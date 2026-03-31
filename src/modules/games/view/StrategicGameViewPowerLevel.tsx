@@ -1,66 +1,56 @@
 import React, { FC } from 'react';
-import { Box, Grid, Typography } from '@mui/material';
+import { Grid } from '@mui/material';
+import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { imageBaseUrl } from '../../services/config';
-import NumericCard from '../../shared/cards/NumericCard';
-import RmuTextCard from '../../shared/cards/RmuTextCard';
+import { gridSizeCard } from '../../services/display';
 
 const grayscale = 0.7;
 
 const StrategicGameViewPowerLevel: FC<{
   strategicGame: StrategicGame;
 }> = ({ strategicGame }) => {
+  const DATA = [
+    {
+      value: strategicGame.powerLevel.baseDevPoints,
+      subtitle: t('Dev points'),
+      image: `${imageBaseUrl}images/generic/trait-combat.png`,
+    },
+    {
+      value: strategicGame.powerLevel.statRandomMin,
+      subtitle: t('Stat rng min'),
+      image: `${imageBaseUrl}images/generic/stat-st.png`,
+    },
+    {
+      value: strategicGame.powerLevel.statBoostPotential,
+      subtitle: t('Stat boost potential'),
+      image: `${imageBaseUrl}images/generic/stat-st.png`,
+    },
+    {
+      value: strategicGame.powerLevel.statBoostTemporary,
+      subtitle: t('Stat boost temporary'),
+      image: `${imageBaseUrl}images/generic/stat-st.png`,
+    },
+    {
+      value: strategicGame.powerLevel.statCreationBoost,
+      subtitle: t('Stat creation boosts'),
+      image: `${imageBaseUrl}images/generic/stat-st.png`,
+    },
+    {
+      value: strategicGame.powerLevel.statCreationSwap,
+      subtitle: t('Stat creation swaps'),
+      image: `${imageBaseUrl}images/generic/stat-st.png`,
+    },
+  ];
+
   return (
-    <Grid container spacing={1}>
-      <Grid size={{ xs: 12, md: 2 }}>
-        <RmuTextCard
-          value={strategicGame.powerLevel.baseDevPoints}
-          subtitle={t('base-dev-points')}
-          image={`${imageBaseUrl}images/generic/trait-combat.png`}
-          grayscale={grayscale}
-        />
-      </Grid>
-      <Grid size={{ xs: 12, md: 2 }}>
-        <RmuTextCard
-          value={strategicGame.powerLevel.statRandomMin}
-          subtitle={t('stat-random-min')}
-          image={`${imageBaseUrl}images/generic/stat-st.png`}
-          grayscale={grayscale}
-        />
-      </Grid>
-      <Grid size={{ xs: 12, md: 2 }}>
-        <RmuTextCard
-          value={strategicGame.powerLevel.statBoostPotential}
-          subtitle={t('stat-boost-potential')}
-          image={`${imageBaseUrl}images/generic/stat-st.png`}
-          grayscale={grayscale}
-        />
-      </Grid>
-      <Grid size={{ xs: 12, md: 2 }}>
-        <RmuTextCard
-          value={strategicGame.powerLevel.statBoostTemporary}
-          subtitle={t('stat-boost-temporary')}
-          image={`${imageBaseUrl}images/generic/stat-st.png`}
-          grayscale={grayscale}
-        />
-      </Grid>
-      <Grid size={{ xs: 12, md: 2 }}>
-        <RmuTextCard
-          value={strategicGame.powerLevel.statCreationBoost}
-          subtitle={t('stat-creation-boosts')}
-          image={`${imageBaseUrl}images/generic/stat-st.png`}
-          grayscale={grayscale}
-        />
-      </Grid>
-      <Grid size={{ xs: 12, md: 2 }}>
-        <RmuTextCard
-          value={strategicGame.powerLevel.statCreationSwap}
-          subtitle={t('stat-creation-swaps')}
-          image={`${imageBaseUrl}images/generic/stat-st.png`}
-          grayscale={grayscale}
-        />
-      </Grid>
+    <Grid container spacing={1} columns={12}>
+      {DATA.map((e, index) => (
+        <Grid key={index} size={gridSizeCard}>
+          <RmuTextCard value={e.value} subtitle={e.subtitle} image={e.image} grayscale={grayscale} />
+        </Grid>
+      ))}
     </Grid>
   );
 };

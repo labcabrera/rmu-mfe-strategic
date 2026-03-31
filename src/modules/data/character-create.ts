@@ -1,6 +1,6 @@
 import { CreateCharacterDto } from '../api/character.dto';
 
-export const CHARACTER_CREATION_TEMPLATE: CreateCharacterDto = {
+export const characterCreationTemplate: CreateCharacterDto = {
   name: '',
   gameId: '',
   factionId: '',
@@ -15,7 +15,7 @@ export const CHARACTER_CREATION_TEMPLATE: CreateCharacterDto = {
     gender: 'male',
     age: 20,
   },
-  level: 1,
+  level: null,
   weaponDevelopment: ['melee', 'ranged', 'shield', 'unarmed'],
   statistics: {
     ag: {
@@ -88,10 +88,6 @@ export const CHARACTER_CREATION_TEMPLATE: CreateCharacterDto = {
       ranks: 0,
     },
     {
-      skillId: 'melee-weapon@blade',
-      ranks: 0,
-    },
-    {
       skillId: 'armor-maneuver',
       ranks: 0,
     },
@@ -112,19 +108,23 @@ export const CHARACTER_CREATION_TEMPLATE: CreateCharacterDto = {
       ranks: 0,
     },
     {
-      skillId: 'multiple-attacks',
-      ranks: 0,
-    },
-    {
       skillId: 'medicine',
       ranks: 0,
     },
   ],
-  items: [
-    {
-      name: 'Basic dagger',
-      itemTypeId: 'dagger',
-    },
-  ],
+  items: [],
   description: '',
+};
+
+export const defaultStats = {
+  ag: { potential: 0, temporary: 0 },
+  co: { potential: 0, temporary: 0 },
+  em: { potential: 0, temporary: 0 },
+  in: { potential: 0, temporary: 0 },
+  me: { potential: 0, temporary: 0 },
+  pr: { potential: 0, temporary: 0 },
+  qu: { potential: 0, temporary: 0 },
+  re: { potential: 0, temporary: 0 },
+  sd: { potential: 0, temporary: 0 },
+  st: { potential: 0, temporary: 0 },
 };

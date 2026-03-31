@@ -7,15 +7,17 @@ import {
   DialogContent,
   DialogTitle,
   CardMedia,
-  Stack,
   Typography,
   Tooltip,
 } from '@mui/material';
 import { t } from 'i18next';
+import { useError } from '../../../../ErrorContext';
 import { equipItem, unequipItem } from '../../../api/character';
 import { Character, CharacterItem } from '../../../api/character.dto';
+import { imageBaseUrl } from '../../../services/config';
+import { itemFilter, itemFilterDisabled } from '../../../services/display';
 
-const imageBaseUrl = process.env.RMU_MFE_ASSETS!;
+const imageSize = 100;
 
 const CharacterEquipmentDialog: FC<{
   open: boolean;
@@ -24,6 +26,10 @@ const CharacterEquipmentDialog: FC<{
   slot: string;
   onEquip?: (character: Character) => void;
 }> = ({ open, onClose, character, slot, onEquip }) => {
+  const { showError } = useError();
+
+  const slotItemId = character.equipment[slot];
+
   const isArmorSlot = (item: CharacterItem, s: string) => {
     return item.armor && item.armor.slot === s;
   };
@@ -39,25 +45,13 @@ const CharacterEquipmentDialog: FC<{
       return character.items.filter(
         (e) => e.category === 'shield' || (e.category === 'weapon' && isOneHandedWeapon(e))
       );
-    } else if (s === 'body') {
-      return character.items.filter((e) => isArmorSlot(e, 'body'));
-    } else if (s === 'head') {
-      return character.items.filter((e) => isArmorSlot(e, 'head'));
-    } else if (s === 'arms') {
-      return character.items.filter((e) => isArmorSlot(e, 'arms'));
-    } else if (s === 'legs') {
-      return character.items.filter((e) => isArmorSlot(e, 'legs'));
+    } else if (s === 'body' || s === 'head' || s === 'arms' || s === 'legs') {
+      return character.items.filter((e) => isArmorSlot(e, s));
     }
     return [];
   };
 
   const slotOptions = useMemo(() => getSlotOptions(character, slot), [character, slot]);
-
-  const selectedItem: CharacterItem | null = useMemo(() => {
-    return character.equipment[slot]
-      ? slotOptions.find((option) => option.id === character.equipment[slot]) || null
-      : null;
-  }, [character, slot, slotOptions]);
 
   const handleEquip = (item: CharacterItem | null) => {
     if (item) {
@@ -66,65 +60,56 @@ const CharacterEquipmentDialog: FC<{
           if (onEquip) onEquip(data);
           onClose();
         })
-        .catch((err) => console.error(err));
+        .catch((err) => showError(err.message));
     } else {
       unequipItem(character.id, slot)
         .then((data) => {
           if (onEquip) onEquip(data);
           onClose();
         })
-        .catch((err) => console.error(err));
+        .catch((err) => showError(err.message));
     }
   };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle>
-        <Stack direction="row" alignItems="center">
-          <CardMedia
-            component="img"
-            image={`${imageBaseUrl}images/items/no-item.png`}
-            sx={{ width: 40, height: 40, verticalAlign: 'middle', marginRight: 1 }}
-          />
-          <Typography variant="h6" component="div">
-            {t(slot)}
-          </Typography>
-        </Stack>
+        <Typography variant="h6" component="div">
+          {t(slot)}
+        </Typography>
       </DialogTitle>
       <DialogContent>
         <Box display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
           <Box
             onClick={() => handleEquip(null)}
             sx={{
-              width: 100,
-              height: 100,
+              width: imageSize,
+              height: imageSize,
               cursor: 'pointer',
-              border: !character.equipment[slot] ? `2px solid` : 'none',
-              borderColor: 'success.main',
-              borderRadius: 1,
+              border: slotItemId ? undefined : '2pt solid',
+              borderColor: slotItemId ? undefined : 'success.main',
             }}
           >
             <CardMedia
               component="img"
               image={`${imageBaseUrl}images/items/no-item.png`}
               alt={t('none')}
-              sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 1 }}
+              sx={{ width: '100%', height: '100%', objectFit: 'cover', filter: itemFilter }}
             />
           </Box>
 
           {slotOptions.map((item) => {
-            const isEquipped = !!character.equipment[slot] && character.equipment[slot] === item.id;
+            const isEquipped = slotItemId === item.id;
             return (
               <Box
                 key={item.id}
                 onClick={() => handleEquip(item)}
                 sx={{
-                  width: 100,
-                  height: 100,
+                  width: imageSize,
+                  height: imageSize,
                   cursor: 'pointer',
-                  border: isEquipped ? `2px solid` : 'none',
-                  borderColor: 'success.main',
-                  borderRadius: 1,
+                  border: isEquipped ? '2pt solid' : undefined,
+                  borderColor: isEquipped ? 'success.main' : undefined,
                 }}
               >
                 <Tooltip title={item.name} arrow>
@@ -132,7 +117,12 @@ const CharacterEquipmentDialog: FC<{
                     component="img"
                     image={`${imageBaseUrl}images/items/${item.itemTypeId}.png`}
                     alt={item.name}
-                    sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 1 }}
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      filter: itemFilter,
+                    }}
                   />
                 </Tooltip>
               </Box>

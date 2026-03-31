@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import { Box, ToggleButton, ToggleButtonGroup, Grid } from '@mui/material';
+import { CategorySeparator, RmuTextCard, AddButton, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacters } from '../../api/character';
@@ -11,9 +12,7 @@ import { fetchFaction } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import AddButton from '../../shared/buttons/AddButton';
-import RmuTextCard from '../../shared/cards/RmuTextCard';
-import CategorySeparator from '../../shared/display/CategorySeparator';
+import { gridSizeResume, gridSizeMain, gridSizeCard } from '../../services/display';
 import FactionViewActions from './FactionViewActions';
 import FactionViewAttributes from './FactionViewAttributes';
 import FactionViewCharactersTable from './FactionViewCharacterTable';
@@ -78,24 +77,27 @@ const FactionView: FC = () => {
     <>
       <FactionViewActions faction={faction} setFaction={setFaction} strategicGame={game} />
       <Grid container spacing={1}>
-        <Grid size={{ xs: 12, md: 12, sm: 12, lg: 2 }}>
+        <Grid size={gridSizeResume}>
           <FactionViewResume faction={faction} setFaction={setFaction} game={game} />
         </Grid>
-        <Grid size={{ xs: 12, md: 12, sm: 12, lg: 8 }}>
+        <Grid size={gridSizeMain}>
           <CategorySeparator text={t('Strategic game')} />
           <Grid container spacing={1}>
-            <Grid size={{ xs: 12, md: 3 }}>
+            <Grid size={gridSizeCard}>
               <RmuTextCard
                 value={game.name}
                 subtitle={t('Strategic game')}
-                image={game.imageUrl}
+                image={game.imageUrl || ''}
                 onClick={() => navigate(`/strategic/games/view/${game.id}`, { state: { strategicGame: game } })}
               />
             </Grid>
           </Grid>
-          <CategorySeparator text={t('faction')} />
+
+          <CategorySeparator text={t('Faction')} />
+
           <FactionViewAttributes faction={faction} />
-          <CategorySeparator text={t('characters')}>
+
+          <CategorySeparator text={t('Characters')}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
               <AddButton onClick={onCharacterCreate} />
               <ToggleButtonGroup
@@ -119,6 +121,11 @@ const FactionView: FC = () => {
           ) : (
             <FactionViewCharacters faction={faction} characters={characters} />
           )}
+          <Grid size={12} mt={2}>
+            <TechnicalInfo>
+              <pre>Faction: {JSON.stringify(faction, null, 2)}</pre>
+            </TechnicalInfo>
+          </Grid>
         </Grid>
       </Grid>
     </>

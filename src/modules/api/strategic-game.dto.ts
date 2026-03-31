@@ -1,3 +1,5 @@
+import { DEFAULT_REALM_IMAGE } from '../services/image-service';
+
 export interface StrategicGame {
   id: string;
   name: string;
@@ -33,7 +35,7 @@ export interface CreateStrategicGameDto extends Omit<StrategicGame, 'id' | 'real
 export interface UpdateStrategicGameDto
   extends Partial<Omit<StrategicGame, 'id' | 'realmId' | 'realmName' | 'status' | 'owner'>> {}
 
-export const gameCreateTemplate = {
+export const CREATE_GAME_TEMPLATE = {
   name: '',
   realmId: '',
   options: {
@@ -51,4 +53,5 @@ export const gameCreateTemplate = {
     statCreationSwap: 2,
   },
   description: '',
+  imageUrl: DEFAULT_REALM_IMAGE,
 } as CreateStrategicGameDto;

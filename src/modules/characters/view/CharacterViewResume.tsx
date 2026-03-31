@@ -1,13 +1,14 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Link, Typography } from '@mui/material';
+import { EditableAvatar } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { updateCharacter } from '../../api/character';
 import { Character } from '../../api/character.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { imageBaseUrl } from '../../services/config';
-import EditableAvatar from '../../shared/avatars/EditableAvatar';
+import { getAvatarImages } from '../../services/image-service';
 
 const defaultCharacterImage = `${imageBaseUrl}images/npcs/unknown.png`;
 
@@ -33,7 +34,11 @@ const CharacterViewResume: FC<{
 
   return (
     <>
-      <EditableAvatar imageUrl={character.imageUrl || defaultCharacterImage} onImageChange={onImageUpdated} />
+      <EditableAvatar
+        imageUrl={character.imageUrl || defaultCharacterImage}
+        onImageChange={onImageUpdated}
+        images={getAvatarImages()}
+      />
       <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
         {character.name}
       </Typography>

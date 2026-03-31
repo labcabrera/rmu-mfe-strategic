@@ -1,7 +1,9 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
+import CropSquareIcon from '@mui/icons-material/CropSquare';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import SquareIcon from '@mui/icons-material/Square';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import TurnedInIcon from '@mui/icons-material/TurnedIn';
@@ -30,7 +32,7 @@ const maxKnackSkills = 2;
 
 const CharacterSkillTable: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>>;
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   profession?: Profession;
 }> = ({ character, setCharacter, profession }) => {
   const currentKnackSkills = character.skills.filter((s) => s.professional?.includes('knack')).length;
@@ -48,16 +50,64 @@ const CharacterSkillTable: FC<{
           }}
         >
           <TableRow>
-            <TableCell align="left">{t('skill')}</TableCell>
-            <TableCell align="left">Spec</TableCell>
-            <TableCell align="left">Prof</TableCell>
+            <TableCell align="left">{t('Skill')}</TableCell>
+            <TableCell align="left">
+              <Tooltip title={t('Specializacion')}>
+                <Typography variant="body2">
+                  <b>Spec</b>
+                </Typography>
+              </Tooltip>
+            </TableCell>
             <TableCell align="left">Stats</TableCell>
-            <TableCell align="right">Dev</TableCell>
-            <TableCell align="right">Ranks</TableCell>
-            <TableCell align="right">Rank bonus</TableCell>
-            <TableCell align="right">Stat</TableCell>
-            <TableCell align="right">Racial</TableCell>
-            <TableCell align="right">Professional</TableCell>
+            <TableCell align="right">
+              <Tooltip title={t('Development cost')}>
+                <Typography variant="body2">
+                  <b>Dev</b>
+                </Typography>
+              </Tooltip>
+            </TableCell>
+            <TableCell align="right">
+              <Tooltip title={t('Developed ranks')}>
+                <Typography variant="body2">
+                  <b>{t('Ranks')}</b>
+                </Typography>
+              </Tooltip>
+            </TableCell>
+            <TableCell align="left">
+              <Tooltip title={t('Developed ranks')}>
+                <Typography variant="body2">
+                  <b>{t('Dev Ranks')}</b>
+                </Typography>
+              </Tooltip>
+            </TableCell>
+            <TableCell align="right">
+              <Tooltip title={t('Rank bonus')}>
+                <Typography variant="body2">
+                  <b>Rank</b>
+                </Typography>
+              </Tooltip>
+            </TableCell>
+            <TableCell align="right">
+              <Tooltip title={t('Stat bonus')}>
+                <Typography variant="body2">
+                  <b>Stat</b>
+                </Typography>
+              </Tooltip>
+            </TableCell>
+            <TableCell align="right">
+              <Tooltip title={t('Racial bonus')}>
+                <Typography variant="body2">
+                  <b>Racial</b>
+                </Typography>
+              </Tooltip>
+            </TableCell>
+            <TableCell align="right">
+              <Tooltip title={t('Profession bonus')}>
+                <Typography variant="body2">
+                  <b>Proffesion</b>
+                </Typography>
+              </Tooltip>
+            </TableCell>
             <TableCell align="right">Custom</TableCell>
             <TableCell align="right">Total</TableCell>
             <TableCell align="left">
@@ -70,9 +120,9 @@ const CharacterSkillTable: FC<{
           </TableRow>
         </TableHead>
         <TableBody>
-          {character?.skills.map((item) => (
+          {character?.skills.map((item, index) => (
             <CharacterViewSkillsEntry
-              key={item.skillId}
+              key={index}
               skill={item}
               character={character}
               setCharacter={setCharacter}
@@ -89,7 +139,7 @@ const CharacterSkillTable: FC<{
 
 const CharacterViewSkillsEntry: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>>;
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   skill: CharacterSkill;
   profession?: Profession;
   currentKnackSkills: number;
@@ -124,7 +174,7 @@ const CharacterViewSkillsEntry: FC<{
       //add
       array.push('professional');
     }
-    setUpProfessionalSkill(character.id, skillObj.skillId, array)
+    setUpProfessionalSkill(character.id, skillObj.skillId, skillObj.specialization, array)
       .then((updated) => setCharacter(updated))
       .catch((error: any) => showError(error.message));
   };
@@ -141,7 +191,7 @@ const CharacterViewSkillsEntry: FC<{
       //add
       array.push('knack');
     }
-    setUpProfessionalSkill(character.id, skillObj.skillId, array)
+    setUpProfessionalSkill(character.id, skillObj.skillId, skillObj.specialization, array)
       .then((updated) => setCharacter(updated))
       .catch((error: any) => showError(error.message));
   };
@@ -179,42 +229,16 @@ const CharacterViewSkillsEntry: FC<{
   };
 
   const getStatistics = (skill: CharacterSkill) => {
-    return skill.statistics && skill.statistics.length > 0 ? skill.statistics.join('/').toUpperCase() : '-';
+    return skill.statistics && skill.statistics.length > 0 ? skill.statistics.join('/').toLowerCase() : '-';
   };
 
   return (
-    <TableRow key={skill.skillId} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+    <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
       <TableCell component="th" scope="row">
         {t(skill.skillId)}
       </TableCell>
       <TableCell component="th" scope="row">
-        {skill.specialization || '-'}
-      </TableCell>
-      <TableCell component="th" scope="row">
-        {isAvailableProfessionSkill(skill) && (
-          <>
-            <Tooltip title={t('Professional skill')}>
-              <IconButton
-                aria-label="set-professional"
-                onClick={() => handleSetUpProfessionalSkill(skill)}
-                disabled={!isProfessional && currentProfessionalSkills >= maxProfessionalSkills}
-                color="primary"
-              >
-                {isProfessional ? <TurnedInIcon /> : <TurnedInNotIcon />}
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t('Knack skill')}>
-              <IconButton
-                aria-label="set-knack"
-                onClick={() => handleSetUpKnackSkill(skill)}
-                color="primary"
-                disabled={!isKnack && currentKnackSkills >= maxKnackSkills}
-              >
-                {isKnack ? <StarIcon /> : <StarBorderIcon />}
-              </IconButton>
-            </Tooltip>
-          </>
-        )}
+        {skill.specialization ? t(skill.specialization) : '-'}
       </TableCell>
       <TableCell align="left">{getStatistics(skill)}</TableCell>
       <TableCell align="right">{skill.development?.join(' / ') || '-'}</TableCell>
@@ -222,17 +246,24 @@ const CharacterViewSkillsEntry: FC<{
         <Typography variant="body2" display="inline">
           {skill.ranks}
         </Typography>
-        {skill.ranksDeveloped > 0 && (
-          <Typography variant="body2" display="inline" color="success">
-            {` (↑${skill.ranksDeveloped})`}
-          </Typography>
-        )}
+      </TableCell>
+      <TableCell align="right">
+        <Stack direction="row" spacing={0}>
+          {Array.from({ length: 3 }, (_, idx) => idx + 1).map((rank) => (
+            <Box key={rank} component="span" sx={{ display: 'inline-flex', mx: 0, p: 0 }}>
+              {rank <= skill.ranksDeveloped ? (
+                <SquareIcon sx={{ mx: 0, p: 0 }} fontSize="small" />
+              ) : (
+                <CropSquareIcon sx={{ mx: 0, p: 0 }} fontSize="small" />
+              )}
+            </Box>
+          ))}
+        </Stack>
       </TableCell>
       <TableCell
         align="right"
         sx={{
           color: getColor(skill.developmentBonus),
-          fontWeight: 'bold',
         }}
       >
         {skill.developmentBonus}
@@ -251,7 +282,12 @@ const CharacterViewSkillsEntry: FC<{
       <TableCell align="right" sx={{ color: getColor(skill.professionalBonus) }}>
         {skill.professionalBonus}
       </TableCell>
-      <TableCell align="right">{skill.customBonus}</TableCell>
+      <TableCell
+        align="right"
+        sx={{ color: skill.customBonus === 0 ? undefined : skill.customBonus > 0 ? 'success.main' : 'error.main' }}
+      >
+        {skill.customBonus}
+      </TableCell>
       <TableCell
         align="right"
         sx={{
@@ -274,6 +310,30 @@ const CharacterViewSkillsEntry: FC<{
               <IconButton onClick={() => handleDeleteSkill(skill)} color="primary">
                 <DeleteForeverIcon />
               </IconButton>
+            )}
+            {isAvailableProfessionSkill(skill) && (
+              <>
+                <Tooltip title={t('Professional skill')}>
+                  <IconButton
+                    aria-label="set-professional"
+                    onClick={() => handleSetUpProfessionalSkill(skill)}
+                    disabled={!isProfessional && currentProfessionalSkills >= maxProfessionalSkills}
+                    color="primary"
+                  >
+                    {isProfessional ? <TurnedInIcon /> : <TurnedInNotIcon />}
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={t('Knack skill')}>
+                  <IconButton
+                    aria-label="set-knack"
+                    onClick={() => handleSetUpKnackSkill(skill)}
+                    color="primary"
+                    disabled={!isKnack && currentKnackSkills >= maxKnackSkills}
+                  >
+                    {isKnack ? <StarIcon /> : <StarBorderIcon />}
+                  </IconButton>
+                </Tooltip>
+              </>
             )}
           </Box>
         </Stack>

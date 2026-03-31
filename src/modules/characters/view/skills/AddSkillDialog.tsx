@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FC } from 'react';
+import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
 import EditSquareIcon from '@mui/icons-material/EditSquare';
 import {
   Button,
@@ -14,150 +14,133 @@ import {
 } from '@mui/material';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
+import { addSkill } from '../../../api/character';
 import { Character } from '../../../api/character.dto';
+import { fetchEnumerations } from '../../../api/enumerations';
 import { fetchSkills } from '../../../api/skill';
 import { fetchSkillCategories } from '../../../api/skill-category';
 import { SkillCategory } from '../../../api/skill-category.dto';
 import { AddSkill, Skill } from '../../../api/skill.dto';
-import AddSkillSpecialization from './AddSkillSpecialization';
 
 const AddSkillDialog: FC<{
   open: boolean;
   character: Character;
+  setCharacter: Dispatch<SetStateAction<Character>>;
   onClose: () => void;
-  onSkillAdded: (addSkill: AddSkill) => void;
-}> = ({ open, character, onClose, onSkillAdded }) => {
+}> = ({ open, character, setCharacter, onClose }) => {
   const { showError } = useError();
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
-  const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
-  const [selectedSpecialization, setSelectedSpecialization] = useState<string | null>(null);
+  const [formData, setFormData] = useState<AddSkill>({ ranks: 0 } as AddSkill);
+  const [validFormData, setValidFormData] = useState<boolean>(false);
 
-  const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
-  const [skills, setSkills] = useState<Skill[]>([]);
-  const [filteredCategories, setFilteredCategories] = useState<SkillCategory[]>([]);
-  const [filteredSkills, setFilteredSkills] = useState<Skill[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<SkillCategory>();
+  const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
+
+  const [availableCategories, setAvailableCategories] = useState<SkillCategory[]>([]);
+  const [availableSkills, setAvailableSkills] = useState<Skill[]>([]);
+  const [availableSpecializations, setAvailableSpecializations] = useState<string[]>();
 
   const bindSkillCategories = () => {
     fetchSkillCategories()
-      .then((data) => setSkillCategories(data))
+      .then((data) => setAvailableCategories(data.content))
       .catch((error) => showError(error.message));
   };
 
   const bindSkills = () => {
-    fetchSkills()
-      .then((data) => setSkills(data))
+    if (!selectedCategory) return;
+    fetchSkills(selectedCategory.id)
+      .then((data) => setAvailableSkills(data.content))
       .catch((error) => showError(error.message));
   };
 
-  const hasSkill = (skill: Skill): boolean => {
-    if (skill.specialization) {
-      return false;
-    }
-    return character.skills?.some((s) => s.skillId === skill.id) ?? false;
-  };
-
-  const filterSkills = () => {
-    const notSelectedSkills = skills.filter((s) => !hasSkill(s));
-    setFilteredCategories(skillCategories.filter((c) => notSelectedSkills.some((s) => s.categoryId === c.id)));
-    setFilteredSkills(
-      notSelectedSkills.filter((s) => (selectedCategoryId ? s.categoryId === selectedCategoryId : true))
-    );
-    setSelectedSkill(null);
-    setSelectedSpecialization(null);
-  };
-
-  const onAddSkill = async () => {
-    if (!selectedSkill) {
-      showError('Please select a skill');
-      return;
-    }
-    try {
-      const skill = {
-        skillId: selectedSkill.id,
-        specialization: selectedSpecialization,
-        ranks: 0,
-      } as AddSkill;
-      onSkillAdded(skill);
-      handleClose();
-    } catch (error: any) {
-      showError(error.message);
-    }
-  };
-
   const handleClose = () => {
-    setSelectedSkill(null);
-    setSelectedSpecialization(null);
+    reset();
     onClose();
   };
 
-  const addSkillDisabled = () => {
-    if (!selectedSkill) return true;
-    if (selectedSkill.specialization && !selectedSpecialization) return true;
-    return false;
+  const onAddSkill = async () => {
+    addSkill(character.id, formData!)
+      .then((response) => {
+        setCharacter(response);
+        reset();
+        onClose();
+      })
+      .catch((err) => showError(err.message));
+  };
+
+  const isValid = (): boolean => {
+    if (!formData || !selectedSkill) return false;
+    if (!formData.skillId) return false;
+    if (!formData.specialization && selectedSkill.specialization) return false;
+    return true;
+  };
+
+  const reset = () => {
+    setSelectedCategory(undefined);
+    setFormData({ ranks: 0 } as AddSkill);
   };
 
   useEffect(() => {
-    filterSkills();
-  }, [character, selectedCategoryId, skills]);
+    setValidFormData(isValid());
+  }, [formData]);
+
+  useEffect(() => {
+    if (selectedSkill) {
+      setFormData((prev) => ({ ...prev, skillId: selectedSkill.id }));
+      if (!selectedSkill.specialization) {
+        setAvailableSpecializations(undefined);
+      } else {
+        fetchEnumerations(`category==${selectedSkill.specialization}`, 0, 100)
+          .then((response) => setAvailableSpecializations(response.content.map((e) => e.key)))
+          .catch((err) => showError(err.message));
+      }
+    }
+  }, [selectedSkill]);
+
+  useEffect(() => {
+    bindSkills();
+    setAvailableSpecializations(undefined);
+  }, [selectedCategory, character]);
 
   useEffect(() => {
     bindSkillCategories();
-    bindSkills();
-  }, []);
+  }, [character]);
+
+  if (!availableCategories) return <p>Loading...</p>;
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth>
-      <DialogTitle>{t('add-skill')}</DialogTitle>
+    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
+      <DialogTitle>{t('Add skill')}</DialogTitle>
       <DialogContent>
-        <Grid container spacing={2} sx={{ mt: 1 }}>
+        <Grid container spacing={1} sx={{ mt: 1 }}>
           <Grid size={4}>
             <Typography variant="subtitle1" sx={{ mb: 1 }}>
-              {t('category')}
+              {t('Skill category')}
             </Typography>
-            <Box sx={{ display: 'flex' }}>
-              <ToggleButtonGroup
-                orientation="vertical"
-                value={selectedCategoryId}
-                exclusive
-                onChange={(_event, newCategoryId) => setSelectedCategoryId(newCategoryId)}
-                fullWidth
-                size="small"
-                aria-label="skill-categories"
-              >
-                {filteredCategories.map((c) => (
-                  <ToggleButton key={c.id} value={c.id} aria-label={c.id} sx={{ justifyContent: 'flex-start' }}>
-                    {t(c.id)}
-                  </ToggleButton>
-                ))}
-              </ToggleButtonGroup>
-            </Box>
+            <SelectionList
+              value={selectedCategory}
+              options={availableCategories}
+              onChange={(value: any) => setSelectedCategory(value)}
+              formatter={(value: any) => t(value.id as string)}
+            />
           </Grid>
           <Grid size={4}>
             <Typography variant="subtitle1" sx={{ mb: 1 }}>
-              {t('skill')}
+              {t('Skill')}
             </Typography>
-            {selectedCategoryId ? (
-              <Box sx={{ display: 'flex' }}>
-                <ToggleButtonGroup
-                  orientation="vertical"
-                  value={selectedSkill?.id ?? null}
-                  exclusive
-                  onChange={(_event, newSkillId) => {
-                    const skill = filteredSkills.find((s) => s.id === newSkillId) ?? null;
-                    setSelectedSkill(skill);
-                  }}
-                  fullWidth
-                  size="small"
-                  aria-label="skills"
-                >
-                  {filteredSkills.map((s) => (
-                    <ToggleButton key={s.id} value={s.id} aria-label={s.id} sx={{ justifyContent: 'flex-start' }}>
-                      {t(s.id)}
-                      {s.specialization && <EditSquareIcon sx={{ ml: 1, fontSize: '0.8em' }} />}
-                    </ToggleButton>
-                  ))}
-                </ToggleButtonGroup>
-              </Box>
+            {selectedCategory ? (
+              <SelectionList
+                value={selectedSkill}
+                options={availableSkills}
+                onChange={(value: any) => setSelectedSkill(value as Skill)}
+                formatter={(value: any) => {
+                  return (
+                    <>
+                      {t(value.id)}
+                      {value.specialization && <EditSquareIcon sx={{ ml: 1, fontSize: '0.8em' }} />}
+                    </>
+                  );
+                }}
+              />
             ) : (
               <Typography variant="body2" color="text.secondary">
                 {t('select-skill-category-first')}
@@ -165,29 +148,56 @@ const AddSkillDialog: FC<{
             )}
           </Grid>
           <Grid size={4}>
-            {selectedSkill && selectedSkill.specialization && (
+            {formData?.skillId && availableSpecializations && (
               <>
                 <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                  {t('specialization')}
+                  {t('Specialization')}
                 </Typography>
-
-                <AddSkillSpecialization
-                  skill={selectedSkill}
-                  specialization={selectedSpecialization}
-                  setSpecialization={setSelectedSpecialization}
+                <SelectionList
+                  value={formData.specialization}
+                  options={availableSpecializations}
+                  onChange={(value) => setFormData((prev) => ({ ...prev, specialization: value }))}
+                  formatter={(value: any) => t(value as string)}
                 />
               </>
             )}
           </Grid>
+          {/* {<pre>FormData: {JSON.stringify(formData, null, 2)}</pre>} */}
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>{t('close')}</Button>
-        <Button onClick={onAddSkill} variant="contained" disabled={addSkillDisabled()}>
-          {t('add')}
+        <Button onClick={handleClose}>{t('Cancel')}</Button>
+        <Button onClick={onAddSkill} variant="contained" disabled={!validFormData}>
+          {t('Add')}
         </Button>
       </DialogActions>
     </Dialog>
+  );
+};
+
+const SelectionList: FC<{
+  value: any;
+  options: any[];
+  onChange: (value: any) => void;
+  formatter: (value: any) => any;
+}> = ({ value, options, onChange, formatter }) => {
+  return (
+    <Box sx={{ display: 'flex' }}>
+      <ToggleButtonGroup
+        orientation="vertical"
+        value={value}
+        exclusive
+        onChange={(_event, skill) => onChange(skill)}
+        size="small"
+        fullWidth
+      >
+        {options.map((s) => (
+          <ToggleButton key={`option-${s.id}`} value={s} sx={{ justifyContent: 'flex-start' }}>
+            {formatter(s)}
+          </ToggleButton>
+        ))}
+      </ToggleButtonGroup>
+    </Box>
   );
 };
 

@@ -1,6 +1,7 @@
 export interface Race {
   id: string;
   name: string;
+  archetype: string;
   sizeId: string;
   stats: Record<string, number>;
   averageHeight: { male: number; female: number };

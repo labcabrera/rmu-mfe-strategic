@@ -1,25 +1,11 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import ViewListIcon from '@mui/icons-material/ViewList';
-import {
-  Box,
-  IconButton,
-  Typography,
-  Card,
-  CardContent,
-  Grid,
-  Stack,
-  ToggleButtonGroup,
-  ToggleButton,
-} from '@mui/material';
+import { Box, ToggleButtonGroup, ToggleButton } from '@mui/material';
+import { CategorySeparator, AddButton } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
-import { useError } from '../../../../ErrorContext';
-import { addSkill } from '../../../api/character';
 import { Character } from '../../../api/character.dto';
 import { Profession } from '../../../api/professions';
-import { AddSkill } from '../../../api/skill.dto';
-import AddButton from '../../../shared/buttons/AddButton';
-import CategorySeparator from '../../../shared/display/CategorySeparator';
 import AddSkillDialog from './AddSkillDialog';
 import CharacterSkillList from './CharacterSkillList';
 import CharacterSkillTable from './CharacterSkillTable';
@@ -28,27 +14,17 @@ const STORAGE_KEY = 'character-display-skill-table';
 
 const CharacterViewSkills: FC<{
   character: Character;
-  setCharacter: React.Dispatch<React.SetStateAction<Character>>;
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   profession?: Profession;
 }> = ({ character, setCharacter, profession }) => {
   const [openAddSkillDialog, setOpenAddSkillDialog] = useState(false);
-  const { showError } = useError();
   const [displaySkillTable, setDisplaySkillTable] = useState<boolean>(() => {
     try {
       return localStorage.getItem(STORAGE_KEY) === 'true';
-    } catch (e) {
+    } catch (ignore) {
       return false;
     }
   });
-
-  const onSkillAdded = (value: AddSkill) => {
-    addSkill(character.id, value)
-      .then((updatedCharacter) => {
-        setCharacter(updatedCharacter);
-        setOpenAddSkillDialog(false);
-      })
-      .catch((error) => showError(error.message));
-  };
 
   const handleViewModeChange = (_e: any, val: string | null) => {
     if (val === null) return;
@@ -61,7 +37,7 @@ const CharacterViewSkills: FC<{
 
   return (
     <>
-      <CategorySeparator text={t('skills')}>
+      <CategorySeparator text={t('Skills')}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
           <AddButton onClick={() => setOpenAddSkillDialog(true)} />
           <ToggleButtonGroup
@@ -89,8 +65,8 @@ const CharacterViewSkills: FC<{
       <AddSkillDialog
         open={openAddSkillDialog}
         character={character}
+        setCharacter={setCharacter}
         onClose={() => setOpenAddSkillDialog(false)}
-        onSkillAdded={(value) => onSkillAdded(value)}
       />
     </>
   );

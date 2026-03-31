@@ -12,15 +12,7 @@ const SelectGender = ({ value, onChange, required = false }) => {
   };
 
   return (
-    <TextField
-      select
-      label={t('gender')}
-      value={value}
-      required={required}
-      fullWidth
-      onChange={handleChange}
-      size="small"
-    >
+    <TextField select label={t('Gender')} value={value} required={required} fullWidth onChange={handleChange}>
       {categories.map((c) => (
         <MenuItem key={c} value={c}>
           {t(c)}

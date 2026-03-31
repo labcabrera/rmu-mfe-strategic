@@ -1,9 +1,9 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { RmuBreadcrumbs } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../ErrorContext';
 import { Character } from '../api/character.dto';
-import RmuBreadcrumbs from '../shared/breadcrumbs/RmuBreadcrumbs';
 
 const TradeViewActions: FC<{
   character: Character;

@@ -1,8 +1,8 @@
 import React from 'react';
-import { Grid, TextField, Typography } from '@mui/material';
+import { Grid, TextField } from '@mui/material';
+import { NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { UpdateFactionDto } from '../../api/faction.dto';
-import NumericInput from '../../shared/inputs/NumericInput';
 
 const FactionUpdateAttributes: React.FC<{
   formData: UpdateFactionDto;

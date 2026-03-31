@@ -3,8 +3,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import Snackbar from '@mui/material/Snackbar';
+import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { fetchFactions } from '../../api/faction';
-import RmuTextCard from '../../shared/cards/RmuTextCard';
 import FactionListActions from './FactionListActions';
 
 const FactionList = () => {

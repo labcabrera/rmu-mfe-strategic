@@ -1,8 +1,8 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { Grid, TextField, Typography } from '@mui/material';
+import { NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { UpdateCharacterDto } from '../../api/character.dto';
-import NumericInput from '../../shared/inputs/NumericInput';
 import SelectGender from '../../shared/selects/SelectGender';
 
 const CharacterUpdateAttributes: FC<{

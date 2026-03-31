@@ -1,4 +1,5 @@
-export function toRoman(num: number): string {
+export function toRoman(num: number | null | undefined): string {
+  if (!num) return '';
   if (num <= 0 || num >= 4000) {
     throw new Error('Solo se aceptan números entre 1 y 3999');
   }

@@ -1,12 +1,11 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Grid } from '@mui/material';
-import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { Faction } from '../../api/faction.dto';
-import { StrategicGame } from '../../api/strategic-game.dto';
-import RmuTextCard from '../../shared/cards/RmuTextCard';
+import { gridSizeCard } from '../../services/display';
 
 const StrategicGameViewFactions: FC<{
   factions: Faction[];
@@ -16,17 +15,21 @@ const StrategicGameViewFactions: FC<{
   return (
     <Grid container spacing={1}>
       {factions.map((faction) => (
-        <Grid key={faction.id} size={{ xs: 12, md: 3 }}>
+        <Grid key={faction.id} size={gridSizeCard}>
           <RmuTextCard
             value={faction.name}
             subtitle={faction.shortDescription}
-            image={faction.imageUrl}
+            image={faction.imageUrl || ''}
             onClick={() => navigate(`/strategic/factions/view/${faction.id}`, { state: { faction } })}
           />
         </Grid>
       ))}
       <Grid size={12}>
-        {factions.length === 0 && <Typography variant="body1">{t('not-found-factions')}</Typography>}
+        {factions.length === 0 && (
+          <Typography variant="body1" color="secondary">
+            <em>{t('No factions have been created')}</em>
+          </Typography>
+        )}
       </Grid>
     </Grid>
   );

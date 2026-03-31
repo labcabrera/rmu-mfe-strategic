@@ -4,17 +4,11 @@ import { t } from 'i18next';
 import { Character } from '../api/character.dto';
 
 const options = ['buy', 'sell'];
-
 const communicationOptions = ['normal', 'poor', 'excelent'];
-
 const economyOptions = ['normal', 'poor', 'wealthy', 'barter-economy'];
-
 const population = ['normal', 'lightly-populated', 'heavily-populated'];
-
 const tradeOptions = ['none', 'barter-economy'];
-
 const itemTypes = ['normal', 'inusual', 'especially useful', 'specialty-item', 'expensive', 'very-expensive', 'ilegal'];
-
 const languageOptions = ['none', 'fewer-than-tree-ranks', 'more-than-six-ranks'];
 
 const TradeViewOptions: FC<{

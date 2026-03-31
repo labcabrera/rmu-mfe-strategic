@@ -1,13 +1,12 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { Grid } from '@mui/material';
+import { NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { CreateCharacterDto } from '../../api/character.dto';
-import { Faction } from '../../api/faction.dto';
 import { Profession } from '../../api/professions';
 import { Race } from '../../api/race.dto';
 import NameTextField from '../../shared/inputs/NameTextField';
-import NumericInput from '../../shared/inputs/NumericInput';
-import SelectGender from '../../shared/selects/SelectGender';
+import RmuSelect from '../../shared/selects/RmuSelect';
 import SelectProfession from '../../shared/selects/SelectProfession';
 import SelectRace from '../../shared/selects/SelectRace';
 import SelectRealmType from '../../shared/selects/SelectRealmType';
@@ -15,12 +14,15 @@ import SelectRealmType from '../../shared/selects/SelectRealmType';
 const CharacterCreateResume: FC<{
   formData: CreateCharacterDto;
   setFormData: Dispatch<SetStateAction<CreateCharacterDto>>;
-  setProfession: Dispatch<SetStateAction<Profession | null>>;
-  factions: Faction[];
+  setProfession: Dispatch<SetStateAction<Profession | undefined>>;
+  setSelectedRace: Dispatch<SetStateAction<Race | undefined>>;
+  selectedRace: Race | undefined;
   races: Race[];
-}> = ({ formData, setFormData, setProfession, factions, races }) => {
+  profession: Profession | undefined;
+}> = ({ formData, setFormData, setProfession, setSelectedRace, selectedRace, races, profession }) => {
   const onRaceChange = (race: Race) => {
     if (race) {
+      setSelectedRace(race);
       const stats = { ...formData.statistics };
       const keys = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're', 'sd', 'st'];
       keys.forEach((key) => {
@@ -47,8 +49,8 @@ const CharacterCreateResume: FC<{
 
   const onProfessionChange = (professionId: string, profession: Profession) => {
     let realmType = formData.info.realmType;
-    if (profession && profession.realmType) {
-      realmType = profession.realmType;
+    if (profession && profession.fixedRealmTypes && profession.fixedRealmTypes.length === 1) {
+      realmType = profession.fixedRealmTypes[0];
     }
     setFormData((prevState) => ({
       ...prevState,
@@ -68,37 +70,31 @@ const CharacterCreateResume: FC<{
     }));
   };
 
-  const onNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prevState) => ({ ...prevState, name: e.target.value }));
-  };
-
-  const updateField = (field: string, value: any) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      [field]: value,
-    }));
-  };
-
   if (!races) return <p>Loading...</p>;
 
   return (
-    <Grid container spacing={2} mt={5}>
+    <Grid container spacing={1} mt={5}>
       <Grid size={12}>
-        <SelectRace label={t('race')} value={formData.info.raceId} onChange={onRaceChange} races={races} />
+        <SelectRace label={t('Race')} value={formData.info.raceId} onChange={onRaceChange} races={races} />
       </Grid>
       <Grid size={12}>
-        <SelectProfession value={formData.info.professionId} onChange={onProfessionChange} />
+        <SelectProfession value={formData.info.professionId} onChange={(e, p) => onProfessionChange(e, p)} />
       </Grid>
       <Grid size={12}>
         <NameTextField
-          label={t('name')}
+          label={t('Name')}
           value={formData.name}
-          onChange={onNameChange}
-          generateRandomRaceValue={formData.info.raceName}
+          gender={formData.roleplay.gender}
+          onChange={(e) => setFormData({ ...formData, name: e })}
+          generateRandomRaceValue={selectedRace?.archetype ?? ''}
         />
       </Grid>
       <Grid size={12}>
-        <SelectRealmType value={formData.info.realmType} onChange={(e) => handleRealmTypeChange(e.target.value)} />
+        <SelectRealmType
+          profession={profession}
+          value={formData.info.realmType}
+          onChange={(e) => handleRealmTypeChange(e.target.value)}
+        />
       </Grid>
       <Grid size={12}>
         <NumericInput
@@ -108,11 +104,12 @@ const CharacterCreateResume: FC<{
           onChange={(value) => setFormData((prev) => ({ ...prev, level: value! }))}
           integer
           allowNegatives={false}
+          error={!formData.level}
         />
       </Grid>
       <Grid size={12}>
         <NumericInput
-          label={t('height')}
+          label={t('Height')}
           name="height"
           value={formData.info.height}
           onChange={(value) => setFormData((prev) => ({ ...prev, info: { ...prev.info, height: value! } }))}
@@ -121,7 +118,7 @@ const CharacterCreateResume: FC<{
       </Grid>
       <Grid size={12}>
         <NumericInput
-          label={t('weight')}
+          label={t('Weight')}
           name="weight"
           value={formData.info.weight}
           onChange={(value) => setFormData((prev) => ({ ...prev, info: { ...prev.info, weight: value! } }))}
@@ -130,8 +127,10 @@ const CharacterCreateResume: FC<{
         />
       </Grid>
       <Grid size={12}>
-        <SelectGender
+        <RmuSelect
           value={formData.roleplay.gender}
+          label={t('Gender')}
+          options={['male', 'female', 'other']}
           onChange={(value: string) =>
             setFormData((prev) => ({ ...prev, roleplay: { ...prev.roleplay, gender: value } }))
           }
@@ -139,7 +138,7 @@ const CharacterCreateResume: FC<{
       </Grid>
       <Grid size={12}>
         <NumericInput
-          label={t('age')}
+          label={t('Age')}
           name="age"
           value={formData.roleplay.age}
           onChange={(value) => setFormData((prev) => ({ ...prev, roleplay: { ...prev.roleplay, age: value! } }))}

@@ -1,12 +1,12 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Grid, Box, Typography, Pagination } from '@mui/material';
+import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
 import { fetchStrategicGamesPaged } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import RmuTextCard from '../../shared/cards/RmuTextCard';
+import { gridSizeMain, gridSizeResume, gridSizeCard } from '../../services/display';
 import StrategicGameListActions from './StrategicGameListActions';
-import StrategicGameListResume from './StrategicGameListResume';
 
 const pageSize = 24;
 
@@ -41,18 +41,15 @@ const StrategicGameList: FC = () => {
     <>
       <StrategicGameListActions />
       <Grid container spacing={1}>
-        <Grid size={2} sx={{ display: { xs: 'none', md: 'block' } }}>
-          <StrategicGameListResume />
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 8 }}>
+        <Grid size={gridSizeResume}></Grid>
+        <Grid size={gridSizeMain}>
           <Grid container spacing={1}>
-            {strategicGames.map((game) => (
-              <Grid key={game.id} size={{ xs: 12, md: 3 }}>
+            {strategicGames.map((game, index) => (
+              <Grid key={index} size={gridSizeCard}>
                 <RmuTextCard
                   value={game.name}
                   subtitle={game.realmName}
-                  image={game.imageUrl || undefined}
+                  image={game.imageUrl || ''}
                   onClick={() => navigate(`/strategic/games/view/${game.id}`, { state: { game } })}
                 />
               </Grid>
@@ -68,9 +65,6 @@ const StrategicGameList: FC = () => {
             <Box display="flex" justifyContent="center" mt={5}>
               <Pagination count={totalPages} page={page + 1} onChange={onPageChange} color="primary" />
             </Box>
-          </Grid>
-          <Grid size={12} sx={{ display: { xs: 'block', md: 'none' } }}>
-            <StrategicGameListResume />
           </Grid>
         </Grid>
       </Grid>

@@ -1,12 +1,13 @@
 import React, { FC, useState } from 'react';
-import { Box, CardMedia, Typography, Stack, Tooltip } from '@mui/material';
+import { Box, CardMedia, Stack, Tooltip } from '@mui/material';
 import { t } from 'i18next';
 import { Character, CharacterItem } from '../../../api/character.dto';
+import { imageBaseUrl } from '../../../services/config';
+import { itemFilter } from '../../../services/display';
 import CharacterEquipmentDialog from './CharacterEquipmentDialog';
 
-const imageBaseUrl = process.env.RMU_MFE_ASSETS!;
 const slots = ['mainHand', 'offHand', 'head', 'body', 'arms', 'legs'];
-const SLOT_SIZE = 150;
+const SLOT_SIZE = 100;
 
 const CharacterViewEquipment: FC<{
   character: Character;
@@ -34,7 +35,7 @@ const CharacterViewEquipment: FC<{
 
   return (
     <>
-      <Stack direction="row" spacing={2} flexWrap="wrap" alignItems="flex-start">
+      <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="flex-start">
         {slots.map((s) => {
           const item = getItemForSlot(s);
           return (
@@ -48,13 +49,10 @@ const CharacterViewEquipment: FC<{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderRadius: 1,
-                boxShadow: 3,
-                bgcolor: 'background.paper',
               }}
               title={t(s)}
             >
-              <Tooltip title={item ? item.name : t('no-item-equipped')} arrow>
+              <Tooltip title={item ? item.name : t('No item equipped')} arrow>
                 <CardMedia
                   component="img"
                   image={
@@ -63,7 +61,12 @@ const CharacterViewEquipment: FC<{
                       : `${imageBaseUrl}images/items/no-item.png`
                   }
                   alt={item ? item.name : t('empty')}
-                  sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 1 }}
+                  sx={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    filter: itemFilter,
+                  }}
                 />
               </Tooltip>
             </Box>

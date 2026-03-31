@@ -3,6 +3,7 @@ import { apiStrategicGameUrl } from './../services/config';
 import { buildErrorFromResponse } from './api-errors';
 import { AddItemDto, AddTraitDto, Character, CharacterTrait } from './character.dto';
 import { AddSkill } from './skill.dto';
+import { DeleteTraitDto } from './trait.dto';
 
 export async function fetchCharacter(characterId: string): Promise<Character> {
   const url = `${apiStrategicGameUrl}/characters/${characterId}`;
@@ -112,8 +113,14 @@ export async function levelDownSkill(
   return await response.json();
 }
 
-export async function setUpProfessionalSkill(characterId: string, skillId: string, types: string[]): Promise<any> {
-  const url = `${apiStrategicGameUrl}/characters/${characterId}/skills/${skillId}/professional`;
+export async function setUpProfessionalSkill(
+  characterId: string,
+  skillId: string,
+  specialization: string | undefined,
+  types: string[]
+): Promise<any> {
+  const specializationQuery = specialization ? `?specialization=${specialization}` : '';
+  const url = `${apiStrategicGameUrl}/characters/${characterId}/skills/${skillId}/professional${specializationQuery}`;
   const response = await fetch(url, {
     method: 'PUT',
     headers: mergeJsonHeaders(),
@@ -236,12 +243,12 @@ export async function addTrait(characterId: string, addTraitDto: AddTraitDto): P
   return await response.json();
 }
 
-export async function deleteTrait(characterId: string, characterTrait: CharacterTrait): Promise<Character> {
+export async function deleteTrait(characterId: string, dto: DeleteTraitDto): Promise<Character> {
   const url = `${apiStrategicGameUrl}/characters/${characterId}/traits`;
   const response = await fetch(url, {
     method: 'DELETE',
     headers: mergeJsonHeaders(),
-    body: JSON.stringify({ traitId: characterTrait.traitId, tier: characterTrait.specialization }),
+    body: JSON.stringify(dto),
   });
   if (response.status !== 200) {
     throw await buildErrorFromResponse(response, url);

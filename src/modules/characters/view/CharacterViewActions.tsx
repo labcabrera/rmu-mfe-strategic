@@ -1,7 +1,5 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
-import UploadIcon from '@mui/icons-material/Upload';
 import {
   Button,
   Dialog,
@@ -10,18 +8,21 @@ import {
   DialogContentText,
   DialogTitle,
   IconButton,
+  Tooltip,
 } from '@mui/material';
+import {
+  RmuBreadcrumbs,
+  RefreshButton,
+  EditButton,
+  DeleteButton,
+  DeleteDialog,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacter, deleteCharacter, levelUpCharacter } from '../../api/character';
 import { Character } from '../../api/character.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import RmuBreadcrumbs from '../../shared/breadcrumbs/RmuBreadcrumbs';
-import DeleteButton from '../../shared/buttons/DeleteButton';
-import EditButton from '../../shared/buttons/EditButton';
 import LevelUpButton from '../../shared/buttons/LevelUpButton';
-import RefreshButton from '../../shared/buttons/RefreshButton';
-import DeleteDialog from '../../shared/dialogs/DeleteDialog';
 
 const CharacterViewActions: FC<{
   character: Character;
@@ -35,7 +36,8 @@ const CharacterViewActions: FC<{
   const levelUpAvailable = character.experience.level < character.experience.availableLevel;
   const breadcrumbs = [
     { name: t('Strategic'), link: '/strategic' },
-    { name: t('Game'), link: `/strategic/games/view/${game.id}` },
+    { name: t('Faction'), link: `/strategic/factions/view/${character.faction.id}` },
+    { name: t('Character') },
   ];
 
   const onRefresh = () => {

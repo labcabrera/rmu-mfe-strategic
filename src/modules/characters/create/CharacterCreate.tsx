@@ -1,8 +1,8 @@
 import React, { useState, useEffect, FC } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import OutboundIcon from '@mui/icons-material/Outbound';
-import { Grid, Accordion, AccordionSummary, AccordionDetails, IconButton, Box, Button, TextField } from '@mui/material';
+import { Grid, IconButton, Box, Button, TextField, Badge } from '@mui/material';
+import { CategorySeparator, EditableAvatar, RefreshButton, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { CreateCharacterDto } from '../../api/character.dto';
@@ -13,12 +13,11 @@ import { fetchRaces } from '../../api/race';
 import { Race } from '../../api/race.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
-import { CHARACTER_CREATION_TEMPLATE } from '../../data/character-create';
+import { characterCreationTemplate, defaultStats } from '../../data/character-create';
 import { imageBaseUrl } from '../../services/config';
+import { gridSizeResume, gridSizeMain } from '../../services/display';
+import { getAvatarImages } from '../../services/image-service';
 import { randomizeStats } from '../../services/randomize-stats';
-import EditableAvatar from '../../shared/avatars/EditableAvatar';
-import RefreshButton from '../../shared/buttons/RefreshButton';
-import CategorySeparator from '../../shared/display/CategorySeparator';
 import CharacterViewStatsChart from '../view/CharacterViewStatsChart';
 import CharacterCreateActions from './CharacterCreateActions';
 import CharacterCreateBoostOptionsDialog from './CharacterCreateBoostOptionsDialog';
@@ -40,28 +39,21 @@ export interface StatBonusFormData {
 }
 
 const CharacterCreate: FC = () => {
+  const { showError } = useError();
+
   const [searchParams] = useSearchParams();
   const gameId = searchParams.get('gameId');
   const factionId = searchParams.get('factionId');
   const [faction, setFaction] = useState<Faction | null>(null);
-  const { showError } = useError();
+
   const [game, setGame] = useState<StrategicGame | null>(null);
+  const [profession, setProfession] = useState<Profession>();
   const [races, setRaces] = useState<Race[]>([]);
+  const [selectedRace, setSelectedRace] = useState<Race>();
+
   const [factions, setFactions] = useState<Faction[]>([]);
-  const [formData, setFormData] = useState<CreateCharacterDto>(CHARACTER_CREATION_TEMPLATE);
-  const [statBonusFormData, setStatBonusFormData] = useState<StatBonusFormData>({
-    ag: { potential: 0, temporary: 0 },
-    co: { potential: 0, temporary: 0 },
-    em: { potential: 0, temporary: 0 },
-    in: { potential: 0, temporary: 0 },
-    me: { potential: 0, temporary: 0 },
-    pr: { potential: 0, temporary: 0 },
-    qu: { potential: 0, temporary: 0 },
-    re: { potential: 0, temporary: 0 },
-    sd: { potential: 0, temporary: 0 },
-    st: { potential: 0, temporary: 0 },
-  });
-  const [profession, setProfession] = useState<Profession | null>(null);
+  const [formData, setFormData] = useState<CreateCharacterDto>(characterCreationTemplate);
+  const [statBonusFormData, setStatBonusFormData] = useState<StatBonusFormData>(defaultStats);
   const [boosts, setBoosts] = useState<number>(game?.powerLevel.statCreationBoost || 2);
   const [swaps, setSwaps] = useState<number>(game?.powerLevel.statCreationSwap || 2);
   const [isValid, setIsValid] = useState<boolean>(false);
@@ -81,6 +73,7 @@ const CharacterCreate: FC = () => {
     if (!formData.info?.professionId) valid = false;
     if (!formData.info?.realmType) valid = false;
     if (!formData.info?.weight) valid = false;
+    if (!formData.level) valid = false;
     setIsValid(valid);
   };
 
@@ -142,27 +135,32 @@ const CharacterCreate: FC = () => {
       <CharacterCreateActions formData={formData} game={game} faction={faction} isValid={isValid} />
 
       <Grid container spacing={1}>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeResume}>
           <EditableAvatar
             imageUrl={formData.imageUrl || defaultImage}
             onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl })}
+            images={getAvatarImages()}
           />
           <CharacterCreateResume
             formData={formData}
             setFormData={setFormData}
             setProfession={setProfession}
-            factions={factions}
+            selectedRace={selectedRace}
             races={races}
+            setSelectedRace={setSelectedRace}
+            profession={profession}
           />
         </Grid>
 
-        <Grid size={{ xs: 12, md: 8 }}>
+        <Grid size={gridSizeMain}>
           <CategorySeparator text={t('stats')}>
             <Box sx={{ display: 'flex', gap: 1 }}>
               <RefreshButton onClick={onRandomStats} />
-              <IconButton onClick={() => setBoostDialogOpen(true)} color="primary">
-                <OutboundIcon />
-              </IconButton>
+              <Badge badgeContent={2} color="success">
+                <IconButton onClick={() => setBoostDialogOpen(true)} color="primary">
+                  <OutboundIcon />
+                </IconButton>
+              </Badge>
             </Box>
           </CategorySeparator>
 
@@ -175,7 +173,7 @@ const CharacterCreate: FC = () => {
             </Grid>
           </Grid>
 
-          <CategorySeparator text={t('weapon-development-order')} />
+          <CategorySeparator text={t('Weapon development order')} />
           <Grid size={12}>
             <CharacterCreateSortCombat items={formData.weaponDevelopment || []} onChange={handleWeaponOrderChange} />
           </Grid>
@@ -183,9 +181,9 @@ const CharacterCreate: FC = () => {
           {profession && (
             <Grid size={12}>
               <>
-                <CategorySeparator text={t('skill-development-costs')} />
+                <CategorySeparator text={t('Skill development costs')} />
                 <CharacterCreateSkillCosts profession={profession} />
-                <CategorySeparator text={t('professional-skills')} />
+                <CategorySeparator text={t('Professional skills')} />
                 <CharacterCreateProfessionalSkills profession={profession} />
               </>
             </Grid>
@@ -194,7 +192,7 @@ const CharacterCreate: FC = () => {
           <CategorySeparator text={t('lore')} />
           <Grid size={12}>
             <TextField
-              label={t('description')}
+              label={t('Description')}
               name="description"
               value={formData.description}
               onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
@@ -204,12 +202,11 @@ const CharacterCreate: FC = () => {
             />
           </Grid>
 
-          <Accordion sx={{ mt: 5 }}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>debug</AccordionSummary>
-            <AccordionDetails>
-              <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{JSON.stringify(formData, null, 2)}</pre>
-            </AccordionDetails>
-          </Accordion>
+          <Grid size={12} mt={2}>
+            <TechnicalInfo>
+              <pre>{JSON.stringify(formData, null, 2)}</pre>
+            </TechnicalInfo>
+          </Grid>
         </Grid>
       </Grid>
 

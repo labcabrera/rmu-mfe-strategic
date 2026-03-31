@@ -83,10 +83,10 @@ const CharacterCreateStats: FC<{
       <TableHead>
         <TableRow>
           <TableCell align="left">Stat</TableCell>
-          <TableCell align="right">{t('potential')}</TableCell>
-          <TableCell align="right">{t('potential-bonus')}</TableCell>
-          <TableCell align="right">{t('temporary')}</TableCell>
-          <TableCell align="right">{t('temporary-bonus')}</TableCell>
+          <TableCell align="right">{t('potential-short')}</TableCell>
+          <TableCell align="right">{t('potential-bonus-short')}</TableCell>
+          <TableCell align="right">{t('temporary-short')}</TableCell>
+          <TableCell align="right">{t('temporary-bonus-short')}</TableCell>
           <TableCell align="right">{t('racial')}</TableCell>
           <TableCell align="right">{t('total')}</TableCell>
         </TableRow>

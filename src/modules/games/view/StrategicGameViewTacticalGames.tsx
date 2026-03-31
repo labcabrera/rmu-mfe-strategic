@@ -1,9 +1,10 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Grid, Typography } from '@mui/material';
+import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { TacticalGame } from '../../api/tactical-games';
-import RmuTextCard from '../../shared/cards/RmuTextCard';
+import { gridSizeCard } from '../../services/display';
 
 const StrategicGameViewTacticalGames: FC<{
   tacticalGames: TacticalGame[];
@@ -13,7 +14,7 @@ const StrategicGameViewTacticalGames: FC<{
   return (
     <Grid container spacing={1}>
       {tacticalGames.map((tacticalGame) => (
-        <Grid key={tacticalGame.id} size={{ xs: 12, md: 3 }}>
+        <Grid key={tacticalGame.id} size={gridSizeCard}>
           <RmuTextCard
             value={tacticalGame.name}
             subtitle={tacticalGame.shortDescription}
@@ -25,7 +26,11 @@ const StrategicGameViewTacticalGames: FC<{
         </Grid>
       ))}
       <Grid size={12}>
-        {tacticalGames.length === 0 && <Typography variant="body1">{t('not-found-tactical-games')}</Typography>}
+        {tacticalGames.length === 0 && (
+          <Typography variant="body1" color="secondary">
+            <em>{t('No tactical games have been created')}</em>
+          </Typography>
+        )}
       </Grid>
     </Grid>
   );

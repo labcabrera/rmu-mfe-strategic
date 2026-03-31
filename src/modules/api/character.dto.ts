@@ -25,7 +25,37 @@ export interface Character {
   imageUrl: string | undefined;
 }
 
-export interface CreateCharacterDto extends Omit<Character, 'id'> {}
+export interface CreateCharacterDto {
+  id: string;
+  gameId: string;
+  faction: NamedId;
+  name: string;
+  info: CreateCharacterInfoDto;
+  roleplay: CharacterRoleplay;
+  level: number;
+  statistics: CharacterStatistics;
+  resistances: CharacterResistance[];
+  hp: CharacterHP;
+  movement: CharacterMovement;
+  initiative: CharacterInitiative;
+  defense: CharacterDefense;
+  skills: CharacterSkill[];
+  items: CharacterItem[];
+  equipment: CharacterEquipment;
+  attacks: CharacterAttack[];
+  traits: CharacterTrait[];
+  weaponDevelopment: string[];
+  description: string | undefined;
+  imageUrl: string | undefined;
+}
+
+export interface CreateCharacterInfoDto {
+  raceId: string;
+  professionId: string;
+  realmType: string;
+  height: number;
+  weight: number;
+}
 
 export interface CharacterDefense {
   defensiveBonus: number;
@@ -140,12 +170,12 @@ export interface CharacterEquipment {
   head: string | undefined;
   arms: string | undefined;
   legs: string | undefined;
-  weight: number | undefined;
-  weightAllowance: number | undefined;
-  encumbrancePenalty?: number;
-  baseManeuverPenalty: number | undefined;
-  maneuverPenalty?: number;
-  rangedPenalty?: number;
+  weight: number;
+  weightAllowance: number;
+  encumbrancePenalty: number;
+  baseManeuverPenalty: number;
+  maneuverPenalty: number;
+  rangedPenalty: number;
   perceptionPenalty?: number;
   movementBaseDifficulty?: string | undefined;
 }
@@ -154,26 +184,43 @@ export interface CharacterItem {
   id: string;
   name: string;
   itemTypeId: string;
-  category?: string;
+  category: string;
   weapon?: WeaponInfo;
   armor?: ArmorInfo;
-  info: any;
+  info: CharacterItemInfo;
   amount?: number;
   carried: boolean;
 }
 
+export interface CharacterItemInfo {
+  strength: number;
+  length: number;
+  weight: number;
+  cost: number;
+}
+
 export interface WeaponMode {
   type: string;
+  attackTable: string;
+  fumbleTable: string;
+  sizeAdjustment: number;
 }
 
 export interface WeaponInfo {
+  skillId: string;
   fumble: string;
   sizeAdjustment: string;
   modes: WeaponMode[];
 }
 
 export interface ArmorInfo {
+  at: number;
   slot: string;
+  enc: number;
+  maneuver: number;
+  rangedPenalty: number;
+  perception: number;
+  baseDifficulty: string;
 }
 
 export interface Stat {
@@ -212,8 +259,10 @@ export interface AddItemDto {
   itemTypeId: string;
   amount?: number;
   weight?: number;
+  length?: number;
   weightPercent?: number;
   strength?: number;
+  fumble?: number;
   cost?: number;
 }
 

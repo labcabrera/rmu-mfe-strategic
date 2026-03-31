@@ -1,6 +1,5 @@
 export function getBearerToken(): string | null {
   try {
-    console.debug('Attempting to retrieve auth token from globalThis.RMU_AUTH');
     const auth = (globalThis as any).RMU_AUTH;
     if (!auth) {
       console.warn('RMU_AUTH is not defined on globalThis');
@@ -11,8 +10,6 @@ export function getBearerToken(): string | null {
       console.warn('Current RMU_AUTH value:', auth);
       return null;
     }
-    console.debug('Auth token retrieved successfully');
-    console.debug('Token value (truncated):', auth.token.substring(0, 10) + '...');
     // Prefer explicit token field
     return auth.token ?? null;
   } catch (e) {

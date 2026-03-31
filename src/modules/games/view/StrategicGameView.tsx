@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
+import { CategorySeparator, AddButton, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchFactions } from '../../api/faction';
@@ -8,8 +9,7 @@ import { Faction } from '../../api/faction.dto';
 import { fetchStrategicGame } from '../../api/strategic-game';
 import { StrategicGame } from '../../api/strategic-game.dto';
 import { fetchTacticalGames, TacticalGame } from '../../api/tactical-games';
-import AddButton from '../../shared/buttons/AddButton';
-import CategorySeparator from '../../shared/display/CategorySeparator';
+import { gridSizeMain, gridSizeResume } from '../../services/display';
 import StrategicGameViewActions from './StrategicGameViewActions';
 import StrategicGameViewAttributes from './StrategicGameViewAttributes';
 import StrategicGameViewFactions from './StrategicGameViewFactions';
@@ -61,22 +61,25 @@ const StrategicGameView: React.FC = () => {
     <>
       <StrategicGameViewActions strategicGame={strategicGame} setStrategicGame={setStrategicGame} />
       <Grid container spacing={1}>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeResume}>
           <StrategicGameViewResume strategicGame={strategicGame} setStrategicGame={setStrategicGame} />
         </Grid>
-        <Grid size={{ xs: 12, md: 8 }}>
-          <CategorySeparator text={t('options')} />
+        <Grid size={gridSizeMain}>
+          <CategorySeparator text={t('Pptions')} />
           <StrategicGameViewAttributes strategicGame={strategicGame} />
-          <CategorySeparator text={t('power-level')} />
+          <CategorySeparator text={t('Power level')} />
           <StrategicGameViewPowerLevel strategicGame={strategicGame} />
-          <CategorySeparator text={t('factions')}>
+          <CategorySeparator text={t('Factions')}>
             <AddButton onClick={onCreateFaction} />
           </CategorySeparator>
           <StrategicGameViewFactions factions={factions} />
-          <CategorySeparator text={t('tactical-games')}>
+          <CategorySeparator text={t('Tactical games')}>
             <AddButton onClick={onCreateTacticalGame} />
           </CategorySeparator>
           <StrategicGameViewTacticalGames tacticalGames={tacticalGames} />
+          <TechnicalInfo>
+            <pre>StrategicGame: {JSON.stringify(strategicGame, null, 2)}</pre>
+          </TechnicalInfo>
         </Grid>
       </Grid>
     </>

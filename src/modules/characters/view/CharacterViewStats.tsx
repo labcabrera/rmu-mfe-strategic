@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { CategorySeparator } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { Character, STATS } from '../../api/character.dto';
 
@@ -11,9 +12,7 @@ const CharacterViewStats: FC<{
 
   return (
     <>
-      <Typography variant="h6" color="primary">
-        {t('statistics')}
-      </Typography>
+      <CategorySeparator text={t('Statistics')} />
       <Paper sx={{ width: 'fit-content', padding: 2 }}>
         <Table sx={{ minWidth: 650, maxWidth: 800 }} aria-label="stats table">
           <TableHead
@@ -26,8 +25,8 @@ const CharacterViewStats: FC<{
           >
             <TableRow>
               <TableCell align="left">Stat</TableCell>
-              <TableCell align="right">{t('potential')}</TableCell>
-              <TableCell align="right">{t('temporary')}</TableCell>
+              <TableCell align="right">{t('potential-short')}</TableCell>
+              <TableCell align="right">{t('temporary-short')}</TableCell>
               <TableCell align="right">{t('bonus')}</TableCell>
               <TableCell align="right">{t('racial')}</TableCell>
               <TableCell align="right">{t('custom')}</TableCell>

@@ -1,18 +1,19 @@
 import React, { FC, useEffect, useState } from 'react';
 import { Grid } from '@mui/material';
+import { EditableAvatar, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
 import { fetchRealms } from '../../api/realm';
 import { Realm } from '../../api/realm.dto';
-import { CreateStrategicGameDto, gameCreateTemplate } from '../../api/strategic-game.dto';
-import EditableAvatar from '../../shared/avatars/EditableAvatar';
-import TechnicalInfo from '../../shared/display/TechnicalInfo';
+import { CreateStrategicGameDto, CREATE_GAME_TEMPLATE } from '../../api/strategic-game.dto';
+import { gridSizeResume, gridSizeMain } from '../../services/display';
+import { DEFAULT_REALM_IMAGE, getAvatarImages } from '../../services/image-service';
+import StrategicGameForm from '../shared/StrategicGameForm';
 import StrategicGameCreateActions from './StrategicGameCreateActions';
-import StrategicGameCreateAttributes from './StrategicGameCreateAttributes';
 
 const StrategicGameCreate: FC = () => {
   const { showError } = useError();
   const [realms, setRealms] = useState<Realm[]>([]);
-  const [formData, setFormData] = useState<CreateStrategicGameDto>(gameCreateTemplate);
+  const [formData, setFormData] = useState<CreateStrategicGameDto>(CREATE_GAME_TEMPLATE);
   const [isValid, setIsValid] = useState<boolean>(false);
 
   const validateForm = (formData: CreateStrategicGameDto) => {
@@ -34,15 +35,16 @@ const StrategicGameCreate: FC = () => {
   return (
     <>
       <StrategicGameCreateActions formData={formData} isValid={isValid} />
-      <Grid container spacing={5}>
-        <Grid size={{ xs: 12, md: 2 }}>
+      <Grid container spacing={1}>
+        <Grid size={gridSizeResume}>
           <EditableAvatar
-            imageUrl={formData.imageUrl || ''}
+            imageUrl={formData.imageUrl || DEFAULT_REALM_IMAGE}
             onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl })}
+            images={getAvatarImages()}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 8 }}>
-          <StrategicGameCreateAttributes formData={formData} setFormData={setFormData} realms={realms} />
+        <Grid size={gridSizeMain}>
+          <StrategicGameForm formData={formData} setFormData={setFormData} realms={realms} />
           <TechnicalInfo>
             <pre>{JSON.stringify(formData, null, 2)}</pre>
           </TechnicalInfo>

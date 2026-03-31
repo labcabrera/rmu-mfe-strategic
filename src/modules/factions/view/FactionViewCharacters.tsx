@@ -1,12 +1,11 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box } from '@mui/material';
 import Grid from '@mui/material/Grid';
+import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { Character } from '../../api/character.dto';
 import { Faction } from '../../api/faction.dto';
-import CharacterCard from '../../shared/cards/CharacterCard';
-import RmuTextCard from '../../shared/cards/RmuTextCard';
+import { gridSizeCard } from '../../services/display';
 
 const FactionViewCharacters: FC<{
   faction: Faction;
@@ -19,7 +18,7 @@ const FactionViewCharacters: FC<{
   return (
     <Grid container spacing={1}>
       {characters.map((character) => (
-        <Grid key={character.id} size={{ xs: 12, md: 3 }}>
+        <Grid key={character.id} size={gridSizeCard}>
           <RmuTextCard
             value={character.name}
             subtitle={`${character.info.race.name} - ${t(character.info.professionId)} - ${character.experience.availableLevel}`}
@@ -28,7 +27,7 @@ const FactionViewCharacters: FC<{
           />
         </Grid>
       ))}
-      <Grid size={12}>{characters.length === 0 && <p>{t('not-found-characters')}</p>}</Grid>
+      <Grid size={12}>{characters.length === 0 && <p>{t('No characters have been created')}</p>}</Grid>
     </Grid>
   );
 };
