@@ -3,13 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import { Grid, Typography } from '@mui/material';
 import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
+import { Faction } from '../../api/faction.dto';
 import { TacticalGame } from '../../api/tactical-games';
+import { imageBaseUrl } from '../../services/config';
 import { gridSizeCard } from '../../services/display';
 
 const StrategicGameViewTacticalGames: FC<{
   tacticalGames: TacticalGame[];
-}> = ({ tacticalGames }) => {
+  factions: Faction[];
+}> = ({ tacticalGames, factions }) => {
   const navigate = useNavigate();
+
+  const getFactionNames = (tacticalGame: TacticalGame) => {
+    if (!tacticalGame.factions || tacticalGame.factions.length === 0) {
+      return t('No factions added');
+    }
+    return tacticalGame.factions.map((e) => factions.find((f) => f.id == e)?.name).join(', ');
+  };
 
   return (
     <Grid container spacing={1}>
@@ -17,8 +27,8 @@ const StrategicGameViewTacticalGames: FC<{
         <Grid key={tacticalGame.id} size={gridSizeCard}>
           <RmuTextCard
             value={tacticalGame.name}
-            subtitle={tacticalGame.shortDescription}
-            image={tacticalGame.imageUrl}
+            subtitle={getFactionNames(tacticalGame)}
+            image={tacticalGame.imageUrl || `${imageBaseUrl}images/generic/tactical.png`}
             onClick={() =>
               navigate(`/tactical/games/view/${tacticalGame.id}`, { state: { tacticalGame: tacticalGame } })
             }

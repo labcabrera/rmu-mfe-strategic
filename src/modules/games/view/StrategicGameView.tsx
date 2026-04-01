@@ -76,7 +76,7 @@ const StrategicGameView: React.FC = () => {
           <CategorySeparator text={t('Tactical games')}>
             <AddButton onClick={onCreateTacticalGame} />
           </CategorySeparator>
-          <StrategicGameViewTacticalGames tacticalGames={tacticalGames} />
+          <StrategicGameViewTacticalGames tacticalGames={tacticalGames} factions={factions} />
           <TechnicalInfo>
             <pre>StrategicGame: {JSON.stringify(strategicGame, null, 2)}</pre>
           </TechnicalInfo>
