@@ -17,7 +17,7 @@ const CharacterCreateActions: FC<{
   const navigate = useNavigate();
   const { showError } = useError();
 
-  if (!game || !faction) return <p>Loading character actions...</p>;
+  if (!game || !faction) return <p>Loading...</p>;
 
   const breadcrumbs = [
     { name: t('strategic'), link: '/strategic' },

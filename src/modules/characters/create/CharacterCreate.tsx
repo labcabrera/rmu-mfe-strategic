@@ -6,6 +6,7 @@ import { CategorySeparator, EditableAvatar, RefreshButton, TechnicalInfo } from 
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { CreateCharacterDto } from '../../api/character.dto';
+import { fetchFaction, fetchFactions } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
 import { Profession } from '../../api/professions';
 import { fetchRaces } from '../../api/race';
@@ -110,14 +111,18 @@ const CharacterCreate: FC = () => {
 
   useEffect(() => {
     if (factionId) {
-      setFormData((prevState) => ({
-        ...prevState,
-        factionId: factionId,
-      }));
+      fetchFaction(factionId)
+        .then((response) => {
+          setFaction(response);
+          setFormData((prevState) => ({ ...prevState, factionId: factionId }));
+        })
+        .catch((err) => showError(err.message));
     }
   }, [factionId]);
 
-  if (!game || !formData || !faction) return <div>Loading...</div>;
+  if (!game || !formData) return <div>Loading....</div>;
+
+  // if (!game || !formData || !faction) return <div>Loading....</div>;
 
   return (
     <>
