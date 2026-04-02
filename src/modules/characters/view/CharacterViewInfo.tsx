@@ -1,6 +1,6 @@
-import React, { FC, use } from 'react';
+import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Badge, Box, Grid, Tooltip, Typography } from '@mui/material';
+import { Badge, Grid, Tooltip, Typography } from '@mui/material';
 import { CategorySeparator, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { Character, STATS } from '../../api/character.dto';
@@ -8,6 +8,7 @@ import { StrategicGame } from '../../api/strategic-game.dto';
 import { imageBaseUrl } from '../../services/config';
 
 const grayscale = 0.7;
+export const gridSizeCard = { xs: 10, sm: 5, md: 5, lg: 3, xl: 2 } as const;
 
 const CharacterViewInfo: FC<{
   strategicGame: StrategicGame;
@@ -46,7 +47,7 @@ const CharacterViewInfo: FC<{
     <>
       <CategorySeparator text={t('Character')} />
       <Grid container spacing={1} columns={10}>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <RmuTextCard
             value={strategicGame.name}
             subtitle={t('Game')}
@@ -55,7 +56,7 @@ const CharacterViewInfo: FC<{
             grayscale={grayscale}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <RmuTextCard
             value={character.faction.name}
             subtitle={t('Faction')}
@@ -64,7 +65,7 @@ const CharacterViewInfo: FC<{
             grayscale={grayscale}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <RmuTextCard
             value={character.info.race.name}
             subtitle={t('Race')}
@@ -73,7 +74,7 @@ const CharacterViewInfo: FC<{
             grayscale={grayscale}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <RmuTextCard
             value={t(character.info.professionId)}
             subtitle={t('Profession')}
@@ -82,7 +83,7 @@ const CharacterViewInfo: FC<{
             grayscale={grayscale}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <Badge
             color="success"
             badgeContent={`+${character.experience.availableLevel - character.experience.level}`}
@@ -102,7 +103,7 @@ const CharacterViewInfo: FC<{
       <CategorySeparator text={t('General info')} />
 
       <Grid container spacing={1} columns={10}>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <RmuTextCard
             value={t(character.info.realmType)}
             subtitle={t('Realm')}
@@ -110,7 +111,7 @@ const CharacterViewInfo: FC<{
             grayscale={grayscale}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <RmuTextCard
             value={t(`size-${character.info.sizeId}`)}
             subtitle={t('Size')}
@@ -118,7 +119,7 @@ const CharacterViewInfo: FC<{
             grayscale={grayscale}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <RmuTextCard
             value={`${character.info.height}'`}
             subtitle={t('Height')}
@@ -126,7 +127,7 @@ const CharacterViewInfo: FC<{
             grayscale={grayscale}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <RmuTextCard
             value={`${character.info.weight} lbs`}
             subtitle={t('Weight')}
@@ -134,7 +135,7 @@ const CharacterViewInfo: FC<{
             grayscale={grayscale}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <Badge
             color="error"
             badgeContent={character.hp.max}
@@ -154,15 +155,15 @@ const CharacterViewInfo: FC<{
       <CategorySeparator text={t('Experience')} />
 
       <Grid container spacing={1} columns={10}>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <RmuTextCard
-            value={character.experience.xp}
+            value={new Intl.NumberFormat('en-US').format(character.experience.xp)}
             subtitle={t('xp')}
             image={`${imageBaseUrl}images/generic/experience.png`}
             grayscale={grayscale}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <Badge
             color="success"
             badgeContent={`+${character.experience.availableDevelopmentPoints}`}
@@ -183,19 +184,13 @@ const CharacterViewInfo: FC<{
 
       <Grid container spacing={1} columns={10}>
         {STATS.map((stat) => (
-          <Grid key={stat} size={{ xs: 12, md: 2 }}>
+          <Grid key={stat} size={gridSizeCard}>
             <RmuTextCard
               key={stat}
               value={character.statistics[stat].totalBonus}
               subtitle={t(stat)}
               image={`${imageBaseUrl}images/generic/stat-${stat}.png`}
-              color={
-                character.statistics[stat].totalBonus === 0
-                  ? undefined
-                  : character.statistics[stat].totalBonus > 0
-                    ? 'success'
-                    : 'error'
-              }
+              applyColor={true}
               grayscale={grayscale}
             />
           </Grid>
@@ -205,22 +200,16 @@ const CharacterViewInfo: FC<{
       <CategorySeparator text={t('Defense')} />
 
       <Grid container spacing={1} columns={10}>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <RmuTextCard
             value={character.defense.defensiveBonus}
             subtitle={t('Defensive bonus')}
             image={`${imageBaseUrl}images/generic/defensive-bonus.png`}
-            color={
-              character.defense.defensiveBonus === 0
-                ? undefined
-                : character.defense.defensiveBonus > 0
-                  ? 'success'
-                  : 'error'
-            }
             grayscale={grayscale}
+            applyColor
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <RmuTextCard
             value={getArmorType()}
             subtitle={t('Armor type')}
@@ -233,7 +222,7 @@ const CharacterViewInfo: FC<{
       <CategorySeparator text={t('Movement')} />
 
       <Grid container spacing={1} columns={10}>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <Tooltip
             title={
               <React.Fragment>
@@ -254,7 +243,7 @@ const CharacterViewInfo: FC<{
             </div>
           </Tooltip>
         </Grid>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <RmuTextCard
             value={character.movement.strideRacialBonus}
             subtitle={t('Stride racial bonus')}
@@ -262,7 +251,7 @@ const CharacterViewInfo: FC<{
             grayscale={grayscale}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <RmuTextCard
             value={character.movement.strideQuBonus}
             subtitle={t('Stride stat bonus')}
@@ -275,49 +264,31 @@ const CharacterViewInfo: FC<{
       <CategorySeparator text={t('initiative')} />
 
       <Grid container spacing={1} columns={10}>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <RmuTextCard
             value={character.initiative.totalBonus}
             subtitle={t('Initiative total bonus')}
             image={`${imageBaseUrl}images/generic/initiative.png`}
             grayscale={grayscale}
-            color={
-              character.initiative.totalBonus === 0
-                ? undefined
-                : character.initiative.totalBonus > 0
-                  ? 'success'
-                  : 'error'
-            }
+            applyColor
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <RmuTextCard
             value={character.initiative.baseBonus}
             subtitle={t('Initiative base bonus')}
             image={`${imageBaseUrl}images/generic/initiative.png`}
             grayscale={grayscale}
-            color={
-              character.initiative.baseBonus === 0
-                ? undefined
-                : character.initiative.baseBonus > 0
-                  ? 'success'
-                  : 'error'
-            }
+            applyColor
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 2 }}>
+        <Grid size={gridSizeCard}>
           <RmuTextCard
             value={character.initiative.customBonus}
             subtitle={t('Initiative custom bonus')}
             image={`${imageBaseUrl}images/generic/initiative.png`}
             grayscale={grayscale}
-            color={
-              character.initiative.customBonus === 0
-                ? undefined
-                : character.initiative.customBonus > 0
-                  ? 'success'
-                  : 'error'
-            }
+            applyColor
           />
         </Grid>
       </Grid>
@@ -333,7 +304,7 @@ const CharacterViewInfo: FC<{
               subtitle={t(resistance.resistance)}
               image={getResistanceImage(resistance.resistance)}
               grayscale={grayscale}
-              color={resistance.totalBonus === 0 ? undefined : resistance.totalBonus > 0 ? 'success' : 'error'}
+              applyColor
             />
           </Grid>
         ))}

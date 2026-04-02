@@ -10,6 +10,7 @@ import TurnedInIcon from '@mui/icons-material/TurnedIn';
 import TurnedInNotIcon from '@mui/icons-material/TurnedInNot';
 import {
   Box,
+  ButtonGroup,
   IconButton,
   Paper,
   Stack,
@@ -21,6 +22,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import { DeleteButton } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../../api/character';
@@ -39,16 +41,9 @@ const CharacterSkillTable: FC<{
   const currentProfessionalSkills = character.skills.filter((s) => s.professional?.includes('professional')).length;
 
   return (
-    <Paper sx={{ width: '100%' }}>
-      <Table size="small" sx={{ minWidth: 900 }} aria-label="character skills table">
-        <TableHead
-          sx={{
-            '& .MuiTableCell-root': {
-              color: 'primary.main',
-              fontWeight: 'bold',
-            },
-          }}
-        >
+    <Paper>
+      <Table size="small">
+        <TableHead>
           <TableRow>
             <TableCell align="left">{t('Skill')}</TableCell>
             <TableCell align="left">
@@ -298,45 +293,39 @@ const CharacterViewSkillsEntry: FC<{
         {skill.totalBonus}
       </TableCell>
       <TableCell align="left">
-        <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center">
-          <Box>
-            <IconButton onClick={handleLevelUp} disabled={isLevelUpDisabled()} color="primary">
-              <ArrowCircleUpIcon />
-            </IconButton>
-            <IconButton onClick={handleLevelDown} disabled={isLevelDownDisabled()} color="primary">
-              <ArrowCircleDownIcon />
-            </IconButton>
-            {!isDeletedDisabled() && (
-              <IconButton onClick={() => handleDeleteSkill(skill)} color="primary">
-                <DeleteForeverIcon />
-              </IconButton>
-            )}
-            {isAvailableProfessionSkill(skill) && (
-              <>
-                <Tooltip title={t('Professional skill')}>
-                  <IconButton
-                    aria-label="set-professional"
-                    onClick={() => handleSetUpProfessionalSkill(skill)}
-                    disabled={!isProfessional && currentProfessionalSkills >= maxProfessionalSkills}
-                    color="primary"
-                  >
-                    {isProfessional ? <TurnedInIcon /> : <TurnedInNotIcon />}
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title={t('Knack skill')}>
-                  <IconButton
-                    aria-label="set-knack"
-                    onClick={() => handleSetUpKnackSkill(skill)}
-                    color="primary"
-                    disabled={!isKnack && currentKnackSkills >= maxKnackSkills}
-                  >
-                    {isKnack ? <StarIcon /> : <StarBorderIcon />}
-                  </IconButton>
-                </Tooltip>
-              </>
-            )}
-          </Box>
-        </Stack>
+        <ButtonGroup>
+          <IconButton onClick={handleLevelUp} disabled={isLevelUpDisabled()} color="primary">
+            <ArrowCircleUpIcon />
+          </IconButton>
+          <IconButton onClick={handleLevelDown} disabled={isLevelDownDisabled()} color="primary">
+            <ArrowCircleDownIcon />
+          </IconButton>
+          <DeleteButton onClick={() => handleDeleteSkill(skill)} disabled={isDeletedDisabled()} />
+          {isAvailableProfessionSkill(skill) && (
+            <>
+              <Tooltip title={t('Professional skill')}>
+                <IconButton
+                  aria-label="set-professional"
+                  onClick={() => handleSetUpProfessionalSkill(skill)}
+                  disabled={!isProfessional && currentProfessionalSkills >= maxProfessionalSkills}
+                  color="primary"
+                >
+                  {isProfessional ? <TurnedInIcon /> : <TurnedInNotIcon />}
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t('Knack skill')}>
+                <IconButton
+                  aria-label="set-knack"
+                  onClick={() => handleSetUpKnackSkill(skill)}
+                  color="primary"
+                  disabled={!isKnack && currentKnackSkills >= maxKnackSkills}
+                >
+                  {isKnack ? <StarIcon /> : <StarBorderIcon />}
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
+        </ButtonGroup>
       </TableCell>
     </TableRow>
   );

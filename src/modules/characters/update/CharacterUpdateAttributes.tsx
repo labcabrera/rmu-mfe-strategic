@@ -11,7 +11,7 @@ const CharacterUpdateAttributes: FC<{
 }> = ({ formData, setFormData }) => {
   return (
     <Grid container spacing={2}>
-      <Grid size={12}>
+      <Grid size={{ xs: 12, md: 4 }}>
         <TextField
           label={t('name')}
           name="name"
@@ -21,9 +21,10 @@ const CharacterUpdateAttributes: FC<{
           fullWidth
         />
       </Grid>
+      <Grid size={12}></Grid>
       <Grid size={{ xs: 12, md: 2 }}>
         <NumericInput
-          label={t('height')}
+          label={t('Height')}
           name="height"
           value={formData.info?.height || 0}
           onChange={(e) => setFormData({ ...formData, info: { ...formData.info, height: e } })}
@@ -41,7 +42,6 @@ const CharacterUpdateAttributes: FC<{
           maxFractionDigits={2}
         />
       </Grid>
-      <Grid size={12}></Grid>
       <Grid size={{ xs: 12, md: 2 }}>
         <NumericInput
           label={t('age')}
@@ -66,7 +66,7 @@ const CharacterUpdateAttributes: FC<{
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           multiline
-          rows={18}
+          rows={6}
         />
       </Grid>
     </Grid>

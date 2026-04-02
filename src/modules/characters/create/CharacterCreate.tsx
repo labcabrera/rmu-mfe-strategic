@@ -6,7 +6,6 @@ import { CategorySeparator, EditableAvatar, RefreshButton, TechnicalInfo } from 
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { CreateCharacterDto } from '../../api/character.dto';
-import { fetchFactions } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
 import { Profession } from '../../api/professions';
 import { fetchRaces } from '../../api/race';
@@ -51,18 +50,13 @@ const CharacterCreate: FC = () => {
   const [races, setRaces] = useState<Race[]>([]);
   const [selectedRace, setSelectedRace] = useState<Race>();
 
-  const [factions, setFactions] = useState<Faction[]>([]);
   const [formData, setFormData] = useState<CreateCharacterDto>(characterCreationTemplate);
   const [statBonusFormData, setStatBonusFormData] = useState<StatBonusFormData>(defaultStats);
-  const [boosts, setBoosts] = useState<number>(game?.powerLevel.statCreationBoost || 2);
-  const [swaps, setSwaps] = useState<number>(game?.powerLevel.statCreationSwap || 2);
   const [isValid, setIsValid] = useState<boolean>(false);
   const [boostDialogOpen, setBoostDialogOpen] = useState<boolean>(false);
 
   const onRandomStats = () => {
     randomizeStats(setFormData, setStatBonusFormData);
-    setBoosts(game?.powerLevel.statCreationBoost || 2);
-    setSwaps(game?.powerLevel.statCreationSwap || 2);
   };
 
   const checkValidForm = (formData: CreateCharacterDto) => {
@@ -78,16 +72,11 @@ const CharacterCreate: FC = () => {
   };
 
   const bindStrategicGame = () => {
-    if (!gameId) return;
-    fetchStrategicGame(gameId)
-      .then((game) => setGame(game))
-      .catch((err) => showError(err.message));
-    fetchFactions(`gameId==${gameId}`, 0, 20)
-      .then((factions) => {
-        setFactions(factions);
-        setFaction(factions.find((f) => f.id === factionId) || null);
-      })
-      .catch((err) => showError(err.message));
+    if (gameId) {
+      fetchStrategicGame(gameId)
+        .then((game) => setGame(game))
+        .catch((err) => showError(err.message));
+    }
   };
 
   const handleWeaponOrderChange = (newOrder: string[]) => {
@@ -153,15 +142,13 @@ const CharacterCreate: FC = () => {
         </Grid>
 
         <Grid size={gridSizeMain}>
-          <CategorySeparator text={t('stats')}>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <RefreshButton onClick={onRandomStats} />
-              <Badge badgeContent={2} color="success">
-                <IconButton onClick={() => setBoostDialogOpen(true)} color="primary">
-                  <OutboundIcon />
-                </IconButton>
-              </Badge>
-            </Box>
+          <CategorySeparator text={t('Stats')}>
+            <RefreshButton onClick={onRandomStats} />
+            <Badge badgeContent={2} color="success">
+              <IconButton onClick={() => setBoostDialogOpen(true)} color="primary">
+                <OutboundIcon />
+              </IconButton>
+            </Badge>
           </CategorySeparator>
 
           <Grid container spacing={1}>

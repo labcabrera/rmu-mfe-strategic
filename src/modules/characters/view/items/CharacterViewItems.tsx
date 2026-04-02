@@ -61,7 +61,7 @@ const CharacterViewItems: FC<{
         </Grid>
 
         <Grid size={12}>
-          <CategorySeparator text={t('Carried')} />
+          <CategorySeparator text={t('Items')} />
         </Grid>
 
         <Grid size={{ xs: 12, md: 6 }}>
