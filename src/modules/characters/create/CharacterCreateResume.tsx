@@ -87,7 +87,7 @@ const CharacterCreateResume: FC<{
           label={t('Name')}
           value={formData.name}
           gender={formData.roleplay.gender}
-          onChange={(e) => setFormData({ ...formData, name: e })}
+          onChange={(value: string) => setFormData((prev) => ({ ...prev, name: value }))}
           generateRandomRaceValue={selectedRace?.archetype ?? ''}
         />
       </Grid>

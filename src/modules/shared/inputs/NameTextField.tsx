@@ -32,7 +32,7 @@ const NameTextField: FC<NameTextFieldProps> = ({
       <TextField
         label={label}
         value={value}
-        onChange={onChange as any}
+        onChange={(e) => onChange((e.target as HTMLInputElement).value)}
         fullWidth
         error={required && !value}
         size="small"
