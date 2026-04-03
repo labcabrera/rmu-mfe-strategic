@@ -8,7 +8,7 @@ import { StrategicGame } from '../../api/strategic-game.dto';
 import { imageBaseUrl } from '../../services/config';
 
 const grayscale = 0.7;
-export const gridSizeCard = { xs: 10, sm: 5, md: 5, lg: 3, xl: 2 } as const;
+const gridSizeCard = { xs: 10, sm: 5, md: 5, lg: 3, xl: 2 } as const;
 
 const CharacterViewInfo: FC<{
   strategicGame: StrategicGame;

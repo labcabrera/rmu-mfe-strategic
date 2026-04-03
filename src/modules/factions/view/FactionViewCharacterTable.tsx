@@ -31,6 +31,13 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
     return `${c.defense.armor.headAt}/${c.defense.armor.bodyAt}/${c.defense.armor.armsAt}/${c.defense.armor.legsAt}`;
   };
 
+  const getExperienceLabel = (c: Character): string => {
+    if (c.experience.level < c.experience.availableLevel) {
+      return `${c.experience.level} (${c.experience.availableLevel})`;
+    }
+    return `${c.experience.level}`;
+  };
+
   return (
     <TableContainer component={Paper} sx={{ width: '100%' }}>
       <Table size="small" aria-label="faction characters table">
@@ -70,7 +77,7 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
                 </Tooltip>
               </TableCell>
               <TableCell>{c.info?.race?.name}</TableCell>
-              <TableCell align="right">{c.experience?.level ?? '-'}</TableCell>
+              <TableCell align="right">{getExperienceLabel(c)}</TableCell>
               <TableCell>{t(c.info?.professionId || '')}</TableCell>
               <TableCell>{getAttackDescription(c)}</TableCell>
               <TableCell>{c.defense.defensiveBonus}</TableCell>

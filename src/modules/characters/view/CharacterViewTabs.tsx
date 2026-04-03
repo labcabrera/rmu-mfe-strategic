@@ -111,7 +111,6 @@ const CharacterViewTabs: FC<{
 
       <CustomTabPanel value={value} index={8}>
         <pre>Character: {JSON.stringify(character, null, 2)}</pre>
-        <pre>Profession: {JSON.stringify(profession, null, 2)}</pre>
       </CustomTabPanel>
     </Box>
   );

@@ -4,7 +4,7 @@ import { RmuBreadcrumbs, SaveButton } from '@labcabrera-rmu/rmu-react-shared-lib
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { createCharacter } from '../../api/character';
-import { CreateCharacterDto } from '../../api/character.dto';
+import { Character, CreateCharacterDto } from '../../api/character.dto';
 import { Faction } from '../../api/faction.dto';
 import { StrategicGame } from '../../api/strategic-game.dto';
 
@@ -24,7 +24,7 @@ const CharacterCreateActions: FC<{
     { name: t('games'), link: '/strategic/games' },
     { name: game.name, link: `/strategic/games/view/${game.id}` },
     { name: faction.name, link: `/strategic/factions/view/${faction.id}` },
-    { name: t('character-creation') },
+    { name: t('Character creation') },
   ];
 
   const onCreate = async () => {
