@@ -53,11 +53,13 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
             <TableCell>{t('name')}</TableCell>
             <TableCell>{t('race')}</TableCell>
             <TableCell align="right">{t('level')}</TableCell>
+            <TableCell align="right">HP</TableCell>
             <TableCell>{t('profession')}</TableCell>
             <TableCell>{t('attacks')}</TableCell>
-            <TableCell>{t('DB')}</TableCell>
-            <TableCell>{t('AT')}</TableCell>
-            <TableCell align="right">HP</TableCell>
+            <TableCell align="right">{t('DB')}</TableCell>
+            <TableCell align="right">{t('AT')}</TableCell>
+            <TableCell align="right">{t('BMR')}</TableCell>
+            <TableCell align="right">{t('M.Pen')}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -78,11 +80,23 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
               </TableCell>
               <TableCell>{c.info?.race?.name}</TableCell>
               <TableCell align="right">{getExperienceLabel(c)}</TableCell>
+              <TableCell align="right">
+                {c.hp.current === c.hp.max ? c.hp.max : `${c.hp.current}/${c.hp.max}`}
+              </TableCell>
               <TableCell>{t(c.info?.professionId || '')}</TableCell>
               <TableCell>{getAttackDescription(c)}</TableCell>
-              <TableCell>{c.defense.defensiveBonus}</TableCell>
-              <TableCell>{getArmorDescription(c)}</TableCell>
-              <TableCell align="right">{c.hp ? `${c.hp.current}/${c.hp.max}` : '-'}</TableCell>
+              <TableCell align="right">
+                <Typography color={c.defense.defensiveBonus < 0 ? 'error' : 'success'}>
+                  {c.defense.defensiveBonus}
+                </Typography>
+              </TableCell>
+              <TableCell align="right">{getArmorDescription(c)}</TableCell>
+              <TableCell align="right">{c.movement.baseMovementRate}</TableCell>
+              <TableCell align="right">
+                <Typography color={c.equipment.maneuverPenalty < 0 ? 'error' : 'success'}>
+                  {c.equipment.maneuverPenalty}
+                </Typography>
+              </TableCell>
             </TableRow>
           ))}
           {characters.length === 0 && (
