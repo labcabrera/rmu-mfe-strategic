@@ -95,7 +95,7 @@ const FactionView: FC = () => {
 
           <CategorySeparator text={t('Faction')} />
 
-          <FactionViewAttributes faction={faction} />
+          <FactionViewAttributes faction={faction} characters={characters} />
 
           <CategorySeparator text={t('Characters')}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>

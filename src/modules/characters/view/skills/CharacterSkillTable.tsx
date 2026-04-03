@@ -54,24 +54,11 @@ const CharacterSkillTable: FC<{
               </Tooltip>
             </TableCell>
             <TableCell align="left">Stats</TableCell>
-            <TableCell align="right">
-              <Tooltip title={t('Development cost')}>
-                <Typography variant="body2">
-                  <b>Dev</b>
-                </Typography>
-              </Tooltip>
-            </TableCell>
+
             <TableCell align="right">
               <Tooltip title={t('Developed ranks')}>
                 <Typography variant="body2">
                   <b>{t('Ranks')}</b>
-                </Typography>
-              </Tooltip>
-            </TableCell>
-            <TableCell align="left">
-              <Tooltip title={t('Developed ranks')}>
-                <Typography variant="body2">
-                  <b>{t('Dev Ranks')}</b>
                 </Typography>
               </Tooltip>
             </TableCell>
@@ -105,6 +92,20 @@ const CharacterSkillTable: FC<{
             </TableCell>
             <TableCell align="right">Custom</TableCell>
             <TableCell align="right">Total</TableCell>
+            <TableCell align="right">
+              <Tooltip title={t('Development cost')}>
+                <Typography variant="body2">
+                  <b>Dev</b>
+                </Typography>
+              </Tooltip>
+            </TableCell>
+            <TableCell align="left">
+              <Tooltip title={t('Developed ranks')}>
+                <Typography variant="body2">
+                  <b>{t('Dev Ranks')}</b>
+                </Typography>
+              </Tooltip>
+            </TableCell>
             <TableCell align="left">
               <Tooltip title={t('Development points available / total')}>
                 <Typography variant="subtitle2">
@@ -236,24 +237,11 @@ const CharacterViewSkillsEntry: FC<{
         {skill.specialization ? t(skill.specialization) : '-'}
       </TableCell>
       <TableCell align="left">{getStatistics(skill)}</TableCell>
-      <TableCell align="right">{skill.development?.join(' / ') || '-'}</TableCell>
+
       <TableCell align="right">
         <Typography variant="body2" display="inline">
-          {skill.ranks}
+          <b>{skill.ranks}</b>
         </Typography>
-      </TableCell>
-      <TableCell align="right">
-        <Stack direction="row" spacing={0}>
-          {Array.from({ length: 3 }, (_, idx) => idx + 1).map((rank) => (
-            <Box key={rank} component="span" sx={{ display: 'inline-flex', mx: 0, p: 0 }}>
-              {rank <= skill.ranksDeveloped ? (
-                <SquareIcon sx={{ mx: 0, p: 0 }} fontSize="small" />
-              ) : (
-                <CropSquareIcon sx={{ mx: 0, p: 0 }} fontSize="small" />
-              )}
-            </Box>
-          ))}
-        </Stack>
       </TableCell>
       <TableCell
         align="right"
@@ -291,6 +279,20 @@ const CharacterViewSkillsEntry: FC<{
         }}
       >
         {skill.totalBonus}
+      </TableCell>
+      <TableCell align="right">{skill.development?.join(' / ') || '-'}</TableCell>
+      <TableCell align="right">
+        <Stack direction="row" spacing={0}>
+          {Array.from({ length: 3 }, (_, idx) => idx + 1).map((rank) => (
+            <Box key={rank} component="span" sx={{ display: 'inline-flex', mx: 0, p: 0 }}>
+              {rank <= skill.ranksDeveloped ? (
+                <SquareIcon sx={{ mx: 0, p: 0 }} fontSize="small" />
+              ) : (
+                <CropSquareIcon sx={{ mx: 0, p: 0 }} fontSize="small" />
+              )}
+            </Box>
+          ))}
+        </Stack>
       </TableCell>
       <TableCell align="left">
         <ButtonGroup>
