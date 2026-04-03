@@ -58,6 +58,7 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
             <TableCell>{t('attacks')}</TableCell>
             <TableCell align="right">{t('DB')}</TableCell>
             <TableCell align="right">{t('AT')}</TableCell>
+            <TableCell align="right">{t('Ini')}</TableCell>
             <TableCell align="right">{t('BMR')}</TableCell>
             <TableCell align="right">{t('M.Pen')}</TableCell>
           </TableRow>
@@ -91,6 +92,11 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
                 </Typography>
               </TableCell>
               <TableCell align="right">{getArmorDescription(c)}</TableCell>
+              <TableCell align="right">
+                <Typography color={c.initiative.totalBonus < 0 ? 'error' : 'success'}>
+                  {c.initiative.totalBonus}
+                </Typography>
+              </TableCell>
               <TableCell align="right">{c.movement.baseMovementRate}</TableCell>
               <TableCell align="right">
                 <Typography color={c.equipment.maneuverPenalty < 0 ? 'error' : 'success'}>
