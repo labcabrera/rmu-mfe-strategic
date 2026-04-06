@@ -19,8 +19,8 @@ export interface CreateFactionDto extends Omit<Faction, 'id'> {}
 export interface UpdateFactionDto extends Partial<Omit<Faction, 'id'>> {}
 
 export const EMPTY_FACTION: CreateFactionDto = {
-  gameId: null,
-  name: null,
+  gameId: '',
+  name: '',
   management: {
     availableGold: 100,
     availableXP: 200000,
