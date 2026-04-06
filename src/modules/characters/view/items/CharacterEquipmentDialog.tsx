@@ -16,7 +16,7 @@ import { equipItem, unequipItem } from '../../../api/character';
 import { Character } from '../../../api/character.dto';
 import { StrategicItem } from '../../../api/strategic-item.dto';
 import { imageBaseUrl } from '../../../services/config';
-import { itemFilter, itemFilterDisabled } from '../../../services/display';
+import { itemFilter } from '../../../services/display';
 
 const imageSize = 100;
 
@@ -41,6 +41,7 @@ const CharacterEquipmentDialog: FC<{
   };
 
   const getSlotOptions = (character: Character, s: string): StrategicItem[] => {
+    console.log(s, items);
     if (s === 'mainHand') {
       return items.filter((e) => e.category === 'weapon');
     } else if (s === 'offHand') {

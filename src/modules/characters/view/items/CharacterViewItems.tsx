@@ -115,6 +115,7 @@ const CharacterViewItems: FC<{
           <CharacterItemDetail
             character={character}
             setCharacter={setCharacter}
+            items={characterItems}
             itemId={selectedItem?.id || undefined}
           />
         </Grid>

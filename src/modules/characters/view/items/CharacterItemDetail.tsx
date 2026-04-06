@@ -13,6 +13,7 @@ const CharacterItemDetail: FC<{
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
 }> = ({ itemId, character, items, setCharacter }) => {
   if (!itemId) return null;
+  if (!items) return <p>Loading...</p>;
 
   const item = items.find((i) => i.id == itemId)!;
 
