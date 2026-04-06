@@ -41,7 +41,6 @@ const CharacterEquipmentDialog: FC<{
   };
 
   const getSlotOptions = (character: Character, s: string): StrategicItem[] => {
-    console.log(s, items);
     if (s === 'mainHand') {
       return items.filter((e) => e.category === 'weapon');
     } else if (s === 'offHand') {
