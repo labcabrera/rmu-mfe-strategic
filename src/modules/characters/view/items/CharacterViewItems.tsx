@@ -13,6 +13,7 @@ import CharacterItemDetail from './CharacterItemDetail';
 import CharacterItemTable from './CharacterItemTable';
 import CharacterViewEquipment from './CharacterViewEquipment';
 import CharacterViewEquipmentInfo from './CharacterViewEquipmentInfo';
+import CharacterViewTransferGold from './CharacterViewTransferGold';
 
 const CharacterViewItems: FC<{
   character: Character;
@@ -127,6 +128,10 @@ const CharacterViewItems: FC<{
             items={characterItems}
             itemId={selectedItem?.id || undefined}
           />
+        </Grid>
+
+        <Grid size={12}>
+          <CharacterViewTransferGold character={character} setCharacter={setCharacter} items={characterItems} />
         </Grid>
 
         <Grid size={12}>

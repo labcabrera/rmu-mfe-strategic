@@ -4,7 +4,6 @@ import { CategorySeparator, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shar
 import { t } from 'i18next';
 import { Character } from '../../../api/character.dto';
 import { StrategicItem } from '../../../api/strategic-item.dto';
-import CharacterViewTransferGold from '../CharacterViewTransferGold';
 
 const CharacterItemDetail: FC<{
   character: Character;
@@ -71,12 +70,6 @@ const CharacterItemDetail: FC<{
                 <KeyValueEntry label={t('Encumbrance')} value={item.armor.enc} />
               </Grid>
             </>
-          )}
-
-          {item.itemTypeId === 'gold-coin' && (
-            <Grid size={12}>
-              <CharacterViewTransferGold character={character} setCharacter={setCharacter} />
-            </Grid>
           )}
 
           <Grid size={12}>

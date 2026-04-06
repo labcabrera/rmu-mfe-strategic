@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 import { Box, CardMedia, Stack, Tooltip } from '@mui/material';
 import { t } from 'i18next';
-import { Character, CharacterItem } from '../../../api/character.dto';
+import { Character } from '../../../api/character.dto';
 import { StrategicItem } from '../../../api/strategic-item.dto';
 import { imageBaseUrl } from '../../../services/config';
 import { itemFilter } from '../../../services/display';

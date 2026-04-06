@@ -1,20 +1,24 @@
 import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { Button, Stack } from '@mui/material';
-import { NumericInput, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Button, Stack, Typography } from '@mui/material';
+import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
-import { useError } from '../../../ErrorContext';
-import { transferFactionGold } from '../../api/character';
-import { Character } from '../../api/character.dto';
-import { fetchFaction } from '../../api/faction';
-import { Faction } from '../../api/faction.dto';
-import { imageBaseUrl } from '../../services/config';
+import { useError } from '../../../../ErrorContext';
+import { transferFactionGold } from '../../../api/character';
+import { Character } from '../../../api/character.dto';
+import { fetchFaction } from '../../../api/faction';
+import { Faction } from '../../../api/faction.dto';
+import { StrategicItem } from '../../../api/strategic-item.dto';
+import { imageBaseUrl } from '../../../services/config';
+
+const goldCoin = 'gold-coin';
 
 const CharacterViewTransferGold: FC<{
   character: Character;
+  items: StrategicItem[];
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
-}> = ({ character, setCharacter }) => {
+}> = ({ character, items, setCharacter }) => {
   const [goldAmount, setGoldAmount] = useState<number>(0);
   const [faction, setFaction] = useState<Faction | null>(null);
   const { showError } = useError();
@@ -27,7 +31,7 @@ const CharacterViewTransferGold: FC<{
 
   useEffect(() => {
     if (character) {
-      const item = character.items.find((item) => item.itemTypeId === 'gold-coin');
+      const item = items.find((item) => item.itemTypeId === goldCoin);
       setGoldAmount(item?.amount || 0);
     }
     fetchFaction(character.faction.id)
@@ -39,7 +43,12 @@ const CharacterViewTransferGold: FC<{
 
   return (
     <Stack direction="row" spacing={1} alignItems="center" mt={2}>
-      <RmuTextCard value={goldAmount} subtitle={t('Character')} image={`${imageBaseUrl}images/generic/coins.png`} />
+      <Stack direction="column">
+        <Typography>{goldAmount}</Typography>
+        <Typography variant="body2" color="secondary">
+          Character
+        </Typography>
+      </Stack>
       <Button onClick={() => handleTransfer(1)} variant="outlined" startIcon={<ChevronLeftIcon />}>
         +1G
       </Button>
@@ -52,11 +61,12 @@ const CharacterViewTransferGold: FC<{
       <Button onClick={() => handleTransfer(-1)} variant="outlined" endIcon={<ChevronRightIcon />}>
         -1G
       </Button>
-      <RmuTextCard
-        value={faction.management.availableGold}
-        subtitle={t('Faction')}
-        image={`${imageBaseUrl}images/generic/coins.png`}
-      />
+      <Stack direction="column">
+        <Typography>{faction.management.availableGold}</Typography>
+        <Typography variant="body2" color="secondary">
+          Faction
+        </Typography>
+      </Stack>
     </Stack>
   );
 };

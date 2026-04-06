@@ -65,7 +65,6 @@ const CharacterViewEquipmentInfo: React.FC<{
                 value={getLabelWeight()}
                 subtitle={t('Carried weight')}
                 image={`${imageBaseUrl}images/generic/carried-weight.png`}
-                color={character.equipment.weight > character.equipment.weightAllowance ? 'error' : undefined}
                 grayscale={grayscale}
               />
             </span>
