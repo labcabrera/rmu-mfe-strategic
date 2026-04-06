@@ -1,8 +1,7 @@
 import React, { FC } from 'react';
 import { Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { CategorySeparator } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CategorySeparator, Character } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
-import { Character } from '../../api/character.dto';
 
 const CharacterViewAttacks: FC<{
   character: Character;
@@ -34,6 +33,7 @@ const CharacterViewAttacks: FC<{
               <TableCell align="left">{t('Size adjustment')}</TableCell>
               <TableCell align="left">{t('Fumble')}</TableCell>
               <TableCell align="left">{t('Offensive bonus')}</TableCell>
+              <TableCell align="left">{t('Melee range')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -48,6 +48,7 @@ const CharacterViewAttacks: FC<{
                 <TableCell align="right" sx={{ color: getColor(row.bo), fontWeight: 'bold' }}>
                   {row.bo}
                 </TableCell>
+                <TableCell align="right">{row.meleeRange ? `${row.meleeRange}'` : '-'}</TableCell>
               </TableRow>
             ))}
           </TableBody>
