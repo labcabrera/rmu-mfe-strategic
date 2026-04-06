@@ -61,7 +61,7 @@ const FactionView: FC = () => {
         .then((data: StrategicGame) => setGame(data))
         .catch((err) => showError(err.message));
       fetchCharacters(`faction.id==${faction.id}`, 0, 100)
-        .then((data: Character[]) => setCharacters(data))
+        .then((data) => setCharacters(data.content))
         .catch((err) => showError(err.message));
     }
   }, [faction]);
