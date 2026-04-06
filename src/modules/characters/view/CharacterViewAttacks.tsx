@@ -1,15 +1,27 @@
 import React, { FC } from 'react';
 import { Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { CategorySeparator, Character } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CategorySeparator, Character, CharacterAttack, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 
 const CharacterViewAttacks: FC<{
   character: Character;
-}> = ({ character }) => {
+  strategicGame: StrategicGame;
+}> = ({ character, strategicGame }) => {
   const getColor = (value: number) => {
     if (value < 0) return 'error.main';
     if (value > 0) return 'success.main';
     return 'inherit';
+  };
+
+  const getMeleeRangeFormated = (attack: CharacterAttack): string => {
+    if (!attack.meleeRange) return '-';
+    if (!strategicGame || !strategicGame.options || !strategicGame.options.boardScaleMultiplier) {
+      return `${attack.meleeRange}'`;
+    } else if (strategicGame.options.boardScaleMultiplier === 1) {
+      return `${attack.meleeRange}'`;
+    }
+    const scaled = Math.round(attack.meleeRange * (strategicGame.options.boardScaleMultiplier || 1) * 10) / 10;
+    return `${attack.meleeRange}' (${scaled}")`;
   };
 
   return (
@@ -48,7 +60,7 @@ const CharacterViewAttacks: FC<{
                 <TableCell align="right" sx={{ color: getColor(row.bo), fontWeight: 'bold' }}>
                   {row.bo}
                 </TableCell>
-                <TableCell align="right">{row.meleeRange ? `${row.meleeRange}'` : '-'}</TableCell>
+                <TableCell align="right">{getMeleeRangeFormated(row)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

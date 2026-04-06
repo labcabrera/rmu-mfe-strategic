@@ -102,7 +102,7 @@ const CharacterViewTabs: FC<{
       </CustomTabPanel>
 
       <CustomTabPanel value={value} index={6}>
-        <CharacterViewAttacks character={character} />
+        <CharacterViewAttacks character={character} strategicGame={strategicGame} />
       </CustomTabPanel>
 
       <CustomTabPanel value={value} index={7}>
