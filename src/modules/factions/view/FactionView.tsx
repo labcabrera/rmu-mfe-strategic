@@ -3,15 +3,20 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import { Box, ToggleButton, ToggleButtonGroup, Grid } from '@mui/material';
-import { CategorySeparator, RmuTextCard, AddButton, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  CategorySeparator,
+  RmuTextCard,
+  AddButton,
+  TechnicalInfo,
+  fetchStrategicGame,
+  StrategicGame,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacters } from '../../api/character';
 import { Character } from '../../api/character.dto';
 import { fetchFaction } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
-import { fetchStrategicGame } from '../../api/strategic-game';
-import { StrategicGame } from '../../api/strategic-game.dto';
 import { gridSizeResume, gridSizeMain, gridSizeCard } from '../../services/display';
 import FactionViewActions from './FactionViewActions';
 import FactionViewAttributes from './FactionViewAttributes';

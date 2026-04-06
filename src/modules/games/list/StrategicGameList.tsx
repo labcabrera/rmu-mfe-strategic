@@ -1,10 +1,8 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Grid } from '@mui/material';
-import { RmuPagination, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { fetchStrategicGames, RmuPagination, RmuTextCard, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
-import { fetchStrategicGamesPaged } from '../../api/strategic-game';
-import { StrategicGame } from '../../api/strategic-game.dto';
 import { gridSizeMain, gridSizeResume, gridSizeCard } from '../../services/display';
 import StrategicGameListActions from './StrategicGameListActions';
 import StrategicGameListSearch from './StrategicGameListSearch';
@@ -20,7 +18,7 @@ const StrategicGameList: FC = () => {
   const totalPages = Math.ceil(totalCount / pageSize);
 
   const bindStrategicGames = () => {
-    fetchStrategicGamesPaged(queryString, page, pageSize)
+    fetchStrategicGames(queryString, page, pageSize)
       .then((response) => {
         setStrategicGames(response.content);
         setTotalCount(response.pagination.totalElements);

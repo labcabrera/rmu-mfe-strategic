@@ -1,12 +1,11 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RmuBreadcrumbs, SaveButton } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { RmuBreadcrumbs, SaveButton, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { createCharacter } from '../../api/character';
-import { Character, CreateCharacterDto } from '../../api/character.dto';
+import { CreateCharacterDto } from '../../api/character.dto';
 import { Faction } from '../../api/faction.dto';
-import { StrategicGame } from '../../api/strategic-game.dto';
 
 const CharacterCreateActions: FC<{
   formData: CreateCharacterDto;

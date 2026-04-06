@@ -1,18 +1,23 @@
 import React, { useState, useEffect, FC } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import OutboundIcon from '@mui/icons-material/Outbound';
-import { Grid, IconButton, Box, Button, TextField, Badge } from '@mui/material';
-import { CategorySeparator, EditableAvatar, RefreshButton, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Grid, IconButton, TextField, Badge } from '@mui/material';
+import {
+  CategorySeparator,
+  EditableAvatar,
+  fetchRaces,
+  fetchStrategicGame,
+  Race,
+  RefreshButton,
+  StrategicGame,
+  TechnicalInfo,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { CreateCharacterDto } from '../../api/character.dto';
-import { fetchFaction, fetchFactions } from '../../api/faction';
+import { fetchFaction } from '../../api/faction';
 import { Faction } from '../../api/faction.dto';
 import { Profession } from '../../api/professions';
-import { fetchRaces } from '../../api/race';
-import { Race } from '../../api/race.dto';
-import { fetchStrategicGame } from '../../api/strategic-game';
-import { StrategicGame } from '../../api/strategic-game.dto';
 import { characterCreationTemplate, defaultStats } from '../../data/character-create';
 import { imageBaseUrl } from '../../services/config';
 import { gridSizeResume, gridSizeMain } from '../../services/display';
@@ -94,7 +99,7 @@ const CharacterCreate: FC = () => {
   useEffect(() => {
     if (game) {
       fetchRaces(`realm.id==${game.realmId}`, 0, 100)
-        .then((data) => setRaces(data))
+        .then((data) => setRaces(data.content))
         .catch((err) => showError(err.message));
     }
   }, [game]);

@@ -14,9 +14,9 @@ import {
   Box,
   Typography,
 } from '@mui/material';
+import { StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { CreateCharacterDto, STATS } from '../../api/character.dto';
-import { StrategicGame } from '../../api/strategic-game.dto';
 import { getStatBonus } from '../../services/stat-service';
 import { StatBonus } from './CharacterCreate';
 import CharacterCreateStatsActions from './CharacterCreateStatsActions';

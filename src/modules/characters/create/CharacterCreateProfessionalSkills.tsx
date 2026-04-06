@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { Chip, Grid, Typography } from '@mui/material';
+import { Chip, Grid } from '@mui/material';
 import { t } from 'i18next';
 import { Profession } from '../../api/professions';
 

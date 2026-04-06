@@ -1,10 +1,14 @@
 import React, { FC, useEffect, useState } from 'react';
 import { Grid } from '@mui/material';
-import { EditableAvatar, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  CREATE_GAME_TEMPLATE,
+  CreateStrategicGameDto,
+  EditableAvatar,
+  fetchRealms,
+  Realm,
+  TechnicalInfo,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
-import { fetchRealms } from '../../api/realm';
-import { Realm } from '../../api/realm.dto';
-import { CreateStrategicGameDto, CREATE_GAME_TEMPLATE } from '../../api/strategic-game.dto';
 import { gridSizeResume, gridSizeMain } from '../../services/display';
 import { DEFAULT_REALM_IMAGE, getAvatarImages } from '../../services/image-service';
 import StrategicGameForm from '../shared/StrategicGameForm';
@@ -25,8 +29,8 @@ const StrategicGameCreate: FC = () => {
   }, [formData]);
 
   useEffect(() => {
-    fetchRealms()
-      .then((data) => setRealms(data))
+    fetchRealms('', 0, 100)
+      .then((data) => setRealms(data.content))
       .catch((err) => showError(err.message));
   }, []);
 

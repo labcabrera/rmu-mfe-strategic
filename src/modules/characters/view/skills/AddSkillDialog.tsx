@@ -12,14 +12,16 @@ import {
   Box,
   Typography,
 } from '@mui/material';
+import {
+  fetchEnumerations,
+  fetchSkillCategories,
+  fetchSkills,
+  SkillCategory,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { addSkill } from '../../../api/character';
 import { Character } from '../../../api/character.dto';
-import { fetchEnumerations } from '../../../api/enumerations';
-import { fetchSkills } from '../../../api/skill';
-import { fetchSkillCategories } from '../../../api/skill-category';
-import { SkillCategory } from '../../../api/skill-category.dto';
 import { AddSkill, Skill } from '../../../api/skill.dto';
 
 const AddSkillDialog: FC<{
@@ -40,14 +42,14 @@ const AddSkillDialog: FC<{
   const [availableSpecializations, setAvailableSpecializations] = useState<string[]>();
 
   const bindSkillCategories = () => {
-    fetchSkillCategories()
+    fetchSkillCategories('', 0, 100)
       .then((data) => setAvailableCategories(data.content))
       .catch((error) => showError(error.message));
   };
 
   const bindSkills = () => {
     if (!selectedCategory) return;
-    fetchSkills(selectedCategory.id)
+    fetchSkills(`categoryId==${selectedCategory}`, 0, 100)
       .then((data) => setAvailableSkills(data.content))
       .catch((error) => showError(error.message));
   };

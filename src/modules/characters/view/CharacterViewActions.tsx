@@ -1,27 +1,18 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import {
   RmuBreadcrumbs,
   RefreshButton,
   EditButton,
   DeleteButton,
   DeleteDialog,
+  StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { fetchCharacter, deleteCharacter, levelUpCharacter } from '../../api/character';
 import { Character } from '../../api/character.dto';
-import { StrategicGame } from '../../api/strategic-game.dto';
 import LevelUpButton from '../../shared/buttons/LevelUpButton';
 
 const CharacterViewActions: FC<{

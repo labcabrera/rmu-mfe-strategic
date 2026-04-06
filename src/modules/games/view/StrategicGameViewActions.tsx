@@ -6,11 +6,12 @@ import {
   EditButton,
   DeleteButton,
   DeleteDialog,
+  StrategicGame,
+  fetchStrategicGame,
+  deleteStrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { fetchStrategicGame, deleteStrategicGame } from '../../api/strategic-game';
-import { StrategicGame } from '../../api/strategic-game.dto';
 
 const StrategicGameViewActions: FC<{
   strategicGame: StrategicGame;
@@ -39,7 +40,7 @@ const StrategicGameViewActions: FC<{
   const onDelete = () => {
     deleteStrategicGame(strategicGame.id)
       .then(() => navigate('/strategic/games'))
-      .catch((err: Error) => showError(err.message));
+      .catch((err) => showError(err.message));
     setDeleteDialogOpen(false);
   };
 

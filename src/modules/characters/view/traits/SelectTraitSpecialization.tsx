@@ -1,7 +1,7 @@
 import React, { useState, useEffect, FC } from 'react';
+import { fetchEnumerations } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
-import { fetchEnumerations } from '../../../api/enumerations';
 import { Trait } from '../../../api/trait.dto';
 import RmuSelect from '../../../shared/selects/RmuSelect';
 

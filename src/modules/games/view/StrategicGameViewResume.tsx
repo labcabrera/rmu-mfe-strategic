@@ -1,11 +1,9 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { Link as RouterLink, useLocation, useParams } from 'react-router-dom';
 import { Link, Typography } from '@mui/material';
-import { EditableAvatar } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { EditableAvatar, StrategicGame, updateStrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { updateStrategicGame } from '../../api/strategic-game';
-import { StrategicGame } from '../../api/strategic-game.dto';
 import { imageBaseUrl } from '../../services/config';
 import { getAvatarImages } from '../../services/image-service';
 
