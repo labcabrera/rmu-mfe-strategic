@@ -271,24 +271,28 @@ const CharacterViewInfo: FC<{
             applyColor
           />
         </Grid>
-        <Grid size={gridSizeCard}>
-          <RmuTextCard
-            value={character.initiative.baseBonus}
-            subtitle={t('Initiative base bonus')}
-            image={`${imageBaseUrl}images/generic/initiative.png`}
-            grayscale={grayscale}
-            applyColor
-          />
-        </Grid>
-        <Grid size={gridSizeCard}>
-          <RmuTextCard
-            value={character.initiative.customBonus}
-            subtitle={t('Initiative custom bonus')}
-            image={`${imageBaseUrl}images/generic/initiative.png`}
-            grayscale={grayscale}
-            applyColor
-          />
-        </Grid>
+        {character.initiative.modifiers && (
+          <>
+            <Grid size={gridSizeCard}>
+              <RmuTextCard
+                value={character.initiative.modifiers['stat'] || 0}
+                subtitle={t('Initiative stat bonus')}
+                image={`${imageBaseUrl}images/generic/initiative.png`}
+                grayscale={grayscale}
+                applyColor
+              />
+            </Grid>
+            <Grid size={gridSizeCard}>
+              <RmuTextCard
+                value={character.initiative.modifiers['trait'] || 0}
+                subtitle={t('Initiative trait bonus')}
+                image={`${imageBaseUrl}images/generic/initiative.png`}
+                grayscale={grayscale}
+                applyColor
+              />
+            </Grid>
+          </>
+        )}
       </Grid>
 
       <CategorySeparator text={t('Resistances')} />
