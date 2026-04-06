@@ -1,13 +1,18 @@
 import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Grid, Stack } from '@mui/material';
-import { CategorySeparator, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  StrategicItem,
+  CategorySeparator,
+  TechnicalInfo,
+  fetchStrategicItems,
+  createStrategicItem,
+  deleteStrategicItem,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { fetchCharacter } from '../../../api/character';
 import { Character } from '../../../api/character.dto';
-import { createStrategicItem, deleteStrategicItem, fetchStrategicItems } from '../../../api/strategic-item';
-import { StrategicItem } from '../../../api/strategic-item.dto';
 import CharacterViewAddItemDialog from './CharacterAddItemDialog';
 import CharacterItemDetail from './CharacterItemDetail';
 import CharacterItemTable from './CharacterItemTable';
