@@ -21,7 +21,7 @@ import {
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { updateCarriedStatus, deleteItem } from '../../../api/character';
-import { Character, CharacterItem } from '../../../api/character.dto';
+import { Character } from '../../../api/character.dto';
 import { StrategicItem } from '../../../api/strategic-item.dto';
 import { imageBaseUrl } from '../../../services/config';
 import { itemFilter } from '../../../services/display';
@@ -34,7 +34,8 @@ const CharacterItemTable: FC<{
   carried?: boolean;
   setCharacter?: Dispatch<SetStateAction<Character | undefined>>;
   onItemClick?: (item: StrategicItem) => void;
-}> = ({ character, items, carried, setCharacter, onItemClick }) => {
+  onItemDeleted: (itemId: string) => void;
+}> = ({ character, items, carried, setCharacter, onItemClick, onItemDeleted }) => {
   const { showError } = useError();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuItemId, setMenuItemId] = useState<string | null>(null);
@@ -104,6 +105,7 @@ const CharacterItemTable: FC<{
                       width: IMG_SIZE,
                       height: IMG_SIZE,
                       filter: itemFilter,
+                      padding: 1,
                     }}
                   />
                 </TableCell>
@@ -141,7 +143,7 @@ const CharacterItemTable: FC<{
                     open={Boolean(anchorEl) && menuItemId === item.id}
                     onClose={handleCloseMenu}
                   >
-                    <MenuItem onClick={() => handleDelete(item.id)}>
+                    <MenuItem onClick={() => onItemDeleted(item.id)}>
                       <ListItemIcon>
                         <DeleteIcon fontSize="small" />
                       </ListItemIcon>

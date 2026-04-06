@@ -1,13 +1,12 @@
 import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckBoxOutlineBlankRounded } from '@mui/icons-material';
 import { Button, Grid, Stack } from '@mui/material';
 import { CategorySeparator, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
-import { addItem, fetchCharacter } from '../../../api/character';
-import { AddItemDto, Character, CharacterItem } from '../../../api/character.dto';
-import { createStrategicItem, fetchStrategicItems } from '../../../api/strategic-item';
+import { fetchCharacter } from '../../../api/character';
+import { Character } from '../../../api/character.dto';
+import { createStrategicItem, deleteStrategicItem, fetchStrategicItems } from '../../../api/strategic-item';
 import { StrategicItem } from '../../../api/strategic-item.dto';
 import CharacterViewAddItemDialog from './CharacterAddItemDialog';
 import CharacterItemDetail from './CharacterItemDetail';
@@ -22,7 +21,7 @@ const CharacterViewItems: FC<{
   const navigate = useNavigate();
   const { showError } = useError();
   const [openAddItemDialog, setOpenAddItemDialog] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<CharacterItem>();
+  const [selectedItem, setSelectedItem] = useState<StrategicItem>();
   const [characterItems, setCharacterItems] = useState<StrategicItem[]>([]);
 
   const onItemAdded = (formData: Partial<StrategicItem>) => {
@@ -30,7 +29,15 @@ const CharacterViewItems: FC<{
     formData.characterId = character.id;
     createStrategicItem(formData)
       .then(() => {
-        bindCharacterItems();
+        // bindCharacterItems();
+        bindCharacter();
+      })
+      .catch((err) => showError(err.message));
+  };
+
+  const onItemDeleted = (itemId: string) => {
+    deleteStrategicItem(itemId)
+      .then(() => {
         bindCharacter();
       })
       .catch((err) => showError(err.message));
@@ -98,6 +105,7 @@ const CharacterViewItems: FC<{
             carried={true}
             setCharacter={setCharacter}
             onItemClick={setSelectedItem}
+            onItemDeleted={onItemDeleted}
           />
         </Grid>
 
@@ -108,6 +116,7 @@ const CharacterViewItems: FC<{
             carried={false}
             setCharacter={setCharacter}
             onItemClick={setSelectedItem}
+            onItemDeleted={onItemDeleted}
           />
         </Grid>
 

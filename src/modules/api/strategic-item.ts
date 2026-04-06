@@ -35,7 +35,7 @@ export async function createStrategicItem(dto: Partial<StrategicItem>): Promise<
   return await response.json();
 }
 
-export async function updateStrategicGame(gameId: string, dto: Partial<StrategicItem>): Promise<StrategicItem> {
+export async function updateStrategicItem(gameId: string, dto: Partial<StrategicItem>): Promise<StrategicItem> {
   const url = `${apiStrategicGameUrl}/items/${gameId}`;
   const response = await fetch(url, {
     method: 'PATCH',
@@ -48,7 +48,7 @@ export async function updateStrategicGame(gameId: string, dto: Partial<Strategic
   return await response.json();
 }
 
-export async function deleteStrategicGame(gameId: string): Promise<void> {
+export async function deleteStrategicItem(gameId: string): Promise<void> {
   const url = `${apiStrategicGameUrl}/items/${gameId}`;
   const response = await fetch(url, { method: 'DELETE', headers: getAuthHeaders() });
   if (response.status !== 204) {
