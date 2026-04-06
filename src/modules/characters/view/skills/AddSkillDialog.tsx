@@ -13,16 +13,17 @@ import {
   Typography,
 } from '@mui/material';
 import {
+  addCharacterSkill,
+  AddSkill,
+  Character,
   fetchEnumerations,
   fetchSkillCategories,
   fetchSkills,
+  Skill,
   SkillCategory,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
-import { addSkill } from '../../../api/character';
-import { Character } from '../../../api/character.dto';
-import { AddSkill, Skill } from '../../../api/skill.dto';
 
 const AddSkillDialog: FC<{
   open: boolean;
@@ -60,7 +61,7 @@ const AddSkillDialog: FC<{
   };
 
   const onAddSkill = async () => {
-    addSkill(character.id, formData!)
+    addCharacterSkill(character.id, formData!)
       .then((response) => {
         setCharacter(response);
         reset();

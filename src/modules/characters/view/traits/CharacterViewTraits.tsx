@@ -1,8 +1,7 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { Box, Grid, Stack, Typography } from '@mui/material';
-import { CategorySeparator, AddButton, RmuCard } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CategorySeparator, AddButton, RmuCard, Character, CharacterTrait } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
-import { Character, CharacterTrait } from '../../../api/character.dto';
 import { imageBaseUrl } from '../../../services/config';
 import { gridSizeCard } from '../../../services/display';
 import { toRoman } from '../../../services/roman-number-service';

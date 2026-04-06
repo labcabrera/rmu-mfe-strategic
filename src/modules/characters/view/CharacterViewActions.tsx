@@ -8,11 +8,13 @@ import {
   DeleteButton,
   DeleteDialog,
   StrategicGame,
+  Character,
+  fetchCharacter,
+  deleteCharacter,
+  levelUpCharacter,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { fetchCharacter, deleteCharacter, levelUpCharacter } from '../../api/character';
-import { Character } from '../../api/character.dto';
 import LevelUpButton from '../../shared/buttons/LevelUpButton';
 
 const CharacterViewActions: FC<{

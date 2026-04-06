@@ -1,11 +1,15 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RmuBreadcrumbs, SaveButton, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  createCharacter,
+  CreateCharacterDto,
+  Faction,
+  RmuBreadcrumbs,
+  SaveButton,
+  StrategicGame,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { createCharacter } from '../../api/character';
-import { CreateCharacterDto } from '../../api/character.dto';
-import { Faction } from '../../api/faction.dto';
 
 const CharacterCreateActions: FC<{
   formData: CreateCharacterDto;

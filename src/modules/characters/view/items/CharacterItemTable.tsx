@@ -18,11 +18,9 @@ import {
   ListItemIcon,
   Stack,
 } from '@mui/material';
+import { Character, StrategicItem, updateCarriedStatus } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
-import { updateCarriedStatus, deleteItem } from '../../../api/character';
-import { Character } from '../../../api/character.dto';
-import { StrategicItem } from '../../../api/strategic-item.dto';
 import { imageBaseUrl } from '../../../services/config';
 import { itemFilter } from '../../../services/display';
 
@@ -53,16 +51,6 @@ const CharacterItemTable: FC<{
   const handleToggleCarried = async (itemId: string, carried: boolean) => {
     try {
       const data = await updateCarriedStatus(character.id, itemId, !carried);
-      if (setCharacter) setCharacter(data);
-      handleCloseMenu();
-    } catch (err: any) {
-      showError(err.message || err);
-    }
-  };
-
-  const handleDelete = async (itemId: string) => {
-    try {
-      const data = await deleteItem(character.id, itemId);
       if (setCharacter) setCharacter(data);
       handleCloseMenu();
     } catch (err: any) {

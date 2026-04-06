@@ -1,9 +1,7 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { Typography } from '@mui/material';
-import { EditableAvatar } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Character, EditableAvatar, updateCharacter } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
-import { updateCharacter } from '../../api/character';
-import { Character } from '../../api/character.dto';
 import { imageBaseUrl } from '../../services/config';
 import { getAvatarImages } from '../../services/image-service';
 

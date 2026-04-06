@@ -8,11 +8,11 @@ import {
   fetchStrategicItems,
   createStrategicItem,
   deleteStrategicItem,
+  Character,
+  fetchCharacter,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
-import { fetchCharacter } from '../../../api/character';
-import { Character } from '../../../api/character.dto';
 import CharacterViewAddItemDialog from './CharacterAddItemDialog';
 import CharacterItemDetail from './CharacterItemDetail';
 import CharacterItemTable from './CharacterItemTable';

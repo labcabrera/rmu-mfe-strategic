@@ -1,11 +1,16 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CancelButton, RmuBreadcrumbs, SaveButton } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  CancelButton,
+  Faction,
+  RmuBreadcrumbs,
+  SaveButton,
+  StrategicGame,
+  updateFaction,
+  UpdateFactionDto,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { updateFaction } from '../../api/faction';
-import { Faction, UpdateFactionDto } from '../../api/faction.dto';
-import { StrategicGame } from '../../api/strategic-game.dto';
 
 const FactionUpdateActions: FC<{
   formData: UpdateFactionDto;

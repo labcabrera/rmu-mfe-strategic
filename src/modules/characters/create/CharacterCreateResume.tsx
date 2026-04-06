@@ -1,9 +1,7 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { Grid } from '@mui/material';
-import { NumericInput, Race } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CreateCharacterDto, NumericInput, Profession, Race } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
-import { CreateCharacterDto } from '../../api/character.dto';
-import { Profession } from '../../api/professions';
 import NameTextField from '../../shared/inputs/NameTextField';
 import RmuSelect from '../../shared/selects/RmuSelect';
 import SelectProfession from '../../shared/selects/SelectProfession';

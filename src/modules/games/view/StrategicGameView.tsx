@@ -7,11 +7,11 @@ import {
   TechnicalInfo,
   StrategicGame,
   fetchStrategicGame,
+  Faction,
+  fetchFactions,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { fetchFactions } from '../../api/faction';
-import { Faction } from '../../api/faction.dto';
 import { fetchTacticalGames, TacticalGame } from '../../api/tactical-games';
 import { gridSizeMain, gridSizeResume } from '../../services/display';
 import StrategicGameViewActions from './StrategicGameViewActions';
@@ -41,7 +41,7 @@ const StrategicGameView: React.FC = () => {
   useEffect(() => {
     if (strategicGame) {
       fetchFactions(`gameId==${strategicGame.id}`, 0, 100)
-        .then((data) => setFactions(data))
+        .then((data) => setFactions(data.content))
         .catch((err) => showError(err.message));
       fetchTacticalGames(`strategicGameId==${gameId}`, 0, 100)
         .then((data) => setTacticalGames(data))

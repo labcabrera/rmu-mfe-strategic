@@ -10,11 +10,9 @@ import {
   Typography,
   Tooltip,
 } from '@mui/material';
+import { Character, StrategicItem, equipItem, unequipItem } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
-import { equipItem, unequipItem } from '../../../api/character';
-import { Character } from '../../../api/character.dto';
-import { StrategicItem } from '../../../api/strategic-item.dto';
 import { imageBaseUrl } from '../../../services/config';
 import { itemFilter } from '../../../services/display';
 

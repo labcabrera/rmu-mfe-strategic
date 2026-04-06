@@ -1,8 +1,7 @@
 import React, { FC, useState } from 'react';
 import { Box, CardMedia, Stack, Tooltip } from '@mui/material';
+import { Character, StrategicItem } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
-import { Character } from '../../../api/character.dto';
-import { StrategicItem } from '../../../api/strategic-item.dto';
 import { imageBaseUrl } from '../../../services/config';
 import { itemFilter } from '../../../services/display';
 import CharacterEquipmentDialog from './CharacterEquipmentDialog';

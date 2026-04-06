@@ -1,9 +1,8 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge, Grid, Tooltip, Typography } from '@mui/material';
-import { CategorySeparator, RmuTextCard, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CategorySeparator, Character, RmuTextCard, STATS, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
-import { Character, STATS } from '../../api/character.dto';
 import { imageBaseUrl } from '../../services/config';
 
 const grayscale = 0.7;

@@ -1,8 +1,7 @@
 import React from 'react';
 import { Grid, Tooltip, Typography } from '@mui/material';
-import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Character, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
-import { Character } from '../../../api/character.dto';
 import { imageBaseUrl } from '../../../services/config';
 import { gridSizeCard } from '../../../services/display';
 

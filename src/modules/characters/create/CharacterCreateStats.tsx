@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { CreateCharacterDto } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
-import { CreateCharacterDto, STATS } from '../../api/character.dto';
 import { StatBonusFormData } from './CharacterCreate';
 
 const CharacterStats: FC<{
@@ -23,7 +23,7 @@ const CharacterStats: FC<{
   const getTotal = (): number => {
     const stat = formData.statistics[statKey];
     const bonus = statBonusFormData[statKey];
-    return stat.racial + bonus.temporary;
+    return stat.racial || 0 + bonus.temporary;
   };
 
   return (

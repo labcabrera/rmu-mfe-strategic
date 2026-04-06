@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { Chip, Grid } from '@mui/material';
+import { Profession } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
-import { Profession } from '../../api/professions';
 
 const CharacterCreateProfessionalSkills: FC<{
   profession: Profession;

@@ -1,10 +1,7 @@
 import React, { FC, useState } from 'react';
 import { Typography } from '@mui/material';
-import { EditableAvatar } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { EditableAvatar, Faction, StrategicGame, updateFaction } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
-import { updateFaction } from '../../api/faction';
-import { Faction } from '../../api/faction.dto';
-import { StrategicGame } from '../../api/strategic-game.dto';
 import { getAvatarImages } from '../../services/image-service';
 
 const FactionViewResume: FC<{

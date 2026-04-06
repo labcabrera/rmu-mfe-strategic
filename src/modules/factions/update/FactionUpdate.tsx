@@ -1,9 +1,7 @@
 import React, { FC, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Grid } from '@mui/material';
-import { EditableAvatar } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { Faction, UpdateFactionDto } from '../../api/faction.dto';
-import { StrategicGame } from '../../api/strategic-game.dto';
+import { EditableAvatar, Faction, StrategicGame, UpdateFactionDto } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { getAvatarImages } from '../../services/image-service';
 import FactionForm from '../shared/FactionForm';
 import FactionUpdateActions from './FactionUpdateActions';

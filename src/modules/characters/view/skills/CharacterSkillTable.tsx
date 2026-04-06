@@ -2,7 +2,6 @@ import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import CropSquareIcon from '@mui/icons-material/CropSquare';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import SquareIcon from '@mui/icons-material/Square';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
@@ -22,12 +21,18 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { DeleteButton } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  Character,
+  CharacterSkill,
+  DeleteButton,
+  deleteSkill,
+  levelDownSkill,
+  levelUpSkill,
+  Profession,
+  setUpProfessionalSkill,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
-import { levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../../api/character';
-import { Character, CharacterSkill } from '../../../api/character.dto';
-import { Profession } from '../../../api/professions';
 
 const maxProfessionalSkills = 10;
 const maxKnackSkills = 2;

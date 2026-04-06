@@ -4,9 +4,13 @@ import OutboundIcon from '@mui/icons-material/Outbound';
 import { Grid, IconButton, TextField, Badge } from '@mui/material';
 import {
   CategorySeparator,
+  CreateCharacterDto,
   EditableAvatar,
+  Faction,
+  fetchFaction,
   fetchRaces,
   fetchStrategicGame,
+  Profession,
   Race,
   RefreshButton,
   StrategicGame,
@@ -14,10 +18,6 @@ import {
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { CreateCharacterDto } from '../../api/character.dto';
-import { fetchFaction } from '../../api/faction';
-import { Faction } from '../../api/faction.dto';
-import { Profession } from '../../api/professions';
 import { characterCreationTemplate, defaultStats } from '../../data/character-create';
 import { imageBaseUrl } from '../../services/config';
 import { gridSizeResume, gridSizeMain } from '../../services/display';

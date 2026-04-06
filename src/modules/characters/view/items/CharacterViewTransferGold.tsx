@@ -2,12 +2,14 @@ import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Button, Stack, Typography } from '@mui/material';
+import {
+  Character,
+  StrategicItem,
+  Faction,
+  transferFactionGold,
+  fetchFaction,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../../ErrorContext';
-import { transferFactionGold } from '../../../api/character';
-import { Character } from '../../../api/character.dto';
-import { fetchFaction } from '../../../api/faction';
-import { Faction } from '../../../api/faction.dto';
-import { StrategicItem } from '../../../api/strategic-item.dto';
 
 const goldCoin = 'gold-coin';
 

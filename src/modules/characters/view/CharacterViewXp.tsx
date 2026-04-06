@@ -1,10 +1,14 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { Button, Stack, Box, Grid, Badge } from '@mui/material';
-import { CategorySeparator, RmuTextCard, NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  CategorySeparator,
+  RmuTextCard,
+  NumericInput,
+  addCharacterXP,
+  Character,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { addCharacterXP } from '../../api/character';
-import { Character } from '../../api/character.dto';
 import { imageBaseUrl } from '../../services/config';
 
 const grayscale = 0.7;

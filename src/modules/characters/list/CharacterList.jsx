@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import List from '@mui/material/List';
 import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
-import { fetchCharacters } from '../../api/character';
 import CharacterListActions from './CharacterListActions';
 
 const CharacterList = () => {

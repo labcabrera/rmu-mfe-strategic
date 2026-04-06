@@ -1,10 +1,15 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
-import { fetchProfession, fetchStrategicGame, Profession, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  Character,
+  fetchCharacter,
+  fetchProfession,
+  fetchStrategicGame,
+  Profession,
+  StrategicGame,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
-import { fetchCharacter } from '../../api/character';
-import { Character } from '../../api/character.dto';
 import { gridSizeResume, gridSizeMain } from '../../services/display';
 import CharacterViewActions from './CharacterViewActions';
 import CharacterViewResume from './CharacterViewResume';

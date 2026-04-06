@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
-import { CreateCharacterDto, STATS } from '../api/character.dto';
+import { CreateCharacterDto, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { StatBonusFormData } from '../characters/create/CharacterCreate';
 import { getStatBonus } from './stat-service';
 

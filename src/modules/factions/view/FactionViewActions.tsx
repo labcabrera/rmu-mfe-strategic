@@ -6,12 +6,13 @@ import {
   EditButton,
   DeleteButton,
   DeleteDialog,
+  deleteFaction,
+  Faction,
+  fetchFaction,
+  StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { fetchFaction, deleteFaction } from '../../api/faction';
-import { Faction } from '../../api/faction.dto';
-import { StrategicGame } from '../../api/strategic-game.dto';
 
 const FactionViewActions: FC<{
   faction: Faction;

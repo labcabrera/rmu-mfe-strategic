@@ -10,13 +10,13 @@ import {
   TechnicalInfo,
   fetchStrategicGame,
   StrategicGame,
+  Character,
+  Faction,
+  fetchCharacters,
+  fetchFaction,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { fetchCharacters } from '../../api/character';
-import { Character } from '../../api/character.dto';
-import { fetchFaction } from '../../api/faction';
-import { Faction } from '../../api/faction.dto';
 import { gridSizeResume, gridSizeMain, gridSizeCard } from '../../services/display';
 import FactionViewActions from './FactionViewActions';
 import FactionViewAttributes from './FactionViewAttributes';
