@@ -17,7 +17,6 @@ export interface Character {
   initiative: CharacterInitiative;
   defense: CharacterDefense;
   skills: CharacterSkill[];
-  items: CharacterItem[];
   equipment: CharacterEquipment;
   attacks: CharacterAttack[];
   traits: CharacterTrait[];
@@ -40,7 +39,6 @@ export interface CreateCharacterDto {
   initiative: CharacterInitiative;
   defense: CharacterDefense;
   skills: CharacterSkill[];
-  items: CharacterItem[];
   equipment: CharacterEquipment;
   attacks: CharacterAttack[];
   traits: CharacterTrait[];
@@ -178,18 +176,6 @@ export interface CharacterEquipment {
   rangedPenalty: number;
   perceptionPenalty?: number;
   movementBaseDifficulty?: string | undefined;
-}
-
-export interface CharacterItem {
-  id: string;
-  name: string;
-  itemTypeId: string;
-  category: string;
-  weapon?: WeaponInfo;
-  armor?: ArmorInfo;
-  info: CharacterItemInfo;
-  amount?: number;
-  carried: boolean;
 }
 
 export interface CharacterItemInfo {

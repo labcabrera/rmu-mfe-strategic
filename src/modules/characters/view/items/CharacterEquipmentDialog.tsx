@@ -13,7 +13,8 @@ import {
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { equipItem, unequipItem } from '../../../api/character';
-import { Character, CharacterItem } from '../../../api/character.dto';
+import { Character } from '../../../api/character.dto';
+import { StrategicItem } from '../../../api/strategic-item.dto';
 import { imageBaseUrl } from '../../../services/config';
 import { itemFilter, itemFilterDisabled } from '../../../services/display';
 
@@ -21,39 +22,38 @@ const imageSize = 100;
 
 const CharacterEquipmentDialog: FC<{
   open: boolean;
-  onClose: () => void;
   character: Character;
+  items: StrategicItem[];
   slot: string;
+  onClose: () => void;
   onEquip?: (character: Character) => void;
-}> = ({ open, onClose, character, slot, onEquip }) => {
+}> = ({ open, character, items, slot, onClose, onEquip }) => {
   const { showError } = useError();
 
-  const slotItemId = character.equipment[slot];
+  const slotItemId = character.equipment[slot] as string;
 
-  const isArmorSlot = (item: CharacterItem, s: string) => {
+  const isArmorSlot = (item: StrategicItem, s: string) => {
     return item.armor && item.armor.slot === s;
   };
 
-  const isOneHandedWeapon = (item: CharacterItem) => {
+  const isOneHandedWeapon = (item: StrategicItem) => {
     return item.weapon && item.weapon.modes.filter((m) => m.type === 'one-hand').length > 0;
   };
 
-  const getSlotOptions = (character: Character, s: string): CharacterItem[] => {
+  const getSlotOptions = (character: Character, s: string): StrategicItem[] => {
     if (s === 'mainHand') {
-      return character.items.filter((e) => e.category === 'weapon');
+      return items.filter((e) => e.category === 'weapon');
     } else if (s === 'offHand') {
-      return character.items.filter(
-        (e) => e.category === 'shield' || (e.category === 'weapon' && isOneHandedWeapon(e))
-      );
+      return items.filter((e) => e.category === 'shield' || (e.category === 'weapon' && isOneHandedWeapon(e)));
     } else if (s === 'body' || s === 'head' || s === 'arms' || s === 'legs') {
-      return character.items.filter((e) => isArmorSlot(e, s));
+      return items.filter((e) => isArmorSlot(e, s));
     }
     return [];
   };
 
   const slotOptions = useMemo(() => getSlotOptions(character, slot), [character, slot]);
 
-  const handleEquip = (item: CharacterItem | null) => {
+  const handleEquip = (item: StrategicItem | null) => {
     if (item) {
       equipItem(character.id, slot, item.id)
         .then((data) => {

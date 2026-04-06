@@ -2,6 +2,7 @@ import React, { FC, useState } from 'react';
 import { Box, CardMedia, Stack, Tooltip } from '@mui/material';
 import { t } from 'i18next';
 import { Character, CharacterItem } from '../../../api/character.dto';
+import { StrategicItem } from '../../../api/strategic-item.dto';
 import { imageBaseUrl } from '../../../services/config';
 import { itemFilter } from '../../../services/display';
 import CharacterEquipmentDialog from './CharacterEquipmentDialog';
@@ -11,8 +12,9 @@ const SLOT_SIZE = 100;
 
 const CharacterViewEquipment: FC<{
   character: Character;
+  items: StrategicItem[];
   setCharacter: (c: Character) => void;
-}> = ({ character, setCharacter }) => {
+}> = ({ character, items, setCharacter }) => {
   const [open, setOpen] = useState(false);
   const [slot, setSlot] = useState<string>('');
 
@@ -27,11 +29,13 @@ const CharacterViewEquipment: FC<{
     setCharacter(updated);
   };
 
-  const getItemForSlot = (s: string): CharacterItem | null => {
+  const getItemForSlot = (s: string): StrategicItem | null => {
     const id = (character.equipment as any)[s];
     if (!id) return null;
-    return character.items.find((it) => it.id === id) || null;
+    return items.find((it) => it.id === id) || null;
   };
+
+  if (!character || !items) return <p>Loading...</p>;
 
   return (
     <>
@@ -74,7 +78,14 @@ const CharacterViewEquipment: FC<{
         })}
       </Stack>
 
-      <CharacterEquipmentDialog open={open} onClose={handleClose} character={character} slot={slot} onEquip={onEquip} />
+      <CharacterEquipmentDialog
+        open={open}
+        character={character}
+        items={items}
+        slot={slot}
+        onEquip={onEquip}
+        onClose={handleClose}
+      />
     </>
   );
 };

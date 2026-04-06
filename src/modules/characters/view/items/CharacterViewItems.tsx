@@ -1,11 +1,14 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CheckBoxOutlineBlankRounded } from '@mui/icons-material';
 import { Button, Grid, Stack } from '@mui/material';
-import { CategorySeparator } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CategorySeparator, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
-import { addItem } from '../../../api/character';
+import { addItem, fetchCharacter } from '../../../api/character';
 import { AddItemDto, Character, CharacterItem } from '../../../api/character.dto';
+import { createStrategicItem, fetchStrategicItems } from '../../../api/strategic-item';
+import { StrategicItem } from '../../../api/strategic-item.dto';
 import CharacterViewAddItemDialog from './CharacterAddItemDialog';
 import CharacterItemDetail from './CharacterItemDetail';
 import CharacterItemTable from './CharacterItemTable';
@@ -20,12 +23,36 @@ const CharacterViewItems: FC<{
   const { showError } = useError();
   const [openAddItemDialog, setOpenAddItemDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState<CharacterItem>();
+  const [characterItems, setCharacterItems] = useState<StrategicItem[]>([]);
 
-  const onItemAdded = (addItemDto: AddItemDto) => {
-    addItem(character.id, addItemDto)
-      .then((data) => setCharacter!(data))
+  const onItemAdded = (formData: Partial<StrategicItem>) => {
+    formData.gameId = character.gameId;
+    formData.characterId = character.id;
+    createStrategicItem(formData)
+      .then(() => {
+        bindCharacterItems();
+        bindCharacter();
+      })
       .catch((err) => showError(err.message));
   };
+
+  const bindCharacter = () => {
+    fetchCharacter(character.id)
+      .then((response) => setCharacter(response))
+      .catch((err) => showError(err.message));
+  };
+
+  const bindCharacterItems = () => {
+    if (character) {
+      fetchStrategicItems(`characterId==${character.id}`, 0, 1000)
+        .then((response) => setCharacterItems(response.content))
+        .catch((err) => showError(err.message));
+    }
+  };
+
+  useEffect(() => {
+    bindCharacterItems();
+  }, [character]);
 
   if (!setCharacter) return <p>Loading...</p>;
 
@@ -49,7 +76,7 @@ const CharacterViewItems: FC<{
         </Grid>
 
         <Grid size={12}>
-          <CharacterViewEquipment character={character} setCharacter={setCharacter} />
+          <CharacterViewEquipment character={character} items={characterItems} setCharacter={setCharacter} />
         </Grid>
 
         <Grid size={12}>
@@ -67,8 +94,9 @@ const CharacterViewItems: FC<{
         <Grid size={{ xs: 12, md: 6 }}>
           <CharacterItemTable
             character={character}
-            setCharacter={setCharacter}
+            items={characterItems}
             carried={true}
+            setCharacter={setCharacter}
             onItemClick={setSelectedItem}
           />
         </Grid>
@@ -76,8 +104,9 @@ const CharacterViewItems: FC<{
         <Grid size={{ xs: 12, md: 6 }}>
           <CharacterItemTable
             character={character}
-            setCharacter={setCharacter}
+            items={characterItems}
             carried={false}
+            setCharacter={setCharacter}
             onItemClick={setSelectedItem}
           />
         </Grid>
@@ -89,7 +118,14 @@ const CharacterViewItems: FC<{
             itemId={selectedItem?.id || undefined}
           />
         </Grid>
+
+        <Grid size={12}>
+          <TechnicalInfo>
+            <pre>{JSON.stringify(characterItems, null, 2)}</pre>
+          </TechnicalInfo>
+        </Grid>
       </Grid>
+
       <CharacterViewAddItemDialog
         open={openAddItemDialog}
         onClose={() => setOpenAddItemDialog(false)}

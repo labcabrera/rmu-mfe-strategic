@@ -22,6 +22,7 @@ import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { updateCarriedStatus, deleteItem } from '../../../api/character';
 import { Character, CharacterItem } from '../../../api/character.dto';
+import { StrategicItem } from '../../../api/strategic-item.dto';
 import { imageBaseUrl } from '../../../services/config';
 import { itemFilter } from '../../../services/display';
 
@@ -29,10 +30,11 @@ const IMG_SIZE = 70;
 
 const CharacterItemTable: FC<{
   character: Character;
-  setCharacter?: Dispatch<SetStateAction<Character | undefined>>;
+  items: StrategicItem[];
   carried?: boolean;
-  onItemClick?: (item: CharacterItem) => void;
-}> = ({ character, setCharacter, carried, onItemClick }) => {
+  setCharacter?: Dispatch<SetStateAction<Character | undefined>>;
+  onItemClick?: (item: StrategicItem) => void;
+}> = ({ character, items, carried, setCharacter, onItemClick }) => {
   const { showError } = useError();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuItemId, setMenuItemId] = useState<string | null>(null);
@@ -67,7 +69,7 @@ const CharacterItemTable: FC<{
     }
   };
 
-  const getAmount = (item: CharacterItem): string => {
+  const getAmount = (item: StrategicItem): string => {
     return item.amount === 0 || (item.amount && item.amount !== 1) ? ` (${item.amount})` : '';
   };
 
@@ -84,7 +86,7 @@ const CharacterItemTable: FC<{
           </TableRow>
         </TableHead>
         <TableBody>
-          {character.items
+          {items
             .filter((item) => (typeof carried === 'boolean' ? !!item.carried === carried : true))
             .map((item) => (
               <TableRow
