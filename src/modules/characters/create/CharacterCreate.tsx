@@ -127,8 +127,6 @@ const CharacterCreate: FC = () => {
 
   if (!game || !formData) return <div>Loading....</div>;
 
-  // if (!game || !formData || !faction) return <div>Loading....</div>;
-
   return (
     <>
       <CharacterCreateActions formData={formData} game={game} faction={faction} isValid={isValid} />

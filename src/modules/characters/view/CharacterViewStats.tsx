@@ -1,7 +1,7 @@
-import React, { FC } from 'react';
+import React, { FC, Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { CategorySeparator, Character, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CategorySeparator, Character, StatKey, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 
 const CharacterViewStats: FC<{
@@ -33,8 +33,10 @@ const CharacterViewStats: FC<{
             </TableRow>
           </TableHead>
           <TableBody>
-            {STATS.map((key) => (
-              <CharacterViewStatsEntry key={key} statKey={key} statName={key} character={character} />
+            {STATS.map((key, index) => (
+              <Fragment key={index}>
+                <CharacterViewStatsEntry stat={key} character={character} />
+              </Fragment>
             ))}
           </TableBody>
         </Table>
@@ -44,11 +46,19 @@ const CharacterViewStats: FC<{
 };
 
 const CharacterViewStatsEntry: FC<{
-  statKey: string;
-  statName: string;
+  stat: StatKey;
   character: Character;
-}> = ({ statKey, statName, character }) => {
-  const { t } = useTranslation();
+}> = ({ stat, character }) => {
+  if (!character.statistics[stat].modifiers) {
+    return null;
+  }
+  const potential = character.statistics[stat].potential;
+  const temporary = character.statistics[stat].temporary;
+  const statBonus = character.statistics[stat].modifiers['stat'] || 0;
+  const racial = character.statistics[stat].modifiers['racial'] || 0;
+  const trait = character.statistics[stat].modifiers['trait'] || 0;
+  const item = character.statistics[stat].modifiers['item'] || 0;
+  const totalBonus = character.statistics[stat].totalBonus;
 
   const getColor = (value: number) => {
     if (value < 0) return 'error.main';
@@ -63,25 +73,25 @@ const CharacterViewStatsEntry: FC<{
   };
 
   return (
-    <TableRow key={statKey} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-      <TableCell>{t(statName)}</TableCell>
-      <TableCell align="right" sx={{ color: getStatColor(character.statistics[statKey].potential) }}>
-        {character.statistics[statKey].potential}
+    <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+      <TableCell>{t(stat)}</TableCell>
+      <TableCell align="right" sx={{ color: getStatColor(potential) }}>
+        {potential}
       </TableCell>
-      <TableCell align="right" sx={{ color: getStatColor(character.statistics[statKey].temporary) }}>
-        {character.statistics[statKey].temporary}
+      <TableCell align="right" sx={{ color: getStatColor(temporary) }}>
+        {temporary}
       </TableCell>
-      <TableCell align="right" sx={{ color: getColor(character.statistics[statKey].bonus) }}>
-        {character.statistics[statKey].bonus}
+      <TableCell align="right" sx={{ color: getColor(statBonus) }}>
+        {statBonus}
       </TableCell>
-      <TableCell align="right" sx={{ color: getColor(character.statistics[statKey].racial) }}>
-        {character.statistics[statKey].racial}
+      <TableCell align="right" sx={{ color: getColor(racial) }}>
+        {racial}
       </TableCell>
-      <TableCell align="right" sx={{ color: getColor(character.statistics[statKey].custom) }}>
-        {character.statistics[statKey].custom}
+      <TableCell align="right" sx={{ color: getColor(trait) }}>
+        {trait}
       </TableCell>
-      <TableCell align="right" sx={{ color: getColor(character.statistics[statKey].totalBonus), fontWeight: 'bold' }}>
-        {character.statistics[statKey].totalBonus}
+      <TableCell align="right" sx={{ color: getColor(totalBonus), fontWeight: 'bold' }}>
+        {totalBonus}
       </TableCell>
     </TableRow>
   );
