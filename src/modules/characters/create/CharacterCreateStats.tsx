@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { CreateCharacterDto } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CreateCharacterDto, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { StatBonusFormData } from './CharacterCreate';
 

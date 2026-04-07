@@ -28,7 +28,7 @@ import { useError } from '../../../../ErrorContext';
 const AddSkillDialog: FC<{
   open: boolean;
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>>;
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   onClose: () => void;
 }> = ({ open, character, setCharacter, onClose }) => {
   const { showError } = useError();

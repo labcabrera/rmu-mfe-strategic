@@ -25,6 +25,7 @@ import {
   Character,
   CharacterSkill,
   DeleteButton,
+  deleteCharacterSkill,
   deleteSkill,
   levelDownSkill,
   levelUpSkill,
@@ -146,10 +147,9 @@ const CharacterViewSkillsEntry: FC<{
   currentKnackSkills: number;
   currentProfessionalSkills: number;
 }> = ({ character, setCharacter, skill, profession, currentKnackSkills, currentProfessionalSkills }) => {
+  const { showError } = useError();
   const isProfessional = skill.professional?.includes('professional');
   const isKnack = skill.professional?.includes('knack');
-
-  const { showError } = useError();
 
   const handleLevelUp = () => {
     levelUpSkill(character.id, skill.skillId, skill.specialization)
@@ -197,10 +197,10 @@ const CharacterViewSkillsEntry: FC<{
       .catch((error: any) => showError(error.message));
   };
 
-  const handleDeleteSkill = (skillObj: CharacterSkill) => {
-    deleteSkill(character.id, skillObj.skillId, skillObj.specialization)
+  const handleDeleteSkill = (skill: CharacterSkill) => {
+    deleteCharacterSkill(character.id, skill.skillId, skill.specialization)
       .then((updated) => setCharacter(updated))
-      .catch((error: any) => showError(error.message));
+      .catch((error) => showError(error.message));
   };
 
   const isLevelUpDisabled = () => {
