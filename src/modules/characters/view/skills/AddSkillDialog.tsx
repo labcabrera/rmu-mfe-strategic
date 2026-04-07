@@ -50,7 +50,7 @@ const AddSkillDialog: FC<{
 
   const bindSkills = () => {
     if (!selectedCategory) return;
-    fetchSkills(`categoryId==${selectedCategory}`, 0, 100)
+    fetchSkills(`categoryId==${selectedCategory.id}`, 0, 100)
       .then((data) => setAvailableSkills(data.content))
       .catch((error) => showError(error.message));
   };

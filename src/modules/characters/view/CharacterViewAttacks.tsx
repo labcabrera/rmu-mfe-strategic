@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Paper, Stack, Table, TableBody, TableCell, TableHead, TableRow, Chip } from '@mui/material';
 import { CategorySeparator, Character, CharacterAttack, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 
@@ -46,6 +46,7 @@ const CharacterViewAttacks: FC<{
               <TableCell align="left">{t('Fumble')}</TableCell>
               <TableCell align="left">{t('Offensive bonus')}</TableCell>
               <TableCell align="left">{t('Melee range')}</TableCell>
+              <TableCell align="left">{t('BO Modifiers')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -61,6 +62,21 @@ const CharacterViewAttacks: FC<{
                   {row.bo}
                 </TableCell>
                 <TableCell align="right">{getMeleeRangeFormated(row)}</TableCell>
+                <TableCell align="right">
+                  <Stack direction="row" spacing={1}>
+                    {row.boModifiers &&
+                      Object.entries(row.boModifiers)
+                        .filter(([, v]) => v !== 0)
+                        .map(([k, v]) => (
+                          <Chip
+                            key={k}
+                            label={`${t(k)}: ${v > 0 ? '+' : ''}${v}`}
+                            size="small"
+                            color={v < 0 ? 'error' : 'primary'}
+                          />
+                        ))}
+                  </Stack>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
