@@ -1,10 +1,9 @@
 import React, { useState, SyntheticEvent, ReactNode, FC, Dispatch, SetStateAction } from 'react';
 import { Box, Grid, Tab, Tabs } from '@mui/material';
-import { Character } from '../../api/character.dto';
-import { Profession } from '../../api/professions';
-import { StrategicGame } from '../../api/strategic-game.dto';
+import { Character, StrategicGame, Profession } from '@labcabrera-rmu/rmu-react-shared-lib';
 import CharacterViewAttacks from './CharacterViewAttacks';
 import CharacterViewInfo from './CharacterViewInfo';
+import CharacterViewMovement from './CharacterViewMovement';
 import CharacterViewResistances from './CharacterViewResistances';
 import CharacterViewStats from './CharacterViewStats';
 import CharacterViewStatsChart from './CharacterViewStatsChart';
@@ -65,8 +64,9 @@ const CharacterViewTabs: FC<{
           <Tab label="Traits" {...a11yProps(4)} />
           <Tab label="Items" {...a11yProps(5)} />
           <Tab label="Attacks" {...a11yProps(6)} />
-          <Tab label="XP" {...a11yProps(7)} />
-          <Tab label="Debug" {...a11yProps(8)} />
+          <Tab label="Movement" {...a11yProps(7)} />
+          <Tab label="XP" {...a11yProps(8)} />
+          <Tab label="Debug" {...a11yProps(9)} />
         </Tabs>
       </Box>
 
@@ -106,10 +106,14 @@ const CharacterViewTabs: FC<{
       </CustomTabPanel>
 
       <CustomTabPanel value={value} index={7}>
-        <CharacterViewExperience character={character} setCharacter={setCharacter} />
+        <CharacterViewMovement character={character} strategicGame={strategicGame} />
       </CustomTabPanel>
 
       <CustomTabPanel value={value} index={8}>
+        <CharacterViewExperience character={character} setCharacter={setCharacter} />
+      </CustomTabPanel>
+
+      <CustomTabPanel value={value} index={9}>
         <pre>Character: {JSON.stringify(character, null, 2)}</pre>
       </CustomTabPanel>
     </Box>

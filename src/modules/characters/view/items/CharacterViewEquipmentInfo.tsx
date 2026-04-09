@@ -10,26 +10,11 @@ const grayscale = 0.7;
 const CharacterViewEquipmentInfo: React.FC<{
   character: Character;
 }> = ({ character }) => {
-  const getArmorManeuverSkill = (): number | undefined => {
-    return character.skills.find((s) => s.skillId === 'armor-maneuver')?.totalBonus || undefined;
-  };
-
   const getArmorType = (): string => {
     const armor = character.defense.armor;
     if (!armor) return '';
     if (armor.at) return `${armor.at}`;
     return `${armor.headAt} / ${armor.bodyAt} / ${armor.armsAt} / ${armor.legsAt}`;
-  };
-
-  const getLabelWeight = () => {
-    return `${character.equipment.weight} (${character.equipment.weightAllowance}) lbs`;
-  };
-
-  const getLabelManeuverPenalty = () => {
-    if (character.equipment.baseManeuverPenalty >= 0) {
-      return `${character.equipment.baseManeuverPenalty}`;
-    }
-    return `${character.equipment.maneuverPenalty} (${character.equipment.baseManeuverPenalty} + ${getArmorManeuverSkill()})`;
   };
 
   if (!character) return <div>Loading...</div>;
@@ -128,7 +113,7 @@ const CharacterViewEquipmentInfo: React.FC<{
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={character.equipment.maneuverPenalty}
-            subtitle={t('Maneuver penalty')}
+            subtitle={t('Armor penalty')}
             image={`${imageBaseUrl}images/generic/maneuver-penalty.png`}
             grayscale={grayscale}
             applyColor
@@ -137,7 +122,7 @@ const CharacterViewEquipmentInfo: React.FC<{
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={character.equipment.baseManeuverPenalty}
-            subtitle={t('Armor maneuver penalty')}
+            subtitle={t('Armor base penalty')}
             image={`${imageBaseUrl}images/generic/maneuver-penalty.png`}
             grayscale={grayscale}
             applyColor
