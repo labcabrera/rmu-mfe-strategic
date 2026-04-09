@@ -19,7 +19,7 @@ const CharacterView: FC = () => {
   const location = useLocation();
   const { characterId } = useParams<{ characterId: string }>();
   const [character, setCharacter] = useState<Character>();
-  const [strategicGame, setStrategicGame] = useState<StrategicGame | null>(null);
+  const [strategicGame, setStrategicGame] = useState<StrategicGame>();
   const [profession, setProfession] = useState<Profession>();
   const { showError } = useError();
 
@@ -49,7 +49,7 @@ const CharacterView: FC = () => {
       <CharacterViewActions character={character} setCharacter={setCharacter} game={strategicGame} />
       <Grid container spacing={1}>
         <Grid size={gridSizeResume}>
-          <CharacterViewResume character={character} setCharacter={setCharacter} strategicGame={strategicGame} />
+          <CharacterViewResume character={character} setCharacter={setCharacter} />
         </Grid>
         <Grid size={gridSizeMain}>
           <CharacterViewTabs

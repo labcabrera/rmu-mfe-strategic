@@ -215,6 +215,26 @@ const CharacterViewInfo: FC<{
             grayscale={grayscale}
           />
         </Grid>
+        {character.defense.shield && (
+          <>
+            <Grid size={gridSizeCard}>
+              <RmuTextCard
+                value={character.defense.shield.db}
+                subtitle={t('Shield db')}
+                image={`${imageBaseUrl}images/generic/armor.png`}
+                grayscale={grayscale}
+              />
+            </Grid>
+            <Grid size={gridSizeCard}>
+              <RmuTextCard
+                value={character.defense.shield.blockCount}
+                subtitle={t('Shield block count')}
+                image={`${imageBaseUrl}images/generic/armor.png`}
+                grayscale={grayscale}
+              />
+            </Grid>
+          </>
+        )}
       </Grid>
 
       <CategorySeparator text={t('Movement')} />
