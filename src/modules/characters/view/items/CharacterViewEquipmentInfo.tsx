@@ -1,6 +1,6 @@
 import React from 'react';
 import { Grid, Tooltip, Typography } from '@mui/material';
-import { Character, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CategorySeparator, Character, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { imageBaseUrl } from '../../../services/config';
 import { gridSizeCard } from '../../../services/display';
@@ -36,22 +36,33 @@ const CharacterViewEquipmentInfo: React.FC<{
 
   return (
     <>
+      <CategorySeparator text={t('Weight info')} />
       <Grid container spacing={1}>
         <Grid size={gridSizeCard}>
-          <Tooltip title={'Armor Type (head / body / arms / legs)'} arrow>
-            <RmuTextCard
-              value={getArmorType()}
-              subtitle={t('Armor type')}
-              image={`${imageBaseUrl}images/generic/armor.png`}
-              grayscale={grayscale}
-            />
+          <Tooltip
+            title={
+              <React.Fragment>
+                <Typography color="inherit">Carried weight</Typography>
+              </React.Fragment>
+            }
+            arrow
+          >
+            <span>
+              <RmuTextCard
+                value={character.equipment.weight}
+                subtitle={`${t('Carried weight')} (lbs)`}
+                image={`${imageBaseUrl}images/generic/carried-weight.png`}
+                grayscale={grayscale}
+                applyColor
+                color={character.equipment.weight > character.equipment.weightAllowance ? 'red' : undefined}
+              />
+            </span>
           </Tooltip>
         </Grid>
         <Grid size={gridSizeCard}>
           <Tooltip
             title={
               <React.Fragment>
-                <Typography color="inherit">Carried weight (Allowance)</Typography>
                 <Typography color="inherit">
                   <em>WA: 15% + 2 x Strength Modifier</em>
                 </Typography>
@@ -61,8 +72,8 @@ const CharacterViewEquipmentInfo: React.FC<{
           >
             <span>
               <RmuTextCard
-                value={getLabelWeight()}
-                subtitle={t('Carried weight')}
+                value={character.equipment.weightAllowance}
+                subtitle={`${t('Weight allowance')} (lbs)`}
                 image={`${imageBaseUrl}images/generic/carried-weight.png`}
                 grayscale={grayscale}
               />
@@ -92,9 +103,46 @@ const CharacterViewEquipmentInfo: React.FC<{
             </span>
           </Tooltip>
         </Grid>
+        <Grid size={gridSizeCard}>
+          <RmuTextCard
+            value={t(character.movement.maxPace)}
+            subtitle={t('Max pace')}
+            image={`${imageBaseUrl}images/generic/maneuver-penalty.png`}
+            grayscale={grayscale}
+          />
+        </Grid>
       </Grid>
 
-      <Grid container spacing={1} mt={1}>
+      <CategorySeparator text={t('Armor')} />
+      <Grid container spacing={1}>
+        <Grid size={gridSizeCard}>
+          <Tooltip title={'Armor Type (head / body / arms / legs)'} arrow>
+            <RmuTextCard
+              value={getArmorType()}
+              subtitle={t('Armor type')}
+              image={`${imageBaseUrl}images/generic/armor.png`}
+              grayscale={grayscale}
+            />
+          </Tooltip>
+        </Grid>
+        <Grid size={gridSizeCard}>
+          <RmuTextCard
+            value={character.equipment.maneuverPenalty}
+            subtitle={t('Maneuver penalty')}
+            image={`${imageBaseUrl}images/generic/maneuver-penalty.png`}
+            grayscale={grayscale}
+            applyColor
+          />
+        </Grid>
+        <Grid size={gridSizeCard}>
+          <RmuTextCard
+            value={character.equipment.baseManeuverPenalty}
+            subtitle={t('Armor maneuver penalty')}
+            image={`${imageBaseUrl}images/generic/maneuver-penalty.png`}
+            grayscale={grayscale}
+            applyColor
+          />
+        </Grid>
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={t(`difficulty-${character.equipment.movementBaseDifficulty}`)}
@@ -102,29 +150,6 @@ const CharacterViewEquipmentInfo: React.FC<{
             image={`${imageBaseUrl}images/generic/maneuver-penalty.png`}
             grayscale={grayscale}
           />
-        </Grid>
-        <Grid size={gridSizeCard}>
-          <Tooltip
-            title={
-              <>
-                <Typography color="inherit">Maneuver penalty</Typography>
-                <Typography color="inherit">
-                  <em>MP = Armor Penalty + Skill</em>
-                </Typography>
-              </>
-            }
-            arrow
-          >
-            <span>
-              <RmuTextCard
-                value={getLabelManeuverPenalty()}
-                subtitle={t('Armor penalty')}
-                image={`${imageBaseUrl}images/generic/maneuver-penalty.png`}
-                grayscale={grayscale}
-                applyColor
-              />
-            </span>
-          </Tooltip>
         </Grid>
         <Grid size={gridSizeCard}>
           <RmuTextCard

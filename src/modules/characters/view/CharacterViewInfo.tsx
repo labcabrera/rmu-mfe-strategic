@@ -243,7 +243,7 @@ const CharacterViewInfo: FC<{
         </Grid>
         <Grid size={gridSizeCard}>
           <RmuTextCard
-            value={character.movement.strideRacialBonus}
+            value={character.movement.modifiers['racial'] || 0}
             subtitle={t('Stride racial bonus')}
             image={`${imageBaseUrl}images/generic/stride-bonus.png`}
             grayscale={grayscale}
@@ -251,7 +251,7 @@ const CharacterViewInfo: FC<{
         </Grid>
         <Grid size={gridSizeCard}>
           <RmuTextCard
-            value={character.movement.strideQuBonus}
+            value={character.movement.modifiers['qu']}
             subtitle={t('Stride stat bonus')}
             image={`${imageBaseUrl}images/generic/stride-bonus.png`}
             grayscale={grayscale}

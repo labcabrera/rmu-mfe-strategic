@@ -93,10 +93,6 @@ const CharacterViewItems: FC<{
         </Grid>
 
         <Grid size={12}>
-          <CategorySeparator text={t('Equipment info')} />
-        </Grid>
-
-        <Grid size={12}>
           <CharacterViewEquipmentInfo character={character} />
         </Grid>
 

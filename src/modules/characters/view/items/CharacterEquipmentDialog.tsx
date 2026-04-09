@@ -10,7 +10,7 @@ import {
   Typography,
   Tooltip,
 } from '@mui/material';
-import { Character, StrategicItem, equipItem, unequipItem } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Character, EquipmentSlot, StrategicItem, equipItem, unequipItem } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { imageBaseUrl } from '../../../services/config';
@@ -22,13 +22,15 @@ const CharacterEquipmentDialog: FC<{
   open: boolean;
   character: Character;
   items: StrategicItem[];
-  slot: string;
+  slot: EquipmentSlot | undefined;
   onClose: () => void;
   onEquip?: (character: Character) => void;
 }> = ({ open, character, items, slot, onClose, onEquip }) => {
   const { showError } = useError();
 
-  const slotItemId = character.equipment[slot] as string;
+  if (!slot) return;
+
+  const slotItemId = character.equipment.slots[slot];
 
   const isArmorSlot = (item: StrategicItem, s: string) => {
     return item.armor && item.armor.slot === s;
@@ -60,7 +62,7 @@ const CharacterEquipmentDialog: FC<{
         })
         .catch((err) => showError(err.message));
     } else {
-      unequipItem(character.id, slot)
+      unequipItem(character.id, slotItemId!)
         .then((data) => {
           if (onEquip) onEquip(data);
           onClose();

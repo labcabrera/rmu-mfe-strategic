@@ -1,12 +1,11 @@
 import React, { FC, useState } from 'react';
 import { Box, CardMedia, Stack, Tooltip } from '@mui/material';
-import { Character, StrategicItem } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Character, EQUIPMENT_SLOTS, EquipmentSlot, StrategicItem } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { imageBaseUrl } from '../../../services/config';
 import { itemFilter } from '../../../services/display';
 import CharacterEquipmentDialog from './CharacterEquipmentDialog';
 
-const slots = ['mainHand', 'offHand', 'head', 'body', 'arms', 'legs'];
 const SLOT_SIZE = 100;
 
 const CharacterViewEquipment: FC<{
@@ -15,9 +14,9 @@ const CharacterViewEquipment: FC<{
   setCharacter: (c: Character) => void;
 }> = ({ character, items, setCharacter }) => {
   const [open, setOpen] = useState(false);
-  const [slot, setSlot] = useState<string>('');
+  const [slot, setSlot] = useState<EquipmentSlot>();
 
-  const handleOpen = (s: string) => {
+  const handleOpen = (s: EquipmentSlot) => {
     setSlot(s);
     setOpen(true);
   };
@@ -28,8 +27,8 @@ const CharacterViewEquipment: FC<{
     setCharacter(updated);
   };
 
-  const getItemForSlot = (s: string): StrategicItem | null => {
-    const id = (character.equipment as any)[s];
+  const getItemForSlot = (slot: EquipmentSlot): StrategicItem | null => {
+    const id = character.equipment.slots[slot] || null;
     if (!id) return null;
     return items.find((it) => it.id === id) || null;
   };
@@ -39,7 +38,7 @@ const CharacterViewEquipment: FC<{
   return (
     <>
       <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="flex-start">
-        {slots.map((s) => {
+        {EQUIPMENT_SLOTS.map((s) => {
           const item = getItemForSlot(s);
           return (
             <Box
