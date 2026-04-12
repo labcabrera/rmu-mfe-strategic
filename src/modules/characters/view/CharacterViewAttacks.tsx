@@ -24,6 +24,11 @@ const CharacterViewAttacks: FC<{
     return `${attack.meleeRange}' (${scaled}")`;
   };
 
+  const getFumbleText = (attack: CharacterAttack): string => {
+    if (attack.fumble === attack.weaponFumble) return `${attack.fumble}`;
+    return `${attack.fumble} (${attack.weaponFumble})`;
+  };
+
   return (
     <>
       <CategorySeparator text={t('Attacks')} />
@@ -50,22 +55,22 @@ const CharacterViewAttacks: FC<{
             </TableRow>
           </TableHead>
           <TableBody>
-            {character.attacks.map((row, index) => (
+            {character.attacks.map((attack, index) => (
               <TableRow key={index}>
-                <TableCell align="left">{t(row.attackName)}</TableCell>
-                <TableCell align="left">{t(row.type)}</TableCell>
-                <TableCell align="left">{t(row.attackTable)}</TableCell>
-                <TableCell align="left">{t(row.fumbleTable)}</TableCell>
-                <TableCell align="right">{row.sizeAdjustment}</TableCell>
-                <TableCell align="right">{row.fumble}</TableCell>
-                <TableCell align="right" sx={{ color: getColor(row.bo), fontWeight: 'bold' }}>
-                  {row.bo}
+                <TableCell align="left">{t(attack.attackName)}</TableCell>
+                <TableCell align="left">{t(attack.type)}</TableCell>
+                <TableCell align="left">{t(attack.attackTable)}</TableCell>
+                <TableCell align="left">{t(attack.fumbleTable)}</TableCell>
+                <TableCell align="right">{attack.sizeAdjustment}</TableCell>
+                <TableCell align="right">{getFumbleText(attack)}</TableCell>
+                <TableCell align="right" sx={{ color: getColor(attack.bo), fontWeight: 'bold' }}>
+                  {attack.bo}
                 </TableCell>
-                <TableCell align="right">{getMeleeRangeFormated(row)}</TableCell>
+                <TableCell align="right">{getMeleeRangeFormated(attack)}</TableCell>
                 <TableCell align="right">
                   <Stack direction="row" spacing={1}>
-                    {row.boModifiers &&
-                      Object.entries(row.boModifiers)
+                    {attack.boModifiers &&
+                      Object.entries(attack.boModifiers)
                         .filter(([, v]) => v !== 0)
                         .map(([k, v]) => (
                           <Chip
