@@ -164,12 +164,12 @@ const CharacterViewInfo: FC<{
         <Grid size={gridSizeCard}>
           <Badge
             color="success"
-            badgeContent={`+${character.experience.availableDevelopmentPoints}`}
-            invisible={character.experience.availableDevelopmentPoints < 1}
+            badgeContent={`+${character.experience.availableDevPoints}`}
+            invisible={character.experience.availableDevPoints < 1}
             sx={{ display: 'block' }}
           >
             <RmuTextCard
-              value={`${character.experience.availableDevelopmentPoints} / ${character.experience.developmentPoints}`}
+              value={`${character.experience.availableDevPoints} / ${character.experience.devPoints}`}
               subtitle={t('Development points')}
               image={`${imageBaseUrl}images/generic/trait-combat.png`}
               grayscale={grayscale}

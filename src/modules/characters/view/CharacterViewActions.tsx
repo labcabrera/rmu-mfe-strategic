@@ -5,6 +5,7 @@ import {
   RmuBreadcrumbs,
   RefreshButton,
   EditButton,
+  DownloadButton,
   DeleteButton,
   DeleteDialog,
   StrategicGame,
@@ -12,10 +13,10 @@ import {
   fetchCharacter,
   deleteCharacter,
   levelUpCharacter,
+  LevelUpButton,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import LevelUpButton from '../../shared/buttons/LevelUpButton';
 
 const CharacterViewActions: FC<{
   character: Character;
@@ -64,6 +65,26 @@ const CharacterViewActions: FC<{
     navigate(`/strategic/characters/edit/${character.id}`, { state: { character } });
   };
 
+  const onDownload = () => {
+    try {
+      const json = JSON.stringify(character, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const sanitize = (name: string) => name.replace(/[^a-z0-9._-]/gi, '_');
+      const baseName = character.name ? sanitize(character.name) : `character-${character.id}`;
+      const filename = `${baseName}.json`;
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err: any) {
+      showError(err?.message || 'Unable to download character');
+    }
+  };
+
   const handleDialogDelete = () => {
     onDelete();
     setDeleteDialogOpen(false);
@@ -75,6 +96,7 @@ const CharacterViewActions: FC<{
         {levelUpAvailable && <LevelUpButton onClick={() => onLevelUp(false)} color="success" />}
         <RefreshButton onClick={onRefresh} />
         <EditButton onClick={onEdit} />
+        <DownloadButton onClick={onDownload} />
         <DeleteButton onClick={() => setDeleteDialogOpen(true)} />
       </RmuBreadcrumbs>
 
@@ -94,8 +116,8 @@ const CharacterViewActions: FC<{
         <DialogTitle id="alert-dialog-title">{'Level Up Confirmation'}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            {character.name} has {character.experience.availableDevelopmentPoints} available development points. Are you
-            sure you want to level up {character.name}? This action cannot be undone.
+            {character.name} has {character.experience.availableDevPoints} available development points. Are you sure
+            you want to level up {character.name}? This action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

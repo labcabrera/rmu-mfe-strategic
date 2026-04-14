@@ -115,7 +115,7 @@ const CharacterSkillTable: FC<{
             <TableCell align="left">
               <Tooltip title={t('Development points available / total')}>
                 <Typography variant="subtitle2">
-                  DP: {character.experience.availableDevelopmentPoints} / {character.experience.developmentPoints}
+                  DP: {character.experience.availableDevPoints} / {character.experience.devPoints}
                 </Typography>
               </Tooltip>
             </TableCell>
@@ -205,9 +205,9 @@ const CharacterViewSkillsEntry: FC<{
 
   const isLevelUpDisabled = () => {
     //TODO read allow 3rd rank from game settings
-    const rank = Math.min(skill.ranksDeveloped, 2);
+    const rank = Math.min(skill.ranksDeveloped, 1);
     const cost = skill.development[rank];
-    return character.experience.availableDevelopmentPoints < cost || skill.ranksDeveloped > 2;
+    return character.experience.availableDevPoints < cost || skill.ranksDeveloped > 2;
   };
 
   const isLevelDownDisabled = () => {
