@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
-import { CategorySeparator, AddButton, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  CategorySeparator,
+  AddButton,
+  TechnicalInfo,
+  StrategicGame,
+  fetchStrategicGame,
+  Faction,
+  fetchFactions,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { fetchFactions } from '../../api/faction';
-import { Faction } from '../../api/faction.dto';
-import { fetchStrategicGame } from '../../api/strategic-game';
-import { StrategicGame } from '../../api/strategic-game.dto';
 import { fetchTacticalGames, TacticalGame } from '../../api/tactical-games';
 import { gridSizeMain, gridSizeResume } from '../../services/display';
 import StrategicGameViewActions from './StrategicGameViewActions';
@@ -37,7 +41,7 @@ const StrategicGameView: React.FC = () => {
   useEffect(() => {
     if (strategicGame) {
       fetchFactions(`gameId==${strategicGame.id}`, 0, 100)
-        .then((data) => setFactions(data))
+        .then((data) => setFactions(data.content))
         .catch((err) => showError(err.message));
       fetchTacticalGames(`strategicGameId==${gameId}`, 0, 100)
         .then((data) => setTacticalGames(data))
@@ -76,7 +80,7 @@ const StrategicGameView: React.FC = () => {
           <CategorySeparator text={t('Tactical games')}>
             <AddButton onClick={onCreateTacticalGame} />
           </CategorySeparator>
-          <StrategicGameViewTacticalGames tacticalGames={tacticalGames} />
+          <StrategicGameViewTacticalGames tacticalGames={tacticalGames} factions={factions} />
           <TechnicalInfo>
             <pre>StrategicGame: {JSON.stringify(strategicGame, null, 2)}</pre>
           </TechnicalInfo>

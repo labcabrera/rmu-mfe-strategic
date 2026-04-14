@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Avatar,
@@ -9,52 +9,108 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
   Tooltip,
   Typography,
 } from '@mui/material';
+import { Character } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
-import { Character } from '../../api/character.dto';
+
+type SortField = 'name' | 'level' | null;
+type SortDirection = 'asc' | 'desc';
 
 const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ characters }) => {
   const navigate = useNavigate();
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   if (!characters) return <>{t('loading')}</>;
 
-  const getAttackDescription = (c: Character): string => {
-    if (!c.attacks || c.attacks.length === 0) return '-';
-    return c.attacks.map((a) => `${t(a.attackTable || '')}: ${a.bo ?? ''}`.trim()).join(', ');
+  const sortedCharacters = useMemo(() => {
+    if (!characters) return [] as Character[];
+    const list = [...characters];
+    const cmp = (a: Character, b: Character) => {
+      if (sortField === 'level') {
+        const la = a.experience?.level ?? 0;
+        const lb = b.experience?.level ?? 0;
+        if (la !== lb) return la - lb;
+        return (a.name || '').localeCompare(b.name || '');
+      }
+      // default: name
+      return (a.name || '').localeCompare(b.name || '');
+    };
+    list.sort((a, b) => (sortDirection === 'asc' ? cmp(a, b) : -cmp(a, b)));
+    return list;
+  }, [characters, sortField, sortDirection]);
+
+  const getAttackDescription = (character: Character): string => {
+    if (!character.attacks || character.attacks.length === 0) return '-';
+    return character.attacks.map((a) => `${t(a.attackTable || '')}: ${a.bo ?? ''}`.trim()).join(', ');
   };
 
-  const getArmorDescription = (c: Character): string => {
-    if (!c.defense || !c.defense.armor) return '-';
-    if (c.defense.armor.at) return `${c.defense.armor.at}`;
-    return `${c.defense.armor.headAt}/${c.defense.armor.bodyAt}/${c.defense.armor.armsAt}/${c.defense.armor.legsAt}`;
+  const getArmorDescription = (character: Character): string => {
+    if (!character.defense || !character.defense.armor) return '-';
+    if (character.defense.armor.at) return `${character.defense.armor.at}`;
+    return `${character.defense.armor.headAt}/${character.defense.armor.bodyAt}/${character.defense.armor.armsAt}/${character.defense.armor.legsAt}`;
+  };
+
+  const getExperienceLabel = (c: Character): string => {
+    if (c.experience.level < c.experience.availableLevel) {
+      return `${c.experience.level} (${c.experience.availableLevel})`;
+    }
+    return `${c.experience.level}`;
   };
 
   return (
     <TableContainer component={Paper} sx={{ width: '100%' }}>
       <Table size="small" aria-label="faction characters table">
-        <TableHead
-          sx={{
-            '& .MuiTableCell-root': {
-              color: 'primary.main',
-              fontWeight: 'bold',
-            },
-          }}
-        >
+        <TableHead>
           <TableRow>
-            <TableCell>{t('name')}</TableCell>
+            <TableCell>
+              <TableSortLabel
+                active={sortField === 'name'}
+                direction={sortField === 'name' ? sortDirection : 'asc'}
+                onClick={() => {
+                  if (sortField === 'name') {
+                    setSortDirection((d) => (d === 'asc' ? 'desc' : 'asc'));
+                  } else {
+                    setSortField('name');
+                    setSortDirection('asc');
+                  }
+                }}
+              >
+                {t('name')}
+              </TableSortLabel>
+            </TableCell>
             <TableCell>{t('race')}</TableCell>
-            <TableCell align="right">{t('level')}</TableCell>
+            <TableCell align="right">
+              <TableSortLabel
+                active={sortField === 'level'}
+                direction={sortField === 'level' ? sortDirection : 'asc'}
+                onClick={() => {
+                  if (sortField === 'level') {
+                    setSortDirection((d) => (d === 'asc' ? 'desc' : 'asc'));
+                  } else {
+                    setSortField('level');
+                    setSortDirection('desc');
+                  }
+                }}
+              >
+                {t('level')}
+              </TableSortLabel>
+            </TableCell>
+            <TableCell align="right">HP</TableCell>
             <TableCell>{t('profession')}</TableCell>
             <TableCell>{t('attacks')}</TableCell>
-            <TableCell>{t('DB')}</TableCell>
-            <TableCell>{t('AT')}</TableCell>
-            <TableCell align="right">HP</TableCell>
+            <TableCell align="right">{t('DB')}</TableCell>
+            <TableCell align="right">{t('AT')}</TableCell>
+            <TableCell align="right">{t('Ini')}</TableCell>
+            <TableCell align="right">{t('BMR')}</TableCell>
+            <TableCell align="right">{t('M.Pen')}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {characters.map((c) => (
+          {sortedCharacters.map((c) => (
             <TableRow
               key={c.id}
               hover
@@ -70,12 +126,29 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
                 </Tooltip>
               </TableCell>
               <TableCell>{c.info?.race?.name}</TableCell>
-              <TableCell align="right">{c.experience?.level ?? '-'}</TableCell>
+              <TableCell align="right">{getExperienceLabel(c)}</TableCell>
+              <TableCell align="right">
+                {c.hp.current === c.hp.max ? c.hp.max : `${c.hp.current}/${c.hp.max}`}
+              </TableCell>
               <TableCell>{t(c.info?.professionId || '')}</TableCell>
               <TableCell>{getAttackDescription(c)}</TableCell>
-              <TableCell>{c.defense.defensiveBonus}</TableCell>
-              <TableCell>{getArmorDescription(c)}</TableCell>
-              <TableCell align="right">{c.hp ? `${c.hp.current}/${c.hp.max}` : '-'}</TableCell>
+              <TableCell align="right">
+                <Typography color={c.defense.defensiveBonus < 0 ? 'error' : 'success'}>
+                  {c.defense.defensiveBonus}
+                </Typography>
+              </TableCell>
+              <TableCell align="right">{getArmorDescription(c)}</TableCell>
+              <TableCell align="right">
+                <Typography color={c.initiative.totalBonus < 0 ? 'error' : 'success'}>
+                  {c.initiative.totalBonus}
+                </Typography>
+              </TableCell>
+              <TableCell align="right">{c.movement.baseMovementRate}</TableCell>
+              <TableCell align="right">
+                <Typography color={c.equipment.maneuverPenalty < 0 ? 'error' : 'success'}>
+                  {c.equipment.maneuverPenalty}
+                </Typography>
+              </TableCell>
             </TableRow>
           ))}
           {characters.length === 0 && (

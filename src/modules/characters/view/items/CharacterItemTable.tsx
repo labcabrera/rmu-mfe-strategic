@@ -18,10 +18,9 @@ import {
   ListItemIcon,
   Stack,
 } from '@mui/material';
+import { Character, StrategicItem, updateCarriedStatus } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
-import { updateCarriedStatus, deleteItem } from '../../../api/character';
-import { Character, CharacterItem } from '../../../api/character.dto';
 import { imageBaseUrl } from '../../../services/config';
 import { itemFilter } from '../../../services/display';
 
@@ -29,10 +28,12 @@ const IMG_SIZE = 70;
 
 const CharacterItemTable: FC<{
   character: Character;
-  setCharacter?: Dispatch<SetStateAction<Character | undefined>>;
+  items: StrategicItem[];
   carried?: boolean;
-  onItemClick?: (item: CharacterItem) => void;
-}> = ({ character, setCharacter, carried, onItemClick }) => {
+  setCharacter?: Dispatch<SetStateAction<Character | undefined>>;
+  onItemClick?: (item: StrategicItem) => void;
+  onItemDeleted: (itemId: string) => void;
+}> = ({ character, items, carried, setCharacter, onItemClick, onItemDeleted }) => {
   const { showError } = useError();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuItemId, setMenuItemId] = useState<string | null>(null);
@@ -57,17 +58,7 @@ const CharacterItemTable: FC<{
     }
   };
 
-  const handleDelete = async (itemId: string) => {
-    try {
-      const data = await deleteItem(character.id, itemId);
-      if (setCharacter) setCharacter(data);
-      handleCloseMenu();
-    } catch (err: any) {
-      showError(err.message || err);
-    }
-  };
-
-  const getAmount = (item: CharacterItem): string => {
+  const getAmount = (item: StrategicItem): string => {
     return item.amount === 0 || (item.amount && item.amount !== 1) ? ` (${item.amount})` : '';
   };
 
@@ -84,7 +75,7 @@ const CharacterItemTable: FC<{
           </TableRow>
         </TableHead>
         <TableBody>
-          {character.items
+          {items
             .filter((item) => (typeof carried === 'boolean' ? !!item.carried === carried : true))
             .map((item) => (
               <TableRow
@@ -102,6 +93,7 @@ const CharacterItemTable: FC<{
                       width: IMG_SIZE,
                       height: IMG_SIZE,
                       filter: itemFilter,
+                      padding: 1,
                     }}
                   />
                 </TableCell>
@@ -139,7 +131,7 @@ const CharacterItemTable: FC<{
                     open={Boolean(anchorEl) && menuItemId === item.id}
                     onClose={handleCloseMenu}
                   >
-                    <MenuItem onClick={() => handleDelete(item.id)}>
+                    <MenuItem onClick={() => onItemDeleted(item.id)}>
                       <ListItemIcon>
                         <DeleteIcon fontSize="small" />
                       </ListItemIcon>

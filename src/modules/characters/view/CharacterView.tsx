@@ -1,12 +1,15 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
+import {
+  Character,
+  fetchCharacter,
+  fetchProfession,
+  fetchStrategicGame,
+  Profession,
+  StrategicGame,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
-import { fetchCharacter } from '../../api/character';
-import { Character } from '../../api/character.dto';
-import { fetchProfession, Profession } from '../../api/professions';
-import { fetchStrategicGame } from '../../api/strategic-game';
-import { StrategicGame } from '../../api/strategic-game.dto';
 import { gridSizeResume, gridSizeMain } from '../../services/display';
 import CharacterViewActions from './CharacterViewActions';
 import CharacterViewResume from './CharacterViewResume';
@@ -16,7 +19,7 @@ const CharacterView: FC = () => {
   const location = useLocation();
   const { characterId } = useParams<{ characterId: string }>();
   const [character, setCharacter] = useState<Character>();
-  const [strategicGame, setStrategicGame] = useState<StrategicGame | null>(null);
+  const [strategicGame, setStrategicGame] = useState<StrategicGame>();
   const [profession, setProfession] = useState<Profession>();
   const { showError } = useError();
 
@@ -29,7 +32,7 @@ const CharacterView: FC = () => {
         .then((professionData) => setProfession(professionData))
         .catch((err) => showError(err.message));
     }
-  }, [character, showError]);
+  }, [character]);
 
   useEffect(() => {
     if (characterId) {
@@ -46,7 +49,7 @@ const CharacterView: FC = () => {
       <CharacterViewActions character={character} setCharacter={setCharacter} game={strategicGame} />
       <Grid container spacing={1}>
         <Grid size={gridSizeResume}>
-          <CharacterViewResume character={character} setCharacter={setCharacter} strategicGame={strategicGame} />
+          <CharacterViewResume character={character} setCharacter={setCharacter} />
         </Grid>
         <Grid size={gridSizeMain}>
           <CharacterViewTabs

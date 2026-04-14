@@ -3,15 +3,20 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import { Box, ToggleButton, ToggleButtonGroup, Grid } from '@mui/material';
-import { CategorySeparator, RmuTextCard, AddButton, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  CategorySeparator,
+  RmuTextCard,
+  AddButton,
+  TechnicalInfo,
+  fetchStrategicGame,
+  StrategicGame,
+  Character,
+  Faction,
+  fetchCharacters,
+  fetchFaction,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { fetchCharacters } from '../../api/character';
-import { Character } from '../../api/character.dto';
-import { fetchFaction } from '../../api/faction';
-import { Faction } from '../../api/faction.dto';
-import { fetchStrategicGame } from '../../api/strategic-game';
-import { StrategicGame } from '../../api/strategic-game.dto';
 import { gridSizeResume, gridSizeMain, gridSizeCard } from '../../services/display';
 import FactionViewActions from './FactionViewActions';
 import FactionViewAttributes from './FactionViewAttributes';
@@ -56,7 +61,7 @@ const FactionView: FC = () => {
         .then((data: StrategicGame) => setGame(data))
         .catch((err) => showError(err.message));
       fetchCharacters(`faction.id==${faction.id}`, 0, 100)
-        .then((data: Character[]) => setCharacters(data))
+        .then((data) => setCharacters(data.content))
         .catch((err) => showError(err.message));
     }
   }, [faction]);
@@ -95,7 +100,7 @@ const FactionView: FC = () => {
 
           <CategorySeparator text={t('Faction')} />
 
-          <FactionViewAttributes faction={faction} />
+          <FactionViewAttributes faction={faction} characters={characters} />
 
           <CategorySeparator text={t('Characters')}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>

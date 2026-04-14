@@ -3,14 +3,14 @@ import { TextField } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
-import { CreateFactionDto, UpdateFactionDto } from '../../api/faction.dto';
+import { CreateFactionDto, Faction, UpdateFactionDto } from '../../api/faction.dto';
 
 const FactionForm: FC<{
-  formData: CreateFactionDto | UpdateFactionDto;
-  setFormData: Dispatch<SetStateAction<CreateFactionDto | UpdateFactionDto>>;
+  formData: Faction;
+  setFormData: Dispatch<SetStateAction<Faction>>;
 }> = ({ formData, setFormData }) => {
   return (
-    <Grid container spacing={1}>
+    <Grid container spacing={2}>
       <Grid size={12}>
         <TextField
           label={t('Faction name')}
@@ -25,7 +25,7 @@ const FactionForm: FC<{
           label={t('Gold')}
           name="availableGold"
           value={formData.management.availableGold}
-          onChange={(e) => setFormData({ ...formData, management: { ...formData.management, availableGold: e } })}
+          onChange={(e) => setFormData({ ...formData, management: { ...formData.management, availableGold: e || 0 } })}
           maxFractionDigits={2}
         />
       </Grid>

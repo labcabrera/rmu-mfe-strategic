@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
+import { CharacterStatistics, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Tooltip } from 'recharts';
-import { CharacterStatistics, STATS } from '../../api/character.dto';
 
 const CharacterViewStatsChart: FC<{ stats: CharacterStatistics }> = ({ stats }) => {
   const { t } = useTranslation();

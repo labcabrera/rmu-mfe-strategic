@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { Chip, Grid, Typography } from '@mui/material';
+import { Profession } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
-import { Profession } from '../../api/professions';
 
 const CharacterCreateSkillCosts: FC<{
   profession: Profession;

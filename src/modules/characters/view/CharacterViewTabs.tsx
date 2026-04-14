@@ -1,16 +1,15 @@
 import React, { useState, SyntheticEvent, ReactNode, FC, Dispatch, SetStateAction } from 'react';
 import { Box, Grid, Tab, Tabs } from '@mui/material';
-import { Character } from '../../api/character.dto';
-import { Profession } from '../../api/professions';
-import { StrategicGame } from '../../api/strategic-game.dto';
+import { Character, StrategicGame, Profession } from '@labcabrera-rmu/rmu-react-shared-lib';
 import CharacterViewAttacks from './CharacterViewAttacks';
 import CharacterViewInfo from './CharacterViewInfo';
+import CharacterViewMovement from './CharacterViewMovement';
 import CharacterViewResistances from './CharacterViewResistances';
-import CharacterViewStats from './CharacterViewStats';
-import CharacterViewStatsChart from './CharacterViewStatsChart';
 import CharacterViewExperience from './CharacterViewXp';
 import CharacterViewItems from './items/CharacterViewItems';
 import CharacterViewSkills from './skills/CharacterViewSkills';
+import CharacterViewStats from './stats/CharacterViewStats';
+import CharacterViewStatsChart from './stats/CharacterViewStatsChart';
 import CharacterViewTraits from './traits/CharacterViewTraits';
 
 function CustomTabPanel(props: { children?: ReactNode; value: number; index: number }) {
@@ -38,10 +37,10 @@ function a11yProps(index: number) {
 
 const CharacterViewTabs: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   strategicGame: StrategicGame;
   profession: Profession;
-}> = ({ character, setCharacter, strategicGame, profession }) => {
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
+}> = ({ character, strategicGame, profession, setCharacter }) => {
   const [value, setValue] = useState<number>(0);
 
   const handleChange = (_event: SyntheticEvent, newValue: number) => {
@@ -65,8 +64,9 @@ const CharacterViewTabs: FC<{
           <Tab label="Traits" {...a11yProps(4)} />
           <Tab label="Items" {...a11yProps(5)} />
           <Tab label="Attacks" {...a11yProps(6)} />
-          <Tab label="XP" {...a11yProps(7)} />
-          <Tab label="Debug" {...a11yProps(8)} />
+          <Tab label="Movement" {...a11yProps(7)} />
+          <Tab label="XP" {...a11yProps(8)} />
+          <Tab label="Debug" {...a11yProps(9)} />
         </Tabs>
       </Box>
 
@@ -77,7 +77,7 @@ const CharacterViewTabs: FC<{
       <CustomTabPanel value={value} index={1}>
         <Grid container spacing={1}>
           <Grid size={6}>
-            <CharacterViewStats character={character} />
+            <CharacterViewStats character={character} setCharacter={setCharacter} />
           </Grid>
           <Grid size={6}>
             <CharacterViewStatsChart stats={character.statistics} />
@@ -102,16 +102,19 @@ const CharacterViewTabs: FC<{
       </CustomTabPanel>
 
       <CustomTabPanel value={value} index={6}>
-        <CharacterViewAttacks character={character} />
+        <CharacterViewAttacks character={character} strategicGame={strategicGame} />
       </CustomTabPanel>
 
       <CustomTabPanel value={value} index={7}>
-        <CharacterViewExperience character={character} setCharacter={setCharacter} />
+        <CharacterViewMovement character={character} strategicGame={strategicGame} />
       </CustomTabPanel>
 
       <CustomTabPanel value={value} index={8}>
+        <CharacterViewExperience character={character} setCharacter={setCharacter} />
+      </CustomTabPanel>
+
+      <CustomTabPanel value={value} index={9}>
         <pre>Character: {JSON.stringify(character, null, 2)}</pre>
-        <pre>Profession: {JSON.stringify(profession, null, 2)}</pre>
       </CustomTabPanel>
     </Box>
   );

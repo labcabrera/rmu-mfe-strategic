@@ -1,18 +1,18 @@
 import React, { Dispatch, FC, Fragment, SetStateAction } from 'react';
 import { Divider, Grid, Typography, Paper, Stack } from '@mui/material';
-import { CategorySeparator, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CategorySeparator, Character, StrategicItem, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
-import { Character, CharacterItem } from '../../../api/character.dto';
-import CharacterViewTransferGold from '../CharacterViewTransferGold';
 
 const CharacterItemDetail: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
+  items: StrategicItem[];
   itemId?: string | undefined;
-}> = ({ itemId, character, setCharacter }) => {
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
+}> = ({ itemId, character, items, setCharacter }) => {
   if (!itemId) return null;
+  if (!items) return <p>Loading...</p>;
 
-  const item = character.items.find((i) => i.id == itemId)!;
+  const item = items.find((i) => i.id == itemId)!;
 
   if (!item) return null;
 
@@ -68,12 +68,6 @@ const CharacterItemDetail: FC<{
                 <KeyValueEntry label={t('Encumbrance')} value={item.armor.enc} />
               </Grid>
             </>
-          )}
-
-          {item.itemTypeId === 'gold-coin' && (
-            <Grid size={12}>
-              <CharacterViewTransferGold character={character} setCharacter={setCharacter} />
-            </Grid>
           )}
 
           <Grid size={12}>

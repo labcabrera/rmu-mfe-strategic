@@ -1,24 +1,29 @@
 import React, { useState, useEffect, FC } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import OutboundIcon from '@mui/icons-material/Outbound';
-import { Grid, IconButton, Box, Button, TextField, Badge } from '@mui/material';
-import { CategorySeparator, EditableAvatar, RefreshButton, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Grid, IconButton, TextField, Badge } from '@mui/material';
+import {
+  CategorySeparator,
+  CreateCharacterDto,
+  EditableAvatar,
+  Faction,
+  fetchFaction,
+  fetchRaces,
+  fetchStrategicGame,
+  Profession,
+  Race,
+  RefreshButton,
+  StrategicGame,
+  TechnicalInfo,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { CreateCharacterDto } from '../../api/character.dto';
-import { fetchFactions } from '../../api/faction';
-import { Faction } from '../../api/faction.dto';
-import { Profession } from '../../api/professions';
-import { fetchRaces } from '../../api/race';
-import { Race } from '../../api/race.dto';
-import { fetchStrategicGame } from '../../api/strategic-game';
-import { StrategicGame } from '../../api/strategic-game.dto';
 import { characterCreationTemplate, defaultStats } from '../../data/character-create';
 import { imageBaseUrl } from '../../services/config';
 import { gridSizeResume, gridSizeMain } from '../../services/display';
 import { getAvatarImages } from '../../services/image-service';
 import { randomizeStats } from '../../services/randomize-stats';
-import CharacterViewStatsChart from '../view/CharacterViewStatsChart';
+import CharacterViewStatsChart from '../view/stats/CharacterViewStatsChart';
 import CharacterCreateActions from './CharacterCreateActions';
 import CharacterCreateBoostOptionsDialog from './CharacterCreateBoostOptionsDialog';
 import CharacterCreateProfessionalSkills from './CharacterCreateProfessionalSkills';
@@ -51,18 +56,13 @@ const CharacterCreate: FC = () => {
   const [races, setRaces] = useState<Race[]>([]);
   const [selectedRace, setSelectedRace] = useState<Race>();
 
-  const [factions, setFactions] = useState<Faction[]>([]);
   const [formData, setFormData] = useState<CreateCharacterDto>(characterCreationTemplate);
   const [statBonusFormData, setStatBonusFormData] = useState<StatBonusFormData>(defaultStats);
-  const [boosts, setBoosts] = useState<number>(game?.powerLevel.statCreationBoost || 2);
-  const [swaps, setSwaps] = useState<number>(game?.powerLevel.statCreationSwap || 2);
   const [isValid, setIsValid] = useState<boolean>(false);
   const [boostDialogOpen, setBoostDialogOpen] = useState<boolean>(false);
 
   const onRandomStats = () => {
     randomizeStats(setFormData, setStatBonusFormData);
-    setBoosts(game?.powerLevel.statCreationBoost || 2);
-    setSwaps(game?.powerLevel.statCreationSwap || 2);
   };
 
   const checkValidForm = (formData: CreateCharacterDto) => {
@@ -78,16 +78,11 @@ const CharacterCreate: FC = () => {
   };
 
   const bindStrategicGame = () => {
-    if (!gameId) return;
-    fetchStrategicGame(gameId)
-      .then((game) => setGame(game))
-      .catch((err) => showError(err.message));
-    fetchFactions(`gameId==${gameId}`, 0, 20)
-      .then((factions) => {
-        setFactions(factions);
-        setFaction(factions.find((f) => f.id === factionId) || null);
-      })
-      .catch((err) => showError(err.message));
+    if (gameId) {
+      fetchStrategicGame(gameId)
+        .then((game) => setGame(game))
+        .catch((err) => showError(err.message));
+    }
   };
 
   const handleWeaponOrderChange = (newOrder: string[]) => {
@@ -104,7 +99,7 @@ const CharacterCreate: FC = () => {
   useEffect(() => {
     if (game) {
       fetchRaces(`realm.id==${game.realmId}`, 0, 100)
-        .then((data) => setRaces(data))
+        .then((data) => setRaces(data.content))
         .catch((err) => showError(err.message));
     }
   }, [game]);
@@ -121,14 +116,16 @@ const CharacterCreate: FC = () => {
 
   useEffect(() => {
     if (factionId) {
-      setFormData((prevState) => ({
-        ...prevState,
-        factionId: factionId,
-      }));
+      fetchFaction(factionId)
+        .then((response) => {
+          setFaction(response);
+          setFormData((prevState) => ({ ...prevState, factionId: factionId }));
+        })
+        .catch((err) => showError(err.message));
     }
   }, [factionId]);
 
-  if (!game || !formData || !faction) return <div>Loading...</div>;
+  if (!game || !formData) return <div>Loading....</div>;
 
   return (
     <>
@@ -153,15 +150,13 @@ const CharacterCreate: FC = () => {
         </Grid>
 
         <Grid size={gridSizeMain}>
-          <CategorySeparator text={t('stats')}>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <RefreshButton onClick={onRandomStats} />
-              <Badge badgeContent={2} color="success">
-                <IconButton onClick={() => setBoostDialogOpen(true)} color="primary">
-                  <OutboundIcon />
-                </IconButton>
-              </Badge>
-            </Box>
+          <CategorySeparator text={t('Stats')}>
+            <RefreshButton onClick={onRandomStats} />
+            <Badge badgeContent={2} color="success">
+              <IconButton onClick={() => setBoostDialogOpen(true)} color="primary">
+                <OutboundIcon />
+              </IconButton>
+            </Badge>
           </CategorySeparator>
 
           <Grid container spacing={1}>

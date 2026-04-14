@@ -1,10 +1,8 @@
 import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography } from '@mui/material';
-import { TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Character, CharacterTrait, deleteCharacterTrait, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
-import { deleteTrait } from '../../../api/character';
-import { Character, CharacterTrait } from '../../../api/character.dto';
 import { fetchTrait } from '../../../api/trait';
 import { DeleteTraitDto, Trait } from '../../../api/trait.dto';
 
@@ -23,7 +21,7 @@ const CharacterViewTraitDialog: FC<{
       traitId: characterTrait.traitId,
       specialization: characterTrait.specialization,
     };
-    deleteTrait(character.id, dto)
+    deleteCharacterTrait(character.id, dto)
       .then((updatedCharacter) => {
         setCharacter(updatedCharacter);
         onClose();

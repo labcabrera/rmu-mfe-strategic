@@ -1,22 +1,22 @@
 import React, { FC, useState } from 'react';
 import { Box, CardMedia, Stack, Tooltip } from '@mui/material';
+import { Character, EQUIPMENT_SLOTS, EquipmentSlot, StrategicItem } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
-import { Character, CharacterItem } from '../../../api/character.dto';
 import { imageBaseUrl } from '../../../services/config';
 import { itemFilter } from '../../../services/display';
 import CharacterEquipmentDialog from './CharacterEquipmentDialog';
 
-const slots = ['mainHand', 'offHand', 'head', 'body', 'arms', 'legs'];
 const SLOT_SIZE = 100;
 
 const CharacterViewEquipment: FC<{
   character: Character;
+  items: StrategicItem[];
   setCharacter: (c: Character) => void;
-}> = ({ character, setCharacter }) => {
+}> = ({ character, items, setCharacter }) => {
   const [open, setOpen] = useState(false);
-  const [slot, setSlot] = useState<string>('');
+  const [slot, setSlot] = useState<EquipmentSlot>();
 
-  const handleOpen = (s: string) => {
+  const handleOpen = (s: EquipmentSlot) => {
     setSlot(s);
     setOpen(true);
   };
@@ -27,16 +27,18 @@ const CharacterViewEquipment: FC<{
     setCharacter(updated);
   };
 
-  const getItemForSlot = (s: string): CharacterItem | null => {
-    const id = (character.equipment as any)[s];
+  const getItemForSlot = (slot: EquipmentSlot): StrategicItem | null => {
+    const id = character.equipment.slots[slot] || null;
     if (!id) return null;
-    return character.items.find((it) => it.id === id) || null;
+    return items.find((it) => it.id === id) || null;
   };
+
+  if (!character || !items) return <p>Loading...</p>;
 
   return (
     <>
       <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="flex-start">
-        {slots.map((s) => {
+        {EQUIPMENT_SLOTS.map((s) => {
           const item = getItemForSlot(s);
           return (
             <Box
@@ -74,7 +76,14 @@ const CharacterViewEquipment: FC<{
         })}
       </Stack>
 
-      <CharacterEquipmentDialog open={open} onClose={handleClose} character={character} slot={slot} onEquip={onEquip} />
+      <CharacterEquipmentDialog
+        open={open}
+        character={character}
+        items={items}
+        slot={slot}
+        onEquip={onEquip}
+        onClose={handleClose}
+      />
     </>
   );
 };

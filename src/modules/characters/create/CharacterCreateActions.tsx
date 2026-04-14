@@ -1,12 +1,15 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RmuBreadcrumbs, SaveButton } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  createCharacter,
+  CreateCharacterDto,
+  Faction,
+  RmuBreadcrumbs,
+  SaveButton,
+  StrategicGame,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { createCharacter } from '../../api/character';
-import { CreateCharacterDto } from '../../api/character.dto';
-import { Faction } from '../../api/faction.dto';
-import { StrategicGame } from '../../api/strategic-game.dto';
 
 const CharacterCreateActions: FC<{
   formData: CreateCharacterDto;
@@ -17,14 +20,14 @@ const CharacterCreateActions: FC<{
   const navigate = useNavigate();
   const { showError } = useError();
 
-  if (!game || !faction) return <p>Loading character actions...</p>;
+  if (!game || !faction) return <p>Loading...</p>;
 
   const breadcrumbs = [
     { name: t('strategic'), link: '/strategic' },
     { name: t('games'), link: '/strategic/games' },
     { name: game.name, link: `/strategic/games/view/${game.id}` },
     { name: faction.name, link: `/strategic/factions/view/${faction.id}` },
-    { name: t('character-creation') },
+    { name: t('Character creation') },
   ];
 
   const onCreate = async () => {

@@ -1,10 +1,13 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
-import { EditableAvatar } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  EditableAvatar,
+  fetchStrategicGame,
+  StrategicGame,
+  UpdateStrategicGameDto,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
-import { fetchStrategicGame } from '../../api/strategic-game';
-import { StrategicGame, UpdateStrategicGameDto } from '../../api/strategic-game.dto';
 import { gridSizeResume, gridSizeMain } from '../../services/display';
 import StrategicGameForm from '../shared/StrategicGameForm';
 import StrategicGameUpdateActions from './StrategicGameUpdateActions';

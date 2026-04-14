@@ -14,11 +14,9 @@ import {
   Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { addCharacterTrait, AddTraitDto, Character, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
-import { addTrait } from '../../../api/character';
-import { AddTraitDto, Character } from '../../../api/character.dto';
 import { fetchTraits } from '../../../api/trait';
 import { Trait, traitCategories } from '../../../api/trait.dto';
 import SelectTraitSpecialization from './SelectTraitSpecialization';
@@ -44,7 +42,7 @@ const AddTraitDialog: FC<{
   };
 
   const onAddTrait = () => {
-    addTrait(character.id, formData)
+    addCharacterTrait(character.id, formData)
       .then((updatedCharacter) => {
         setCharacter(updatedCharacter);
         reset();

@@ -22,8 +22,6 @@ const NameTextField: FC<NameTextFieldProps> = ({
   generateRandomRaceValue,
   gender,
 }) => {
-  const error = required && (!value || value.trim() === '');
-
   const handleRandomNameClick = async () => {
     const name = await fetchRandomName(generateRandomRaceValue, gender);
     onChange(name);
@@ -34,9 +32,9 @@ const NameTextField: FC<NameTextFieldProps> = ({
       <TextField
         label={label}
         value={value}
-        onChange={onChange as any}
+        onChange={(e) => onChange((e.target as HTMLInputElement).value)}
         fullWidth
-        error={error}
+        error={required && !value}
         size="small"
         slotProps={{
           input: {

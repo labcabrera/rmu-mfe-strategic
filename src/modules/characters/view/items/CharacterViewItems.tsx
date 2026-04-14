@@ -1,16 +1,24 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Grid, Stack } from '@mui/material';
-import { CategorySeparator } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  StrategicItem,
+  CategorySeparator,
+  TechnicalInfo,
+  fetchStrategicItems,
+  createStrategicItem,
+  deleteStrategicItem,
+  Character,
+  fetchCharacter,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
-import { addItem } from '../../../api/character';
-import { AddItemDto, Character, CharacterItem } from '../../../api/character.dto';
 import CharacterViewAddItemDialog from './CharacterAddItemDialog';
 import CharacterItemDetail from './CharacterItemDetail';
 import CharacterItemTable from './CharacterItemTable';
 import CharacterViewEquipment from './CharacterViewEquipment';
 import CharacterViewEquipmentInfo from './CharacterViewEquipmentInfo';
+import CharacterViewTransferGold from './CharacterViewTransferGold';
 
 const CharacterViewItems: FC<{
   character: Character;
@@ -19,13 +27,45 @@ const CharacterViewItems: FC<{
   const navigate = useNavigate();
   const { showError } = useError();
   const [openAddItemDialog, setOpenAddItemDialog] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<CharacterItem>();
+  const [selectedItem, setSelectedItem] = useState<StrategicItem>();
+  const [characterItems, setCharacterItems] = useState<StrategicItem[]>([]);
 
-  const onItemAdded = (addItemDto: AddItemDto) => {
-    addItem(character.id, addItemDto)
-      .then((data) => setCharacter!(data))
+  const onItemAdded = (formData: Partial<StrategicItem>) => {
+    formData.gameId = character.gameId;
+    formData.characterId = character.id;
+    createStrategicItem(formData)
+      .then(() => {
+        // bindCharacterItems();
+        bindCharacter();
+      })
       .catch((err) => showError(err.message));
   };
+
+  const onItemDeleted = (itemId: string) => {
+    deleteStrategicItem(itemId)
+      .then(() => {
+        bindCharacter();
+      })
+      .catch((err) => showError(err.message));
+  };
+
+  const bindCharacter = () => {
+    fetchCharacter(character.id)
+      .then((response) => setCharacter(response))
+      .catch((err) => showError(err.message));
+  };
+
+  const bindCharacterItems = () => {
+    if (character) {
+      fetchStrategicItems(`characterId==${character.id}`, 0, 1000)
+        .then((response) => setCharacterItems(response.content))
+        .catch((err) => showError(err.message));
+    }
+  };
+
+  useEffect(() => {
+    bindCharacterItems();
+  }, [character]);
 
   if (!setCharacter) return <p>Loading...</p>;
 
@@ -49,11 +89,7 @@ const CharacterViewItems: FC<{
         </Grid>
 
         <Grid size={12}>
-          <CharacterViewEquipment character={character} setCharacter={setCharacter} />
-        </Grid>
-
-        <Grid size={12}>
-          <CategorySeparator text={t('Equipment info')} />
+          <CharacterViewEquipment character={character} items={characterItems} setCharacter={setCharacter} />
         </Grid>
 
         <Grid size={12}>
@@ -61,24 +97,28 @@ const CharacterViewItems: FC<{
         </Grid>
 
         <Grid size={12}>
-          <CategorySeparator text={t('Carried')} />
+          <CategorySeparator text={t('Items')} />
         </Grid>
 
         <Grid size={{ xs: 12, md: 6 }}>
           <CharacterItemTable
             character={character}
-            setCharacter={setCharacter}
+            items={characterItems}
             carried={true}
+            setCharacter={setCharacter}
             onItemClick={setSelectedItem}
+            onItemDeleted={onItemDeleted}
           />
         </Grid>
 
         <Grid size={{ xs: 12, md: 6 }}>
           <CharacterItemTable
             character={character}
-            setCharacter={setCharacter}
+            items={characterItems}
             carried={false}
+            setCharacter={setCharacter}
             onItemClick={setSelectedItem}
+            onItemDeleted={onItemDeleted}
           />
         </Grid>
 
@@ -86,10 +126,22 @@ const CharacterViewItems: FC<{
           <CharacterItemDetail
             character={character}
             setCharacter={setCharacter}
+            items={characterItems}
             itemId={selectedItem?.id || undefined}
           />
         </Grid>
+
+        <Grid size={12}>
+          <CharacterViewTransferGold character={character} setCharacter={setCharacter} items={characterItems} />
+        </Grid>
+
+        <Grid size={12}>
+          <TechnicalInfo>
+            <pre>{JSON.stringify(characterItems, null, 2)}</pre>
+          </TechnicalInfo>
+        </Grid>
       </Grid>
+
       <CharacterViewAddItemDialog
         open={openAddItemDialog}
         onClose={() => setOpenAddItemDialog(false)}

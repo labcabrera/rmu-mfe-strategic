@@ -2,7 +2,6 @@ import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import CropSquareIcon from '@mui/icons-material/CropSquare';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import SquareIcon from '@mui/icons-material/Square';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
@@ -10,6 +9,7 @@ import TurnedInIcon from '@mui/icons-material/TurnedIn';
 import TurnedInNotIcon from '@mui/icons-material/TurnedInNot';
 import {
   Box,
+  ButtonGroup,
   IconButton,
   Paper,
   Stack,
@@ -21,11 +21,19 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import {
+  Character,
+  CharacterSkill,
+  DeleteButton,
+  deleteCharacterSkill,
+  deleteSkill,
+  levelDownSkill,
+  levelUpSkill,
+  Profession,
+  setUpProfessionalSkill,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
-import { levelUpSkill, levelDownSkill, setUpProfessionalSkill, deleteSkill } from '../../../api/character';
-import { Character, CharacterSkill } from '../../../api/character.dto';
-import { Profession } from '../../../api/professions';
 
 const maxProfessionalSkills = 10;
 const maxKnackSkills = 2;
@@ -39,16 +47,9 @@ const CharacterSkillTable: FC<{
   const currentProfessionalSkills = character.skills.filter((s) => s.professional?.includes('professional')).length;
 
   return (
-    <Paper sx={{ width: '100%' }}>
-      <Table size="small" sx={{ minWidth: 900 }} aria-label="character skills table">
-        <TableHead
-          sx={{
-            '& .MuiTableCell-root': {
-              color: 'primary.main',
-              fontWeight: 'bold',
-            },
-          }}
-        >
+    <Paper>
+      <Table size="small">
+        <TableHead>
           <TableRow>
             <TableCell align="left">{t('Skill')}</TableCell>
             <TableCell align="left">
@@ -59,24 +60,11 @@ const CharacterSkillTable: FC<{
               </Tooltip>
             </TableCell>
             <TableCell align="left">Stats</TableCell>
-            <TableCell align="right">
-              <Tooltip title={t('Development cost')}>
-                <Typography variant="body2">
-                  <b>Dev</b>
-                </Typography>
-              </Tooltip>
-            </TableCell>
+
             <TableCell align="right">
               <Tooltip title={t('Developed ranks')}>
                 <Typography variant="body2">
                   <b>{t('Ranks')}</b>
-                </Typography>
-              </Tooltip>
-            </TableCell>
-            <TableCell align="left">
-              <Tooltip title={t('Developed ranks')}>
-                <Typography variant="body2">
-                  <b>{t('Dev Ranks')}</b>
                 </Typography>
               </Tooltip>
             </TableCell>
@@ -110,10 +98,24 @@ const CharacterSkillTable: FC<{
             </TableCell>
             <TableCell align="right">Custom</TableCell>
             <TableCell align="right">Total</TableCell>
+            <TableCell align="right">
+              <Tooltip title={t('Development cost')}>
+                <Typography variant="body2">
+                  <b>Dev</b>
+                </Typography>
+              </Tooltip>
+            </TableCell>
+            <TableCell align="left">
+              <Tooltip title={t('Developed ranks')}>
+                <Typography variant="body2">
+                  <b>{t('Dev Ranks')}</b>
+                </Typography>
+              </Tooltip>
+            </TableCell>
             <TableCell align="left">
               <Tooltip title={t('Development points available / total')}>
                 <Typography variant="subtitle2">
-                  DP: {character.experience.availableDevelopmentPoints} / {character.experience.developmentPoints}
+                  DP: {character.experience.availableDevPoints} / {character.experience.devPoints}
                 </Typography>
               </Tooltip>
             </TableCell>
@@ -145,10 +147,9 @@ const CharacterViewSkillsEntry: FC<{
   currentKnackSkills: number;
   currentProfessionalSkills: number;
 }> = ({ character, setCharacter, skill, profession, currentKnackSkills, currentProfessionalSkills }) => {
+  const { showError } = useError();
   const isProfessional = skill.professional?.includes('professional');
   const isKnack = skill.professional?.includes('knack');
-
-  const { showError } = useError();
 
   const handleLevelUp = () => {
     levelUpSkill(character.id, skill.skillId, skill.specialization)
@@ -196,17 +197,17 @@ const CharacterViewSkillsEntry: FC<{
       .catch((error: any) => showError(error.message));
   };
 
-  const handleDeleteSkill = (skillObj: CharacterSkill) => {
-    deleteSkill(character.id, skillObj.skillId, skillObj.specialization)
+  const handleDeleteSkill = (skill: CharacterSkill) => {
+    deleteCharacterSkill(character.id, skill.skillId, skill.specialization)
       .then((updated) => setCharacter(updated))
-      .catch((error: any) => showError(error.message));
+      .catch((error) => showError(error.message));
   };
 
   const isLevelUpDisabled = () => {
     //TODO read allow 3rd rank from game settings
-    const rank = Math.min(skill.ranksDeveloped, 2);
+    const rank = Math.min(skill.ranksDeveloped, 1);
     const cost = skill.development[rank];
-    return character.experience.availableDevelopmentPoints < cost || skill.ranksDeveloped > 2;
+    return character.experience.availableDevPoints < cost || skill.ranksDeveloped > 2;
   };
 
   const isLevelDownDisabled = () => {
@@ -241,24 +242,11 @@ const CharacterViewSkillsEntry: FC<{
         {skill.specialization ? t(skill.specialization) : '-'}
       </TableCell>
       <TableCell align="left">{getStatistics(skill)}</TableCell>
-      <TableCell align="right">{skill.development?.join(' / ') || '-'}</TableCell>
+
       <TableCell align="right">
         <Typography variant="body2" display="inline">
-          {skill.ranks}
+          <b>{skill.ranks}</b>
         </Typography>
-      </TableCell>
-      <TableCell align="right">
-        <Stack direction="row" spacing={0}>
-          {Array.from({ length: 3 }, (_, idx) => idx + 1).map((rank) => (
-            <Box key={rank} component="span" sx={{ display: 'inline-flex', mx: 0, p: 0 }}>
-              {rank <= skill.ranksDeveloped ? (
-                <SquareIcon sx={{ mx: 0, p: 0 }} fontSize="small" />
-              ) : (
-                <CropSquareIcon sx={{ mx: 0, p: 0 }} fontSize="small" />
-              )}
-            </Box>
-          ))}
-        </Stack>
       </TableCell>
       <TableCell
         align="right"
@@ -297,46 +285,54 @@ const CharacterViewSkillsEntry: FC<{
       >
         {skill.totalBonus}
       </TableCell>
-      <TableCell align="left">
-        <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center">
-          <Box>
-            <IconButton onClick={handleLevelUp} disabled={isLevelUpDisabled()} color="primary">
-              <ArrowCircleUpIcon />
-            </IconButton>
-            <IconButton onClick={handleLevelDown} disabled={isLevelDownDisabled()} color="primary">
-              <ArrowCircleDownIcon />
-            </IconButton>
-            {!isDeletedDisabled() && (
-              <IconButton onClick={() => handleDeleteSkill(skill)} color="primary">
-                <DeleteForeverIcon />
-              </IconButton>
-            )}
-            {isAvailableProfessionSkill(skill) && (
-              <>
-                <Tooltip title={t('Professional skill')}>
-                  <IconButton
-                    aria-label="set-professional"
-                    onClick={() => handleSetUpProfessionalSkill(skill)}
-                    disabled={!isProfessional && currentProfessionalSkills >= maxProfessionalSkills}
-                    color="primary"
-                  >
-                    {isProfessional ? <TurnedInIcon /> : <TurnedInNotIcon />}
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title={t('Knack skill')}>
-                  <IconButton
-                    aria-label="set-knack"
-                    onClick={() => handleSetUpKnackSkill(skill)}
-                    color="primary"
-                    disabled={!isKnack && currentKnackSkills >= maxKnackSkills}
-                  >
-                    {isKnack ? <StarIcon /> : <StarBorderIcon />}
-                  </IconButton>
-                </Tooltip>
-              </>
-            )}
-          </Box>
+      <TableCell align="right">{skill.development?.join(' / ') || '-'}</TableCell>
+      <TableCell align="right">
+        <Stack direction="row" spacing={0}>
+          {Array.from({ length: 3 }, (_, idx) => idx + 1).map((rank) => (
+            <Box key={rank} component="span" sx={{ display: 'inline-flex', mx: 0, p: 0 }}>
+              {rank <= skill.ranksDeveloped ? (
+                <SquareIcon sx={{ mx: 0, p: 0 }} fontSize="small" />
+              ) : (
+                <CropSquareIcon sx={{ mx: 0, p: 0 }} fontSize="small" />
+              )}
+            </Box>
+          ))}
         </Stack>
+      </TableCell>
+      <TableCell align="left">
+        <ButtonGroup>
+          <IconButton onClick={handleLevelUp} disabled={isLevelUpDisabled()} color="primary">
+            <ArrowCircleUpIcon />
+          </IconButton>
+          <IconButton onClick={handleLevelDown} disabled={isLevelDownDisabled()} color="primary">
+            <ArrowCircleDownIcon />
+          </IconButton>
+          <DeleteButton onClick={() => handleDeleteSkill(skill)} disabled={isDeletedDisabled()} />
+          {isAvailableProfessionSkill(skill) && (
+            <>
+              <Tooltip title={t('Professional skill')}>
+                <IconButton
+                  aria-label="set-professional"
+                  onClick={() => handleSetUpProfessionalSkill(skill)}
+                  disabled={!isProfessional && currentProfessionalSkills >= maxProfessionalSkills}
+                  color="primary"
+                >
+                  {isProfessional ? <TurnedInIcon /> : <TurnedInNotIcon />}
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t('Knack skill')}>
+                <IconButton
+                  aria-label="set-knack"
+                  onClick={() => handleSetUpKnackSkill(skill)}
+                  color="primary"
+                  disabled={!isKnack && currentKnackSkills >= maxKnackSkills}
+                >
+                  {isKnack ? <StarIcon /> : <StarBorderIcon />}
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
+        </ButtonGroup>
       </TableCell>
     </TableRow>
   );

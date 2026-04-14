@@ -1,5 +1,5 @@
-import React, { ChangeEvent, FC } from 'react';
-import { MenuItem, TextField } from '@mui/material';
+import React, { FC } from 'react';
+import { TextField, Autocomplete } from '@mui/material';
 import { Race } from '../../api/race.dto';
 
 const SelectFaction: FC<{
@@ -8,31 +8,24 @@ const SelectFaction: FC<{
   value: string | null | undefined;
   onChange: (race: Race) => void;
 }> = ({ label, value, onChange, races }) => {
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const race = races.find((r) => r.id === e.target.value);
-    onChange(race!);
-  };
-
-  const error = value === undefined || value === null || value === '' ? true : false;
-
   if (!races) return <p>Loading...</p>;
 
+  const selectedRace = races.find((r) => r.id === value) ?? null;
+
+  const handleChange = (_: unknown, newValue: Race | null) => {
+    if (newValue) onChange(newValue);
+  };
+
   return (
-    <TextField
-      select
-      label={label}
-      value={value === undefined || value === null || races.length === 0 ? '' : value}
-      fullWidth
-      size="small"
+    <Autocomplete
+      options={races}
+      getOptionLabel={(option) => option.name}
+      isOptionEqualToValue={(option, val) => option.id === val.id}
+      value={selectedRace}
       onChange={handleChange}
-      error={error}
-    >
-      {races.map((option) => (
-        <MenuItem key={option.id} value={option.id}>
-          {option.name}
-        </MenuItem>
-      ))}
-    </TextField>
+      fullWidth
+      renderInput={(params) => <TextField {...params} label={label} size="small" error={!value} />}
+    />
   );
 };
 

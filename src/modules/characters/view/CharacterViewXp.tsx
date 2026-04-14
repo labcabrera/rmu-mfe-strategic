@@ -1,15 +1,22 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { Button, Stack, Box, Grid, Badge } from '@mui/material';
-import { CategorySeparator, RmuTextCard, NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  CategorySeparator,
+  RmuTextCard,
+  NumericInput,
+  addCharacterXP,
+  Character,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { addCharacterXP } from '../../api/character';
-import { Character } from '../../api/character.dto';
 import { imageBaseUrl } from '../../services/config';
+
+const grayscale = 0.7;
+const gridSizeCard = { xs: 10, sm: 5, md: 5, lg: 3, xl: 2 } as const;
 
 const CharacterViewExperience: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>>;
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
 }> = ({ character, setCharacter }) => {
   const { showError } = useError();
   const [xpToAdd, setXpToAdd] = useState<number>();
@@ -31,65 +38,72 @@ const CharacterViewExperience: FC<{
   return (
     <>
       <CategorySeparator text={t('Experience')} />
-      <Grid container spacing={2} mt={2}>
-        <Grid size={12}>
-          <Box mb={2} display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+      <Grid container spacing={1} columns={10}>
+        <Grid size={gridSizeCard}>
+          <RmuTextCard
+            value={character.experience.availableLevel}
+            subtitle={t('Level')}
+            image={`${imageBaseUrl}images/generic/experience.png`}
+            grayscale={grayscale}
+          />
+        </Grid>
+        <Grid size={gridSizeCard}>
+          <Badge
+            color="success"
+            badgeContent={`+${character.experience.availableLevel - character.experience.level}`}
+            invisible={character.experience.availableLevel <= character.experience.level}
+            sx={{ display: 'block' }}
+          >
             <RmuTextCard
-              value={character.experience.availableLevel}
-              subtitle={t('Level')}
+              value={character.experience.level}
+              subtitle={t('Current level')}
               image={`${imageBaseUrl}images/generic/experience.png`}
-              applyColor={false}
+              grayscale={grayscale}
             />
-            <Badge
-              color="success"
-              badgeContent={`+${character.experience.availableLevel - character.experience.level}`}
-              invisible={character.experience.availableLevel <= character.experience.level}
-            >
-              <RmuTextCard
-                value={character.experience.level}
-                subtitle={t('Current level')}
-                image={`${imageBaseUrl}images/generic/experience.png`}
-                applyColor={false}
-              />
-            </Badge>
+          </Badge>
+        </Grid>
+        <Grid size={gridSizeCard}>
+          <RmuTextCard
+            value={new Intl.NumberFormat('en-US').format(character.experience.xp)}
+            subtitle={t('XP')}
+            image={`${imageBaseUrl}images/generic/experience.png`}
+            grayscale={grayscale}
+          />
+        </Grid>
+        <Grid size={gridSizeCard}>
+          <Badge
+            color="success"
+            badgeContent={`+${character.experience.availableDevPoints}`}
+            invisible={character.experience.availableDevPoints < 1}
+            sx={{ display: 'block' }}
+          >
             <RmuTextCard
-              value={character.experience.xp}
-              subtitle={t('XP')}
-              image={`${imageBaseUrl}images/generic/experience.png`}
-              applyColor={false}
+              value={`${character.experience.availableDevPoints} / ${character.experience.devPoints}`}
+              subtitle={t('Development points')}
+              image={`${imageBaseUrl}images/generic/trait-combat.png`}
+              grayscale={grayscale}
             />
-            <Badge
-              color="success"
-              badgeContent={`+${character.experience.availableDevelopmentPoints}`}
-              invisible={character.experience.availableDevelopmentPoints < 1}
-            >
-              <RmuTextCard
-                value={`${character.experience.availableDevelopmentPoints} / ${character.experience.developmentPoints}`}
-                subtitle={t('Development points')}
-                image={`${imageBaseUrl}images/generic/trait-combat.png`}
-              />
-            </Badge>
+          </Badge>
+        </Grid>
+      </Grid>
+      <Grid size={12}>
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1 }}>
+          <Box sx={{ width: 160 }}>
+            <NumericInput
+              value={xpToAdd || null}
+              onChange={(v) => {
+                setXpToAdd(v!);
+                if (v && v > 0) setError(false);
+              }}
+              integer
+              label={t('Add XP')}
+              error={error}
+            />
           </Box>
-        </Grid>
-        <Grid size={12}>
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1 }}>
-            <Box sx={{ width: 160 }}>
-              <NumericInput
-                value={xpToAdd || null}
-                onChange={(v) => {
-                  setXpToAdd(v!);
-                  if (v && v > 0) setError(false);
-                }}
-                integer
-                label={t('Add XP')}
-                error={error}
-              />
-            </Box>
-            <Button variant="contained" color="primary" onClick={handleAdd}>
-              {t('Add')}
-            </Button>
-          </Stack>
-        </Grid>
+          <Button variant="contained" color="primary" onClick={handleAdd}>
+            {t('Add')}
+          </Button>
+        </Stack>
       </Grid>
     </>
   );

@@ -1,12 +1,7 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import { Link, Typography } from '@mui/material';
-import { EditableAvatar } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
+import { Typography } from '@mui/material';
+import { Character, EditableAvatar, updateCharacter } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
-import { updateCharacter } from '../../api/character';
-import { Character } from '../../api/character.dto';
-import { StrategicGame } from '../../api/strategic-game.dto';
 import { imageBaseUrl } from '../../services/config';
 import { getAvatarImages } from '../../services/image-service';
 
@@ -15,10 +10,8 @@ const defaultCharacterImage = `${imageBaseUrl}images/npcs/unknown.png`;
 const CharacterViewResume: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
-  strategicGame: StrategicGame;
-}> = ({ character, setCharacter, strategicGame }) => {
+}> = ({ character, setCharacter }) => {
   const { showError } = useError();
-  const [imageDialogOpen, setImageDialogOpen] = useState(false);
 
   const onImageUpdated = (imageId: string) => {
     updateCharacter(character.id, { ...character, imageUrl: imageId })
@@ -42,9 +35,14 @@ const CharacterViewResume: FC<{
       <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
         {character.name}
       </Typography>
-      {character.experience.availableDevelopmentPoints > 0 && (
+      {character.experience.availableDevPoints > 0 && (
         <Typography variant="body1" color="success" sx={{ mt: 2 }}>
-          {`${character.experience.availableDevelopmentPoints} unspent dev points`}
+          {`${character.experience.availableDevPoints} unspent dev points`}
+        </Typography>
+      )}
+      {character.experience.availableStatLevelUp > 0 && (
+        <Typography variant="body1" color="success" sx={{ mt: 2 }}>
+          {`${character.experience.availableStatLevelUp} stats updates`}
         </Typography>
       )}
       <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>

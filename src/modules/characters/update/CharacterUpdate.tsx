@@ -1,14 +1,18 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
-import { EditableAvatar, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  Character,
+  EditableAvatar,
+  Faction,
+  fetchCharacter,
+  fetchFaction,
+  fetchStrategicGame,
+  StrategicGame,
+  TechnicalInfo,
+  UpdateCharacterDto,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
-import { fetchCharacter } from '../../api/character';
-import { Character, UpdateCharacterDto } from '../../api/character.dto';
-import { fetchFaction } from '../../api/faction';
-import { Faction } from '../../api/faction.dto';
-import { fetchStrategicGame } from '../../api/strategic-game';
-import { StrategicGame } from '../../api/strategic-game.dto';
 import { gridSizeResume, gridSizeMain } from '../../services/display';
 import { getAvatarImages } from '../../services/image-service';
 import CharacterUpdateActions from './CharacterUpdateActions';

@@ -1,10 +1,9 @@
 import React, { useState, useEffect, FC, forwardRef, ReactElement, Ref } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Slide } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
-import { TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { AddItemDto, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
-import { AddItemDto } from '../../../api/character.dto';
 import { fetchItems, Item, armorSubcategories, weaponSubcategories } from '../../../api/items';
 import CharacterAddItemDialogForm from './CharacterAddItemDialogForm';
 import CharacterAddItemDialogSelect from './CharacterAddItemDialogSelect';

@@ -1,15 +1,14 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { Grid } from '@mui/material';
-import { NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CreateCharacterDto, NumericInput, Profession, Race } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
-import { CreateCharacterDto } from '../../api/character.dto';
-import { Profession } from '../../api/professions';
-import { Race } from '../../api/race.dto';
 import NameTextField from '../../shared/inputs/NameTextField';
 import RmuSelect from '../../shared/selects/RmuSelect';
 import SelectProfession from '../../shared/selects/SelectProfession';
 import SelectRace from '../../shared/selects/SelectRace';
 import SelectRealmType from '../../shared/selects/SelectRealmType';
+
+const gridFormSize = { xs: 12, sm: 12, md: 6, lg: 6, xl: 12 };
 
 const CharacterCreateResume: FC<{
   formData: CreateCharacterDto;
@@ -74,29 +73,29 @@ const CharacterCreateResume: FC<{
 
   return (
     <Grid container spacing={1} mt={5}>
-      <Grid size={12}>
+      <Grid size={gridFormSize}>
         <SelectRace label={t('Race')} value={formData.info.raceId} onChange={onRaceChange} races={races} />
       </Grid>
-      <Grid size={12}>
+      <Grid size={gridFormSize}>
         <SelectProfession value={formData.info.professionId} onChange={(e, p) => onProfessionChange(e, p)} />
       </Grid>
-      <Grid size={12}>
+      <Grid size={gridFormSize}>
         <NameTextField
           label={t('Name')}
           value={formData.name}
           gender={formData.roleplay.gender}
-          onChange={(e) => setFormData({ ...formData, name: e })}
+          onChange={(value: string) => setFormData((prev) => ({ ...prev, name: value }))}
           generateRandomRaceValue={selectedRace?.archetype ?? ''}
         />
       </Grid>
-      <Grid size={12}>
+      <Grid size={gridFormSize}>
         <SelectRealmType
           profession={profession}
           value={formData.info.realmType}
           onChange={(e) => handleRealmTypeChange(e.target.value)}
         />
       </Grid>
-      <Grid size={12}>
+      <Grid size={gridFormSize}>
         <NumericInput
           label={t('level')}
           name="level"
@@ -107,7 +106,7 @@ const CharacterCreateResume: FC<{
           error={!formData.level}
         />
       </Grid>
-      <Grid size={12}>
+      <Grid size={gridFormSize}>
         <NumericInput
           label={t('Height')}
           name="height"
@@ -116,7 +115,7 @@ const CharacterCreateResume: FC<{
           allowNegatives={false}
         />
       </Grid>
-      <Grid size={12}>
+      <Grid size={gridFormSize}>
         <NumericInput
           label={t('Weight')}
           name="weight"
@@ -126,7 +125,7 @@ const CharacterCreateResume: FC<{
           error={!formData.info.weight}
         />
       </Grid>
-      <Grid size={12}>
+      <Grid size={gridFormSize}>
         <RmuSelect
           value={formData.roleplay.gender}
           label={t('Gender')}
@@ -136,7 +135,7 @@ const CharacterCreateResume: FC<{
           }
         />
       </Grid>
-      <Grid size={12}>
+      <Grid size={gridFormSize}>
         <NumericInput
           label={t('Age')}
           name="age"

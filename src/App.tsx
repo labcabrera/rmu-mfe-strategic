@@ -9,7 +9,6 @@ import CharacterList from './modules/characters/list/CharacterList';
 import CharacterUpdate from './modules/characters/update/CharacterUpdate';
 import CharacterView from './modules/characters/view/CharacterView';
 import FactionCreate from './modules/factions/create/FactionCreate';
-import FactionList from './modules/factions/list/FactionList';
 import FactionUpdate from './modules/factions/update/FactionUpdate';
 import FactionView from './modules/factions/view/FactionView';
 import StrategicGameCreate from './modules/games/create/StrategicGameCreate';
@@ -36,7 +35,6 @@ const App: FC = () => {
             <Route path="/games/view/:gameId" element={<StrategicGameView />} />
             <Route path="/games/edit/:gameId" element={<StrategicGameEdit />} />
             <Route path="/games/create" element={<StrategicGameCreate />} />
-            <Route path="/factions" element={<FactionList />} />
             <Route path="/factions/view/:factionId" element={<FactionView />} />
             <Route path="/factions/edit/:factionId" element={<FactionUpdate />} />
             <Route path="/factions/create" element={<FactionCreate />} />

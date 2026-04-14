@@ -1,9 +1,8 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
+import { Character, fetchCharacter } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../ErrorContext';
-import { fetchCharacter } from '../api/character';
-import { Character } from '../api/character.dto';
 import TradeViewActions from './TradeViewActions';
 import TradeViewItemSearch from './TradeViewItemSearch';
 import TradeViewOptions from './TradeViewOptions';

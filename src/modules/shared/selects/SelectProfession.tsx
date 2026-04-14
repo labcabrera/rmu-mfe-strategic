@@ -1,8 +1,8 @@
 import React, { useState, useEffect, ChangeEvent, useMemo } from 'react';
 import { TextField, Autocomplete } from '@mui/material';
+import { Profession, fetchProfessions } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { fetchProfessions, Profession } from '../../api/professions';
 
 const SelectProfession: React.FC<{
   value?: string | null;
@@ -25,7 +25,7 @@ const SelectProfession: React.FC<{
   return (
     <Autocomplete
       options={professions}
-      getOptionLabel={(option) => (option ? t(option.id) || option.name || '' : '')}
+      getOptionLabel={(option) => (option ? t(option.id) || '' : '')}
       value={selectedProfession}
       onChange={(_event, newValue) => onChange(newValue?.id ?? '', newValue ?? undefined)}
       isOptionEqualToValue={(option, val) => option.id === val.id}

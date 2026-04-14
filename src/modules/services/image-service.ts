@@ -6,11 +6,38 @@ export const defaultTacticalGameImage = `${imageBaseUrl}images/generic/tactical.
 export const defaultStrategicGameImage = `${imageBaseUrl}images/generic/strategic.png`;
 export const defaultFactionImage = `${imageBaseUrl}images/generic/avatar-001.png`;
 
-// Note: generate options using the following command in the images/items folder:
-// for f in *; do [ -f "$f" ] || continue; echo "\`\${imageBaseUrl}images/items/$f\`,"; done
+// Note: generate options using the following command:
+// for f in *; do [ -f "$f" ] || continue; echo "\`\${imageBaseUrl}images/miniatures/$f\`,"; done
 
 export const getAvatarImages = () => {
   return [
+    `${imageBaseUrl}images/miniatures/est-01.png`,
+    `${imageBaseUrl}images/miniatures/est-02.png`,
+    `${imageBaseUrl}images/miniatures/est-03.png`,
+    `${imageBaseUrl}images/miniatures/est-04.png`,
+    `${imageBaseUrl}images/miniatures/est-05.png`,
+    `${imageBaseUrl}images/miniatures/est-06.png`,
+    `${imageBaseUrl}images/miniatures/est-07.png`,
+    `${imageBaseUrl}images/miniatures/est-08.png`,
+    `${imageBaseUrl}images/miniatures/est-09.png`,
+    `${imageBaseUrl}images/miniatures/est-10.png`,
+    `${imageBaseUrl}images/miniatures/est-11.png`,
+    `${imageBaseUrl}images/miniatures/human-01.png`,
+    `${imageBaseUrl}images/miniatures/nn-01.png`,
+    `${imageBaseUrl}images/miniatures/nn-02.png`,
+    `${imageBaseUrl}images/miniatures/nn-03.png`,
+    `${imageBaseUrl}images/miniatures/nn-04.png`,
+    `${imageBaseUrl}images/miniatures/orc-01.png`,
+    `${imageBaseUrl}images/miniatures/orc-02.png`,
+    `${imageBaseUrl}images/miniatures/orc-03.png`,
+    `${imageBaseUrl}images/miniatures/orc-04.png`,
+    `${imageBaseUrl}images/miniatures/orc-05.png`,
+    `${imageBaseUrl}images/miniatures/orc-06.png`,
+    `${imageBaseUrl}images/miniatures/snaga-01.png`,
+    `${imageBaseUrl}images/miniatures/snaga-02.png`,
+    `${imageBaseUrl}images/miniatures/snaga-03.png`,
+    `${imageBaseUrl}images/miniatures/snaga-04.png`,
+
     `${imageBaseUrl}images/avatars/avatar-000.png`,
     `${imageBaseUrl}images/avatars/avatar-001.png`,
     `${imageBaseUrl}images/avatars/avatar-002.png`,
