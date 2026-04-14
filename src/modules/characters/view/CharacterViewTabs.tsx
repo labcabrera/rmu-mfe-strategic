@@ -37,10 +37,10 @@ function a11yProps(index: number) {
 
 const CharacterViewTabs: FC<{
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   strategicGame: StrategicGame;
   profession: Profession;
-}> = ({ character, setCharacter, strategicGame, profession }) => {
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
+}> = ({ character, strategicGame, profession, setCharacter }) => {
   const [value, setValue] = useState<number>(0);
 
   const handleChange = (_event: SyntheticEvent, newValue: number) => {

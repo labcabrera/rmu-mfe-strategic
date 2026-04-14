@@ -35,9 +35,14 @@ const CharacterViewResume: FC<{
       <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
         {character.name}
       </Typography>
-      {character.experience.availableDevelopmentPoints > 0 && (
+      {character.experience.availableDevPoints > 0 && (
         <Typography variant="body1" color="success" sx={{ mt: 2 }}>
-          {`${character.experience.availableDevelopmentPoints} unspent dev points`}
+          {`${character.experience.availableDevPoints} unspent dev points`}
+        </Typography>
+      )}
+      {character.experience.availableStatLevelUp > 0 && (
+        <Typography variant="body1" color="success" sx={{ mt: 2 }}>
+          {`${character.experience.availableStatLevelUp} stats updates`}
         </Typography>
       )}
       <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>

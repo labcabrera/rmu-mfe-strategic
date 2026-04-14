@@ -32,7 +32,7 @@ const CharacterView: FC = () => {
         .then((professionData) => setProfession(professionData))
         .catch((err) => showError(err.message));
     }
-  }, [character, showError]);
+  }, [character]);
 
   useEffect(() => {
     if (characterId) {

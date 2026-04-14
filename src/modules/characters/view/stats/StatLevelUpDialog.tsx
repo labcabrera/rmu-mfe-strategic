@@ -30,7 +30,7 @@ const StatLevelUpDialog: FC<{
   const temporary = character.statistics[stat].temporary;
 
   const onLevelUp = () => {
-    const dto = { stat, roll } as UpdateTemporaryStatDto;
+    const dto = { stat: stat, roll: roll } as UpdateTemporaryStatDto;
     updateCharacterTemporaryStat(character.id, dto)
       .then((response) => {
         setCharacter(response);
