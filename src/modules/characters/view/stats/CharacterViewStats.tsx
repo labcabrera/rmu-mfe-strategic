@@ -1,19 +1,35 @@
-import React, { FC, Fragment } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { CategorySeparator, Character, StatKey, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
+import React, { Dispatch, FC, Fragment, SetStateAction, useState } from 'react';
+import { Chip, Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { CategorySeparator, Character, LevelUpButton, StatKey, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
+import StatLevelUpDialog from './StatLevelUpDialog';
+
+const LEVEL_UP_STAT_COST = 4;
 
 const CharacterViewStats: FC<{
   character: Character;
-}> = ({ character }) => {
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
+}> = ({ character, setCharacter }) => {
   if (!character) return <div>Loading...</div>;
+
+  const [levelUpStatDialogOpen, setLevelUpStatDialogOpen] = useState<boolean>(false);
+  const [levelUpStat, setLevelUpStat] = useState<StatKey>();
+
+  const onLevelUpButtonClick = (stat: StatKey) => {
+    setLevelUpStat(stat);
+    setLevelUpStatDialogOpen(true);
+  };
+
+  const onCloseLevelUpDialog = () => {
+    setLevelUpStatDialogOpen(false);
+    setLevelUpStat(undefined);
+  };
 
   return (
     <>
       <CategorySeparator text={t('Statistics')} />
       <Paper sx={{ width: 'fit-content', padding: 2 }}>
-        <Table sx={{ minWidth: 650, maxWidth: 800 }} aria-label="stats table">
+        <Table sx={{ minWidth: 650, maxWidth: 800 }} aria-label="stats table" size="small">
           <TableHead
             sx={{
               '& .MuiTableCell-root': {
@@ -30,17 +46,29 @@ const CharacterViewStats: FC<{
               <TableCell align="right">{t('racial')}</TableCell>
               <TableCell align="right">{t('custom')}</TableCell>
               <TableCell align="right">{t('total')}</TableCell>
+              <TableCell align="right">
+                {character.experience.availableStatLevelUp > 0 && (
+                  <Chip label={`+${character.experience.availableStatLevelUp}`} color="success" />
+                )}
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {STATS.map((key, index) => (
               <Fragment key={index}>
-                <CharacterViewStatsEntry stat={key} character={character} />
+                <CharacterViewStatsEntry stat={key} character={character} onLevelUp={onLevelUpButtonClick} />
               </Fragment>
             ))}
           </TableBody>
         </Table>
       </Paper>
+      <StatLevelUpDialog
+        character={character}
+        stat={levelUpStat}
+        open={levelUpStatDialogOpen}
+        setCharacter={setCharacter}
+        onClose={() => onCloseLevelUpDialog()}
+      />
     </>
   );
 };
@@ -48,17 +76,16 @@ const CharacterViewStats: FC<{
 const CharacterViewStatsEntry: FC<{
   stat: StatKey;
   character: Character;
-}> = ({ stat, character }) => {
-  if (!character.statistics[stat].modifiers) {
-    return null;
-  }
+  onLevelUp: (stat: StatKey) => void;
+}> = ({ stat, character, onLevelUp }) => {
+  if (!character.statistics[stat].modifiers) return;
   const potential = character.statistics[stat].potential;
   const temporary = character.statistics[stat].temporary;
   const statBonus = character.statistics[stat].modifiers['stat'] || 0;
   const racial = character.statistics[stat].modifiers['racial'] || 0;
   const trait = character.statistics[stat].modifiers['trait'] || 0;
-  const item = character.statistics[stat].modifiers['item'] || 0;
   const totalBonus = character.statistics[stat].totalBonus;
+  const freeUpdate = character.experience.availableStatLevelUp > 0;
 
   const getColor = (value: number) => {
     if (value < 0) return 'error.main';
@@ -92,6 +119,11 @@ const CharacterViewStatsEntry: FC<{
       </TableCell>
       <TableCell align="right" sx={{ color: getColor(totalBonus), fontWeight: 'bold' }}>
         {totalBonus}
+      </TableCell>
+      <TableCell align="right">
+        {character.experience.availableDevPoints >= LEVEL_UP_STAT_COST && (
+          <LevelUpButton onClick={() => onLevelUp(stat)} color={freeUpdate ? 'success' : undefined} />
+        )}
       </TableCell>
     </TableRow>
   );

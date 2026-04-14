@@ -5,11 +5,11 @@ import CharacterViewAttacks from './CharacterViewAttacks';
 import CharacterViewInfo from './CharacterViewInfo';
 import CharacterViewMovement from './CharacterViewMovement';
 import CharacterViewResistances from './CharacterViewResistances';
-import CharacterViewStats from './CharacterViewStats';
-import CharacterViewStatsChart from './CharacterViewStatsChart';
 import CharacterViewExperience from './CharacterViewXp';
 import CharacterViewItems from './items/CharacterViewItems';
 import CharacterViewSkills from './skills/CharacterViewSkills';
+import CharacterViewStats from './stats/CharacterViewStats';
+import CharacterViewStatsChart from './stats/CharacterViewStatsChart';
 import CharacterViewTraits from './traits/CharacterViewTraits';
 
 function CustomTabPanel(props: { children?: ReactNode; value: number; index: number }) {
@@ -77,7 +77,7 @@ const CharacterViewTabs: FC<{
       <CustomTabPanel value={value} index={1}>
         <Grid container spacing={1}>
           <Grid size={6}>
-            <CharacterViewStats character={character} />
+            <CharacterViewStats character={character} setCharacter={setCharacter} />
           </Grid>
           <Grid size={6}>
             <CharacterViewStatsChart stats={character.statistics} />

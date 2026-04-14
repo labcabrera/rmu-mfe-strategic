@@ -23,7 +23,7 @@ import { imageBaseUrl } from '../../services/config';
 import { gridSizeResume, gridSizeMain } from '../../services/display';
 import { getAvatarImages } from '../../services/image-service';
 import { randomizeStats } from '../../services/randomize-stats';
-import CharacterViewStatsChart from '../view/CharacterViewStatsChart';
+import CharacterViewStatsChart from '../view/stats/CharacterViewStatsChart';
 import CharacterCreateActions from './CharacterCreateActions';
 import CharacterCreateBoostOptionsDialog from './CharacterCreateBoostOptionsDialog';
 import CharacterCreateProfessionalSkills from './CharacterCreateProfessionalSkills';
