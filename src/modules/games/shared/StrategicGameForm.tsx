@@ -1,18 +1,12 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { Grid, TextField } from '@mui/material';
-import {
-  CategorySeparator,
-  CreateStrategicGameDto,
-  NumericInput,
-  Realm,
-  UpdateStrategicGameDto,
-} from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CategorySeparator, NumericInput, Realm, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import SelectRealm from '../../shared/selects/SelectRealm';
 
 const StrategicGameForm: FC<{
-  formData: CreateStrategicGameDto | UpdateStrategicGameDto;
-  setFormData: Dispatch<SetStateAction<CreateStrategicGameDto | UpdateStrategicGameDto | undefined>>;
+  formData: StrategicGame;
+  setFormData: Dispatch<SetStateAction<StrategicGame>>;
   realms?: Realm[];
 }> = ({ formData, setFormData, realms }) => {
   const handleOptionsChange = (field: string, value: number) => {
@@ -56,7 +50,7 @@ const StrategicGameForm: FC<{
             <SelectRealm
               realms={realms}
               value={formData.realmId}
-              onChange={(realmId) => setFormData({ ...formData, realmId })}
+              onChange={(realmId) => setFormData({ ...formData, realmId: realmId || '' })}
               required
             />
           </Grid>
@@ -71,7 +65,9 @@ const StrategicGameForm: FC<{
             label={t('Experience multiplier')}
             name="experienceMultiplier"
             value={formData.options.experienceMultiplier}
-            onChange={(e) => setFormData({ ...formData, options: { ...formData.options, experienceMultiplier: e } })}
+            onChange={(e) =>
+              setFormData({ ...formData, options: { ...formData.options, experienceMultiplier: e || 1 } })
+            }
             maxFractionDigits={2}
             allowNegatives={false}
           />
@@ -81,7 +77,7 @@ const StrategicGameForm: FC<{
             label={t('Fatigue multiplier')}
             name="fatigueMultiplier"
             value={formData.options.fatigueMultiplier}
-            onChange={(e) => handleOptionsChange('fatigueMultiplier', e)}
+            onChange={(e) => handleOptionsChange('fatigueMultiplier', e || 0)}
             maxFractionDigits={2}
             allowNegatives={false}
           />
@@ -91,7 +87,7 @@ const StrategicGameForm: FC<{
             label={t('Board scale multiplier')}
             name="boardScaleMultiplier"
             value={formData.options.boardScaleMultiplier}
-            onChange={(e) => handleOptionsChange('boardScaleMultiplier', e)}
+            onChange={(e) => handleOptionsChange('boardScaleMultiplier', e || 1)}
             maxFractionDigits={2}
             allowNegatives={false}
           />
@@ -101,7 +97,7 @@ const StrategicGameForm: FC<{
             label={t('Letality')}
             name="letality"
             value={formData.options.letality}
-            onChange={(e) => handleOptionsChange('letality', e)}
+            onChange={(e) => handleOptionsChange('letality', e || 0)}
             integer
           />
         </Grid>
@@ -115,7 +111,7 @@ const StrategicGameForm: FC<{
             label={t('Base dev points')}
             name="baseDevPoints"
             value={formData.powerLevel.baseDevPoints}
-            onChange={(e) => handlePowerLevelChange('baseDevPoints', e)}
+            onChange={(e) => handlePowerLevelChange('baseDevPoints', e || 0)}
             integer
             allowNegatives={false}
           />
@@ -125,7 +121,7 @@ const StrategicGameForm: FC<{
             label={t('Stat random min')}
             name="statRandomMin"
             value={formData.powerLevel.statRandomMin}
-            onChange={(e) => handlePowerLevelChange('statRandomMin', e)}
+            onChange={(e) => handlePowerLevelChange('statRandomMin', e || 0)}
             integer
             allowNegatives={false}
           />
@@ -135,7 +131,7 @@ const StrategicGameForm: FC<{
             label={t('Stat boost potential')}
             name="statBoostPotential"
             value={formData.powerLevel.statBoostPotential}
-            onChange={(e) => handlePowerLevelChange('statBoostPotential', e)}
+            onChange={(e) => handlePowerLevelChange('statBoostPotential', e || 0)}
             integer
             allowNegatives={false}
           />
@@ -145,7 +141,7 @@ const StrategicGameForm: FC<{
             label={t('Stat boost temporary')}
             name="statBoostTemporary"
             value={formData.powerLevel.statBoostTemporary}
-            onChange={(e) => handlePowerLevelChange('statBoostTemporary', e)}
+            onChange={(e) => handlePowerLevelChange('statBoostTemporary', e || 0)}
             integer
             allowNegatives={false}
           />
@@ -155,7 +151,7 @@ const StrategicGameForm: FC<{
             label={t('Stat creation boosts')}
             name="statCreationBoost"
             value={formData.powerLevel.statCreationBoost}
-            onChange={(e) => handlePowerLevelChange('statCreationBoost', e)}
+            onChange={(e) => handlePowerLevelChange('statCreationBoost', e || 0)}
             integer
             allowNegatives={false}
           />
@@ -165,7 +161,7 @@ const StrategicGameForm: FC<{
             label={t('Stat creation swaps')}
             name="statCreationSwap"
             value={formData.powerLevel.statCreationSwap}
-            onChange={(e) => handlePowerLevelChange('statCreationSwap', e)}
+            onChange={(e) => handlePowerLevelChange('statCreationSwap', e || 0)}
             integer
             allowNegatives={false}
           />

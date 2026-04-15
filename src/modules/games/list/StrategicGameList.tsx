@@ -32,10 +32,10 @@ const StrategicGameList: FC = () => {
 
   return (
     <>
-      <StrategicGameListActions />
       <Grid container spacing={1}>
         <Grid size={gridSizeResume}></Grid>
         <Grid size={gridSizeMain}>
+          <StrategicGameListActions />
           <Grid container spacing={1}>
             <Grid size={12}>
               <StrategicGameListSearch setQueryString={setQueryString} />

@@ -79,61 +79,56 @@ const FactionView: FC = () => {
   if (!faction || !game) return <div>Loading...</div>;
 
   return (
-    <>
-      <FactionViewActions faction={faction} setFaction={setFaction} strategicGame={game} />
-      <Grid container spacing={1}>
-        <Grid size={gridSizeResume}>
-          <FactionViewResume faction={faction} setFaction={setFaction} game={game} />
+    <Grid container spacing={1}>
+      <Grid size={gridSizeResume}>
+        <FactionViewResume faction={faction} setFaction={setFaction} game={game} />
+      </Grid>
+      <Grid size={gridSizeMain}>
+        <FactionViewActions faction={faction} setFaction={setFaction} strategicGame={game} />
+        <CategorySeparator text={t('Strategic game')} />
+        <Grid container spacing={1}>
+          <Grid size={gridSizeCard}>
+            <RmuTextCard
+              value={game.name}
+              subtitle={t('Strategic game')}
+              image={game.imageUrl || ''}
+              onClick={() => navigate(`/strategic/games/view/${game.id}`, { state: { strategicGame: game } })}
+            />
+          </Grid>
         </Grid>
-        <Grid size={gridSizeMain}>
-          <CategorySeparator text={t('Strategic game')} />
-          <Grid container spacing={1}>
-            <Grid size={gridSizeCard}>
-              <RmuTextCard
-                value={game.name}
-                subtitle={t('Strategic game')}
-                image={game.imageUrl || ''}
-                onClick={() => navigate(`/strategic/games/view/${game.id}`, { state: { strategicGame: game } })}
-              />
-            </Grid>
-          </Grid>
-
-          <CategorySeparator text={t('Faction')} />
-
-          <FactionViewAttributes faction={faction} characters={characters} />
-
-          <CategorySeparator text={t('Characters')}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-              <AddButton onClick={onCharacterCreate} />
-              <ToggleButtonGroup
-                value={displayCharacterTable ? 'table' : 'list'}
-                exclusive
-                size="small"
-                onChange={handleViewModeChange}
-                aria-label="view-mode"
-              >
-                <ToggleButton value="list" aria-label="list">
-                  <ViewListIcon fontSize="small" />
-                </ToggleButton>
-                <ToggleButton value="table" aria-label="table">
-                  <TableRowsIcon fontSize="small" />
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </Box>
-          </CategorySeparator>
-          {displayCharacterTable ? (
-            <FactionViewCharactersTable characters={characters} />
-          ) : (
-            <FactionViewCharacters faction={faction} characters={characters} />
-          )}
-          <Grid size={12} mt={2}>
-            <TechnicalInfo>
-              <pre>Faction: {JSON.stringify(faction, null, 2)}</pre>
-            </TechnicalInfo>
-          </Grid>
+        <CategorySeparator text={t('Faction')} />
+        <FactionViewAttributes faction={faction} characters={characters} />
+        <CategorySeparator text={t('Characters')}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+            <AddButton onClick={onCharacterCreate} />
+            <ToggleButtonGroup
+              value={displayCharacterTable ? 'table' : 'list'}
+              exclusive
+              size="small"
+              onChange={handleViewModeChange}
+              aria-label="view-mode"
+            >
+              <ToggleButton value="list" aria-label="list">
+                <ViewListIcon fontSize="small" />
+              </ToggleButton>
+              <ToggleButton value="table" aria-label="table">
+                <TableRowsIcon fontSize="small" />
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+        </CategorySeparator>
+        {displayCharacterTable ? (
+          <FactionViewCharactersTable characters={characters} />
+        ) : (
+          <FactionViewCharacters faction={faction} characters={characters} />
+        )}
+        <Grid size={12} mt={2}>
+          <TechnicalInfo>
+            <pre>Faction: {JSON.stringify(faction, null, 2)}</pre>
+          </TechnicalInfo>
         </Grid>
       </Grid>
-    </>
+    </Grid>
   );
 };
 

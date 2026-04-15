@@ -4,6 +4,7 @@ import OutboundIcon from '@mui/icons-material/Outbound';
 import { Grid, IconButton, TextField, Badge } from '@mui/material';
 import {
   CategorySeparator,
+  Character,
   CreateCharacterDto,
   EditableAvatar,
   Faction,
@@ -18,7 +19,7 @@ import {
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { characterCreationTemplate, defaultStats } from '../../data/character-create';
+import { defaultStats } from '../../data/character-create';
 import { imageBaseUrl } from '../../services/config';
 import { gridSizeResume, gridSizeMain } from '../../services/display';
 import { getAvatarImages } from '../../services/image-service';
@@ -33,6 +34,123 @@ import { CharacterCreateSortCombat } from './CharacterCreateSortCombat';
 import CharacterCreateStats from './CharacterCreateStats';
 
 const defaultImage = `${imageBaseUrl}images/races/unknown-alt.png`;
+
+export const CHARACTER_EMPTY_TEMPLATE = {
+  name: '',
+  gameId: '',
+  factionId: '',
+  info: {
+    raceId: '',
+    professionId: '',
+    realmType: '',
+    height: 7,
+    weight: 120,
+  },
+  roleplay: {
+    gender: 'male',
+    age: 20,
+  },
+  level: null,
+  weaponDevelopment: ['melee', 'ranged', 'shield', 'unarmed'],
+  statistics: {
+    ag: {
+      potential: 50,
+      temporary: 50,
+      racial: 0,
+    },
+    co: {
+      potential: 50,
+      temporary: 50,
+      racial: 0,
+    },
+    em: {
+      potential: 50,
+      temporary: 50,
+      racial: 0,
+    },
+    in: {
+      potential: 50,
+      temporary: 50,
+      racial: 0,
+    },
+    me: {
+      potential: 50,
+      temporary: 50,
+      racial: 0,
+    },
+    pr: {
+      potential: 50,
+      temporary: 50,
+      racial: 0,
+    },
+    qu: {
+      potential: 50,
+      temporary: 50,
+      racial: 0,
+    },
+    re: {
+      potential: 50,
+      temporary: 50,
+      racial: 0,
+    },
+    sd: {
+      potential: 50,
+      temporary: 50,
+      racial: 0,
+    },
+    st: {
+      potential: 50,
+      temporary: 50,
+      racial: 0,
+    },
+  },
+  movement: {
+    strideCustomBonus: 1,
+  },
+  defense: {},
+  endurance: {
+    customBonus: 5,
+  },
+  power: {
+    max: 0,
+  },
+  initiative: {
+    customBonus: 1,
+  },
+  skills: [
+    {
+      skillId: 'body-development',
+      ranks: 0,
+    },
+    {
+      skillId: 'armor-maneuver',
+      ranks: 0,
+    },
+    {
+      skillId: 'perception',
+      ranks: 0,
+    },
+    {
+      skillId: 'jumping',
+      ranks: 0,
+    },
+    {
+      skillId: 'running',
+      ranks: 0,
+    },
+    {
+      skillId: 'leadership',
+      ranks: 0,
+    },
+    {
+      skillId: 'medicine',
+      ranks: 0,
+    },
+  ],
+  items: [],
+  description: '',
+  imageUrl: `${imageBaseUrl}images/generic/races.png`,
+} as unknown as CreateCharacterDto;
 
 export interface StatBonus {
   potential: number;
@@ -49,14 +167,14 @@ const CharacterCreate: FC = () => {
   const [searchParams] = useSearchParams();
   const gameId = searchParams.get('gameId');
   const factionId = searchParams.get('factionId');
-  const [faction, setFaction] = useState<Faction | null>(null);
+  const [faction, setFaction] = useState<Faction>();
 
   const [game, setGame] = useState<StrategicGame | null>(null);
   const [profession, setProfession] = useState<Profession>();
   const [races, setRaces] = useState<Race[]>([]);
   const [selectedRace, setSelectedRace] = useState<Race>();
 
-  const [formData, setFormData] = useState<CreateCharacterDto>(characterCreationTemplate);
+  const [formData, setFormData] = useState<CreateCharacterDto>(CHARACTER_EMPTY_TEMPLATE);
   const [statBonusFormData, setStatBonusFormData] = useState<StatBonusFormData>(defaultStats);
   const [isValid, setIsValid] = useState<boolean>(false);
   const [boostDialogOpen, setBoostDialogOpen] = useState<boolean>(false);
@@ -129,8 +247,6 @@ const CharacterCreate: FC = () => {
 
   return (
     <>
-      <CharacterCreateActions formData={formData} game={game} faction={faction} isValid={isValid} />
-
       <Grid container spacing={1}>
         <Grid size={gridSizeResume}>
           <EditableAvatar
@@ -148,8 +264,8 @@ const CharacterCreate: FC = () => {
             profession={profession}
           />
         </Grid>
-
         <Grid size={gridSizeMain}>
+          <CharacterCreateActions formData={formData} game={game} faction={faction} isValid={isValid} />
           <CategorySeparator text={t('Stats')}>
             <RefreshButton onClick={onRandomStats} />
             <Badge badgeContent={2} color="success">

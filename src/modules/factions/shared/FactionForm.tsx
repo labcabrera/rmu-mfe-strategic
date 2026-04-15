@@ -1,9 +1,8 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { TextField } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Faction, NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { t } from 'i18next';
-import { CreateFactionDto, Faction, UpdateFactionDto } from '../../api/faction.dto';
 
 const FactionForm: FC<{
   formData: Faction;
@@ -20,7 +19,7 @@ const FactionForm: FC<{
           fullWidth
         />
       </Grid>
-      <Grid size={12}>
+      <Grid size={{ xs: 12, md: 4 }}>
         <NumericInput
           label={t('Gold')}
           name="availableGold"
@@ -29,12 +28,12 @@ const FactionForm: FC<{
           maxFractionDigits={2}
         />
       </Grid>
-      <Grid size={12}>
+      <Grid size={{ xs: 12, md: 4 }}>
         <NumericInput
           label={t('XP')}
           name="availableXP"
           value={formData.management.availableXP}
-          onChange={(e) => setFormData({ ...formData, management: { ...formData.management, availableXP: e } })}
+          onChange={(e) => setFormData({ ...formData, management: { ...formData.management, availableXP: e || 0 } })}
           integer
         />
       </Grid>
