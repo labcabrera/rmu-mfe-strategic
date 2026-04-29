@@ -70,8 +70,8 @@ const CharacterItemTable: FC<{
       <Table size="small" sx={{ tableLayout: 'fixed' }}>
         <TableHead>
           <TableRow>
-            <TableCell sx={{ width: '10%' }}>{carried ? t('carried') : t('stored')}</TableCell>
-            <TableCell sx={{ width: '60%' }}>{t('name')}</TableCell>
+            <TableCell sx={{ width: '15%' }}>{carried ? t('carried-items') : t('stored-items')}</TableCell>
+            <TableCell sx={{ width: '55%' }}>{t('name')}</TableCell>
             <TableCell sx={{ width: '10%' }}>{t('weight')}</TableCell>
             <TableCell sx={{ width: '10%' }} align="right"></TableCell>
             <TableCell sx={{ width: '10%' }} align="right"></TableCell>

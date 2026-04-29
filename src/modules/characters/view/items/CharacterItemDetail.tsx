@@ -41,7 +41,7 @@ const CharacterItemDetail: FC<{
                 <KeyValueEntry label={t('Skill')} value={t(item.weapon.skillId)} />
                 <KeyValueEntry label={t('Fumble')} value={t(item.weapon.fumble)} />
               </Grid>
-              <Grid container spacing={1} mt={2}>
+              <Grid container spacing={1} sx={{ mt: 2 }}>
                 {item.weapon.modes.map((mode, index) => (
                   <Fragment key={index}>
                     <KeyValueEntry label={t('Attack type')} value={t(mode.type)} />
