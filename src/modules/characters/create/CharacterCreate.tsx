@@ -28,8 +28,8 @@ import { randomizeStats } from '../../services/randomize-stats';
 import CharacterViewStatsChart from '../view/stats/CharacterViewStatsChart';
 import CharacterCreateActions from './CharacterCreateActions';
 import CharacterCreateBoostOptionsDialog from './CharacterCreateBoostOptionsDialog';
+import CharacterCreateMainForm from './CharacterCreateMainForm';
 import CharacterCreateProfessionalSkills from './CharacterCreateProfessionalSkills';
-import CharacterCreateResume from './CharacterCreateResume';
 import CharacterCreateSkillCosts from './CharacterCreateSkillCosts';
 import { CharacterCreateSortCombat } from './CharacterCreateSortCombat';
 import CharacterCreateStats from './CharacterCreateStats';
@@ -257,19 +257,19 @@ const CharacterCreate: FC = () => {
             onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl })}
             images={getAvatarImages()}
           />
-          <CharacterCreateResume
-            formData={formData}
-            setFormData={setFormData}
-            setProfession={setProfession}
-            selectedRace={selectedRace}
-            races={races}
-            setSelectedRace={setSelectedRace}
-            profession={profession}
-          />
         </Grid>
         <Grid size={gridSizeMain}>
           <CharacterCreateActions formData={formData} game={game} faction={faction} isValid={isValid} />
           <Paper sx={{ p: 2 }}>
+            <CharacterCreateMainForm
+              formData={formData}
+              setFormData={setFormData}
+              setProfession={setProfession}
+              selectedRace={selectedRace}
+              races={races}
+              setSelectedRace={setSelectedRace}
+              profession={profession}
+            />
             <CategorySeparator text={t('Stats')}>
               <RefreshButton onClick={onRandomStats} />
               <Badge badgeContent={2} color="success">

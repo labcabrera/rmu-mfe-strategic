@@ -20,9 +20,9 @@ const StrategicGameCreateActions: React.FC<{
   const { t } = useTranslation();
   const { showError } = useError();
   const breadcrumbs = [
-    { name: t('Strategic'), link: '/strategic' },
-    { name: t('Games'), link: '/strategic/games' },
-    { name: t('Create') },
+    { name: t('strategic'), link: '/strategic' },
+    { name: t('strategic-games'), link: '/strategic/games' },
+    { name: t('create') },
   ];
 
   const createGame = () => {

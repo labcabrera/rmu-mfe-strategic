@@ -1,9 +1,8 @@
 import React, { FC, useEffect, useState } from 'react';
+import { useAuth } from 'react-oidc-context';
 import { useSearchParams, useLocation } from 'react-router-dom';
-import { Grid } from '@mui/material';
+import { Grid, Paper } from '@mui/material';
 import {
-  CategorySeparator,
-  CreateFactionDto,
   EditableAvatar,
   Faction,
   fetchStrategicGame,
@@ -30,6 +29,7 @@ export const EMPTY_FACTION = {
 } as Faction;
 
 const FactionCreate: FC = () => {
+  const auth = useAuth();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { showError } = useError();
@@ -52,7 +52,7 @@ const FactionCreate: FC = () => {
     if (location.state?.strategicGame && !formData.gameId) {
       setStrategicGame(location.state.strategicGame);
     } else if (gameId) {
-      fetchStrategicGame(gameId)
+      fetchStrategicGame(gameId, auth)
         .then((data) => setStrategicGame(data))
         .catch((err) => showError(err.message));
     }
@@ -70,12 +70,10 @@ const FactionCreate: FC = () => {
         />
       </Grid>
       <Grid size={gridSizeMain}>
-        <Grid size={12}>
-          <FactionCreateActions formData={formData} strategicGame={strategicGame} isValid={isValid} />
-        </Grid>
-        <Grid size={12}>
+        <FactionCreateActions formData={formData} strategicGame={strategicGame} isValid={isValid} />
+        <Paper sx={{ p: 2 }}>
           <FactionForm formData={formData} setFormData={setFormData} />
-        </Grid>
+        </Paper>
         <TechnicalInfo>
           <pre>{JSON.stringify(formData, null, 2)}</pre>
         </TechnicalInfo>

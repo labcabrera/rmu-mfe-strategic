@@ -28,10 +28,10 @@ const CharacterCreateActions: FC<{
 
   const breadcrumbs = [
     { name: t('strategic'), link: '/strategic' },
-    { name: t('games'), link: '/strategic/games' },
+    { name: t('strategic-games'), link: '/strategic/games' },
     { name: game.name, link: `/strategic/games/view/${game.id}` },
     { name: faction.name, link: `/strategic/factions/view/${faction.id}` },
-    { name: t('Character creation') },
+    { name: t('create') },
   ];
 
   const onCreate = async () => {

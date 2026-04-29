@@ -1,16 +1,23 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Grid } from '@mui/material';
-import { CreateCharacterDto, NumericInput, Profession, Race, STATISTICS } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Grid, Paper } from '@mui/material';
+import {
+  CategorySeparator,
+  CreateCharacterDto,
+  NumericInput,
+  Profession,
+  Race,
+  RmuSelect,
+  STATISTICS,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import NameTextField from '../../shared/inputs/NameTextField';
-import RmuSelect from '../../shared/selects/RmuSelect';
 import SelectProfession from '../../shared/selects/SelectProfession';
 import SelectRace from '../../shared/selects/SelectRace';
 import SelectRealmType from '../../shared/selects/SelectRealmType';
 
-const gridFormSize = { xs: 12, sm: 12, md: 6, lg: 6, xl: 12 };
+const gridFormSize = { xs: 12, sm: 12, md: 6, lg: 6, xl: 4 };
 
-const CharacterCreateResume: FC<{
+const CharacterCreateMainForm: FC<{
   formData: CreateCharacterDto;
   setFormData: Dispatch<SetStateAction<CreateCharacterDto>>;
   setProfession: Dispatch<SetStateAction<Profession | undefined>>;
@@ -73,7 +80,10 @@ const CharacterCreateResume: FC<{
   if (!races) return <p>Loading...</p>;
 
   return (
-    <Grid container spacing={2} sx={{ mt: 5 }}>
+    <Grid container spacing={2}>
+      <Grid size={12}>
+        <CategorySeparator text={t('information')} />
+      </Grid>
       <Grid size={gridFormSize}>
         <SelectRace label={t('race')} value={formData.info.raceId} onChange={onRaceChange} races={races} />
       </Grid>
@@ -150,4 +160,4 @@ const CharacterCreateResume: FC<{
   );
 };
 
-export default CharacterCreateResume;
+export default CharacterCreateMainForm;
