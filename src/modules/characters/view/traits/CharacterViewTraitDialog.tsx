@@ -1,10 +1,17 @@
 import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography } from '@mui/material';
-import { Character, CharacterTrait, deleteCharacterTrait, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
+import {
+  Character,
+  CharacterTrait,
+  deleteCharacterTrait,
+  DeleteTraitDto,
+  fetchTrait,
+  TechnicalInfo,
+  Trait,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../../ErrorContext';
-import { fetchTrait } from '../../../api/trait';
-import { DeleteTraitDto, Trait } from '../../../api/trait.dto';
 
 const CharacterViewTraitDialog: FC<{
   character: Character;
@@ -13,6 +20,8 @@ const CharacterViewTraitDialog: FC<{
   open: boolean;
   onClose: () => void;
 }> = ({ character, setCharacter, characterTrait, open, onClose }) => {
+  const auth = useAuth();
+  const { t } = useTranslation();
   const { showError } = useError();
   const [trait, setTrait] = useState<Trait | null>(null);
 
@@ -21,7 +30,7 @@ const CharacterViewTraitDialog: FC<{
       traitId: characterTrait.traitId,
       specialization: characterTrait.specialization,
     };
-    deleteCharacterTrait(character.id, dto)
+    deleteCharacterTrait(character.id, dto, auth)
       .then((updatedCharacter) => {
         setCharacter(updatedCharacter);
         onClose();
@@ -31,7 +40,7 @@ const CharacterViewTraitDialog: FC<{
 
   useEffect(() => {
     if (characterTrait) {
-      fetchTrait(characterTrait.traitId)
+      fetchTrait(characterTrait.traitId, auth)
         .then((data) => setTrait(data))
         .catch((error) => showError(error.message));
     }
@@ -55,9 +64,9 @@ const CharacterViewTraitDialog: FC<{
       </DialogContent>
       <DialogActions>
         <Button onClick={onDeleteTrait} color="error">
-          {t('Delete')}
+          {t('delete')}
         </Button>
-        <Button onClick={onClose}>{t('Close')}</Button>
+        <Button onClick={onClose}>{t('cancel')}</Button>
       </DialogActions>
     </Dialog>
   );

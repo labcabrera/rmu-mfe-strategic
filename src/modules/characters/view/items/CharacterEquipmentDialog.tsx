@@ -1,4 +1,6 @@
 import React, { FC, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import {
   Box,
   Button,
@@ -10,8 +12,8 @@ import {
   Typography,
   Tooltip,
 } from '@mui/material';
+import { flex } from '@mui/system';
 import { Character, EquipmentSlot, StrategicItem, equipItem, unequipItem } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { imageBaseUrl } from '../../../services/config';
 import { itemFilter } from '../../../services/display';
@@ -26,6 +28,8 @@ const CharacterEquipmentDialog: FC<{
   onClose: () => void;
   onEquip?: (character: Character) => void;
 }> = ({ open, character, items, slot, onClose, onEquip }) => {
+  const auth = useAuth();
+  const { t } = useTranslation();
   const { showError } = useError();
 
   if (!slot) return;
@@ -55,14 +59,14 @@ const CharacterEquipmentDialog: FC<{
 
   const handleEquip = (item: StrategicItem | null) => {
     if (item) {
-      equipItem(character.id, slot, item.id)
+      equipItem(character.id, slot, item.id, auth)
         .then((data) => {
           if (onEquip) onEquip(data);
           onClose();
         })
         .catch((err) => showError(err.message));
     } else {
-      unequipItem(character.id, slotItemId!)
+      unequipItem(character.id, slotItemId!, auth)
         .then((data) => {
           if (onEquip) onEquip(data);
           onClose();
@@ -79,7 +83,7 @@ const CharacterEquipmentDialog: FC<{
         </Typography>
       </DialogTitle>
       <DialogContent>
-        <Box display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 2 }}>
           <Box
             onClick={() => handleEquip(null)}
             sx={{

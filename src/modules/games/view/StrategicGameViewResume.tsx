@@ -1,9 +1,9 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { Link as RouterLink, useLocation, useParams } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { Link, Typography } from '@mui/material';
 import { EditableAvatar, StrategicGame, updateStrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { imageBaseUrl } from '../../services/config';
 import { getAvatarImages } from '../../services/image-service';
@@ -15,6 +15,7 @@ const StrategicGameViewResume: FC<{
   setStrategicGame: Dispatch<SetStateAction<StrategicGame>>;
 }> = ({ strategicGame, setStrategicGame: setGame }) => {
   const auth = useAuth();
+  const { t } = useTranslation();
   const { showError } = useError();
 
   const onImageUpdated = (imageId: string) => {

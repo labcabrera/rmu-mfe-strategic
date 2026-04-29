@@ -1,7 +1,6 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Grid, ButtonGroup, Button } from '@mui/material';
-import { t } from 'i18next';
-import { Character } from '../api/character.dto';
 
 const options = ['buy', 'sell'];
 const communicationOptions = ['normal', 'poor', 'excelent'];
@@ -12,11 +11,11 @@ const itemTypes = ['normal', 'inusual', 'especially useful', 'specialty-item', '
 const languageOptions = ['none', 'fewer-than-tree-ranks', 'more-than-six-ranks'];
 
 const TradeViewOptions: FC<{
-  character: Character;
-  setCharacter: Dispatch<SetStateAction<Character>>;
   formData: any;
   setFormData: Dispatch<SetStateAction<any>>;
-}> = ({ character, setCharacter, formData, setFormData }) => {
+}> = ({ formData, setFormData }) => {
+  const { t } = useTranslation();
+
   return (
     <Grid container spacing={1}>
       <OptionGroup

@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Grid,
   Card,
@@ -13,10 +14,10 @@ import {
   Button,
   CircularProgress,
 } from '@mui/material';
-import { t } from 'i18next';
 import { fetchItems, Item } from '../api/items';
 
 const TradeViewItemSearch: FC<{ onItemSelect?: (item: Item) => void }> = ({ onItemSelect }) => {
+  const { t } = useTranslation();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

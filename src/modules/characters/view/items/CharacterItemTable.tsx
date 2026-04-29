@@ -1,4 +1,6 @@
 import React, { FC, useState, Dispatch, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SwapVerticalCircleIcon from '@mui/icons-material/SwapVerticalCircle';
@@ -19,7 +21,6 @@ import {
   Stack,
 } from '@mui/material';
 import { Character, StrategicItem, updateCarriedStatus } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { imageBaseUrl } from '../../../services/config';
 import { itemFilter } from '../../../services/display';
@@ -34,6 +35,8 @@ const CharacterItemTable: FC<{
   onItemClick?: (item: StrategicItem) => void;
   onItemDeleted: (itemId: string) => void;
 }> = ({ character, items, carried, setCharacter, onItemClick, onItemDeleted }) => {
+  const auth = useAuth();
+  const { t } = useTranslation();
   const { showError } = useError();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuItemId, setMenuItemId] = useState<string | null>(null);
@@ -50,7 +53,7 @@ const CharacterItemTable: FC<{
 
   const handleToggleCarried = async (itemId: string, carried: boolean) => {
     try {
-      const data = await updateCarriedStatus(character.id, itemId, !carried);
+      const data = await updateCarriedStatus(character.id, itemId, !carried, auth);
       if (setCharacter) setCharacter(data);
       handleCloseMenu();
     } catch (err: any) {
@@ -67,9 +70,9 @@ const CharacterItemTable: FC<{
       <Table size="small" sx={{ tableLayout: 'fixed' }}>
         <TableHead>
           <TableRow>
-            <TableCell sx={{ width: '10%' }}>{carried ? t('Carried') : t('Stored')}</TableCell>
-            <TableCell sx={{ width: '60%' }}>{t('Name')}</TableCell>
-            <TableCell sx={{ width: '10%' }}>{t('Weight')}</TableCell>
+            <TableCell sx={{ width: '10%' }}>{carried ? t('carried') : t('stored')}</TableCell>
+            <TableCell sx={{ width: '60%' }}>{t('name')}</TableCell>
+            <TableCell sx={{ width: '10%' }}>{t('weight')}</TableCell>
             <TableCell sx={{ width: '10%' }} align="right"></TableCell>
             <TableCell sx={{ width: '10%' }} align="right"></TableCell>
           </TableRow>

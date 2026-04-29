@@ -1,14 +1,13 @@
 import React, { Dispatch, FC, Fragment, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Divider, Grid, Typography, Paper, Stack } from '@mui/material';
 import { CategorySeparator, Character, StrategicItem, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 
 const CharacterItemDetail: FC<{
-  character: Character;
   items: StrategicItem[];
   itemId?: string | undefined;
-  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
-}> = ({ itemId, character, items, setCharacter }) => {
+}> = ({ itemId, items }) => {
+  const { t } = useTranslation();
   if (!itemId) return null;
   if (!items) return <p>Loading...</p>;
 
@@ -27,7 +26,7 @@ const CharacterItemDetail: FC<{
 
           <Divider sx={{ my: 1 }} />
 
-          <Grid container spacing={1} mb={2}>
+          <Grid container spacing={1} sx={{ mb: 2 }}>
             {item.amount && <KeyValueEntry label={t('Amount')} value={item.amount} />}
             {item.info.weight !== 0 && <KeyValueEntry label={t('Weight')} value={`${item.info.weight} lbs`} />}
             {item.info.length && <KeyValueEntry label={t('Length')} value={`${item.info.length}'`} />}

@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Box, CardMedia, Stack, Tooltip } from '@mui/material';
 import { Character, EQUIPMENT_SLOTS, EquipmentSlot, StrategicItem } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { imageBaseUrl } from '../../../services/config';
 import { itemFilter } from '../../../services/display';
 import CharacterEquipmentDialog from './CharacterEquipmentDialog';
@@ -13,6 +13,7 @@ const CharacterViewEquipment: FC<{
   items: StrategicItem[];
   setCharacter: (c: Character) => void;
 }> = ({ character, items, setCharacter }) => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [slot, setSlot] = useState<EquipmentSlot>();
 
