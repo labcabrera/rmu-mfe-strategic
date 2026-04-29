@@ -37,7 +37,7 @@ const CharacterViewEquipment: FC<{
 
   return (
     <>
-      <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="flex-start">
+      <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', alignItems: 'flex-start' }}>
         {EQUIPMENT_SLOTS.map((s) => {
           const item = getItemForSlot(s);
           return (

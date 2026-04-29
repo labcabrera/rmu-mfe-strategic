@@ -1,11 +1,12 @@
 import React, { FC, SetStateAction, Dispatch, ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Box, CardMedia, Divider, Grid, Tooltip, Typography } from '@mui/material';
-import { t } from 'i18next';
 import { Item, categories } from '../../../api/items';
 import { imageBaseUrl } from '../../../services/config';
 import { itemFilter, itemFilterDisabled } from '../../../services/display';
 
 const imageSize = 80;
+const boxSx = { display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 0.2 };
 
 const CharacterAddItemDialogSelect: FC<{
   subcategories: string[];
@@ -26,13 +27,14 @@ const CharacterAddItemDialogSelect: FC<{
   items,
   onLoadItem,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <>
       <Grid container spacing={1}>
         <Grid size={12}>
           <CustomCategorySeparator text={`Category${selectedCategory ? `: ${t(selectedCategory)}` : ''}`} />
-
-          <Box display="flex" flexDirection="row" flexWrap="wrap" gap={0.2}>
+          <Box sx={boxSx}>
             {categories.map((category) => (
               <>
                 <Tooltip key={category} title={t(category)} arrow>
@@ -60,8 +62,7 @@ const CharacterAddItemDialogSelect: FC<{
         {subcategories && subcategories.length > 0 && (
           <Grid size={12}>
             <CustomCategorySeparator text={`Category${selectedSubcategory ? `: ${t(selectedSubcategory)}` : ''}`} />
-
-            <Box display="flex" flexDirection="row" flexWrap="wrap" gap={0.2}>
+            <Box sx={boxSx}>
               {subcategories.map((subcategory, index) => (
                 <Tooltip key={index} title={t(subcategory)} arrow>
                   <CardMedia
@@ -87,7 +88,7 @@ const CharacterAddItemDialogSelect: FC<{
         )}
         <Grid size={12}>
           <CustomCategorySeparator text={t('Items')} />
-          <Box display="flex" flexDirection="row" flexWrap="wrap" gap={0.2}>
+          <Box sx={boxSx}>
             {items.map((item, index) => (
               <Tooltip key={index} title={t(item.id)} arrow>
                 <CardMedia
@@ -116,8 +117,8 @@ const CharacterAddItemDialogSelect: FC<{
 
 const CustomCategorySeparator: FC<{ text: string; children?: ReactNode }> = ({ text, children }) => {
   return (
-    <Box mb={1} mt={0}>
-      <Box display="flex" alignItems="center" justifyContent="space-between">
+    <Box sx={{ mb: 1, mt: 0 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant="subtitle2" color="text.secondary">
           {text}
         </Typography>

@@ -1,7 +1,7 @@
 import React, { FC, Dispatch, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Grid, Stack, TextField, Typography } from '@mui/material';
 import { AddItemDto, CategorySeparator, NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { Item } from '../../../api/items';
 
 const inputSize = { xs: 12, md: 4 } as const;
@@ -11,6 +11,7 @@ const CharacterAddItemDialogForm: FC<{
   setFormData: Dispatch<SetStateAction<AddItemDto | undefined>>;
   item: Item | undefined;
 }> = ({ formData, setFormData, item }) => {
+  const { t } = useTranslation();
   if (!item) return;
   return (
     <>
@@ -20,7 +21,7 @@ const CharacterAddItemDialogForm: FC<{
         </Grid>
         <Grid size={12}>
           <TextField
-            label={t('Item name')}
+            label={t('name')}
             value={formData.name || ''}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             fullWidth
@@ -28,14 +29,14 @@ const CharacterAddItemDialogForm: FC<{
         </Grid>
         <Grid size={inputSize}>
           <NumericInput
-            label={t('Cost')}
+            label={t('cost')}
             value={formData.cost || null}
             onChange={(value) => setFormData({ ...formData, cost: value || undefined })}
           />
         </Grid>
         <Grid size={inputSize}>
           <NumericInput
-            label={t('Weight')}
+            label={t('weight')}
             value={formData.weight || null}
             onChange={(value) => setFormData({ ...formData, weight: value || undefined })}
           />
@@ -68,7 +69,7 @@ const CharacterAddItemDialogForm: FC<{
         {item.category === 'weapon' && (
           <Grid size={inputSize}>
             <NumericInput
-              label={t('Fumble')}
+              label={t('fumble')}
               value={formData.fumble || null}
               onChange={(value) => setFormData({ ...formData, fumble: value || undefined })}
             />
@@ -76,14 +77,14 @@ const CharacterAddItemDialogForm: FC<{
         )}
         <Grid size={inputSize}>
           <NumericInput
-            label={t('Amount')}
+            label={t('amount')}
             value={formData.amount || null}
             onChange={(value) => setFormData({ ...formData, amount: value || undefined })}
           />
         </Grid>
 
         <Grid size={12}>
-          <CategorySeparator text={t('Item information')} />
+          <CategorySeparator text={t('information')} />
         </Grid>
 
         <KeyValueEntry label="Min cost" value={item.info.cost?.min || '-'} />

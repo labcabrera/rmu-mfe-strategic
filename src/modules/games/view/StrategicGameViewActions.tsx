@@ -25,7 +25,7 @@ const StrategicGameViewActions: FC<{
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const breadcrumbs = [
     { name: t('strategic'), link: '/strategic' },
-    { name: t('games'), link: '/strategic/games' },
+    { name: t('strategic-games'), link: '/strategic/games' },
   ];
 
   if (!strategicGame) return <p>Loading...</p>;

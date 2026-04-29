@@ -82,7 +82,7 @@ const CharacterViewItems: FC<{
                 {t('buy')}
               </Button>
               <Button variant="outlined" onClick={() => navigate(`/strategic/characters/trade/${character.id}`)}>
-                {t('trade')}
+                {t('trading')}
               </Button>
               <Button variant="outlined" onClick={() => navigate(`/strategic/characters/craft/${character.id}`)}>
                 {t('craft')}

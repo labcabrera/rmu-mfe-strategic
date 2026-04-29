@@ -1,4 +1,6 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import { Button, Stack, Box, Grid, Badge } from '@mui/material';
 import {
   CategorySeparator,
@@ -7,7 +9,6 @@ import {
   addCharacterXP,
   Character,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { imageBaseUrl } from '../../services/config';
 
@@ -19,6 +20,8 @@ const CharacterViewExperience: FC<{
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
 }> = ({ character, setCharacter }) => {
   const { showError } = useError();
+  const { t } = useTranslation();
+  const auth = useAuth();
   const [xpToAdd, setXpToAdd] = useState<number>();
   const [error, setError] = useState<boolean>(false);
 
@@ -26,7 +29,7 @@ const CharacterViewExperience: FC<{
 
   function handleAdd() {
     if (xpToAdd && xpToAdd !== 0) {
-      addCharacterXP(character.id, xpToAdd)
+      addCharacterXP(character.id, xpToAdd, auth)
         .then((response) => {
           setCharacter(response);
           setXpToAdd(undefined);
@@ -37,12 +40,12 @@ const CharacterViewExperience: FC<{
 
   return (
     <>
-      <CategorySeparator text={t('Experience')} />
+      <CategorySeparator text={t('experience')} />
       <Grid container spacing={1} columns={10}>
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={character.experience.availableLevel}
-            subtitle={t('Level')}
+            subtitle={t('level')}
             image={`${imageBaseUrl}images/generic/experience.png`}
             grayscale={grayscale}
           />
@@ -56,7 +59,7 @@ const CharacterViewExperience: FC<{
           >
             <RmuTextCard
               value={character.experience.level}
-              subtitle={t('Current level')}
+              subtitle={t('current-level')}
               image={`${imageBaseUrl}images/generic/experience.png`}
               grayscale={grayscale}
             />
@@ -65,7 +68,7 @@ const CharacterViewExperience: FC<{
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={new Intl.NumberFormat('en-US').format(character.experience.xp)}
-            subtitle={t('XP')}
+            subtitle={t('xp')}
             image={`${imageBaseUrl}images/generic/experience.png`}
             grayscale={grayscale}
           />
@@ -79,7 +82,7 @@ const CharacterViewExperience: FC<{
           >
             <RmuTextCard
               value={`${character.experience.availableDevPoints} / ${character.experience.devPoints}`}
-              subtitle={t('Development points')}
+              subtitle={t('dev-points')}
               image={`${imageBaseUrl}images/generic/trait-combat.png`}
               grayscale={grayscale}
             />
@@ -87,7 +90,7 @@ const CharacterViewExperience: FC<{
         </Grid>
       </Grid>
       <Grid size={12}>
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1 }}>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mt: 1 }}>
           <Box sx={{ width: 160 }}>
             <NumericInput
               value={xpToAdd || null}
@@ -96,12 +99,12 @@ const CharacterViewExperience: FC<{
                 if (v && v > 0) setError(false);
               }}
               integer
-              label={t('Add XP')}
+              label={t('add-xp')}
               error={error}
             />
           </Box>
           <Button variant="contained" color="primary" onClick={handleAdd}>
-            {t('Add')}
+            {t('add')}
           </Button>
         </Stack>
       </Grid>

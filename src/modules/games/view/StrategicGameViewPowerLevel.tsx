@@ -15,32 +15,32 @@ const StrategicGameViewPowerLevel: FC<{
   const DATA = [
     {
       value: strategicGame.powerLevel.baseDevPoints,
-      subtitle: t('Dev points'),
+      subtitle: t('dev-points'),
       image: `${imageBaseUrl}images/generic/trait-combat.png`,
     },
     {
       value: strategicGame.powerLevel.statRandomMin,
-      subtitle: t('Stat rng min'),
+      subtitle: t('stat-random-min'),
       image: `${imageBaseUrl}images/generic/stat-st.png`,
     },
     {
       value: strategicGame.powerLevel.statBoostPotential,
-      subtitle: t('Stat boost potential'),
+      subtitle: t('stat-boost-potential'),
       image: `${imageBaseUrl}images/generic/stat-st.png`,
     },
     {
       value: strategicGame.powerLevel.statBoostTemporary,
-      subtitle: t('Stat boost temporary'),
+      subtitle: t('stat-boost-temporary'),
       image: `${imageBaseUrl}images/generic/stat-st.png`,
     },
     {
       value: strategicGame.powerLevel.statCreationBoost,
-      subtitle: t('Stat creation boosts'),
+      subtitle: t('stat-creation-boosts'),
       image: `${imageBaseUrl}images/generic/stat-st.png`,
     },
     {
       value: strategicGame.powerLevel.statCreationSwap,
-      subtitle: t('Stat creation swaps'),
+      subtitle: t('stat-creation-swaps'),
       image: `${imageBaseUrl}images/generic/stat-st.png`,
     },
   ];

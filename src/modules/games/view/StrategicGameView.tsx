@@ -72,7 +72,7 @@ const StrategicGameView: FC = () => {
       </Grid>
       <Grid size={gridSizeMain}>
         <StrategicGameViewActions strategicGame={strategicGame} setStrategicGame={setStrategicGame} />
-        <CategorySeparator text={t('options')} />
+        <CategorySeparator text={t('settings')} />
         <StrategicGameViewAttributes strategicGame={strategicGame} />
         <CategorySeparator text={t('power-level')} />
         <StrategicGameViewPowerLevel strategicGame={strategicGame} />
