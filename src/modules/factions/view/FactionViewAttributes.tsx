@@ -1,13 +1,15 @@
 import React, { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import { Character, Faction, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { imageBaseUrl } from '../../services/config';
 
 const FactionViewAttributes: FC<{
   faction: Faction;
   characters: Character[];
 }> = ({ faction, characters }) => {
+  const { t } = useTranslation();
+
   const getTotalLevels = (): number => {
     if (!characters || characters.length === 0) return 0;
     return characters.reduce((sum, c) => sum + (c.experience?.availableLevel ?? 0), 0);
@@ -18,7 +20,7 @@ const FactionViewAttributes: FC<{
       <Grid size={{ xs: 12, md: 3 }}>
         <RmuTextCard
           value={new Intl.NumberFormat('en-EN').format(faction.management.availableGold)}
-          subtitle={t('Gold')}
+          subtitle={t('gold')}
           image={`${imageBaseUrl}images/generic/coins.png`}
           grayscale={0.7}
         />
@@ -26,7 +28,7 @@ const FactionViewAttributes: FC<{
       <Grid size={{ xs: 12, md: 3 }}>
         <RmuTextCard
           value={new Intl.NumberFormat('en-EN').format(faction.management.availableXP)}
-          subtitle={t('Experience')}
+          subtitle={t('experience')}
           image={`${imageBaseUrl}images/generic/experience.png`}
           grayscale={0.7}
         />
@@ -34,7 +36,7 @@ const FactionViewAttributes: FC<{
       <Grid size={{ xs: 12, md: 3 }}>
         <RmuTextCard
           value={getTotalLevels()}
-          subtitle={t('Total levels')}
+          subtitle={t('total-levels')}
           image={`${imageBaseUrl}images/generic/experience.png`}
           grayscale={0.7}
         />

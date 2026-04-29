@@ -1,4 +1,6 @@
 import React, { FC, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
 import {
   RmuBreadcrumbs,
@@ -11,7 +13,6 @@ import {
   fetchFaction,
   StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 
 const FactionViewActions: FC<{
@@ -19,30 +20,25 @@ const FactionViewActions: FC<{
   setFaction: React.Dispatch<React.SetStateAction<Faction | null>>;
   strategicGame: StrategicGame;
 }> = ({ faction, setFaction, strategicGame }) => {
+  const auth = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { showError } = useError();
-  const breadcrumbs = [{ name: t('strategic'), link: '/strategic' }, { name: t('Faction') }];
+  const breadcrumbs = [{ name: t('strategic'), link: '/strategic' }, { name: t('faction') }];
 
   if (!faction || !strategicGame) return <p>Loading...</p>;
 
   const handleRefresh = () => {
-    fetchFaction(faction.id)
-      .then((data: Faction) => {
-        setFaction(data);
-      })
-      .catch((error: Error) => {
-        showError(error.message);
-      });
+    fetchFaction(faction.id, auth)
+      .then((data) => setFaction(data))
+      .catch((error) => showError(error.message));
   };
 
   const handleDelete = async () => {
-    try {
-      await deleteFaction(faction.id);
-      navigate(`/strategic/games/view/${faction.gameId}`);
-    } catch (err: any) {
-      showError(err.message);
-    }
+    deleteFaction(faction.id, auth)
+      .then(() => navigate(`/strategic/games/view/${faction.gameId}`))
+      .catch((error) => showError(error.message));
   };
 
   const handleEditClick = () => {

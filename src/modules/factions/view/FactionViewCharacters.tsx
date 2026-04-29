@@ -1,16 +1,15 @@
 import React, { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
-import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
-import { Character } from '../../api/character.dto';
-import { Faction } from '../../api/faction.dto';
+import { Character, Faction, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { gridSizeCard } from '../../services/display';
 
 const FactionViewCharacters: FC<{
   faction: Faction;
   characters: Character[];
 }> = ({ faction, characters }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   if (!faction || !characters) return <>Loading...</>;
@@ -22,7 +21,7 @@ const FactionViewCharacters: FC<{
           <RmuTextCard
             value={character.name}
             subtitle={`${character.info.race.name} - ${t(character.info.professionId)} - ${character.experience.availableLevel}`}
-            image={character.imageUrl}
+            image={character.imageUrl || ''}
             onClick={() => navigate(`/strategic/characters/view/${character.id}`, { state: { character } })}
           />
         </Grid>

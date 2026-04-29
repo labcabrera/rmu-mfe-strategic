@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
+import { useAuth } from 'react-oidc-context';
 import { useLocation, useParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
 import {
@@ -16,6 +17,7 @@ import CharacterViewResume from './CharacterViewResume';
 import CharacterViewTabs from './CharacterViewTabs';
 
 const CharacterView: FC = () => {
+  const auth = useAuth();
   const location = useLocation();
   const { characterId } = useParams<{ characterId: string }>();
   const [character, setCharacter] = useState<Character>();
@@ -25,33 +27,32 @@ const CharacterView: FC = () => {
 
   useEffect(() => {
     if (character) {
-      fetchStrategicGame(character.gameId)
+      fetchStrategicGame(character.gameId, auth)
         .then((game) => setStrategicGame(game))
         .catch((err) => showError(err.message));
-      fetchProfession(character.info.professionId)
+      fetchProfession(character.info.professionId, auth)
         .then((professionData) => setProfession(professionData))
         .catch((err) => showError(err.message));
     }
   }, [character]);
 
   useEffect(() => {
-    if (characterId) {
-      fetchCharacter(characterId)
-        .then((data) => setCharacter(data))
-        .catch((err) => showError(err.message));
-    }
+    if (!characterId) return;
+    fetchCharacter(characterId, auth)
+      .then((data) => setCharacter(data))
+      .catch((err) => showError(err.message));
   }, [location.state, characterId, showError]);
 
   if (!character || !setCharacter || !strategicGame || !profession) return <div>Loading...</div>;
 
   return (
     <>
-      <CharacterViewActions character={character} setCharacter={setCharacter} game={strategicGame} />
       <Grid container spacing={1}>
         <Grid size={gridSizeResume}>
           <CharacterViewResume character={character} setCharacter={setCharacter} />
         </Grid>
         <Grid size={gridSizeMain}>
+          <CharacterViewActions character={character} setCharacter={setCharacter} game={strategicGame} />
           <CharacterViewTabs
             character={character}
             setCharacter={setCharacter}

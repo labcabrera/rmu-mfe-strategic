@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Badge, Grid, Tooltip, Typography } from '@mui/material';
 import { CategorySeparator, Character, RmuTextCard, STATS, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { imageBaseUrl } from '../../services/config';
 
 const grayscale = 0.7;
@@ -12,6 +12,7 @@ const CharacterViewInfo: FC<{
   strategicGame: StrategicGame;
   character: Character;
 }> = ({ character, strategicGame }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const getArmorType = (): string => {
@@ -43,12 +44,12 @@ const CharacterViewInfo: FC<{
 
   return (
     <>
-      <CategorySeparator text={t('Character')} />
+      <CategorySeparator text={t('character')} />
       <Grid container spacing={1} columns={10}>
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={strategicGame.name}
-            subtitle={t('Game')}
+            subtitle={t('strategic-game')}
             image={strategicGame.imageUrl || ''}
             onClick={() => navigate(`/strategic/games/view/${strategicGame.id}`)}
             grayscale={grayscale}
@@ -57,7 +58,7 @@ const CharacterViewInfo: FC<{
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={character.faction.name}
-            subtitle={t('Faction')}
+            subtitle={t('faction')}
             image={`${imageBaseUrl}images/generic/race-size.png`}
             onClick={() => navigate(`/strategic/factions/view/${character.faction.id}`)}
             grayscale={grayscale}
@@ -66,7 +67,7 @@ const CharacterViewInfo: FC<{
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={character.info.race.name}
-            subtitle={t('Race')}
+            subtitle={t('race')}
             image={`${imageBaseUrl}images/generic/race-size.png`}
             onClick={() => navigate(`/core/races/view/${character.info.race.id}`)}
             grayscale={grayscale}
@@ -75,7 +76,7 @@ const CharacterViewInfo: FC<{
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={t(character.info.professionId)}
-            subtitle={t('Profession')}
+            subtitle={t('profession')}
             image={`${imageBaseUrl}images/generic/race-size.png`}
             onClick={() => navigate(`/core/professions/view/${character.info.professionId}`)}
             grayscale={grayscale}
@@ -104,7 +105,7 @@ const CharacterViewInfo: FC<{
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={t(character.info.realmType)}
-            subtitle={t('Realm')}
+            subtitle={t('realm')}
             image={`${imageBaseUrl}images/generic/realm.png`}
             grayscale={grayscale}
           />
@@ -112,7 +113,7 @@ const CharacterViewInfo: FC<{
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={t(`size-${character.info.sizeId}`)}
-            subtitle={t('Size')}
+            subtitle={t('size')}
             image={`${imageBaseUrl}images/generic/race-size.png`}
             grayscale={grayscale}
           />
@@ -120,7 +121,7 @@ const CharacterViewInfo: FC<{
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={`${character.info.height}'`}
-            subtitle={t('Height')}
+            subtitle={t('height')}
             image={`${imageBaseUrl}images/generic/character-height.png`}
             grayscale={grayscale}
           />
@@ -128,7 +129,7 @@ const CharacterViewInfo: FC<{
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={`${character.info.weight} lbs`}
-            subtitle={t('Weight')}
+            subtitle={t('weight')}
             image={`${imageBaseUrl}images/generic/character-weight.png`}
             grayscale={grayscale}
           />
@@ -142,7 +143,7 @@ const CharacterViewInfo: FC<{
           >
             <RmuTextCard
               value={`${character.hp.current} / ${character.hp.max}`}
-              subtitle={t('Hit points')}
+              subtitle={t('hit-points')}
               image={`${imageBaseUrl}images/generic/hp.png`}
               grayscale={grayscale}
             />
@@ -150,7 +151,7 @@ const CharacterViewInfo: FC<{
         </Grid>
       </Grid>
 
-      <CategorySeparator text={t('Experience')} />
+      <CategorySeparator text={t('experience')} />
 
       <Grid container spacing={1} columns={10}>
         <Grid size={gridSizeCard}>
@@ -170,7 +171,7 @@ const CharacterViewInfo: FC<{
           >
             <RmuTextCard
               value={`${character.experience.availableDevPoints} / ${character.experience.devPoints}`}
-              subtitle={t('Development points')}
+              subtitle={t('dev-points')}
               image={`${imageBaseUrl}images/generic/trait-combat.png`}
               grayscale={grayscale}
             />
@@ -178,7 +179,7 @@ const CharacterViewInfo: FC<{
         </Grid>
       </Grid>
 
-      <CategorySeparator text={t('Statistics')} />
+      <CategorySeparator text={t('statistics')} />
 
       <Grid container spacing={1} columns={10}>
         {STATS.map((stat) => (
@@ -195,13 +196,13 @@ const CharacterViewInfo: FC<{
         ))}
       </Grid>
 
-      <CategorySeparator text={t('Defense')} />
+      <CategorySeparator text={t('defense')} />
 
       <Grid container spacing={1} columns={10}>
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={character.defense.defensiveBonus}
-            subtitle={t('Defensive bonus')}
+            subtitle={t('defensive-bonus')}
             image={`${imageBaseUrl}images/generic/defensive-bonus.png`}
             grayscale={grayscale}
             applyColor
@@ -210,7 +211,7 @@ const CharacterViewInfo: FC<{
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={getArmorType()}
-            subtitle={t('Armor type')}
+            subtitle={t('armor-type')}
             image={`${imageBaseUrl}images/generic/armor.png`}
             grayscale={grayscale}
           />
@@ -220,7 +221,7 @@ const CharacterViewInfo: FC<{
             <Grid size={gridSizeCard}>
               <RmuTextCard
                 value={character.defense.shield.db}
-                subtitle={t('Shield db')}
+                subtitle={t('shield-db')}
                 image={`${imageBaseUrl}images/generic/armor.png`}
                 grayscale={grayscale}
               />
@@ -228,7 +229,7 @@ const CharacterViewInfo: FC<{
             <Grid size={gridSizeCard}>
               <RmuTextCard
                 value={character.defense.shield.blockCount}
-                subtitle={t('Shield block count')}
+                subtitle={t('shield-block-count')}
                 image={`${imageBaseUrl}images/generic/armor.png`}
                 grayscale={grayscale}
               />
@@ -237,7 +238,7 @@ const CharacterViewInfo: FC<{
         )}
       </Grid>
 
-      <CategorySeparator text={t('Movement')} />
+      <CategorySeparator text={t('movement')} />
 
       <Grid container spacing={1} columns={10}>
         <Grid size={gridSizeCard}>
@@ -254,7 +255,7 @@ const CharacterViewInfo: FC<{
             <div>
               <RmuTextCard
                 value={`${character.movement.baseMovementRate}' /rnd`}
-                subtitle={t('Base movement rate')}
+                subtitle={t('base-movement-rate')}
                 image={`${imageBaseUrl}images/generic/stride-bonus.png`}
                 grayscale={grayscale}
               />
@@ -264,7 +265,7 @@ const CharacterViewInfo: FC<{
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={character.movement.modifiers['racial'] || 0}
-            subtitle={t('Stride racial bonus')}
+            subtitle={t('stride-racial-bonus')}
             image={`${imageBaseUrl}images/generic/stride-bonus.png`}
             grayscale={grayscale}
           />
@@ -272,7 +273,7 @@ const CharacterViewInfo: FC<{
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={character.movement.modifiers['qu']}
-            subtitle={t('Stride stat bonus')}
+            subtitle={t('stride-stat-bonus')}
             image={`${imageBaseUrl}images/generic/stride-bonus.png`}
             grayscale={grayscale}
           />

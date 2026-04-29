@@ -14,17 +14,18 @@ import {
   Typography,
 } from '@mui/material';
 import { Character } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 type SortField = 'name' | 'level' | null;
 type SortDirection = 'asc' | 'desc';
 
 const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ characters }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation(); 
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
-  if (!characters) return <>{t('loading')}</>;
+  if (!characters) return <p>Loading...</p>;
 
   const sortedCharacters = useMemo(() => {
     if (!characters) return [] as Character[];

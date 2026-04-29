@@ -1,4 +1,5 @@
 import React, { FC, useState } from 'react';
+import { useAuth } from 'react-oidc-context';
 import { Typography } from '@mui/material';
 import { EditableAvatar, Faction, StrategicGame, updateFaction } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
@@ -9,10 +10,12 @@ const FactionViewResume: FC<{
   setFaction: (faction: Faction) => void;
   game: StrategicGame;
 }> = ({ faction, setFaction, game }) => {
+  const auth = useAuth();
   const { showError } = useError();
 
   const onImageUpdated = (imageId: string) => {
-    updateFaction(faction.id, { ...faction, imageUrl: imageId })
+    const dto = { imageUrl: imageId };
+    updateFaction(faction.id, dto, auth)
       .then(() => setFaction({ ...faction, imageUrl: imageId }))
       .catch((error: Error) => showError(error.message));
   };
