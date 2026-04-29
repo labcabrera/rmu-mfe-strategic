@@ -1,7 +1,9 @@
 import React, { useState, useEffect, FC } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import { useSearchParams } from 'react-router-dom';
 import OutboundIcon from '@mui/icons-material/Outbound';
-import { Grid, IconButton, TextField, Badge } from '@mui/material';
+import { Grid, IconButton, TextField, Badge, Paper } from '@mui/material';
 import {
   CategorySeparator,
   Character,
@@ -17,7 +19,6 @@ import {
   StrategicGame,
   TechnicalInfo,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 import { defaultStats } from '../../data/character-create';
 import { imageBaseUrl } from '../../services/config';
@@ -162,6 +163,8 @@ export interface StatBonusFormData {
 }
 
 const CharacterCreate: FC = () => {
+  const auth = useAuth();
+  const { t } = useTranslation();
   const { showError } = useError();
 
   const [searchParams] = useSearchParams();
@@ -197,7 +200,7 @@ const CharacterCreate: FC = () => {
 
   const bindStrategicGame = () => {
     if (gameId) {
-      fetchStrategicGame(gameId)
+      fetchStrategicGame(gameId, auth)
         .then((game) => setGame(game))
         .catch((err) => showError(err.message));
     }
@@ -216,7 +219,7 @@ const CharacterCreate: FC = () => {
 
   useEffect(() => {
     if (game) {
-      fetchRaces(`realm.id==${game.realmId}`, 0, 100)
+      fetchRaces(`realmId==${game.realmId}`, 0, 100, auth)
         .then((data) => setRaces(data.content))
         .catch((err) => showError(err.message));
     }
@@ -234,7 +237,7 @@ const CharacterCreate: FC = () => {
 
   useEffect(() => {
     if (factionId) {
-      fetchFaction(factionId)
+      fetchFaction(factionId, auth)
         .then((response) => {
           setFaction(response);
           setFormData((prevState) => ({ ...prevState, factionId: factionId }));
@@ -266,58 +269,59 @@ const CharacterCreate: FC = () => {
         </Grid>
         <Grid size={gridSizeMain}>
           <CharacterCreateActions formData={formData} game={game} faction={faction} isValid={isValid} />
-          <CategorySeparator text={t('Stats')}>
-            <RefreshButton onClick={onRandomStats} />
-            <Badge badgeContent={2} color="success">
-              <IconButton onClick={() => setBoostDialogOpen(true)} color="primary">
-                <OutboundIcon />
-              </IconButton>
-            </Badge>
-          </CategorySeparator>
+          <Paper sx={{ p: 2 }}>
+            <CategorySeparator text={t('Stats')}>
+              <RefreshButton onClick={onRandomStats} />
+              <Badge badgeContent={2} color="success">
+                <IconButton onClick={() => setBoostDialogOpen(true)} color="primary">
+                  <OutboundIcon />
+                </IconButton>
+              </Badge>
+            </CategorySeparator>
 
-          <Grid container spacing={1}>
-            <Grid size={5}>
-              <CharacterCreateStats formData={formData} statBonusFormData={statBonusFormData} />
+            <Grid container spacing={1}>
+              <Grid size={5}>
+                <CharacterCreateStats formData={formData} statBonusFormData={statBonusFormData} />
+              </Grid>
+              <Grid size={5} sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                <CharacterViewStatsChart stats={formData.statistics} />
+              </Grid>
             </Grid>
-            <Grid size={5} sx={{ display: 'flex', alignItems: 'flex-start' }}>
-              <CharacterViewStatsChart stats={formData.statistics} />
-            </Grid>
-          </Grid>
 
-          <CategorySeparator text={t('Weapon development order')} />
-          <Grid size={12}>
-            <CharacterCreateSortCombat items={formData.weaponDevelopment || []} onChange={handleWeaponOrderChange} />
-          </Grid>
-
-          {profession && (
+            <CategorySeparator text={t('Weapon development order')} />
             <Grid size={12}>
-              <>
-                <CategorySeparator text={t('Skill development costs')} />
-                <CharacterCreateSkillCosts profession={profession} />
-                <CategorySeparator text={t('Professional skills')} />
-                <CharacterCreateProfessionalSkills profession={profession} />
-              </>
+              <CharacterCreateSortCombat items={formData.weaponDevelopment || []} onChange={handleWeaponOrderChange} />
             </Grid>
-          )}
 
-          <CategorySeparator text={t('lore')} />
-          <Grid size={12}>
-            <TextField
-              label={t('Description')}
-              name="description"
-              value={formData.description}
-              onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-              fullWidth
-              multiline
-              maxRows={4}
-            />
-          </Grid>
+            {profession && (
+              <Grid size={12}>
+                <>
+                  <CategorySeparator text={t('Skill development costs')} />
+                  <CharacterCreateSkillCosts profession={profession} />
+                  <CategorySeparator text={t('Professional skills')} />
+                  <CharacterCreateProfessionalSkills profession={profession} />
+                </>
+              </Grid>
+            )}
 
-          <Grid size={12} mt={2}>
-            <TechnicalInfo>
-              <pre>{JSON.stringify(formData, null, 2)}</pre>
-            </TechnicalInfo>
-          </Grid>
+            <CategorySeparator text={t('lore')} />
+            <Grid size={12}>
+              <TextField
+                label={t('Description')}
+                name="description"
+                value={formData.description}
+                onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+                fullWidth
+                multiline
+                maxRows={4}
+              />
+            </Grid>
+            <Grid size={12}>
+              <TechnicalInfo>
+                <pre>{JSON.stringify(formData, null, 2)}</pre>
+              </TechnicalInfo>
+            </Grid>
+          </Paper>
         </Grid>
       </Grid>
 

@@ -15,10 +15,10 @@ import {
   Typography,
 } from '@mui/material';
 import { CreateCharacterDto, STATS, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { getStatBonus } from '../../services/stat-service';
 import { StatBonus } from './CharacterCreate';
 import CharacterCreateStatsActions from './CharacterCreateStatsActions';
+import { useTranslation } from 'react-i18next';
 
 const CharacterCreateBoostOptionsDialog: FC<{
   open: boolean;
@@ -27,6 +27,7 @@ const CharacterCreateBoostOptionsDialog: FC<{
   formData: CreateCharacterDto;
   setFormData: React.Dispatch<React.SetStateAction<CreateCharacterDto>>;
 }> = ({ open, onClose, strategicGame, formData, setFormData }) => {
+  const { t } = useTranslation();
   const [statBonusFormData, setStatBonusFormData] = useState<{ [key: string]: StatBonus }>({} as any);
   const [boosts, setBoosts] = useState<number>(strategicGame?.powerLevel.statCreationBoost || 0);
   const [swaps, setSwaps] = useState<number>(strategicGame?.powerLevel.statCreationSwap || 0);

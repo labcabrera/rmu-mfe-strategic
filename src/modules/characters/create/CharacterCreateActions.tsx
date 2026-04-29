@@ -1,6 +1,9 @@
 import React, { FC } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
 import {
+  Character,
   createCharacter,
   CreateCharacterDto,
   Faction,
@@ -8,7 +11,6 @@ import {
   SaveButton,
   StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 
 const CharacterCreateActions: FC<{
@@ -17,6 +19,8 @@ const CharacterCreateActions: FC<{
   faction?: Faction;
   isValid: boolean;
 }> = ({ formData, game, faction, isValid }) => {
+  const auth = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { showError } = useError();
 
@@ -31,7 +35,8 @@ const CharacterCreateActions: FC<{
   ];
 
   const onCreate = async () => {
-    createCharacter(formData)
+    const dto = formData as unknown as Partial<Character>;
+    createCharacter(dto, auth)
       .then((data) => navigate('/strategic/characters/view/' + data.id, { state: { character: data, game: game } }))
       .catch((err) => showError(err.message));
   };

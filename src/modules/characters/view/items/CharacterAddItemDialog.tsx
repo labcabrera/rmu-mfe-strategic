@@ -1,8 +1,8 @@
 import React, { useState, useEffect, FC, forwardRef, ReactElement, Ref } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Slide } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
 import { AddItemDto, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { fetchItems, Item, armorSubcategories, weaponSubcategories } from '../../../api/items';
 import CharacterAddItemDialogForm from './CharacterAddItemDialogForm';
@@ -22,6 +22,7 @@ const CharacterAddItemDialog: FC<{
   onClose: () => void;
   onItemAdded: (item: AddItemDto) => void;
 }> = ({ open, onClose, onItemAdded }) => {
+  const { t } = useTranslation();
   const { showError } = useError();
   const [selectedCategory, setSelectedCategory] = useState<string>();
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>();
