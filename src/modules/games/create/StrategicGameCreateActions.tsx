@@ -1,4 +1,6 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
 import {
   RmuBreadcrumbs,
@@ -7,7 +9,6 @@ import {
   createStrategicGame,
   CreateStrategicGameDto,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 
 const StrategicGameCreateActions: React.FC<{
@@ -15,6 +16,8 @@ const StrategicGameCreateActions: React.FC<{
   isValid: boolean;
 }> = ({ formData, isValid }) => {
   const navigate = useNavigate();
+  const auth = useAuth();
+  const { t } = useTranslation();
   const { showError } = useError();
   const breadcrumbs = [
     { name: t('Strategic'), link: '/strategic' },
@@ -23,7 +26,7 @@ const StrategicGameCreateActions: React.FC<{
   ];
 
   const createGame = () => {
-    createStrategicGame(formData)
+    createStrategicGame(formData, auth)
       .then((data) => navigate('/strategic/games/view/' + data.id, { state: { strategicGame: data } }))
       .catch((err) => showError(err.message));
   };

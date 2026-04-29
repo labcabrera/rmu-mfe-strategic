@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
+import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
 import { Grid } from '@mui/material';
 import { fetchStrategicGames, RmuPagination, RmuTextCard, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
@@ -9,6 +10,7 @@ import StrategicGameListSearch from './StrategicGameListSearch';
 
 const StrategicGameList: FC = () => {
   const navigate = useNavigate();
+  const auth = useAuth();
   const { showError } = useError();
   const [strategicGames, setStrategicGames] = useState<StrategicGame[]>([]);
   const [queryString, setQueryString] = useState<string>('');
@@ -18,7 +20,7 @@ const StrategicGameList: FC = () => {
   const totalPages = Math.ceil(totalCount / pageSize);
 
   const bindStrategicGames = () => {
-    fetchStrategicGames(queryString, page, pageSize)
+    fetchStrategicGames(queryString, page, pageSize, auth)
       .then((response) => {
         setStrategicGames(response.content);
         setTotalCount(response.pagination.totalElements);

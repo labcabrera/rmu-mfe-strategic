@@ -1,4 +1,5 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import { useAuth } from 'react-oidc-context';
 import { Link as RouterLink, useLocation, useParams } from 'react-router-dom';
 import { Link, Typography } from '@mui/material';
 import { EditableAvatar, StrategicGame, updateStrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
@@ -13,12 +14,12 @@ const StrategicGameViewResume: FC<{
   strategicGame: StrategicGame;
   setStrategicGame: Dispatch<SetStateAction<StrategicGame>>;
 }> = ({ strategicGame, setStrategicGame: setGame }) => {
+  const auth = useAuth();
   const { showError } = useError();
-  const [imageDialogOpen, setImageDialogOpen] = useState(false);
 
   const onImageUpdated = (imageId: string) => {
-    console.log(`Image selected: ${imageId}`);
-    updateStrategicGame(strategicGame.id, { ...strategicGame, imageUrl: imageId })
+    const dto = { imageUrl: imageId };
+    updateStrategicGame(strategicGame.id, dto, auth)
       .then(() => setGame({ ...strategicGame, imageUrl: imageId }))
       .catch((error: Error) => showError(error.message));
   };

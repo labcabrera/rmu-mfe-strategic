@@ -1,4 +1,5 @@
 import React, { Dispatch, FC, SetStateAction, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Grid } from '@mui/material';
 import { ClearableTextField } from '@labcabrera-rmu/rmu-react-shared-lib';
 
@@ -7,6 +8,7 @@ type Props = {
 };
 
 const StrategicGameListSearch: FC<Props> = ({ setQueryString }) => {
+  const { t } = useTranslation();
   const [searchName, setSearchName] = React.useState('');
 
   useEffect(() => {
@@ -21,7 +23,7 @@ const StrategicGameListSearch: FC<Props> = ({ setQueryString }) => {
     <Grid container spacing={1}>
       <Grid size={{ xs: 12, md: 3 }}>
         <ClearableTextField
-          label="Name"
+          label={t('name')}
           name="name"
           value={searchName}
           onChange={(e) => setSearchName(e.target.value)}

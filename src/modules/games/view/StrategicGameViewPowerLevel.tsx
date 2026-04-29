@@ -1,8 +1,7 @@
 import React, { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Grid } from '@mui/material';
-import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
-import { StrategicGame } from '../../api/strategic-game.dto';
+import { RmuTextCard, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { imageBaseUrl } from '../../services/config';
 import { gridSizeCard } from '../../services/display';
 
@@ -11,6 +10,8 @@ const grayscale = 0.7;
 const StrategicGameViewPowerLevel: FC<{
   strategicGame: StrategicGame;
 }> = ({ strategicGame }) => {
+  const { t } = useTranslation();
+
   const DATA = [
     {
       value: strategicGame.powerLevel.baseDevPoints,

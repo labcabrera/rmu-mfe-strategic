@@ -1,5 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
-import { Grid } from '@mui/material';
+import { useAuth } from 'react-oidc-context';
+import { Grid, Paper } from '@mui/material';
 import {
   CreateStrategicGameDto,
   EditableAvatar,
@@ -38,6 +39,7 @@ const EMPTY_STRATEGIC_GAME = {
 
 const StrategicGameCreate: FC = () => {
   const { showError } = useError();
+  const auth = useAuth();
   const [realms, setRealms] = useState<Realm[]>([]);
   const [formData, setFormData] = useState<StrategicGame>(EMPTY_STRATEGIC_GAME);
   const [isValid, setIsValid] = useState<boolean>(false);
@@ -51,7 +53,7 @@ const StrategicGameCreate: FC = () => {
   }, [formData]);
 
   useEffect(() => {
-    fetchRealms('', 0, 100)
+    fetchRealms('', 0, 100, auth)
       .then((data) => setRealms(data.content))
       .catch((err) => showError(err.message));
   }, []);
@@ -69,7 +71,9 @@ const StrategicGameCreate: FC = () => {
       </Grid>
       <Grid size={gridSizeMain}>
         <StrategicGameCreateActions formData={formData} isValid={isValid} />
-        <StrategicGameForm formData={formData} setFormData={setFormData} realms={realms} />
+        <Paper sx={{ p: 2 }}>
+          <StrategicGameForm formData={formData} setFormData={setFormData} realms={realms} />
+        </Paper>
         <TechnicalInfo>
           <pre>{JSON.stringify(formData, null, 2)}</pre>
         </TechnicalInfo>

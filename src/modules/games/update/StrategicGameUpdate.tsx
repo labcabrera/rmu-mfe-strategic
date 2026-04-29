@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
+import { useAuth } from 'react-oidc-context';
 import { useLocation, useParams } from 'react-router-dom';
-import { Grid } from '@mui/material';
+import { Grid, Paper } from '@mui/material';
 import {
   EditableAvatar,
   fetchStrategicGame,
@@ -14,6 +15,7 @@ import StrategicGameUpdateActions from './StrategicGameUpdateActions';
 
 const StrategicGameUpdate: FC = () => {
   const location = useLocation();
+  const auth = useAuth();
   const { showError } = useError();
   const { gameId } = useParams<{ gameId?: string }>();
   const [strategicGame, setStrategicGame] = useState<StrategicGame>();
@@ -42,7 +44,7 @@ const StrategicGameUpdate: FC = () => {
     if (location.state && location.state.strategicGame) {
       setStrategicGame(location.state.strategicGame);
     } else if (gameId) {
-      fetchStrategicGame(gameId)
+      fetchStrategicGame(gameId, auth)
         .then((response) => setStrategicGame(response))
         .catch((err) => showError(err.message));
     }
@@ -61,7 +63,9 @@ const StrategicGameUpdate: FC = () => {
       </Grid>
       <Grid size={gridSizeMain}>
         <StrategicGameUpdateActions strategicGame={strategicGame} formData={formData} isValid={isValid} />
-        <StrategicGameForm formData={formData} setFormData={setFormData} />
+        <Paper sx={{ p: 2 }}>
+          <StrategicGameForm formData={formData} setFormData={setFormData} />
+        </Paper>
       </Grid>
     </Grid>
   );

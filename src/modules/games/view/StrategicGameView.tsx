@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
 import {
@@ -9,10 +11,10 @@ import {
   fetchStrategicGame,
   Faction,
   fetchFactions,
+  fetchTacticalGames,
+  TacticalGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { fetchTacticalGames, TacticalGame } from '../../api/tactical-games';
 import { gridSizeMain, gridSizeResume } from '../../services/display';
 import StrategicGameViewActions from './StrategicGameViewActions';
 import StrategicGameViewAttributes from './StrategicGameViewAttributes';
@@ -21,8 +23,10 @@ import StrategicGameViewPowerLevel from './StrategicGameViewPowerLevel';
 import StrategicGameViewResume from './StrategicGameViewResume';
 import StrategicGameViewTacticalGames from './StrategicGameViewTacticalGames';
 
-const StrategicGameView: React.FC = () => {
+const StrategicGameView: FC = () => {
+  const auth = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const location = useLocation();
   const { showError } = useError();
   const { gameId } = useParams<{ gameId?: string }>();
@@ -40,11 +44,11 @@ const StrategicGameView: React.FC = () => {
 
   useEffect(() => {
     if (strategicGame) {
-      fetchFactions(`gameId==${strategicGame.id}`, 0, 100)
+      fetchFactions(`gameId==${strategicGame.id}`, 0, 100, auth)
         .then((data) => setFactions(data.content))
         .catch((err) => showError(err.message));
-      fetchTacticalGames(`strategicGameId==${gameId}`, 0, 100)
-        .then((data) => setTacticalGames(data))
+      fetchTacticalGames(`strategicGameId==${gameId}`, 0, 100, auth)
+        .then((data) => setTacticalGames(data.content))
         .catch((err) => showError(err.message));
     }
   }, [strategicGame]);
@@ -53,7 +57,7 @@ const StrategicGameView: React.FC = () => {
     if (location.state?.strategicGame) {
       setStrategicGame(location.state.strategicGame);
     } else if (gameId) {
-      fetchStrategicGame(gameId)
+      fetchStrategicGame(gameId, auth)
         .then((data) => setStrategicGame(data))
         .catch((err) => showError(err.message));
     }
@@ -68,15 +72,15 @@ const StrategicGameView: React.FC = () => {
       </Grid>
       <Grid size={gridSizeMain}>
         <StrategicGameViewActions strategicGame={strategicGame} setStrategicGame={setStrategicGame} />
-        <CategorySeparator text={t('Options')} />
+        <CategorySeparator text={t('options')} />
         <StrategicGameViewAttributes strategicGame={strategicGame} />
-        <CategorySeparator text={t('Power level')} />
+        <CategorySeparator text={t('power-level')} />
         <StrategicGameViewPowerLevel strategicGame={strategicGame} />
-        <CategorySeparator text={t('Factions')}>
+        <CategorySeparator text={t('factions')}>
           <AddButton onClick={onCreateFaction} />
         </CategorySeparator>
         <StrategicGameViewFactions factions={factions} />
-        <CategorySeparator text={t('Tactical games')}>
+        <CategorySeparator text={t('tactical-games')}>
           <AddButton onClick={onCreateTacticalGame} />
         </CategorySeparator>
         <StrategicGameViewTacticalGames tacticalGames={tacticalGames} factions={factions} />

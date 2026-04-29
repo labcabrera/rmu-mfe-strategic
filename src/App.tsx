@@ -3,7 +3,6 @@ import { Route, Routes } from 'react-router-dom';
 import { Box, ThemeProvider } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { ErrorProvider } from './ErrorContext';
-import './i18n';
 import CharacterCreate from './modules/characters/create/CharacterCreate';
 import CharacterList from './modules/characters/list/CharacterList';
 import CharacterUpdate from './modules/characters/update/CharacterUpdate';
@@ -28,7 +27,7 @@ const App: FC = () => {
   return (
     <ThemeProvider theme={useTheme()}>
       <ErrorProvider>
-        <Box padding={2}>
+        <Box sx={{ p: 2 }}>
           <Routes>
             <Route path="/" element={<StrategicGameList />} />
             <Route path="/games" element={<StrategicGameList />} />

@@ -1,16 +1,16 @@
 import React, { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Grid } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
-import { Faction } from '../../api/faction.dto';
+import { Faction, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { gridSizeCard } from '../../services/display';
 
 const StrategicGameViewFactions: FC<{
   factions: Faction[];
 }> = ({ factions }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <Grid container spacing={1}>
