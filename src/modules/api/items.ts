@@ -60,16 +60,6 @@ export interface ItemCost {
   max: number;
 }
 
-export async function fetchItems(rsql: string, page: number, size: number): Promise<Item[]> {
-  const url = `${apiItemsUrl}/items?q=${rsql}&page=${page}&size=${size}`;
-  const response = await fetch(url, { method: 'GET', headers: getAuthHeaders() });
-  if (response.status !== 200) {
-    throw await buildErrorFromResponse(response, url);
-  }
-  const pageContent = await response.json();
-  return pageContent.content as Item[];
-}
-
 export const weaponSubcategories = [
   'melee-weapon@blade',
   'melee-weapon@greater-blade',

@@ -1,19 +1,15 @@
 import React, { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
+import { Box, Button, CardMedia, Tooltip } from '@mui/material';
 import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  CardMedia,
-  Typography,
-  Tooltip,
-} from '@mui/material';
-import { flex } from '@mui/system';
-import { Character, EquipmentSlot, StrategicItem, equipItem, unequipItem } from '@labcabrera-rmu/rmu-react-shared-lib';
+  Character,
+  EquipmentSlot,
+  RmuDialog,
+  StrategicItem,
+  equipItem,
+  unequipItem,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../../ErrorContext';
 import { imageBaseUrl } from '../../../services/config';
 import { itemFilter } from '../../../services/display';
@@ -31,9 +27,6 @@ const CharacterEquipmentDialog: FC<{
   const auth = useAuth();
   const { t } = useTranslation();
   const { showError } = useError();
-
-  if (!slot) return;
-
   const slotItemId = character.equipment.slots[slot];
 
   const isArmorSlot = (item: StrategicItem, s: string) => {
@@ -57,6 +50,8 @@ const CharacterEquipmentDialog: FC<{
 
   const slotOptions = useMemo(() => getSlotOptions(character, slot), [character, slot]);
 
+  if (!slot) return null;
+
   const handleEquip = (item: StrategicItem | null) => {
     if (item) {
       equipItem(character.id, slot, item.id, auth)
@@ -75,14 +70,11 @@ const CharacterEquipmentDialog: FC<{
     }
   };
 
+  const buttons = [<Button onClick={onClose}>{t('cancel')}</Button>];
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
-      <DialogTitle>
-        <Typography variant="h6" component="div">
-          {t(slot)}
-        </Typography>
-      </DialogTitle>
-      <DialogContent>
+    <RmuDialog open={open} title={t(slot)} buttons={buttons}>
+      <>
         <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 2 }}>
           <Box
             onClick={() => handleEquip(null)}
@@ -133,11 +125,8 @@ const CharacterEquipmentDialog: FC<{
             );
           })}
         </Box>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>{t('cancel')}</Button>
-      </DialogActions>
-    </Dialog>
+      </>
+    </RmuDialog>
   );
 };
 

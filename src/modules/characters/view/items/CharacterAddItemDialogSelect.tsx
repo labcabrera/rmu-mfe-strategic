@@ -87,7 +87,7 @@ const CharacterAddItemDialogSelect: FC<{
           </Grid>
         )}
         <Grid size={12}>
-          <CustomCategorySeparator text={t('Items')} />
+          <CustomCategorySeparator text={t('items')} />
           <Box sx={boxSx}>
             {items.map((item, index) => (
               <Tooltip key={index} title={t(item.id)} arrow>

@@ -1,27 +1,19 @@
-import React, { useState, useEffect, FC, forwardRef, ReactElement, Ref } from 'react';
+import React, { useState, useEffect, FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Slide } from '@mui/material';
-import { TransitionProps } from '@mui/material/transitions';
-import { AddItemDto, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { useAuth } from 'react-oidc-context';
+import { Button, Grid } from '@mui/material';
+import { AddItemDto, fetchItems, Item, RmuDialog, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../../ErrorContext';
-import { fetchItems, Item, armorSubcategories, weaponSubcategories } from '../../../api/items';
+import { armorSubcategories, weaponSubcategories } from '../../../api/items';
 import CharacterAddItemDialogForm from './CharacterAddItemDialogForm';
 import CharacterAddItemDialogSelect from './CharacterAddItemDialogSelect';
-
-const Transition = forwardRef(function Transition(
-  props: TransitionProps & {
-    children: ReactElement<any, any>;
-  },
-  ref: Ref<unknown>
-) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
 
 const CharacterAddItemDialog: FC<{
   open: boolean;
   onClose: () => void;
   onItemAdded: (item: AddItemDto) => void;
 }> = ({ open, onClose, onItemAdded }) => {
+  const auth = useAuth();
   const { t } = useTranslation();
   const { showError } = useError();
   const [selectedCategory, setSelectedCategory] = useState<string>();
@@ -58,8 +50,8 @@ const CharacterAddItemDialog: FC<{
     } else if (category === 'armor' && selectedSubcategory) {
       rsql += `;armor.slot==${selectedSubcategory}`;
     }
-    fetchItems(rsql, 0, 100)
-      .then((data) => setItems(data))
+    fetchItems(rsql, 0, 100, auth)
+      .then((data) => setItems(data.content))
       .catch((err) => showError(err.message));
   };
 
@@ -112,52 +104,41 @@ const CharacterAddItemDialog: FC<{
     setIsValid(isFormValid());
   }, [formData]);
 
+  const buttons = [
+    <>
+      <Button onClick={handleClose}>{t('close')}</Button>
+      <Button onClick={handleSave} variant="contained" disabled={!isValid}>
+        {t('buy')}
+      </Button>
+    </>,
+  ];
+
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      maxWidth="xl"
-      fullWidth
-      slots={{
-        transition: Transition,
-      }}
-      sx={{ minHeight: '600px' }}
-    >
-      <DialogTitle>{t('direct-buy')}</DialogTitle>
-      <DialogContent>
-        <Grid container spacing={1}>
-          <Grid size={6}>
-            <CharacterAddItemDialogSelect
-              subcategories={subcategories}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-              selectedSubcategory={selectedSubcategory}
-              setSelectedSubcategory={setSelectedSubcategory}
-              selectedItem={selectedItem}
-              items={items}
-              onLoadItem={loadItem}
-            />
-          </Grid>
-          <Grid size={6}>
-            {formData && (
-              <CharacterAddItemDialogForm formData={formData} setFormData={setFormData} item={selectedItem} />
-            )}
-          </Grid>
-          <Grid size={12}>
-            <TechnicalInfo>
-              <pre>FormData: {JSON.stringify(formData, null, 2)}</pre>
-              <pre>Item: {JSON.stringify(selectedItem, null, 2)}</pre>
-            </TechnicalInfo>
-          </Grid>
+    <RmuDialog open={open} maxWidth="xl" title={t('buy')} buttons={buttons}>
+      <Grid container spacing={1}>
+        <Grid size={6}>
+          <CharacterAddItemDialogSelect
+            subcategories={subcategories}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            selectedSubcategory={selectedSubcategory}
+            setSelectedSubcategory={setSelectedSubcategory}
+            selectedItem={selectedItem}
+            items={items}
+            onLoadItem={loadItem}
+          />
         </Grid>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose}>{t('Close')}</Button>
-        <Button onClick={handleSave} variant="contained" disabled={!isValid}>
-          {t('Buy')}
-        </Button>
-      </DialogActions>
-    </Dialog>
+        <Grid size={6}>
+          {formData && <CharacterAddItemDialogForm formData={formData} setFormData={setFormData} item={selectedItem} />}
+        </Grid>
+        <Grid size={12}>
+          <TechnicalInfo>
+            <pre>FormData: {JSON.stringify(formData, null, 2)}</pre>
+            <pre>Item: {JSON.stringify(selectedItem, null, 2)}</pre>
+          </TechnicalInfo>
+        </Grid>
+      </Grid>
+    </RmuDialog>
   );
 };
 
