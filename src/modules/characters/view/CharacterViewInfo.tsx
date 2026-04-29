@@ -99,7 +99,7 @@ const CharacterViewInfo: FC<{
         </Grid>
       </Grid>
 
-      <CategorySeparator text={t('General info')} />
+      <CategorySeparator text={t('general-info')} />
 
       <Grid container spacing={1} columns={10}>
         <Grid size={gridSizeCard}>
@@ -286,7 +286,7 @@ const CharacterViewInfo: FC<{
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={character.initiative.totalBonus}
-            subtitle={t('Initiative total bonus')}
+            subtitle={t('initiative-total-bonus')}
             image={`${imageBaseUrl}images/generic/initiative.png`}
             grayscale={grayscale}
             applyColor
@@ -297,7 +297,7 @@ const CharacterViewInfo: FC<{
             <Grid size={gridSizeCard}>
               <RmuTextCard
                 value={character.initiative.modifiers['stat'] || 0}
-                subtitle={t('Initiative stat bonus')}
+                subtitle={t('initiative-stat-bonus')}
                 image={`${imageBaseUrl}images/generic/initiative.png`}
                 grayscale={grayscale}
                 applyColor
@@ -306,7 +306,7 @@ const CharacterViewInfo: FC<{
             <Grid size={gridSizeCard}>
               <RmuTextCard
                 value={character.initiative.modifiers['trait'] || 0}
-                subtitle={t('Initiative trait bonus')}
+                subtitle={t('initiative-trait-bonus')}
                 image={`${imageBaseUrl}images/generic/initiative.png`}
                 grayscale={grayscale}
                 applyColor
@@ -316,7 +316,7 @@ const CharacterViewInfo: FC<{
         )}
       </Grid>
 
-      <CategorySeparator text={t('Resistances')} />
+      <CategorySeparator text={t('resistances')} />
 
       <Grid container spacing={1} columns={10}>
         {character.resistances.map((resistance) => (

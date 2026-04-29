@@ -1,7 +1,7 @@
-import React, { Dispatch, FC, Fragment, SetStateAction, useState } from 'react';
+import React, { Dispatch, FC, Fragment, SetStateAction, useState, useTransition } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Chip, Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { CategorySeparator, Character, LevelUpButton, StatKey, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import StatLevelUpDialog from './StatLevelUpDialog';
 
 const LEVEL_UP_STAT_COST = 4;
@@ -10,6 +10,8 @@ const CharacterViewStats: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
 }> = ({ character, setCharacter }) => {
+  const { t } = useTranslation();
+
   if (!character) return <div>Loading...</div>;
 
   const [levelUpStatDialogOpen, setLevelUpStatDialogOpen] = useState<boolean>(false);
@@ -27,17 +29,10 @@ const CharacterViewStats: FC<{
 
   return (
     <>
-      <CategorySeparator text={t('Statistics')} />
+      <CategorySeparator text={t('statistics')} />
       <Paper sx={{ width: 'fit-content', padding: 2 }}>
-        <Table sx={{ minWidth: 650, maxWidth: 800 }} aria-label="stats table" size="small">
-          <TableHead
-            sx={{
-              '& .MuiTableCell-root': {
-                color: 'primary.main',
-                fontWeight: 'bold',
-              },
-            }}
-          >
+        <Table sx={{ minWidth: 650, maxWidth: 800 }} size="small">
+          <TableHead>
             <TableRow>
               <TableCell align="left">Stat</TableCell>
               <TableCell align="right">{t('potential-short')}</TableCell>
@@ -78,6 +73,8 @@ const CharacterViewStatsEntry: FC<{
   character: Character;
   onLevelUp: (stat: StatKey) => void;
 }> = ({ stat, character, onLevelUp }) => {
+  const { t } = useTranslation();
+
   if (!character.statistics[stat].modifiers) return;
   const potential = character.statistics[stat].potential;
   const temporary = character.statistics[stat].temporary;

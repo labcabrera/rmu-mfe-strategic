@@ -1,12 +1,14 @@
 import React, { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Paper, Stack, Table, TableBody, TableCell, TableHead, TableRow, Chip } from '@mui/material';
 import { CategorySeparator, Character, CharacterAttack, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 
 const CharacterViewAttacks: FC<{
   character: Character;
   strategicGame: StrategicGame;
 }> = ({ character, strategicGame }) => {
+  const { t } = useTranslation();
+
   const getColor = (value: number) => {
     if (value < 0) return 'error.main';
     if (value > 0) return 'success.main';
@@ -31,7 +33,7 @@ const CharacterViewAttacks: FC<{
 
   return (
     <>
-      <CategorySeparator text={t('Attacks')} />
+      <CategorySeparator text={t('attacks')} />
       <Paper sx={{ width: 'fit-content', padding: 2 }}>
         <Table aria-label="item table">
           <TableHead
@@ -44,14 +46,14 @@ const CharacterViewAttacks: FC<{
           >
             <TableRow>
               <TableCell>{t('name')}</TableCell>
-              <TableCell align="left">{t('Type')}</TableCell>
-              <TableCell align="left">{t('Attack table')}</TableCell>
-              <TableCell align="left">{t('Fumble table')}</TableCell>
-              <TableCell align="left">{t('Size adjustment')}</TableCell>
-              <TableCell align="left">{t('Fumble')}</TableCell>
-              <TableCell align="left">{t('Offensive bonus')}</TableCell>
-              <TableCell align="left">{t('Melee range')}</TableCell>
-              <TableCell align="left">{t('BO Modifiers')}</TableCell>
+              <TableCell align="left">{t('type')}</TableCell>
+              <TableCell align="left">{t('attack-table')}</TableCell>
+              <TableCell align="left">{t('fumble-table')}</TableCell>
+              <TableCell align="left">{t('size-adjustment')}</TableCell>
+              <TableCell align="left">{t('fumble')}</TableCell>
+              <TableCell align="left">{t('offensive-bonus')}</TableCell>
+              <TableCell align="left">{t('melee-range')}</TableCell>
+              <TableCell align="left">{t('bo-modifiers')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

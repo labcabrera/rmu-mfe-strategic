@@ -1,4 +1,5 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import { useAuth } from 'react-oidc-context';
 import { Typography } from '@mui/material';
 import { Character, EditableAvatar, updateCharacter } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
@@ -11,16 +12,14 @@ const CharacterViewResume: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
 }> = ({ character, setCharacter }) => {
+  const auth = useAuth();
   const { showError } = useError();
 
   const onImageUpdated = (imageId: string) => {
-    updateCharacter(character.id, { ...character, imageUrl: imageId })
-      .then((character) => {
-        setCharacter(character);
-      })
-      .catch((error: Error) => {
-        showError(error.message);
-      });
+    const dto = { imageUrl: imageId };
+    updateCharacter(character.id, dto, auth)
+      .then((character) => setCharacter(character))
+      .catch((error) => showError(error.message));
   };
 
   if (!character) return <div>Loading...</div>;

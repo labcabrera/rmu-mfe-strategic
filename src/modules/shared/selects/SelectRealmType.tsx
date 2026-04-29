@@ -1,8 +1,8 @@
 import React, { ChangeEvent, FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
-import { t } from 'i18next';
-import { Profession } from '../../api/professions';
+import { Profession } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const realms: string[] = ['channeling', 'essence', 'mentalism'];
 
@@ -12,6 +12,7 @@ const SelectRealmType: FC<{
   required?: boolean;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }> = ({ profession, value, onChange, required = true }) => {
+  const { t } = useTranslation();
   const error = required && (!value || value.trim() === '');
 
   const getOptions = () => {

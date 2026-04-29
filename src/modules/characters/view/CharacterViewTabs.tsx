@@ -1,4 +1,5 @@
 import React, { useState, SyntheticEvent, ReactNode, FC, Dispatch, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Box, Grid, Tab, Tabs } from '@mui/material';
 import { Character, StrategicGame, Profession } from '@labcabrera-rmu/rmu-react-shared-lib';
 import CharacterViewAttacks from './CharacterViewAttacks';
@@ -16,13 +17,7 @@ function CustomTabPanel(props: { children?: ReactNode; value: number; index: num
   const { children, value, index, ...other } = props;
 
   return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
+    <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} {...other}>
       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
@@ -41,6 +36,7 @@ const CharacterViewTabs: FC<{
   profession: Profession;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
 }> = ({ character, strategicGame, profession, setCharacter }) => {
+  const { t } = useTranslation();
   const [value, setValue] = useState<number>(0);
 
   const handleChange = (_event: SyntheticEvent, newValue: number) => {
@@ -50,23 +46,17 @@ const CharacterViewTabs: FC<{
   return (
     <Box sx={{ width: '100%' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          aria-label="Character tabs"
-          variant="scrollable"
-          scrollButtons="auto"
-        >
-          <Tab label="Information" {...a11yProps(0)} />
-          <Tab label="Stats" {...a11yProps(1)} />
-          <Tab label="Resistances" {...a11yProps(2)} />
-          <Tab label="Skills" {...a11yProps(3)} />
-          <Tab label="Traits" {...a11yProps(4)} />
-          <Tab label="Items" {...a11yProps(5)} />
-          <Tab label="Attacks" {...a11yProps(6)} />
-          <Tab label="Movement" {...a11yProps(7)} />
-          <Tab label="XP" {...a11yProps(8)} />
-          <Tab label="Debug" {...a11yProps(9)} />
+        <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto">
+          <Tab label={t('information')} {...a11yProps(0)} />
+          <Tab label={t('stats')} {...a11yProps(1)} />
+          <Tab label={t('resistances')} {...a11yProps(2)} />
+          <Tab label={t('skills')} {...a11yProps(3)} />
+          <Tab label={t('traits')} {...a11yProps(4)} />
+          <Tab label={t('items')} {...a11yProps(5)} />
+          <Tab label={t('attacks')} {...a11yProps(6)} />
+          <Tab label={t('movement')} {...a11yProps(7)} />
+          <Tab label={t('xp')} {...a11yProps(8)} />
+          <Tab label={t('debug')} {...a11yProps(9)} />
         </Tabs>
       </Box>
 

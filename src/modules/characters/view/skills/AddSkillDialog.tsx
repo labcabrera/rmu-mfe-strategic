@@ -1,4 +1,6 @@
 import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid } from '@mui/material';
 import {
   addCharacterSkill,
@@ -8,7 +10,6 @@ import {
   Skill,
   SkillSelector,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 
 const AddSkillDialog: FC<{
@@ -17,6 +18,8 @@ const AddSkillDialog: FC<{
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   onClose: () => void;
 }> = ({ open, character, setCharacter, onClose }) => {
+  const auth = useAuth();
+  const { t } = useTranslation();
   const { showError } = useError();
   const [formData, setFormData] = useState<AddSkill>({ ranks: 0 } as AddSkill);
   const [validFormData, setValidFormData] = useState<boolean>(false);
@@ -29,7 +32,7 @@ const AddSkillDialog: FC<{
 
   const onSelectedSkill = (skillId: string) => {
     if (!skillId) return;
-    fetchSkill(skillId)
+    fetchSkill(skillId, auth)
       .then((response) => {
         setSelectedSkill(response);
         setFormData({ ...formData, skillId });
@@ -38,7 +41,7 @@ const AddSkillDialog: FC<{
   };
 
   const onAddSkill = async () => {
-    addCharacterSkill(character.id, formData!)
+    addCharacterSkill(character.id, formData!, auth)
       .then((response) => {
         setCharacter(response);
         reset();
@@ -63,7 +66,7 @@ const AddSkillDialog: FC<{
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
-      <DialogTitle>{t('Add skill')}</DialogTitle>
+      <DialogTitle>{t('add-skill')}</DialogTitle>
       <DialogContent>
         <Grid container spacing={1}>
           <Grid size={12}>
@@ -71,15 +74,14 @@ const AddSkillDialog: FC<{
               onSkillChange={(v) => onSelectedSkill(v || '')}
               onSpecializationChange={(v) => setFormData({ ...formData, specialization: v })}
               onError={(err) => showError(err)}
-              t={(msg) => t(msg)}
             />
           </Grid>
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>{t('Cancel')}</Button>
+        <Button onClick={handleClose}>{t('cancel')}</Button>
         <Button onClick={onAddSkill} variant="contained" disabled={!validFormData}>
-          {t('Add')}
+          {t('add')}
         </Button>
       </DialogActions>
     </Dialog>

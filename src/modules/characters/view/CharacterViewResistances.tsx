@@ -1,12 +1,13 @@
 import React, { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { CategorySeparator } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
-import { Character } from '../../api/character.dto';
+import { CategorySeparator, Character } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const CharacterViewResistances: FC<{
   character: Character;
 }> = ({ character }) => {
+  const { t } = useTranslation();
+
   const getColor = (value: number) => {
     if (value < 0) return 'error.main';
     if (value > 0) return 'success.main';

@@ -1,4 +1,6 @@
 import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import { Grid, Stack, Typography } from '@mui/material';
 import {
   Character,
@@ -8,7 +10,6 @@ import {
   updateCharacterTemporaryStat,
   UpdateTemporaryStatDto,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { gridSizeCard } from '../../../services/display';
 
@@ -19,6 +20,9 @@ const StatLevelUpDialog: FC<{
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   onClose: () => void;
 }> = ({ character, stat, open, setCharacter, onClose }) => {
+  const auth = useAuth();
+  const { t } = useTranslation();
+
   if (!character || !stat) return <div>Loading...</div>;
 
   const { showError } = useError();
@@ -31,7 +35,7 @@ const StatLevelUpDialog: FC<{
 
   const onLevelUp = () => {
     const dto = { stat: stat, roll: roll } as UpdateTemporaryStatDto;
-    updateCharacterTemporaryStat(character.id, dto)
+    updateCharacterTemporaryStat(character.id, dto, auth)
       .then((response) => {
         setCharacter(response);
         onClose();

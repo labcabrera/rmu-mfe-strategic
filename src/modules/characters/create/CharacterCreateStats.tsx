@@ -1,8 +1,7 @@
-import React, { FC } from 'react';
+import React, { FC, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { CreateCharacterDto, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { StatBonusFormData } from './CharacterCreate';
 
 const CharacterStats: FC<{
@@ -78,6 +77,8 @@ const CharacterCreateStats: FC<{
   formData: CreateCharacterDto;
   statBonusFormData: StatBonusFormData;
 }> = ({ formData, statBonusFormData }) => {
+  const { t } = useTranslation();
+
   return (
     <Table sx={{ minWidth: 650 }} aria-label="stats table" size="small">
       <TableHead>

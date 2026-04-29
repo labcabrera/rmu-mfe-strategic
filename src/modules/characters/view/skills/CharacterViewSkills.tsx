@@ -1,9 +1,9 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import { Box, ToggleButtonGroup, ToggleButton } from '@mui/material';
 import { CategorySeparator, AddButton, Character, Profession } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import AddSkillDialog from './AddSkillDialog';
 import CharacterSkillList from './CharacterSkillList';
 import CharacterSkillTable from './CharacterSkillTable';
@@ -15,6 +15,7 @@ const CharacterViewSkills: FC<{
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   profession?: Profession;
 }> = ({ character, setCharacter, profession }) => {
+  const { t } = useTranslation();
   const [openAddSkillDialog, setOpenAddSkillDialog] = useState(false);
   const [displaySkillTable, setDisplaySkillTable] = useState<boolean>(() => {
     try {
@@ -35,7 +36,7 @@ const CharacterViewSkills: FC<{
 
   return (
     <>
-      <CategorySeparator text={t('Skills')}>
+      <CategorySeparator text={t('skills')}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
           <AddButton onClick={() => setOpenAddSkillDialog(true)} />
           <ToggleButtonGroup

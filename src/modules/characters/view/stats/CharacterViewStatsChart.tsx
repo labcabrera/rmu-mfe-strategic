@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CharacterStatistics, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CharacterStat, StatKey, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Tooltip } from 'recharts';
 
-const CharacterViewStatsChart: FC<{ stats: CharacterStatistics }> = ({ stats }) => {
+const CharacterViewStatsChart: FC<{ stats: Record<StatKey, CharacterStat> }> = ({ stats }) => {
   const { t } = useTranslation();
 
   if (!stats) return <div>Loading...</div>;

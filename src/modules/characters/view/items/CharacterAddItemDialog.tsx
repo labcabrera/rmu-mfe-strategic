@@ -123,7 +123,7 @@ const CharacterAddItemDialog: FC<{
       }}
       sx={{ minHeight: '600px' }}
     >
-      <DialogTitle>{t('Direct buy')}</DialogTitle>
+      <DialogTitle>{t('direct-buy')}</DialogTitle>
       <DialogContent>
         <Grid container spacing={1}>
           <Grid size={6}>

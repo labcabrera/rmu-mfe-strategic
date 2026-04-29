@@ -32,9 +32,9 @@ const CharacterViewActions: FC<{
   const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
   const levelUpAvailable = character.experience.level < character.experience.availableLevel;
   const breadcrumbs = [
-    { name: t('Strategic'), link: '/strategic' },
-    { name: t('Faction'), link: `/strategic/factions/view/${character.faction.id}` },
-    { name: t('Character') },
+    { name: t('strategic'), link: '/strategic' },
+    { name: t('faction'), link: `/strategic/factions/view/${character.faction.id}` },
+    { name: t('character') },
   ];
 
   const onRefresh = () => {

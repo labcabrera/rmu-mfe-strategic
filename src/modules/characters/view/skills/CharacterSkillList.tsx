@@ -1,10 +1,11 @@
 import React, { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Grid, Typography } from '@mui/material';
 import { Character, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { defaultImage } from '../../../services/image-service';
 
 const CharacterSkillList: FC<{ character: Character }> = ({ character }) => {
+  const { t } = useTranslation();
   const skills = character?.skills || [];
 
   return (
