@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
+import { useAuth } from 'react-oidc-context';
 import { useParams } from 'react-router-dom';
 import { Grid } from '@mui/material';
 import { Character, fetchCharacter } from '@labcabrera-rmu/rmu-react-shared-lib';
@@ -8,9 +9,10 @@ import TradeViewItemSearch from './TradeViewItemSearch';
 import TradeViewOptions from './TradeViewOptions';
 
 const TradeView: FC = () => {
+  const auth = useAuth();
   const { showError } = useError();
   const { characterId } = useParams<{ characterId: string }>();
-  const [character, setCharacter] = useState<Character | undefined>();
+  const [character, setCharacter] = useState<Character>({} as Character);
   const [loading, setLoading] = useState<boolean>(true);
   const [communicationsType, setCommunicationsType] = useState<string>('local');
   const [itemType, setItemType] = useState<string>('usual');
@@ -25,7 +27,7 @@ const TradeView: FC = () => {
 
   useEffect(() => {
     if (characterId) {
-      fetchCharacter(characterId)
+      fetchCharacter(characterId, auth)
         .then((c) => setCharacter(c))
         .catch((err) => showError(err.message));
     }

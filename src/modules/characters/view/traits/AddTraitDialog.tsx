@@ -23,6 +23,7 @@ import {
   fetchTraits,
   TechnicalInfo,
   Trait,
+  traitCategories,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../../ErrorContext';
 import SelectTraitSpecialization from './SelectTraitSpecialization';
@@ -87,7 +88,7 @@ const AddTraitDialog: FC<{
     }
   }, [selectedTraitCategory]);
 
-  if (!traits) return <p>Loading...</p>;
+  if (!traits || !traitCategories) return <p>Loading...</p>;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
@@ -121,9 +122,9 @@ const AddTraitDialog: FC<{
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onCloseClick}>{t('Cancel')}</Button>
+        <Button onClick={onCloseClick}>{t('cancel')}</Button>
         <Button onClick={onAddTrait} variant="contained" disabled={false}>
-          {t('Add')}
+          {t('add')}
         </Button>
       </DialogActions>
     </Dialog>
@@ -167,6 +168,8 @@ const TraitForm: FC<{
   formData: AddTraitDto;
   setFormData: Dispatch<SetStateAction<AddTraitDto>>;
 }> = ({ trait, formData, setFormData }) => {
+  const { t } = useTranslation();
+
   if (!trait) return;
 
   return (
@@ -175,7 +178,7 @@ const TraitForm: FC<{
         <Grid size={12}>
           <TextField
             select
-            label={t('Tier')}
+            label={t('tier')}
             value={formData.tier || null}
             onChange={(e) => setFormData({ ...formData, tier: Number.parseInt(e.target.value) })}
             fullWidth
@@ -204,7 +207,7 @@ const TraitForm: FC<{
         {trait.isTierBased && (
           <>
             <Typography variant="body2" color="secondary">
-              Cost: {trait.adquisitionCost} + ({trait.tierCost} x tier)
+              {t('cost')}: {trait.adquisitionCost} + ({trait.tierCost} x tier)
             </Typography>
           </>
         )}

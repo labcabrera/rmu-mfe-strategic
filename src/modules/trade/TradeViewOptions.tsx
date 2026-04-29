@@ -75,6 +75,8 @@ const OptionGroup = ({
   value: string;
   onChange: (value: string) => void;
 }) => {
+  const { t } = useTranslation();
+
   return (
     <>
       <Grid size={{ xs: 12, md: 3 }}>{label}</Grid>
