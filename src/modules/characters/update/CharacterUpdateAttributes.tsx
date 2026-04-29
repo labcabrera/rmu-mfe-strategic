@@ -1,8 +1,7 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Grid, TextField, Typography } from '@mui/material';
-import { NumericInput, UpdateCharacterDto } from '@labcabrera-rmu/rmu-react-shared-lib';
-import SelectGender from '../../shared/selects/SelectGender';
+import { NumericInput, RmuSelect, UpdateCharacterDto } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const CharacterUpdateAttributes: FC<{
   formData: UpdateCharacterDto;
@@ -54,9 +53,11 @@ const CharacterUpdateAttributes: FC<{
         />
       </Grid>
       <Grid size={{ xs: 12, md: 2 }}>
-        <SelectGender
-          value={formData.roleplay?.gender}
-          onChange={(gender) => setFormData({ ...formData, roleplay: { ...formData.roleplay, gender } })}
+        <RmuSelect
+          value={formData.roleplay?.gender || ''}
+          label={t('gender')}
+          options={['male', 'female', 'other']}
+          onChange={(e) => setFormData({ ...formData, roleplay: { ...formData.roleplay, gender: e } })}
         />
       </Grid>
       <Grid size={12}>

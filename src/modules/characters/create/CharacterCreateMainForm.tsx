@@ -1,14 +1,13 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Grid, Paper } from '@mui/material';
+import { Grid } from '@mui/material';
 import {
   CategorySeparator,
   CreateCharacterDto,
   NumericInput,
   Profession,
   Race,
-  RmuSelect,
-  STATISTICS,
+  STATS,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import NameTextField from '../../shared/inputs/NameTextField';
 import SelectProfession from '../../shared/selects/SelectProfession';
@@ -32,7 +31,7 @@ const CharacterCreateMainForm: FC<{
     if (race) {
       setSelectedRace(race);
       const stats = { ...formData.statistics };
-      STATISTICS.forEach((key) => {
+      STATS.forEach((key) => {
         stats[key].racial = race.stats[key];
       });
       setFormData((prevState) => ({
@@ -88,7 +87,7 @@ const CharacterCreateMainForm: FC<{
         <SelectRace label={t('race')} value={formData.info.raceId} onChange={onRaceChange} races={races} />
       </Grid>
       <Grid size={gridFormSize}>
-        <SelectProfession value={formData.info.professionId} onChange={(e, p) => onProfessionChange(e, p)} />
+        <SelectProfession value={formData.info.professionId} onChange={(e, p) => onProfessionChange(e, p!)} />
       </Grid>
       <Grid size={gridFormSize}>
         <NameTextField
@@ -134,26 +133,6 @@ const CharacterCreateMainForm: FC<{
           onChange={(value) => setFormData((prev) => ({ ...prev, info: { ...prev.info, weight: value! } }))}
           allowNegatives={false}
           error={!formData.info.weight}
-        />
-      </Grid>
-      <Grid size={gridFormSize}>
-        <RmuSelect
-          value={formData.roleplay.gender}
-          label={t('gender')}
-          options={['male', 'female', 'other']}
-          onChange={(value: string) =>
-            setFormData((prev) => ({ ...prev, roleplay: { ...prev.roleplay, gender: value } }))
-          }
-        />
-      </Grid>
-      <Grid size={gridFormSize}>
-        <NumericInput
-          label={t('age')}
-          name="age"
-          value={formData.roleplay.age}
-          onChange={(value) => setFormData((prev) => ({ ...prev, roleplay: { ...prev.roleplay, age: value! } }))}
-          integer
-          allowNegatives={false}
         />
       </Grid>
     </Grid>

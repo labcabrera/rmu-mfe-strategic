@@ -13,9 +13,11 @@ import {
   fetchFaction,
   fetchRaces,
   fetchStrategicGame,
+  NumericInput,
   Profession,
   Race,
   RefreshButton,
+  RmuSelect,
   StrategicGame,
   TechnicalInfo,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
@@ -51,7 +53,7 @@ export const CHARACTER_EMPTY_TEMPLATE = {
     gender: 'male',
     age: 20,
   },
-  level: null,
+  level: 1,
   weaponDevelopment: ['melee', 'ranged', 'shield', 'unarmed'],
   statistics: {
     ag: {
@@ -280,10 +282,10 @@ const CharacterCreate: FC = () => {
             </CategorySeparator>
 
             <Grid container spacing={1}>
-              <Grid size={5}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <CharacterCreateStats formData={formData} statBonusFormData={statBonusFormData} />
               </Grid>
-              <Grid size={5} sx={{ display: 'flex', alignItems: 'flex-start' }}>
+              <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex', alignItems: 'flex-start' }}>
                 <CharacterViewStatsChart stats={formData.statistics} />
               </Grid>
             </Grid>
@@ -296,9 +298,9 @@ const CharacterCreate: FC = () => {
             {profession && (
               <Grid size={12}>
                 <>
-                  <CategorySeparator text={t('Skill development costs')} />
+                  <CategorySeparator text={t('skill-development-costs')} />
                   <CharacterCreateSkillCosts profession={profession} />
-                  <CategorySeparator text={t('Professional skills')} />
+                  <CategorySeparator text={t('professional-skills')} />
                   <CharacterCreateProfessionalSkills profession={profession} />
                 </>
               </Grid>
@@ -307,13 +309,33 @@ const CharacterCreate: FC = () => {
             <CategorySeparator text={t('lore')} />
             <Grid size={12}>
               <TextField
-                label={t('Description')}
+                label={t('description')}
                 name="description"
                 value={formData.description}
                 onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
                 fullWidth
                 multiline
                 maxRows={4}
+              />
+            </Grid>
+            <Grid size={4}>
+              <RmuSelect
+                value={formData.roleplay.gender}
+                label={t('gender')}
+                options={['male', 'female', 'other']}
+                onChange={(value: string) =>
+                  setFormData((prev) => ({ ...prev, roleplay: { ...prev.roleplay, gender: value } }))
+                }
+              />
+            </Grid>
+            <Grid size={4}>
+              <NumericInput
+                label={t('age')}
+                name="age"
+                value={formData.roleplay.age}
+                onChange={(value) => setFormData((prev) => ({ ...prev, roleplay: { ...prev.roleplay, age: value! } }))}
+                integer
+                allowNegatives={false}
               />
             </Grid>
             <Grid size={12}>
