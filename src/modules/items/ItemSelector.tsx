@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useEffectEvent, useState, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import BuildIcon from '@mui/icons-material/Build';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import Inventory2Icon from '@mui/icons-material/Inventory2';
+import ListIcon from '@mui/icons-material/List';
 import ShieldIcon from '@mui/icons-material/Shield';
 import {
   Box,
@@ -19,23 +20,23 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { fetchItems, Item } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { AddItemDto, fetchItems, Item, NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../ErrorContext';
 import { imageBaseUrl } from '../services/config';
 import { itemFilter } from '../services/display';
 
 const categories = [
-  { id: 'weapon', label: 'Armas', icon: <FitnessCenterIcon /> },
+  { id: 'weapon', label: 'Armas', icon: <ListIcon /> },
   { id: 'armor', label: 'Armaduras', icon: <ShieldIcon /> },
-  { id: 'shield', label: 'Herramientas', icon: <BuildIcon /> },
+  { id: 'shield', label: 'Herramientas', icon: <ShieldIcon /> },
   { id: 'clothes', label: 'Consumibles', icon: <Inventory2Icon /> },
   { id: 'ammunition', label: 'Consumibles', icon: <Inventory2Icon /> },
-  { id: 'tools', label: 'Consumibles', icon: <Inventory2Icon /> },
+  { id: 'tools', label: 'Consumibles', icon: <BuildIcon /> },
   { id: 'food', label: 'Consumibles', icon: <Inventory2Icon /> },
 ] as const;
-export const armorSubcategories = ['head', 'body', 'arms', 'legs'];
-export const armorTypes = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
-export const weaponSubcategories = [
+const armorSubcategories = ['head', 'body', 'arms', 'legs'];
+const armorTypes = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+const weaponSubcategories = [
   'melee-weapon@blade',
   'melee-weapon@greater-blade',
   'melee-weapon@chain',
@@ -47,11 +48,17 @@ export const weaponSubcategories = [
   'ranged-weapon@crossbow',
 ];
 
-export function ItemSelector() {
+export function ItemSelector({
+  formData,
+  setFormData,
+}: {
+  formData: AddItemDto;
+  setFormData: Dispatch<SetStateAction<AddItemDto>>;
+}) {
   const auth = useAuth();
   const { t } = useTranslation();
   const { showError } = useError();
-  const [category, setCategory] = useState<string>('weapon');
+  const [category, setCategory] = useState<string | undefined>('weapon');
   const [subcategories, setSubcategories] = useState<string[]>([]);
   const [subcategory, setSubcategory] = useState<string>();
   const [armorType, setArmorType] = useState<string>();
@@ -83,6 +90,18 @@ export function ItemSelector() {
   };
 
   useEffect(() => {
+    if (!item) return;
+    setFormData({
+      name: item.id,
+      itemTypeId: item.id,
+      amount: 1,
+      cost: item.info.cost.average,
+      fumble: item.weapon?.fumble,
+      strength: item.info.strength || undefined,
+    });
+  }, [item]);
+
+  useEffect(() => {
     bindItems();
   }, [subcategory, armorType]);
 
@@ -97,6 +116,9 @@ export function ItemSelector() {
       setArmorType(undefined);
     } else if (category === 'armor') {
       setSubcategories(armorSubcategories);
+    } else {
+      setSubcategories([]);
+      setArmorType(undefined);
     }
     bindItems();
   }, [category]);
@@ -249,12 +271,19 @@ export function ItemSelector() {
         sx={{
           borderLeft: { md: 1 },
           borderTop: { xs: 1, md: 0 },
-          borderColor: 'divider',
+          borderColor: 'secondary',
           p: 2,
           bgcolor: 'background.paper',
         }}
       >
-        {item && <ItemResume item={item} />}
+        {item && formData && formData.itemTypeId && (
+          <>
+            <ItemResume item={item} />
+            <Divider sx={{ my: 3 }} />
+            <AddItemForm item={item} formData={formData} setFormData={setFormData} />
+            {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
+          </>
+        )}
       </Box>
     </Box>
   );
@@ -322,7 +351,6 @@ function ItemResume({ item }: { item: Item }) {
             filter: itemFilter,
           }}
         />
-
         <Box>
           <Typography variant="h6">{item?.id}</Typography>
           <Typography variant="body2" color="text.secondary">
@@ -331,23 +359,18 @@ function ItemResume({ item }: { item: Item }) {
           <Chip size="small" label="Común" color="success" sx={{ mt: 1 }} />
         </Box>
       </Stack>
-
       <Typography variant="body2" color="text.secondary">
         {item.description}
       </Typography>
-
       <Divider />
-
       <Stack direction="row" spacing={4}>
         <Typography>🪙 {item?.info.cost.average}</Typography>
         <Typography>⚖ {item?.info.weight}</Typography>
       </Stack>
-
       <Divider />
-
       <Box>
         <Typography variant="overline" color="text.secondary">
-          Estadísticas
+          {t('information')}
         </Typography>
         {item && item.weapon && (
           <>
@@ -410,5 +433,50 @@ function StatRow({
         {value}
       </Typography>
     </Stack>
+  );
+}
+
+function AddItemForm({
+  item,
+  formData,
+  setFormData,
+}: {
+  item: Item;
+  formData: AddItemDto;
+  setFormData: Dispatch<SetStateAction<AddItemDto>>;
+}) {
+  const { t } = useTranslation();
+  if (!item || !formData) return;
+  return (
+    <>
+      <Typography variant="body2" color="text.secondary">
+        {t('settings')}
+      </Typography>
+      <Grid container spacing={1} sx={{ mt: 3 }}>
+        <Grid size={12}>
+          <NumericInput
+            label={t('cost')}
+            value={formData.cost}
+            onChange={(e) => setFormData({ ...formData, cost: e || item.info.cost.average || 0 })}
+          />
+        </Grid>
+        <Grid size={12}>
+          <NumericInput
+            label={t('strength')}
+            value={formData.strength}
+            onChange={(e) => setFormData({ ...formData, strength: e || item.info?.strength || 0 })}
+          />
+        </Grid>
+        {item.info.stackable && (
+          <Grid size={12}>
+            <NumericInput
+              label={t('amount')}
+              value={formData.amount}
+              onChange={(e) => setFormData({ ...formData, amount: e || 1 })}
+            />
+          </Grid>
+        )}
+      </Grid>
+    </>
   );
 }

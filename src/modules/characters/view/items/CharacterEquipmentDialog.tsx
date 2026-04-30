@@ -27,7 +27,7 @@ const CharacterEquipmentDialog: FC<{
   const auth = useAuth();
   const { t } = useTranslation();
   const { showError } = useError();
-  const slotItemId = character.equipment.slots[slot];
+  const slotItemId = slot ? character.equipment.slots[slot] : undefined;
 
   const isArmorSlot = (item: StrategicItem, s: string) => {
     return item.armor && item.armor.slot === s;
@@ -37,18 +37,18 @@ const CharacterEquipmentDialog: FC<{
     return item.weapon && item.weapon.modes.filter((m) => m.type === 'one-hand').length > 0;
   };
 
-  const getSlotOptions = (character: Character, s: string): StrategicItem[] => {
-    if (s === 'mainHand') {
+  const getSlotOptions = (slot: EquipmentSlot | undefined): StrategicItem[] => {
+    if (slot === 'mainHand') {
       return items.filter((e) => e.category === 'weapon');
-    } else if (s === 'offHand') {
+    } else if (slot === 'offHand') {
       return items.filter((e) => e.category === 'shield' || (e.category === 'weapon' && isOneHandedWeapon(e)));
-    } else if (s === 'body' || s === 'head' || s === 'arms' || s === 'legs') {
-      return items.filter((e) => isArmorSlot(e, s));
+    } else if (slot === 'body' || slot === 'head' || slot === 'arms' || slot === 'legs') {
+      return items.filter((e) => isArmorSlot(e, slot));
     }
     return [];
   };
 
-  const slotOptions = useMemo(() => getSlotOptions(character, slot), [character, slot]);
+  const slotOptions = useMemo(() => getSlotOptions(slot), [character, slot]);
 
   if (!slot) return null;
 
