@@ -81,7 +81,7 @@ const CharacterViewTabs: FC<{
       </CustomTabPanel>
 
       <CustomTabPanel value={value} index={5}>
-        <CharacterEquipmentPanel character={character} />
+        <CharacterEquipmentPanel character={character} setCharacter={setCharacter} />
         <CharacterViewItems character={character} setCharacter={setCharacter} />
       </CustomTabPanel>
 

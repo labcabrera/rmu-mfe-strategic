@@ -2,38 +2,36 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Box, Card, CardContent, Chip, Divider, IconButton, LinearProgress, Stack, Typography } from '@mui/material';
-import { Character, fetchStrategicItems, Item, StrategicItem } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  Box,
+  Card,
+  CardContent,
+  Chip,
+  Divider,
+  IconButton,
+  LinearProgress,
+  ListItemIcon,
+  Menu,
+  MenuItem,
+  Stack,
+  Typography,
+} from '@mui/material';
+import {
+  Character,
+  deleteStrategicItem,
+  EquipmentSlot,
+  fetchCharacter,
+  fetchStrategicItems,
+  Item,
+  StrategicItem,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
+import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import { imageBaseUrl } from '../../../services/config';
 import { itemFilter } from '../../../services/display';
-
-type EquipmentStats = {
-  carriedWeight: number;
-  weightLimit: number;
-  encumbrancePenalty: number;
-  armorType: number;
-  armorPenalty: number;
-  armorBasePenalty: number;
-  rangedPenalty: number;
-  perceptionPenalty: number;
-  maxPace: string;
-  movementDifficulty: string;
-};
-
-const stats: EquipmentStats = {
-  carriedWeight: 51.38,
-  weightLimit: 42.55,
-  encumbrancePenalty: -4,
-  armorType: 10,
-  armorPenalty: -88,
-  armorBasePenalty: -100,
-  rangedPenalty: -30,
-  perceptionPenalty: -15,
-  maxPace: 'Spring',
-  movementDifficulty: 'Sheer folly',
-};
+import CharacterEquipmentDialog from './CharacterEquipmentDialog';
 
 export function CharacterEquipmentPanel({
   character,
@@ -43,20 +41,41 @@ export function CharacterEquipmentPanel({
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
 }) {
   const auth = useAuth();
-  const { t } = useTranslation();
   const { showError } = useError();
   const [items, setItems] = useState<StrategicItem[]>([]);
+  const [dialogEquipSlot, setDialogEquipSlot] = useState<EquipmentSlot>();
+  const [dialogEquipOpen, setDialogEquipOpen] = useState<boolean>(false);
 
-  //TODO remove
-  const overload = stats.carriedWeight - stats.weightLimit;
-  const loadPercent = Math.min((stats.carriedWeight / stats.weightLimit) * 100, 140);
+  const openDialog = (slot: EquipmentSlot) => {
+    setDialogEquipSlot(slot);
+    setDialogEquipOpen(true);
+  };
+
+  const bindItems = (characterId: string) => {
+    fetchStrategicItems(`characterId==${characterId}`, 0, 100, auth)
+      .then((response) => setItems(response.content))
+      .catch((err) => showError(err.message));
+  };
+
+  const bindCharacter = () => {
+    fetchCharacter(character.id, auth)
+      .then((response) => {
+        setCharacter(response);
+        bindItems(response.id);
+      })
+      .catch((err) => showError(err.message));
+  };
+
+  const onItemDeleted = (itemId: string) => {
+    deleteStrategicItem(itemId, auth)
+      .then(() => bindCharacter())
+      .catch((err) => showError(err.message));
+  };
 
   useEffect(() => {
     if (!character) return;
-    fetchStrategicItems(`characterId==${character.id}`, 0, 100, auth)
-      .then((response) => setItems(response.content))
-      .catch((err) => showError(err.message));
-  }, []);
+    bindItems(character.id);
+  }, [character]);
 
   return (
     <Box
@@ -76,23 +95,46 @@ export function CharacterEquipmentPanel({
           gap: 3,
         }}
       >
-        <EquipmentSlots character={character} items={items} />
-        <StatsPanel character={character} stats={stats} overload={overload} loadPercent={loadPercent} />
+        <EquipmentSlots character={character} items={items} onClick={(e) => openDialog(e)} />
+        <StatsPanel character={character} />
         <Stack spacing={2}>
           <ItemList
-            title={t('carried')}
+            carried={true}
             totalWeight={51.38}
             items={items.filter((e) => e.carried)}
-            showQuantity={false}
+            onItemDeleted={(e) => onItemDeleted(e)}
           />
-          <ItemList title={t('owned')} totalWeight={154.35} items={items.filter((e) => !e.carried)} showQuantity />
+          <ItemList
+            carried={false}
+            totalWeight={154.35}
+            items={items.filter((e) => !e.carried)}
+            onItemDeleted={(e) => onItemDeleted(e)}
+          />
         </Stack>
       </Box>
+      {dialogEquipSlot && (
+        <CharacterEquipmentDialog
+          open={dialogEquipOpen}
+          character={character}
+          items={items}
+          slot={dialogEquipSlot}
+          onClose={() => setDialogEquipOpen(false)}
+          onEquip={(character) => setCharacter(character)}
+        />
+      )}
     </Box>
   );
 }
 
-function EquipmentSlots({ character, items }: { character: Character; items: StrategicItem[] }) {
+function EquipmentSlots({
+  character,
+  items,
+  onClick,
+}: {
+  character: Character;
+  items: StrategicItem[];
+  onClick: (slot: EquipmentSlot) => void;
+}) {
   const { t } = useTranslation();
   return (
     <Card variant="outlined" sx={{ borderRadius: 3 }}>
@@ -112,51 +154,48 @@ function EquipmentSlots({ character, items }: { character: Character; items: Str
             justifyItems: 'center',
           }}
         >
-          <SlotCard label={t('mainHand')} itemId={character.equipment.slots['mainHand']} items={items} />
-          <SlotCard label={t('head')} itemId={character.equipment.slots['head']} items={items} />
-          <SlotCard label={t('offHand')} itemId={character.equipment.slots['offHand']} items={items} />
+          <SlotCard slot="mainHand" itemId={character.equipment.slots['mainHand']} items={items} onClick={onClick} />
+          <SlotCard slot="head" itemId={character.equipment.slots['head']} items={items} onClick={onClick} />
+          <SlotCard slot="offHand" itemId={character.equipment.slots['offHand']} items={items} onClick={onClick} />
           <Box />
-          <SlotCard label={t('body')} itemId={character.equipment.slots['body']} items={items} />
-          <Box />
-          <Box />
-          <SlotCard label={t('arms')} itemId={character.equipment.slots['arms']} items={items} />
+          <SlotCard slot="body" itemId={character.equipment.slots['body']} items={items} onClick={onClick} />
           <Box />
           <Box />
-          <SlotCard label={t('legs')} itemId={character.equipment.slots['legs']} items={items} />
+          <SlotCard slot="arms" itemId={character.equipment.slots['arms']} items={items} onClick={onClick} />
+          <Box />
+          <Box />
+          <SlotCard slot="legs" itemId={character.equipment.slots['legs']} items={items} onClick={onClick} />
           <Box />
         </Box>
-
-        {/* <Divider sx={{ my: 3 }} /> */}
-
-        {/* <Typography variant="overline" color="text.secondary">
-          Accesos rápidos
-        </Typography> */}
-
-        {/* <Stack direction="row" spacing={1.5} sx={{ mt: 2 }}>
-          {[equipped.leftHand, equipped.rightHand, carriedItems[2], undefined, undefined, undefined].map(
-            (item, index) => (
-              <QuickSlot key={index} index={index + 1} item={item} />
-            )
-          )}
-        </Stack> */}
       </CardContent>
     </Card>
   );
 }
 
-function SlotCard({ label, itemId, items }: { label: string; itemId: string | null; items: StrategicItem[] }) {
+function SlotCard({
+  slot,
+  itemId,
+  items,
+  onClick,
+}: {
+  slot: EquipmentSlot;
+  itemId: string | null;
+  items: StrategicItem[];
+  onClick: (slot: EquipmentSlot) => void;
+}) {
+  const { t } = useTranslation();
   const item = items.find((e) => e.id === itemId) || undefined;
   return (
     <Stack spacing={0.5} sx={{ alignItems: 'center' }}>
       <Typography variant="caption" color="text.secondary">
-        {label}
+        {t(slot)}
       </Typography>
 
       <Box
         sx={{
           width: 82,
           height: 82,
-          border: 1,
+          border: 0.5,
           borderColor: item ? 'primary.main' : 'divider',
           borderRadius: 2,
           overflow: 'hidden',
@@ -171,6 +210,7 @@ function SlotCard({ label, itemId, items }: { label: string; itemId: string | nu
             component="img"
             src={`${imageBaseUrl}images/items/${item.itemTypeId}.png`}
             alt={item.name}
+            onClick={() => onClick(slot)}
             sx={{
               width: '100%',
               height: '100%',
@@ -179,60 +219,20 @@ function SlotCard({ label, itemId, items }: { label: string; itemId: string | nu
             }}
           />
         ) : (
-          <AddIcon color="disabled" />
+          <IconButton onClick={() => onClick(slot)}>
+            <AddIcon color="disabled" />
+          </IconButton>
         )}
       </Box>
     </Stack>
   );
 }
 
-function QuickSlot({ index, item }: { index: number; item?: Item }) {
-  return (
-    <Stack spacing={0.5} sx={{ alignItems: 'center' }}>
-      <Box
-        sx={{
-          width: 54,
-          height: 54,
-          border: 1,
-          borderColor: item ? 'primary.main' : 'divider',
-          borderRadius: 2,
-          bgcolor: 'action.hover',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          overflow: 'hidden',
-        }}
-      >
-        {item ? (
-          <Box
-            component="img"
-            src={`${imageBaseUrl}images/items/${item.id}.png`}
-            alt={item.id}
-            sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        ) : (
-          <AddIcon fontSize="small" color="disabled" />
-        )}
-      </Box>
-
-      <Typography variant="caption">{index}</Typography>
-    </Stack>
-  );
-}
-
-function StatsPanel({
-  character,
-  stats,
-  overload,
-  loadPercent,
-}: {
-  character: Character;
-  stats: EquipmentStats;
-  overload: number;
-  loadPercent: number;
-}) {
+function StatsPanel({ character }: { character: Character }) {
   const { t } = useTranslation();
   const eq = character.equipment;
+  // const loadPercent = Math.min((stats.carriedWeight / stats.weightLimit) * 100, 140);
+  const loadPercent = Math.min((eq.weight / eq.weightAllowance) * 100, 100);
 
   const getArmorType = (): string => {
     const armor = character.defense.armor;
@@ -246,7 +246,7 @@ function StatsPanel({
       <Card variant="outlined" sx={{ borderRadius: 3 }}>
         <CardContent>
           <Typography variant="overline" color="text.secondary">
-            Estadísticas del equipo
+            {t('equipment-stats')}
           </Typography>
 
           <Stack spacing={1.25} sx={{ mt: 2 }}>
@@ -259,7 +259,7 @@ function StatsPanel({
             />
             <StatRow label={t('armor-type')} value={getArmorType()} />
             <StatRow label={t('maneuver-penalty')} value={eq.maneuverPenalty} danger={eq.maneuverPenalty < 0} />
-            <StatRow label={t('base-armor-penalty')} value={stats.armorBasePenalty} danger />
+            <StatRow label={t('armor-penalty-base')} value={eq.baseManeuverPenalty} danger />
             <StatRow label={t('ranged-penalty')} value={eq.rangedPenalty} danger />
             <StatRow label={t('perception-penalty')} value={eq.perceptionPenalty!} danger />
             <StatRow label={t('max-pace')} value={character.movement.maxPace} />
@@ -271,7 +271,7 @@ function StatsPanel({
       <Card variant="outlined" sx={{ borderRadius: 3 }}>
         <CardContent>
           <Typography variant="overline" color="text.secondary">
-            Resumen de carga
+            Resumen de carga {loadPercent}%
           </Typography>
 
           <Stack spacing={2} sx={{ mt: 2 }}>
@@ -279,20 +279,20 @@ function StatsPanel({
               <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
                 <Typography variant="body2">Carga</Typography>
                 <Typography variant="body2" color="error.main">
-                  {stats.carriedWeight} / {stats.weightLimit} lbs
+                  {eq.weight} / {eq.weightAllowance} lbs
                 </Typography>
               </Stack>
 
               <LinearProgress
                 variant="determinate"
-                value={Math.min(loadPercent, 100)}
-                color={loadPercent > 100 ? 'error' : 'primary'}
+                value={loadPercent}
+                color={eq.weight > eq.weightAllowance ? 'error' : 'primary'}
                 sx={{ mt: 1, height: 8, borderRadius: 99 }}
               />
             </Box>
 
-            <StatRow label="Exceso de peso" value={`${overload.toFixed(2)} lbs`} danger />
-            <StatRow label="Penalización total" value={stats.encumbrancePenalty} danger />
+            {/* <StatRow label="Exceso de peso" value={`${overload.toFixed(2)} lbs`} danger /> */}
+            {/* <StatRow label="Penalización total" value={stats.encumbrancePenalty} danger /> */}
           </Stack>
         </CardContent>
       </Card>
@@ -340,22 +340,35 @@ function StatRow({
 }
 
 function ItemList({
-  title,
+  carried,
   totalWeight,
   items,
-  showQuantity,
+  onItemDeleted,
 }: {
-  title: string;
+  carried: boolean;
   totalWeight: number;
   items: StrategicItem[];
-  showQuantity?: boolean;
+  onItemDeleted: (itemId: string) => void;
 }) {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuItemId, setMenuItemId] = useState<string | null>(null);
+
+  const handleOpenMenu = (e: React.MouseEvent<HTMLElement>, itemId: string) => {
+    setAnchorEl(e.currentTarget);
+    setMenuItemId(itemId);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+    setMenuItemId(null);
+  };
+
   return (
     <Card variant="outlined" sx={{ borderRadius: 3 }}>
       <CardContent sx={{ p: 0 }}>
         <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', px: 2, py: 1.5 }}>
           <Typography variant="subtitle2" sx={{ textTransform: 'uppercase' }}>
-            {title}
+            {t(carried ? 'carried' : 'stored')}
           </Typography>
 
           <Chip size="small" label={`${totalWeight} lbs`} />
@@ -366,7 +379,7 @@ function ItemList({
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: showQuantity ? '56px 1fr 90px 100px 40px' : '56px 1fr 100px 40px',
+            gridTemplateColumns: '56px 1fr 90px 100px 40px',
             px: 2,
             py: 1,
             color: 'text.secondary',
@@ -374,7 +387,7 @@ function ItemList({
         >
           <Box />
           <Typography variant="caption">Nombre</Typography>
-          {showQuantity && <Typography variant="caption">Cantidad</Typography>}
+          <Typography variant="caption">Cantidad</Typography>
           <Typography variant="caption" sx={{ textAlign: 'right' }}>
             Peso
           </Typography>
@@ -389,7 +402,7 @@ function ItemList({
               key={item.id}
               sx={{
                 display: 'grid',
-                gridTemplateColumns: showQuantity ? '56px 1fr 90px 100px 40px' : '56px 1fr 100px 40px',
+                gridTemplateColumns: '56px 1fr 90px 100px 40px',
                 alignItems: 'center',
                 px: 2,
                 py: 1,
@@ -418,16 +431,28 @@ function ItemList({
                   {item.name}
                 </Typography>
               </Box>
-
-              {showQuantity && <Typography variant="body2">{item.amount ?? 1}</Typography>}
-
+              <Typography variant="body2">{item.amount ?? 1}</Typography>
               <Typography variant="body2" sx={{ textAlign: 'right' }}>
                 {item.info.weight} lbs
               </Typography>
 
-              <IconButton size="small">
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenMenu(e, item.id);
+                }}
+              >
                 <MoreVertIcon fontSize="small" />
               </IconButton>
+              <Menu anchorEl={anchorEl} open={Boolean(anchorEl) && menuItemId === item.id} onClose={handleCloseMenu}>
+                <MenuItem onClick={() => onItemDeleted(item.id)}>
+                  <ListItemIcon>
+                    <DeleteIcon fontSize="small" />
+                  </ListItemIcon>
+                  {t('Delete')}
+                </MenuItem>
+              </Menu>
             </Box>
           ))}
         </Stack>
