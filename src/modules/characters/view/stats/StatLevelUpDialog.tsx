@@ -23,7 +23,7 @@ const StatLevelUpDialog: FC<{
   const auth = useAuth();
   const { t } = useTranslation();
 
-  if (!character || !stat) return <div>Loading...</div>;
+  if (!character || !stat) return;
 
   const { showError } = useError();
   const [roll, setRoll] = useState<number>();

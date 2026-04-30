@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useSearchParams } from 'react-router-dom';
 import OutboundIcon from '@mui/icons-material/Outbound';
-import { Grid, IconButton, TextField, Badge, Paper } from '@mui/material';
+import { Grid, IconButton, TextField, Badge, Paper, Box } from '@mui/material';
 import {
   CategorySeparator,
   Character,
@@ -285,8 +285,10 @@ const CharacterCreate: FC = () => {
               <Grid size={{ xs: 12, md: 6 }}>
                 <CharacterCreateStats formData={formData} statBonusFormData={statBonusFormData} />
               </Grid>
-              <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex', alignItems: 'flex-start' }}>
-                <CharacterViewStatsChart stats={formData.statistics} />
+              <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex', alignItems: 'stretch' }}>
+                <Box sx={{ flex: 1 }}>
+                  <CharacterViewStatsChart stats={formData.statistics} minHeight={320} />
+                </Box>
               </Grid>
             </Grid>
 

@@ -5,6 +5,7 @@ import { Button, Grid } from '@mui/material';
 import { AddItemDto, fetchItems, Item, RmuDialog, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../../ErrorContext';
 import { armorSubcategories, weaponSubcategories } from '../../../api/items';
+import { ItemSelector } from '../../../items/ItemSelector';
 import CharacterAddItemDialogForm from './CharacterAddItemDialogForm';
 import CharacterAddItemDialogSelect from './CharacterAddItemDialogSelect';
 
@@ -116,8 +117,11 @@ const CharacterAddItemDialog: FC<{
   return (
     <RmuDialog open={open} maxWidth="xl" title={t('buy')} buttons={buttons}>
       <Grid container spacing={1}>
+        <Grid size={12}>
+          <ItemSelector />
+        </Grid>
         <Grid size={6}>
-          <CharacterAddItemDialogSelect
+          {/* <CharacterAddItemDialogSelect
             subcategories={subcategories}
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
@@ -126,7 +130,7 @@ const CharacterAddItemDialog: FC<{
             selectedItem={selectedItem}
             items={items}
             onLoadItem={loadItem}
-          />
+          /> */}
         </Grid>
         <Grid size={6}>
           {formData && <CharacterAddItemDialogForm formData={formData} setFormData={setFormData} item={selectedItem} />}
