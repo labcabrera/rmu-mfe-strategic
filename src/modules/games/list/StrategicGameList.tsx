@@ -17,6 +17,7 @@ const StrategicGameList: FC = () => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(24);
   const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState<boolean>(true);
   const totalPages = Math.ceil(totalCount / pageSize);
 
   const bindStrategicGames = () => {
@@ -44,17 +45,23 @@ const StrategicGameList: FC = () => {
             </Grid>
             <Grid size={12}>
               <Grid container spacing={1}>
-                {strategicGames.map((game, index) => (
-                  <Grid key={index} size={gridSizeCard}>
-                    <RmuTextCard
-                      value={game.name}
-                      subtitle={game.realmName}
-                      image={game.imageUrl || ''}
-                      onClick={() => navigate(`/strategic/games/view/${game.id}`, { state: { game } })}
-                    />
-                  </Grid>
-                ))}
-                {strategicGames.length === 0 && <>No games found.</>}
+                {strategicGames === undefined ? (
+                  <>loading...</>
+                ) : (
+                  <>
+                    {strategicGames.map((game, index) => (
+                      <Grid key={index} size={gridSizeCard}>
+                        <RmuTextCard
+                          value={game.name}
+                          subtitle={game.realmName}
+                          image={game.imageUrl || ''}
+                          onClick={() => navigate(`/strategic/games/view/${game.id}`, { state: { game } })}
+                        />
+                      </Grid>
+                    ))}
+                  </>
+                )}
+                {strategicGames && strategicGames.length === 0 && <>No games found.</>}
               </Grid>
             </Grid>
             <Grid size={12}>

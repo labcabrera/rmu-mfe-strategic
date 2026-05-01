@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useParams } from 'react-router-dom';
-import { Grid } from '@mui/material';
+import { Grid, Paper } from '@mui/material';
 import {
   Character,
   EditableAvatar,
@@ -80,7 +80,9 @@ export default function CharacterUpdate() {
           />
         </Grid>
         <Grid size={gridSizeMain}>
-          <CharacterUpdateAttributes formData={formData} setFormData={setFormData} />
+          <Paper sx={{ p: 2 }}>
+            <CharacterUpdateAttributes formData={formData} setFormData={setFormData} />
+          </Paper>
           <TechnicalInfo>
             <pre>FormData: {JSON.stringify(formData, null, 2)}</pre>
           </TechnicalInfo>

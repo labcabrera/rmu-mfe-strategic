@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { Box, ThemeProvider } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { NotFound } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { ErrorProvider } from './ErrorContext';
 import CharacterCreate from './modules/characters/create/CharacterCreate';
 import CharacterList from './modules/characters/list/CharacterList';
@@ -15,13 +16,6 @@ import StrategicGameList from './modules/games/list/StrategicGameList';
 import StrategicGameEdit from './modules/games/update/StrategicGameUpdate';
 import StrategicGameView from './modules/games/view/StrategicGameView';
 import TradeView from './modules/trade/TradeView';
-
-const NotFound: FC = () => (
-  <div>
-    <h2>Not found</h2>
-    <p>The requested route does not exist.</p>
-  </div>
-);
 
 const App: FC = () => {
   return (

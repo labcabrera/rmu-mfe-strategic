@@ -138,7 +138,7 @@ const CharacterItemTable: FC<{
                       <ListItemIcon>
                         <DeleteIcon fontSize="small" />
                       </ListItemIcon>
-                      {t('Delete')}
+                      {t('delete')}
                     </MenuItem>
                   </Menu>
                 </TableCell>

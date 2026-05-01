@@ -30,7 +30,7 @@ export default function StrategicGameView() {
   const location = useLocation();
   const { showError } = useError();
   const { gameId } = useParams<{ gameId?: string }>();
-  const [strategicGame, setStrategicGame] = useState<StrategicGame>(location.state?.strategicGame || null);
+  const [strategicGame, setStrategicGame] = useState<StrategicGame>(location.state?.strategicGame);
   const [factions, setFactions] = useState<Faction[]>();
   const [tacticalGames, setTacticalGames] = useState<TacticalGame[]>();
 
@@ -63,7 +63,7 @@ export default function StrategicGameView() {
     }
   }, [location.state, gameId, showError]);
 
-  if (!strategicGame || !factions) return <div>Loading...</div>;
+  if (!strategicGame || !factions || !tacticalGames) return <div>Loading...</div>;
 
   return (
     <Grid container spacing={1}>

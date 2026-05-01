@@ -1,6 +1,6 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Grid, TextField, Typography } from '@mui/material';
+import { Grid, TextField } from '@mui/material';
 import { NumericInput, RmuSelect, UpdateCharacterDto } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const CharacterUpdateAttributes: FC<{
