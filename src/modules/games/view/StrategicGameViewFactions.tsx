@@ -1,14 +1,11 @@
-import React, { FC } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Grid } from '@mui/material';
-import Typography from '@mui/material/Typography';
+import { Grid, Typography } from '@mui/material';
 import { Faction, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { gridSizeCard } from '../../services/display';
 
-const StrategicGameViewFactions: FC<{
-  factions: Faction[];
-}> = ({ factions }) => {
+export default function StrategicGameViewFactions({ factions }: { factions: Faction[] }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -33,6 +30,4 @@ const StrategicGameViewFactions: FC<{
       </Grid>
     </Grid>
   );
-};
-
-export default StrategicGameViewFactions;
+}

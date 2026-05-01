@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -23,7 +23,7 @@ import StrategicGameViewPowerLevel from './StrategicGameViewPowerLevel';
 import StrategicGameViewResume from './StrategicGameViewResume';
 import StrategicGameViewTacticalGames from './StrategicGameViewTacticalGames';
 
-const StrategicGameView: FC = () => {
+export default function StrategicGameView() {
   const auth = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -90,6 +90,4 @@ const StrategicGameView: FC = () => {
       </Grid>
     </Grid>
   );
-};
-
-export default StrategicGameView;
+}

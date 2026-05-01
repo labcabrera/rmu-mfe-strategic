@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Box, Button, CardMedia, Tooltip } from '@mui/material';
@@ -16,14 +16,21 @@ import { itemFilter } from '../../../services/display';
 
 const imageSize = 100;
 
-const CharacterEquipmentDialog: FC<{
+export default function CharacterEquipmentDialog({
+  open,
+  character,
+  items,
+  slot,
+  onClose,
+  onEquip,
+}: {
   open: boolean;
   character: Character;
   items: StrategicItem[];
   slot: EquipmentSlot | undefined;
   onClose: () => void;
-  onEquip?: (character: Character) => void;
-}> = ({ open, character, items, slot, onClose, onEquip }) => {
+  onEquip: (character: Character) => void;
+}) {
   const auth = useAuth();
   const { t } = useTranslation();
   const { showError } = useError();
@@ -128,6 +135,4 @@ const CharacterEquipmentDialog: FC<{
       </>
     </RmuDialog>
   );
-};
-
-export default CharacterEquipmentDialog;
+}

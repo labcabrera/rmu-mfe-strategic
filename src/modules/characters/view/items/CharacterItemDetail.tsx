@@ -1,7 +1,7 @@
-import React, { Dispatch, FC, Fragment, SetStateAction } from 'react';
+import React, { FC, Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Divider, Grid, Typography, Paper, Stack } from '@mui/material';
-import { CategorySeparator, Character, StrategicItem, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CategorySeparator, StrategicItem, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const CharacterItemDetail: FC<{
   items: StrategicItem[];
@@ -30,7 +30,7 @@ const CharacterItemDetail: FC<{
             {item.amount && <KeyValueEntry label={t('Amount')} value={item.amount} />}
             {item.info.weight !== 0 && <KeyValueEntry label={t('Weight')} value={`${item.info.weight} lbs`} />}
             {item.info.length && <KeyValueEntry label={t('Length')} value={`${item.info.length}'`} />}
-            {item.info.cost && <KeyValueEntry label={t('Weight')} value={item.info.cost} />}
+            {item.info.cost && <KeyValueEntry label={t('Weight')} value={item.info.cost.average} />}
             {item.info.strength && <KeyValueEntry label={t('Strength')} value={item.info.strength} />}
           </Grid>
 
@@ -39,7 +39,7 @@ const CharacterItemDetail: FC<{
               <CategorySeparator text={t('Weapon')} />
               <Grid container spacing={1}>
                 <KeyValueEntry label={t('Skill')} value={t(item.weapon.skillId)} />
-                <KeyValueEntry label={t('Fumble')} value={t(item.weapon.fumble)} />
+                <KeyValueEntry label={t('Fumble')} value={item.weapon.fumble} />
               </Grid>
               <Grid container spacing={1} sx={{ mt: 2 }}>
                 {item.weapon.modes.map((mode, index) => (

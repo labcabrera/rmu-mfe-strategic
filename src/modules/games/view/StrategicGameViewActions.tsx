@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
@@ -14,10 +14,13 @@ import {
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
 
-const StrategicGameViewActions: FC<{
+export default function StrategicGameViewActions({
+  strategicGame,
+  setStrategicGame,
+}: {
   strategicGame: StrategicGame;
   setStrategicGame: Dispatch<SetStateAction<StrategicGame>>;
-}> = ({ strategicGame, setStrategicGame }) => {
+}) {
   const navigate = useNavigate();
   const auth = useAuth();
   const { t } = useTranslation();
@@ -62,6 +65,4 @@ const StrategicGameViewActions: FC<{
       />
     </>
   );
-};
-
-export default StrategicGameViewActions;
+}

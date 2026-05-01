@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Grid } from '@mui/material';
 import { RmuTextCard, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
@@ -6,11 +6,8 @@ import { imageBaseUrl } from '../../services/config';
 import { gridSizeCard } from '../../services/display';
 
 const grayscale = 0.7;
-const gridSize = { xs: 10, md: 3 } as const;
 
-const StrategicGameViewAttributes: FC<{
-  strategicGame: StrategicGame;
-}> = ({ strategicGame }) => {
+export default function StrategicGameViewAttributes({ strategicGame }: { strategicGame: StrategicGame }) {
   const { t } = useTranslation();
 
   const DATA = [
@@ -52,6 +49,4 @@ const StrategicGameViewAttributes: FC<{
       ))}
     </Grid>
   );
-};
-
-export default StrategicGameViewAttributes;
+}
