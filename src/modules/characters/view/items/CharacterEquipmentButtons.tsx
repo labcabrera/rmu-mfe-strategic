@@ -7,7 +7,7 @@ import { StrategicItem, createStrategicItem, Character, fetchCharacter } from '@
 import { useError } from '../../../../ErrorContext';
 import CharacterViewAddItemDialog from './CharacterAddItemDialog';
 
-export function CharacterEquipmentButtons({
+export default function CharacterEquipmentButtons({
   character,
   setCharacter,
 }: {

@@ -34,8 +34,9 @@ import { useError } from '../../../../ErrorContext';
 import { imageBaseUrl } from '../../../services/config';
 import { itemFilter } from '../../../services/display';
 import CharacterEquipmentDialog from './CharacterEquipmentDialog';
+import CharacterViewTransferGold from './CharacterViewTransferGold';
 
-export function CharacterEquipmentPanel({
+export default function CharacterEquipmentPanel({
   character,
   setCharacter,
 }: {
@@ -80,55 +81,58 @@ export function CharacterEquipmentPanel({
   }, [character]);
 
   return (
-    <Box
-      sx={{
-        p: 3,
-        color: 'text.primary',
-        bgcolor: 'background.default',
-      }}
-    >
+    <>
       <Box
         sx={{
-          display: 'grid',
-          gridTemplateColumns: {
-            xs: '1fr',
-            lg: '360px 1fr 520px',
-          },
-          gap: 3,
+          p: 3,
+          color: 'text.primary',
+          bgcolor: 'background.default',
         }}
       >
-        <EquipmentSlots character={character} items={items} onClick={(e) => openDialog(e)} />
-        <StatsPanel character={character} />
-        <Stack spacing={2}>
-          <ItemList
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              lg: '360px 1fr 520px',
+            },
+            gap: 3,
+          }}
+        >
+          <EquipmentSlots character={character} items={items} onClick={(e) => openDialog(e)} />
+          <StatsPanel character={character} />
+          <Stack spacing={2}>
+            <ItemList
+              character={character}
+              carried={true}
+              totalWeight={51.38}
+              items={items.filter((e) => e.carried)}
+              setCharacter={setCharacter}
+              onItemDeleted={(e) => onItemDeleted(e)}
+            />
+            <ItemList
+              character={character}
+              carried={false}
+              totalWeight={154.35}
+              items={items.filter((e) => !e.carried)}
+              setCharacter={setCharacter}
+              onItemDeleted={(e) => onItemDeleted(e)}
+            />
+          </Stack>
+        </Box>
+        {dialogEquipSlot && (
+          <CharacterEquipmentDialog
+            open={dialogEquipOpen}
             character={character}
-            carried={true}
-            totalWeight={51.38}
-            items={items.filter((e) => e.carried)}
-            setCharacter={setCharacter}
-            onItemDeleted={(e) => onItemDeleted(e)}
+            items={items}
+            slot={dialogEquipSlot}
+            onClose={() => setDialogEquipOpen(false)}
+            onEquip={(character) => setCharacter(character)}
           />
-          <ItemList
-            character={character}
-            carried={false}
-            totalWeight={154.35}
-            items={items.filter((e) => !e.carried)}
-            setCharacter={setCharacter}
-            onItemDeleted={(e) => onItemDeleted(e)}
-          />
-        </Stack>
+        )}
       </Box>
-      {dialogEquipSlot && (
-        <CharacterEquipmentDialog
-          open={dialogEquipOpen}
-          character={character}
-          items={items}
-          slot={dialogEquipSlot}
-          onClose={() => setDialogEquipOpen(false)}
-          onEquip={(character) => setCharacter(character)}
-        />
-      )}
-    </Box>
+      <CharacterViewTransferGold character={character} items={items} setCharacter={setCharacter} />
+    </>
   );
 }
 
