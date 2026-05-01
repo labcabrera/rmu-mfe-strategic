@@ -1,12 +1,13 @@
 import React, { useState, SyntheticEvent, ReactNode, FC, Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Grid, Tab, Tabs } from '@mui/material';
+import { Box, Tab, Tabs } from '@mui/material';
 import { Character, StrategicGame, Profession } from '@labcabrera-rmu/rmu-react-shared-lib';
 import CharacterViewAttacks from './CharacterViewAttacks';
 import CharacterViewInfo from './CharacterViewInfo';
 import CharacterViewMovement from './CharacterViewMovement';
 import CharacterViewResistances from './CharacterViewResistances';
 import CharacterViewExperience from './CharacterViewXp';
+import { CharacterEquipmentButtons } from './items/CharacterEquipmentButtons';
 import { CharacterEquipmentPanel } from './items/CharacterEquipmentPanel';
 import CharacterViewItems from './items/CharacterViewItems';
 import CharacterViewSkills from './skills/CharacterViewSkills';
@@ -81,6 +82,7 @@ const CharacterViewTabs: FC<{
       </CustomTabPanel>
 
       <CustomTabPanel value={value} index={5}>
+        <CharacterEquipmentButtons character={character} setCharacter={setCharacter} />
         <CharacterEquipmentPanel character={character} setCharacter={setCharacter} />
         <CharacterViewItems character={character} setCharacter={setCharacter} />
       </CustomTabPanel>
