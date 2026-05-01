@@ -3,17 +3,19 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import i18next from 'i18next';
 import App from './App';
-import { imageBaseUrl } from './modules/services/config';
+import { assetsBaseUrl } from './modules/services/config';
 
 const rootElement = document.getElementById('app');
 if (!rootElement) throw new Error('Root element with id "app" not found');
 const root = ReactDOM.createRoot(rootElement);
 
 async function loadItemsNamespace(): Promise<void> {
+  console.log('loading i18n');
   try {
     const lng = (i18next && (i18next.language || (i18next.options && (i18next.options as any).lng))) || 'en';
-    const base = (window as any).i18nBase || (window as any).assetsBaseUrl || imageBaseUrl || '';
-    const url = `${base}locales/items_${lng}.json`;
+    const url = `${assetsBaseUrl}locales/items_${lng}.json`;
+
+    console.info('loading i18n', url);
 
     const res = await fetch(url, { credentials: 'same-origin' });
     if (!res.ok) return;
@@ -25,8 +27,8 @@ async function loadItemsNamespace(): Promise<void> {
     } else {
       Object.keys(data).forEach((k) => i18next.addResource(lng, 'items', k, data[k]));
     }
-  } catch (err) {
-    // ignore errors when loading optional federated namespace
+  } catch (ex) {
+    console.error('Error loading i18n', ex);
   }
 }
 

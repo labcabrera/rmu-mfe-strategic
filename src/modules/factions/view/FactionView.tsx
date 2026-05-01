@@ -27,7 +27,7 @@ import FactionViewResume from './FactionViewResume';
 
 const STORAGE_KEY = 'faction-display-character-table';
 
-const FactionView: FC = () => {
+export default function FactionView() {
   const navigate = useNavigate();
   const auth = useAuth();
   const { t } = useTranslation();
@@ -133,6 +133,4 @@ const FactionView: FC = () => {
       </Grid>
     </Grid>
   );
-};
-
-export default FactionView;
+}

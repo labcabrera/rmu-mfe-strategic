@@ -5,9 +5,11 @@ import { Grid, Typography } from '@mui/material';
 import { Faction, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { gridSizeCard } from '../../services/display';
 
-export default function StrategicGameViewFactions({ factions }: { factions: Faction[] }) {
+export default function StrategicGameViewFactions({ factions }: { factions: Faction[] | undefined }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  if (!factions) return;
 
   return (
     <Grid container spacing={1}>

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Link as RouterLink } from 'react-router-dom';
 import { Link, Typography } from '@mui/material';
-import { EditableAvatar, StrategicGame, updateStrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { EditableAvatar, RmuTextCard, StrategicGame, updateStrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
 import { imageBaseUrl } from '../../services/config';
 import { getAvatarImages } from '../../services/image-service';
@@ -33,8 +33,9 @@ const StrategicGameViewResume: FC<{
         images={getAvatarImages()}
       />
       <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
-        {t(strategicGame.name)}
+        {strategicGame.name}
       </Typography>
+
       <Typography variant="body1" sx={{ mt: 2 }}>
         <Link
           component={RouterLink}

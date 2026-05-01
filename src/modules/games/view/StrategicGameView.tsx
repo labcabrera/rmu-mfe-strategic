@@ -31,8 +31,8 @@ export default function StrategicGameView() {
   const { showError } = useError();
   const { gameId } = useParams<{ gameId?: string }>();
   const [strategicGame, setStrategicGame] = useState<StrategicGame>(location.state?.strategicGame || null);
-  const [factions, setFactions] = useState<Faction[]>([]);
-  const [tacticalGames, setTacticalGames] = useState<TacticalGame[]>([]);
+  const [factions, setFactions] = useState<Faction[]>();
+  const [tacticalGames, setTacticalGames] = useState<TacticalGame[]>();
 
   const onCreateFaction = () => {
     navigate(`/strategic/factions/create?gameId=${strategicGame.id}`, { state: { strategicGame } });

@@ -1,4 +1,5 @@
 import React, { FC, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import {
   Avatar,
@@ -14,14 +15,13 @@ import {
   Typography,
 } from '@mui/material';
 import { Character } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useTranslation } from 'react-i18next';
 
 type SortField = 'name' | 'level' | null;
 type SortDirection = 'asc' | 'desc';
 
 const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ characters }) => {
   const navigate = useNavigate();
-  const { t } = useTranslation(); 
+  const { t } = useTranslation();
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
@@ -103,11 +103,11 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
             <TableCell align="right">HP</TableCell>
             <TableCell>{t('profession')}</TableCell>
             <TableCell>{t('attacks')}</TableCell>
-            <TableCell align="right">{t('DB')}</TableCell>
-            <TableCell align="right">{t('AT')}</TableCell>
-            <TableCell align="right">{t('Ini')}</TableCell>
-            <TableCell align="right">{t('BMR')}</TableCell>
-            <TableCell align="right">{t('M.Pen')}</TableCell>
+            <TableCell align="right">DB</TableCell>
+            <TableCell align="right">AT</TableCell>
+            <TableCell align="right">Ini</TableCell>
+            <TableCell align="right">BMR</TableCell>
+            <TableCell align="right">Pen</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
