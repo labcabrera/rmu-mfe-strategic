@@ -138,7 +138,7 @@ export default function CharacterViewResume({
             onClick={() => navigate(`/strategic/factions/view/${faction?.id}`)}
           />
 
-          <Card variant="outlined" sx={{ borderRadius: 3 }}>
+          <Card variant="outlined" sx={{ borderRadius: 1 }}>
             <CardContent>
               <Stack spacing={2}>
                 <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
@@ -177,7 +177,7 @@ export default function CharacterViewResume({
             </CardContent>
           </Card>
 
-          <Card variant="outlined" sx={{ borderRadius: 3 }}>
+          <Card variant="outlined" sx={{ borderRadius: 1 }}>
             <CardContent>
               <Typography variant="overline" color="text.secondary">
                 {t('resume')}

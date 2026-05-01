@@ -1,15 +1,16 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box } from '@mui/material';
-import { CharacterStat, StatKey, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { StatKey, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Tooltip } from 'recharts';
 
-type Props = {
+export default function CharacterViewStatsChart({
+  stats,
+  minHeight = 240,
+}: {
   stats: Record<StatKey, { potential: number; temporary: number }>;
   minHeight?: number | string;
-};
-
-const CharacterViewStatsChart: FC<Props> = ({ stats, minHeight = 240 }) => {
+}) {
   const { t } = useTranslation();
 
   if (!stats) return <div>Loading chart...</div>;
@@ -35,6 +36,4 @@ const CharacterViewStatsChart: FC<Props> = ({ stats, minHeight = 240 }) => {
       </ResponsiveContainer>
     </Box>
   );
-};
-
-export default CharacterViewStatsChart;
+}

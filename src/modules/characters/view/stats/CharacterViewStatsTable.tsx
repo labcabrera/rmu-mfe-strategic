@@ -28,7 +28,7 @@ const CharacterViewStatsTable: FC<{
   return (
     <>
       <TableContainer component={Paper}>
-        <Table size="small" sx={{ minWidth: 650 }}>
+        <Table sx={{ minWidth: 650 }}>
           <TableHead>
             <TableRow>
               <TableCell align="left">Stat</TableCell>

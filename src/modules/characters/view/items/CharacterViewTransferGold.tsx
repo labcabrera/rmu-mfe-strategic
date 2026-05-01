@@ -50,7 +50,7 @@ export default function CharacterViewTransferGold({
   if (!character || !faction) return null;
 
   return (
-    <Card variant="outlined" sx={{ borderRadius: 3 }}>
+    <Card variant="outlined" sx={{ borderRadius: 1, mt: 2 }}>
       <CardContent>
         <Typography variant="overline" color="text.secondary">
           {t('transfer-gold')}

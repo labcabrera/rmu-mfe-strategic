@@ -1,7 +1,6 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import AddIcon from '@mui/icons-material/Add';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -35,6 +34,8 @@ import { imageBaseUrl } from '../../../services/config';
 import { itemFilter } from '../../../services/display';
 import CharacterEquipmentDialog from './CharacterEquipmentDialog';
 import CharacterViewTransferGold from './CharacterViewTransferGold';
+
+const borderRadius = 1;
 
 export default function CharacterEquipmentPanel({
   character,
@@ -84,7 +85,7 @@ export default function CharacterEquipmentPanel({
     <>
       <Box
         sx={{
-          p: 3,
+          mt: 2,
           color: 'text.primary',
           bgcolor: 'background.default',
         }}
@@ -96,7 +97,7 @@ export default function CharacterEquipmentPanel({
               xs: '1fr',
               lg: '360px 1fr 520px',
             },
-            gap: 3,
+            gap: 1,
           }}
         >
           <EquipmentSlots character={character} items={items} onClick={(e) => openDialog(e)} />
@@ -105,7 +106,6 @@ export default function CharacterEquipmentPanel({
             <ItemList
               character={character}
               carried={true}
-              totalWeight={51.38}
               items={items.filter((e) => e.carried)}
               setCharacter={setCharacter}
               onItemDeleted={(e) => onItemDeleted(e)}
@@ -113,7 +113,6 @@ export default function CharacterEquipmentPanel({
             <ItemList
               character={character}
               carried={false}
-              totalWeight={154.35}
               items={items.filter((e) => !e.carried)}
               setCharacter={setCharacter}
               onItemDeleted={(e) => onItemDeleted(e)}
@@ -147,7 +146,7 @@ function EquipmentSlots({
 }) {
   const { t } = useTranslation();
   return (
-    <Card variant="outlined" sx={{ borderRadius: 3 }}>
+    <Card variant="outlined" sx={{ borderRadius: borderRadius }}>
       <CardContent>
         <Typography variant="overline" color="text.secondary">
           {t('equipment')}
@@ -155,21 +154,21 @@ function EquipmentSlots({
 
         <Box
           sx={{
-            mt: 3,
+            mt: 1,
             display: 'grid',
             gridTemplateColumns: '1fr 120px 1fr',
             gridTemplateRows: 'repeat(4, 110px)',
-            gap: 2,
+            gap: 1,
             alignItems: 'center',
             justifyItems: 'center',
           }}
         >
-          <SlotCard slot="mainHand" itemId={character.equipment.slots['mainHand']} items={items} onClick={onClick} />
+          <Box />
           <SlotCard slot="head" itemId={character.equipment.slots['head']} items={items} onClick={onClick} />
-          <SlotCard slot="offHand" itemId={character.equipment.slots['offHand']} items={items} onClick={onClick} />
           <Box />
+          <SlotCard slot="mainHand" itemId={character.equipment.slots['mainHand']} items={items} onClick={onClick} />
           <SlotCard slot="body" itemId={character.equipment.slots['body']} items={items} onClick={onClick} />
-          <Box />
+          <SlotCard slot="offHand" itemId={character.equipment.slots['offHand']} items={items} onClick={onClick} />
           <Box />
           <SlotCard slot="arms" itemId={character.equipment.slots['arms']} items={items} onClick={onClick} />
           <Box />
@@ -193,15 +192,10 @@ function SlotCard({
   items: StrategicItem[];
   onClick: (slot: EquipmentSlot) => void;
 }) {
-  const { t } = useTranslation();
   const item = items.find((e) => e.id === itemId) || undefined;
   const image = item ? `${imageBaseUrl}images/items/${item.itemTypeId}.png` : `${imageBaseUrl}images/items/no-item.png`;
   return (
     <Stack spacing={0.5} sx={{ alignItems: 'center' }}>
-      <Typography variant="caption" color="text.secondary">
-        {t(slot)}
-      </Typography>
-
       <Box
         sx={{
           width: 82,
@@ -248,7 +242,7 @@ function StatsPanel({ character }: { character: Character }) {
 
   return (
     <Stack spacing={2}>
-      <Card variant="outlined" sx={{ borderRadius: 3 }}>
+      <Card variant="outlined" sx={{ borderRadius: borderRadius }}>
         <CardContent>
           <Typography variant="overline" color="text.secondary">
             {t('equipment-stats')}
@@ -264,16 +258,20 @@ function StatsPanel({ character }: { character: Character }) {
             />
             <StatRow label={t('armor-type')} value={getArmorType()} />
             <StatRow label={t('maneuver-penalty')} value={eq.maneuverPenalty} danger={eq.maneuverPenalty < 0} />
-            <StatRow label={t('armor-base-penalty')} value={eq.baseManeuverPenalty} danger />
-            <StatRow label={t('ranged-penalty')} value={eq.rangedPenalty} danger />
-            <StatRow label={t('perception-penalty')} value={eq.perceptionPenalty!} danger />
+            <StatRow
+              label={t('armor-base-penalty')}
+              value={eq.baseManeuverPenalty}
+              danger={eq.baseManeuverPenalty < 0}
+            />
+            <StatRow label={t('ranged-penalty')} value={eq.rangedPenalty} danger={eq.rangedPenalty < 0} />
+            <StatRow label={t('perception-penalty')} value={eq.perceptionPenalty!} danger={eq.perceptionPenalty! < 0} />
             <StatRow label={t('max-pace')} value={t(character.movement.maxPace)} />
             <StatRow label={t('movement-base-difficulty')} value={t(`difficulty-${eq.movementBaseDifficulty!}`)} />
           </Stack>
         </CardContent>
       </Card>
 
-      <Card variant="outlined" sx={{ borderRadius: 3 }}>
+      <Card variant="outlined" sx={{ borderRadius: borderRadius }}>
         <CardContent>
           <Typography variant="overline" color="text.secondary">
             {t('weight')}
@@ -345,14 +343,12 @@ function StatRow({
 function ItemList({
   character,
   carried,
-  totalWeight,
   items,
   setCharacter,
   onItemDeleted,
 }: {
   character: Character;
   carried: boolean;
-  totalWeight: number;
   items: StrategicItem[];
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   onItemDeleted: (itemId: string) => void;
@@ -385,7 +381,7 @@ function ItemList({
   if (items.length < 1) return;
 
   return (
-    <Card variant="outlined" sx={{ borderRadius: 3 }}>
+    <Card variant="outlined" sx={{ borderRadius: borderRadius }}>
       <CardContent sx={{ p: 0 }}>
         <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', px: 2, py: 1.5 }}>
           <Typography variant="subtitle2" sx={{ textTransform: 'uppercase' }}>

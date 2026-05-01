@@ -1,9 +1,8 @@
-import React, { Dispatch, SetStateAction, useEffect, useEffectEvent, useState, useTransition } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import BuildIcon from '@mui/icons-material/Build';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import Inventory2Icon from '@mui/icons-material/Inventory2';
 import ListIcon from '@mui/icons-material/List';
 import ShieldIcon from '@mui/icons-material/Shield';
@@ -14,10 +13,13 @@ import {
   CardActionArea,
   CardContent,
   CardMedia,
+  Checkbox,
   Chip,
   Divider,
+  FormControlLabel,
   Grid,
   Stack,
+  TextField,
   Typography,
 } from '@mui/material';
 import { AddItemDto, fetchItems, Item, NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
@@ -92,12 +94,13 @@ export function ItemSelector({
   useEffect(() => {
     if (!item) return;
     setFormData({
-      name: item.id,
+      name: t(item.id),
       itemTypeId: item.id,
-      amount: 1,
       cost: item.info.cost.average,
       fumble: item.weapon?.fumble,
+      weight: item.info.weight || undefined,
       strength: item.info.strength || undefined,
+      amount: 1,
     });
   }, [item]);
 
@@ -143,8 +146,8 @@ export function ItemSelector({
       <Box
         sx={{
           borderRight: { md: 1 },
-          borderColor: 'divider',
-          p: 2,
+          borderColor: '#040a22',
+          p: 1,
           display: { xs: 'none', md: 'block' },
         }}
       >
@@ -189,20 +192,18 @@ export function ItemSelector({
             />
           </>
         )}
-        {/* <Divider sx={{ my: 3 }} />
+        <Divider sx={{ my: 3 }} />
         <Typography variant="overline" color="text.secondary">
-          Filtros
+          {t('filters')}
         </Typography>
         <Stack>
-          <FormControlLabel control={<Checkbox size="small" defaultChecked />} label="Solo disponibles" />
-          <FormControlLabel control={<Checkbox size="small" defaultChecked />} label="Solo comprables" />
-          <FormControlLabel control={<Checkbox size="small" />} label="Compatible" />
-          <FormControlLabel control={<Checkbox size="small" />} label="Ya equipado" />
-        </Stack> */}
+          <FormControlLabel control={<Checkbox size="small" defaultChecked />} label="Available" />
+          <FormControlLabel control={<Checkbox size="small" defaultChecked />} label="Unique" />
+        </Stack>
       </Box>
 
       {/* Main content */}
-      <Box sx={{ p: 2, overflow: 'auto', minWidth: 0, width: '100%' }}>
+      <Box sx={{ p: 1, overflow: 'auto', minWidth: 0, width: '100%' }}>
         <Grid container spacing={2}>
           {items.map((e, index) => {
             const selected = e.id === item?.id;
@@ -452,7 +453,15 @@ function AddItemForm({
       <Typography variant="body2" color="text.secondary">
         {t('settings')}
       </Typography>
-      <Grid container spacing={1} sx={{ mt: 3 }}>
+      <Grid container spacing={2} sx={{ mt: 3 }}>
+        <Grid size={12}>
+          <TextField
+            label={t('name')}
+            value={formData.name}
+            fullWidth
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          />
+        </Grid>
         <Grid size={12}>
           <NumericInput
             label={t('cost')}
@@ -465,6 +474,13 @@ function AddItemForm({
             label={t('strength')}
             value={formData.strength}
             onChange={(e) => setFormData({ ...formData, strength: e || item.info?.strength || 0 })}
+          />
+        </Grid>
+        <Grid size={12}>
+          <NumericInput
+            label={t('weight')}
+            value={formData.weight}
+            onChange={(e) => setFormData({ ...formData, weight: e || item.info?.weight || 0 })}
           />
         </Grid>
         {item.info.stackable && (
