@@ -272,7 +272,7 @@ function StatsPanel({ character }: { character: Character }) {
       <Card variant="outlined" sx={{ borderRadius: 3 }}>
         <CardContent>
           <Typography variant="overline" color="text.secondary">
-            Resumen de carga {loadPercent}%
+            {t('weight')}
           </Typography>
 
           <Stack spacing={2} sx={{ mt: 2 }}>
