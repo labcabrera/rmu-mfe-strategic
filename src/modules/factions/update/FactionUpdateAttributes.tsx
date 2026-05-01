@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { Dispatch, FC, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Grid, TextField } from '@mui/material';
-import { NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
-import { UpdateFactionDto } from '../../api/faction.dto';
+import { Faction, NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
 
-const FactionUpdateAttributes: React.FC<{
-  formData: UpdateFactionDto;
-  setFormData: React.Dispatch<React.SetStateAction<UpdateFactionDto>>;
+const FactionUpdateAttributes: FC<{
+  formData: Faction;
+  setFormData: Dispatch<SetStateAction<Faction>>;
 }> = ({ formData, setFormData }) => {
+  const { t } = useTranslation();
+
   if (!formData) return <p>Loading...</p>;
 
   const handleManagementChange = (field: string, value: number) => {
@@ -39,7 +40,7 @@ const FactionUpdateAttributes: React.FC<{
           value={formData.management.availableXP}
           integer
           min={0}
-          onChange={(e) => handleManagementChange('availableXP', e)}
+          onChange={(e) => handleManagementChange('availableXP', e || 0)}
         />
       </Grid>
       <Grid size={12}>
@@ -49,7 +50,7 @@ const FactionUpdateAttributes: React.FC<{
           value={formData.management.availableGold}
           integer
           min={0}
-          onChange={(e) => handleManagementChange('availableGold', e)}
+          onChange={(e) => handleManagementChange('availableGold', e || 0)}
         />
       </Grid>
       <Grid size={12}>

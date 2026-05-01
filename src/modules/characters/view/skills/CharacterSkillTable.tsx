@@ -32,8 +32,9 @@ import {
   Profession,
   setUpProfessionalSkill,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
+import { useAuth } from 'react-oidc-context';
+import { useTranslation } from 'react-i18next';
 
 const maxProfessionalSkills = 10;
 const maxKnackSkills = 2;
@@ -43,6 +44,7 @@ const CharacterSkillTable: FC<{
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   profession?: Profession;
 }> = ({ character, setCharacter, profession }) => {
+  const { t } = useTranslation();
   const currentKnackSkills = character.skills.filter((s) => s.professional?.includes('knack')).length;
   const currentProfessionalSkills = character.skills.filter((s) => s.professional?.includes('professional')).length;
 
@@ -147,18 +149,20 @@ const CharacterViewSkillsEntry: FC<{
   currentKnackSkills: number;
   currentProfessionalSkills: number;
 }> = ({ character, setCharacter, skill, profession, currentKnackSkills, currentProfessionalSkills }) => {
+  const auth = useAuth();
+  const { t } = useTranslation(); 
   const { showError } = useError();
   const isProfessional = skill.professional?.includes('professional');
   const isKnack = skill.professional?.includes('knack');
 
   const handleLevelUp = () => {
-    levelUpSkill(character.id, skill.skillId, skill.specialization)
+    levelUpSkill(character.id, skill.skillId, skill.specialization, auth)
       .then((updated) => setCharacter(updated))
       .catch((error: any) => showError(error.message));
   };
 
   const handleLevelDown = () => {
-    levelDownSkill(character.id, skill.skillId, skill.specialization)
+    levelDownSkill(character.id, skill.skillId, skill.specialization, auth)
       .then((updated) => setCharacter(updated))
       .catch((error: any) => showError(error.message));
   };
@@ -175,7 +179,7 @@ const CharacterViewSkillsEntry: FC<{
       //add
       array.push('professional');
     }
-    setUpProfessionalSkill(character.id, skillObj.skillId, skillObj.specialization, array)
+    setUpProfessionalSkill(character.id, skillObj.skillId, skillObj.specialization, array, auth)
       .then((updated) => setCharacter(updated))
       .catch((error: any) => showError(error.message));
   };
@@ -192,13 +196,13 @@ const CharacterViewSkillsEntry: FC<{
       //add
       array.push('knack');
     }
-    setUpProfessionalSkill(character.id, skillObj.skillId, skillObj.specialization, array)
+    setUpProfessionalSkill(character.id, skillObj.skillId, skillObj.specialization, array, auth)
       .then((updated) => setCharacter(updated))
       .catch((error: any) => showError(error.message));
   };
 
   const handleDeleteSkill = (skill: CharacterSkill) => {
-    deleteCharacterSkill(character.id, skill.skillId, skill.specialization)
+    deleteCharacterSkill(character.id, skill.skillId, skill.specialization, auth)
       .then((updated) => setCharacter(updated))
       .catch((error) => showError(error.message));
   };
@@ -244,7 +248,7 @@ const CharacterViewSkillsEntry: FC<{
       <TableCell align="left">{getStatistics(skill)}</TableCell>
 
       <TableCell align="right">
-        <Typography variant="body2" display="inline">
+        <Typography variant="body2">
           <b>{skill.ranks}</b>
         </Typography>
       </TableCell>

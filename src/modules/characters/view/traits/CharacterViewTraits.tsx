@@ -1,7 +1,7 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
-import { Box, Grid, Stack, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import { Grid, Stack, Typography } from '@mui/material';
 import { CategorySeparator, AddButton, RmuCard, Character, CharacterTrait } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { imageBaseUrl } from '../../../services/config';
 import { gridSizeCard } from '../../../services/display';
 import { toRoman } from '../../../services/roman-number-service';
@@ -12,6 +12,7 @@ const CharacterViewTraits: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
 }> = ({ character, setCharacter }) => {
+  const { t } = useTranslation();
   const [openAddTraitDialog, setOpenAddTraitDialog] = useState(false);
   const [openTraitDialog, setOpenTraitDialog] = useState(false);
   const [traitId, setTraitId] = useState<string | null>(null);

@@ -1,8 +1,7 @@
-import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
+import React, { useState, useEffect, FC, Dispatch, SetStateAction, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Grid, MenuItem, TextField, Typography } from '@mui/material';
 import { CreateCharacterDto, STATS, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { getStatBonus } from '../../services/stat-service';
 import { StatBonus } from './CharacterCreate';
 
@@ -15,6 +14,8 @@ const StatSelect: FC<{
   value: string;
   setValue: (value: string) => void;
 }> = ({ name, value, setValue }) => {
+  const { t } = useTranslation();
+
   return (
     <TextField
       select
@@ -44,6 +45,7 @@ const CharacterCreateStatsActions: FC<{
   swaps: number;
   setSwaps: Dispatch<SetStateAction<number>>;
 }> = ({ strategicGame, formData, setFormData, setStatBonusFormData, boosts, setBoosts, swaps, setSwaps }) => {
+  const { t } = useTranslation();
   const [sourceBoostStat, setSourceBoostStat] = useState<string>('');
   const [targetBoostStat, setTargetBoostStat] = useState<string>('');
   const [replaceBoostStat, setReplaceBoostStat] = useState<string>('');

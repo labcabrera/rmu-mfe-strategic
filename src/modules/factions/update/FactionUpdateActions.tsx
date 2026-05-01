@@ -1,4 +1,6 @@
 import React, { FC } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
 import {
   CancelButton,
@@ -9,7 +11,6 @@ import {
   updateFaction,
   UpdateFactionDto,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 
 const FactionUpdateActions: FC<{
@@ -17,6 +18,8 @@ const FactionUpdateActions: FC<{
   faction: Faction;
   strategicGame: StrategicGame;
 }> = ({ formData, faction, strategicGame }) => {
+  const auth = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { showError } = useError();
   const breadcrumbs = [
@@ -28,7 +31,7 @@ const FactionUpdateActions: FC<{
   if (!faction || !strategicGame) return <p>Loading...</p>;
 
   const handleFactionUpdate = async () => {
-    updateFaction(faction.id, formData)
+    updateFaction(faction.id, formData, auth)
       .then((data: Faction) => navigate(`/strategic/factions/view/${data.id}`, { state: { faction: data } }))
       .catch((error: Error) => {
         showError(error.message);

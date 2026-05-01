@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
+import { useAuth } from 'react-oidc-context';
 import { useLocation, useParams } from 'react-router-dom';
-import { Grid } from '@mui/material';
+import { Grid, Paper } from '@mui/material';
 import {
   EditableAvatar,
   fetchStrategicGame,
@@ -14,10 +15,11 @@ import StrategicGameUpdateActions from './StrategicGameUpdateActions';
 
 const StrategicGameUpdate: FC = () => {
   const location = useLocation();
+  const auth = useAuth();
   const { showError } = useError();
   const { gameId } = useParams<{ gameId?: string }>();
-  const [strategicGame, setStrategicGame] = useState<StrategicGame | null>(null);
-  const [formData, setFormData] = useState<UpdateStrategicGameDto | null>(null);
+  const [strategicGame, setStrategicGame] = useState<StrategicGame>();
+  const [formData, setFormData] = useState<StrategicGame>({} as StrategicGame);
   const [isValid, setIsValid] = useState(false);
 
   const validateForm = (data: UpdateStrategicGameDto) => {
@@ -33,12 +35,8 @@ const StrategicGameUpdate: FC = () => {
 
   useEffect(() => {
     if (strategicGame) {
-      setFormData({
-        name: strategicGame.name,
-        description: strategicGame.description,
-        options: strategicGame.options,
-        powerLevel: strategicGame.powerLevel,
-      });
+      const { id, owner, ...rest } = strategicGame;
+      setFormData(rest as StrategicGame);
     }
   }, [strategicGame]);
 
@@ -46,30 +44,30 @@ const StrategicGameUpdate: FC = () => {
     if (location.state && location.state.strategicGame) {
       setStrategicGame(location.state.strategicGame);
     } else if (gameId) {
-      fetchStrategicGame(gameId)
+      fetchStrategicGame(gameId, auth)
         .then((response) => setStrategicGame(response))
         .catch((err) => showError(err.message));
     }
   }, [location.state, gameId, showError]);
 
-  if (!strategicGame || !formData) return <div>Loading...</div>;
+  if (!strategicGame || !formData.realmId) return <div>Loading...</div>;
 
   return (
-    <>
-      <StrategicGameUpdateActions strategicGame={strategicGame} formData={formData} isValid={isValid} />
-      <Grid container spacing={1}>
-        <Grid size={gridSizeResume}>
-          <EditableAvatar
-            imageUrl={formData.imageUrl || ''}
-            onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl: imageUrl })}
-            images={[]}
-          />
-        </Grid>
-        <Grid size={gridSizeMain}>
-          <StrategicGameForm formData={formData} setFormData={setFormData} create={false} />
-        </Grid>
+    <Grid container spacing={1}>
+      <Grid size={gridSizeResume}>
+        <EditableAvatar
+          imageUrl={formData.imageUrl || ''}
+          onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl: imageUrl })}
+          images={[]}
+        />
       </Grid>
-    </>
+      <Grid size={gridSizeMain}>
+        <StrategicGameUpdateActions strategicGame={strategicGame} formData={formData} isValid={isValid} />
+        <Paper sx={{ p: 2 }}>
+          <StrategicGameForm formData={formData} setFormData={setFormData} />
+        </Paper>
+      </Grid>
+    </Grid>
   );
 };
 

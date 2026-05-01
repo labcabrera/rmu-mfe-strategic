@@ -1,16 +1,15 @@
-import React, { FC } from 'react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Grid } from '@mui/material';
-import Typography from '@mui/material/Typography';
-import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
-import { Faction } from '../../api/faction.dto';
+import { Grid, Typography } from '@mui/material';
+import { Faction, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { gridSizeCard } from '../../services/display';
 
-const StrategicGameViewFactions: FC<{
-  factions: Faction[];
-}> = ({ factions }) => {
+export default function StrategicGameViewFactions({ factions }: { factions: Faction[] | undefined }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  if (!factions) return;
 
   return (
     <Grid container spacing={1}>
@@ -18,7 +17,7 @@ const StrategicGameViewFactions: FC<{
         <Grid key={faction.id} size={gridSizeCard}>
           <RmuTextCard
             value={faction.name}
-            subtitle={faction.shortDescription}
+            subtitle={faction.shortDescription || 'No description provided'}
             image={faction.imageUrl || ''}
             onClick={() => navigate(`/strategic/factions/view/${faction.id}`, { state: { faction } })}
           />
@@ -33,6 +32,4 @@ const StrategicGameViewFactions: FC<{
       </Grid>
     </Grid>
   );
-};
-
-export default StrategicGameViewFactions;
+}

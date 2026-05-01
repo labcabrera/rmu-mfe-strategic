@@ -11,7 +11,6 @@ import {
   Character,
   fetchCharacter,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { useError } from '../../../../ErrorContext';
 import CharacterViewAddItemDialog from './CharacterAddItemDialog';
 import CharacterItemDetail from './CharacterItemDetail';
@@ -19,11 +18,15 @@ import CharacterItemTable from './CharacterItemTable';
 import CharacterViewEquipment from './CharacterViewEquipment';
 import CharacterViewEquipmentInfo from './CharacterViewEquipmentInfo';
 import CharacterViewTransferGold from './CharacterViewTransferGold';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 
 const CharacterViewItems: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
 }> = ({ character, setCharacter }) => {
+  const auth = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { showError } = useError();
   const [openAddItemDialog, setOpenAddItemDialog] = useState(false);
@@ -33,7 +36,7 @@ const CharacterViewItems: FC<{
   const onItemAdded = (formData: Partial<StrategicItem>) => {
     formData.gameId = character.gameId;
     formData.characterId = character.id;
-    createStrategicItem(formData)
+    createStrategicItem(formData, auth)
       .then(() => {
         // bindCharacterItems();
         bindCharacter();
@@ -42,7 +45,7 @@ const CharacterViewItems: FC<{
   };
 
   const onItemDeleted = (itemId: string) => {
-    deleteStrategicItem(itemId)
+    deleteStrategicItem(itemId, auth)
       .then(() => {
         bindCharacter();
       })
@@ -50,14 +53,14 @@ const CharacterViewItems: FC<{
   };
 
   const bindCharacter = () => {
-    fetchCharacter(character.id)
+    fetchCharacter(character.id, auth)
       .then((response) => setCharacter(response))
       .catch((err) => showError(err.message));
   };
 
   const bindCharacterItems = () => {
     if (character) {
-      fetchStrategicItems(`characterId==${character.id}`, 0, 1000)
+      fetchStrategicItems(`characterId==${character.id}`, 0, 100, auth)
         .then((response) => setCharacterItems(response.content))
         .catch((err) => showError(err.message));
     }
@@ -73,16 +76,16 @@ const CharacterViewItems: FC<{
     <>
       <Grid container spacing={1}>
         <Grid size={12}>
-          <CategorySeparator text={t('Equiped')}>
+          <CategorySeparator text={t('equiped')}>
             <Stack direction="row" spacing={1}>
               <Button variant="outlined" onClick={() => setOpenAddItemDialog(true)}>
-                {t('Buy')}
+                {t('buy')}
               </Button>
               <Button variant="outlined" onClick={() => navigate(`/strategic/characters/trade/${character.id}`)}>
-                {t('Trade')}
+                {t('trading')}
               </Button>
               <Button variant="outlined" onClick={() => navigate(`/strategic/characters/craft/${character.id}`)}>
-                {t('Craft')}
+                {t('craft')}
               </Button>
             </Stack>
           </CategorySeparator>
@@ -97,7 +100,7 @@ const CharacterViewItems: FC<{
         </Grid>
 
         <Grid size={12}>
-          <CategorySeparator text={t('Items')} />
+          <CategorySeparator text={t('items')} />
         </Grid>
 
         <Grid size={{ xs: 12, md: 6 }}>

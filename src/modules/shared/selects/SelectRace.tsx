@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 import { TextField, Autocomplete } from '@mui/material';
-import { Race } from '../../api/race.dto';
+import { Race } from '@labcabrera-rmu/rmu-react-shared-lib';
 
-const SelectFaction: FC<{
+const SelectRace: FC<{
   races: Race[];
   label: string;
   value: string | null | undefined;
@@ -29,4 +29,4 @@ const SelectFaction: FC<{
   );
 };
 
-export default SelectFaction;
+export default SelectRace;

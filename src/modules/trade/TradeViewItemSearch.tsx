@@ -1,4 +1,6 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import {
   Grid,
   Card,
@@ -11,30 +13,23 @@ import {
   InputLabel,
   FormControl,
   Button,
-  CircularProgress,
 } from '@mui/material';
-import { t } from 'i18next';
-import { fetchItems, Item } from '../api/items';
+import { fetchItems, Item } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { useError } from '../../ErrorContext';
 
 const TradeViewItemSearch: FC<{ onItemSelect?: (item: Item) => void }> = ({ onItemSelect }) => {
+  const auth = useAuth();
+  const { t } = useTranslation();
+  const { showError } = useError();
   const [items, setItems] = useState<Item[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const [nameFilter, setNameFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string | ''>('');
 
   useEffect(() => {
-    setLoading(true);
-    fetchItems('', 0, 200)
-      .then((data) => {
-        setItems(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message || String(err));
-        setLoading(false);
-      });
+    fetchItems('', 0, 200, auth)
+      .then((data) => setItems(data.content))
+      .catch((err) => showError(err.message));
   }, []);
 
   const categories = useMemo(() => {
@@ -95,33 +90,27 @@ const TradeViewItemSearch: FC<{ onItemSelect?: (item: Item) => void }> = ({ onIt
       </Grid>
 
       <Grid size={{ xs: 12 }}>
-        {loading ? (
-          <CircularProgress />
-        ) : error ? (
-          <Typography color="error">{error}</Typography>
-        ) : (
-          <Grid container spacing={2}>
-            {filtered.map((item) => (
-              <Grid size={{ xs: 6, sm: 4, md: 3, lg: 2 }} key={item.id}>
-                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                  <CardMedia
-                    component="img"
-                    height="120"
-                    image={item.imageUrl || `/static/images/items/${item.itemTypeId}.png`}
-                    alt={item.name}
-                  />
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography variant="body2">{item.name}</Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {item.info?.type || t(item.itemTypeId) || ''}
-                    </Typography>
-                  </CardContent>
-                  <Button onClick={() => onItemSelect && onItemSelect(item)}>{t('select')}</Button>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        )}
+        <Grid container spacing={2}>
+          {filtered.map((item) => (
+            <Grid size={{ xs: 6, sm: 4, md: 3, lg: 2 }} key={item.id}>
+              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <CardMedia
+                  component="img"
+                  height="120"
+                  image={item.imageUrl || `/static/images/items/${item.itemTypeId}.png`}
+                  alt={item.name}
+                />
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Typography variant="body2">{item.name}</Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {item.info?.type || t(item.itemTypeId) || ''}
+                  </Typography>
+                </CardContent>
+                <Button onClick={() => onItemSelect && onItemSelect(item)}>{t('select')}</Button>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
       </Grid>
     </Grid>
   );

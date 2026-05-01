@@ -1,4 +1,6 @@
 import React, { FC } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
 import {
   RmuBreadcrumbs,
@@ -8,7 +10,6 @@ import {
   createFaction,
   CreateFactionDto,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 
 const FactionCreateActions: FC<{
@@ -16,17 +17,19 @@ const FactionCreateActions: FC<{
   formData: CreateFactionDto;
   isValid: boolean;
 }> = ({ strategicGame, formData, isValid }) => {
+  const auth = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { showError } = useError();
   const breadcrumbs = [
     { name: t('strategic'), link: '/strategic' },
-    { name: t('games'), link: '/strategic/games' },
+    { name: t('strategic-games'), link: '/strategic/games' },
     { name: strategicGame.name, link: `/strategic/games/view/${strategicGame.id}` },
-    { name: t('Create faction') },
+    { name: t('create-faction') },
   ];
 
   const onCreate = () => {
-    createFaction(formData)
+    createFaction(formData, auth)
       .then((data: { id: string }) => navigate(`/strategic/factions/view/${data.id}`, { state: { faction: data } }))
       .catch((err) => showError(err.message));
   };

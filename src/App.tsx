@@ -2,8 +2,8 @@ import React, { FC } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { Box, ThemeProvider } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { NotFound } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { ErrorProvider } from './ErrorContext';
-import './i18n';
 import CharacterCreate from './modules/characters/create/CharacterCreate';
 import CharacterList from './modules/characters/list/CharacterList';
 import CharacterUpdate from './modules/characters/update/CharacterUpdate';
@@ -17,18 +17,11 @@ import StrategicGameEdit from './modules/games/update/StrategicGameUpdate';
 import StrategicGameView from './modules/games/view/StrategicGameView';
 import TradeView from './modules/trade/TradeView';
 
-const NotFound: FC = () => (
-  <div>
-    <h2>Not found</h2>
-    <p>The requested route does not exist.</p>
-  </div>
-);
-
 const App: FC = () => {
   return (
     <ThemeProvider theme={useTheme()}>
       <ErrorProvider>
-        <Box padding={2}>
+        <Box sx={{ p: 2 }}>
           <Routes>
             <Route path="/" element={<StrategicGameList />} />
             <Route path="/games" element={<StrategicGameList />} />

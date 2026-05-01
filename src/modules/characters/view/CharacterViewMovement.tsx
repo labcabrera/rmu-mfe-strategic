@@ -1,7 +1,7 @@
 import React, { FC, Fragment } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { CategorySeparator, Character, Pace, RmuTextCard, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { imageBaseUrl } from '../../services/config';
 import { gridSizeCard, greyScale } from '../../services/display';
 
@@ -69,6 +69,7 @@ const CharacterViewMovement: FC<{
   character: Character;
   strategicGame: StrategicGame;
 }> = ({ character, strategicGame }) => {
+  const { t } = useTranslation();
   if (!character || !strategicGame) return <div>Loading...</div>;
 
   const bmr = character.movement.baseMovementRate;
@@ -87,20 +88,20 @@ const CharacterViewMovement: FC<{
 
   return (
     <>
-      <CategorySeparator text={t('Movement')} />
+      <CategorySeparator text={t('movement')} />
       <Grid container spacing={1}>
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={bmr}
-            subtitle={t('Base movement rate')}
+            subtitle={t('base-movement-rate')}
             image={`${imageBaseUrl}images/generic/stride-bonus.png`}
             grayscale={greyScale}
           />
         </Grid>
         <Grid size={gridSizeCard}>
           <RmuTextCard
-            value={character.movement.maxPace}
-            subtitle={t('Max pace')}
+            value={t(character.movement.maxPace)}
+            subtitle={t('max-pace')}
             image={`${imageBaseUrl}images/generic/stride-bonus.png`}
             grayscale={greyScale}
           />
@@ -108,13 +109,13 @@ const CharacterViewMovement: FC<{
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={t(`difficulty-${character.equipment.movementBaseDifficulty || '-'}`)}
-            subtitle={t('Base difficulty')}
+            subtitle={t('base-difficulty')}
             image={`${imageBaseUrl}images/generic/stride-bonus.png`}
             grayscale={greyScale}
           />
         </Grid>
       </Grid>
-      <CategorySeparator text={t('Stride modifiers')} />
+      <CategorySeparator text={t('stride-modifiers')} />
       <Grid container spacing={1}>
         {character.movement?.modifiers &&
           Object.entries(character.movement.modifiers).map(([key, value]) => (
@@ -128,12 +129,12 @@ const CharacterViewMovement: FC<{
             </Grid>
           ))}
       </Grid>
-      <CategorySeparator text={t('Board scale')} />
+      <CategorySeparator text={t('board-scale')} />
       <Grid container spacing={1}>
         <Grid size={gridSizeCard}>
           <RmuTextCard
             value={scale}
-            subtitle={t('Board scale')}
+            subtitle={t('board-scale')}
             image={`${imageBaseUrl}images/generic/stride-bonus.png`}
             grayscale={greyScale}
           />

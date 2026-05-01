@@ -1,14 +1,14 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
-import { Grid, TextField, Typography } from '@mui/material';
-import { NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
-import { UpdateCharacterDto } from '../../api/character.dto';
-import SelectGender from '../../shared/selects/SelectGender';
+import { useTranslation } from 'react-i18next';
+import { Grid, TextField } from '@mui/material';
+import { NumericInput, RmuSelect, UpdateCharacterDto } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const CharacterUpdateAttributes: FC<{
   formData: UpdateCharacterDto;
   setFormData: Dispatch<SetStateAction<UpdateCharacterDto | undefined>>;
 }> = ({ formData, setFormData }) => {
+  const { t } = useTranslation();
+
   return (
     <Grid container spacing={2}>
       <Grid size={{ xs: 12, md: 4 }}>
@@ -27,7 +27,7 @@ const CharacterUpdateAttributes: FC<{
           label={t('Height')}
           name="height"
           value={formData.info?.height || 0}
-          onChange={(e) => setFormData({ ...formData, info: { ...formData.info, height: e } })}
+          onChange={(e) => setFormData({ ...formData, info: { ...formData.info, height: e || 0 } })}
           allowNegatives={false}
           maxFractionDigits={2}
         />
@@ -37,7 +37,7 @@ const CharacterUpdateAttributes: FC<{
           label={t('weight')}
           name="weight"
           value={formData.info?.weight || 0}
-          onChange={(e) => setFormData({ ...formData, info: { ...formData.info, weight: e } })}
+          onChange={(e) => setFormData({ ...formData, info: { ...formData.info, weight: e || 0 } })}
           allowNegatives={false}
           maxFractionDigits={2}
         />
@@ -53,9 +53,11 @@ const CharacterUpdateAttributes: FC<{
         />
       </Grid>
       <Grid size={{ xs: 12, md: 2 }}>
-        <SelectGender
-          value={formData.roleplay?.gender}
-          onChange={(gender) => setFormData({ ...formData, roleplay: { ...formData.roleplay, gender } })}
+        <RmuSelect
+          value={formData.roleplay?.gender || ''}
+          label={t('gender')}
+          options={['male', 'female', 'other']}
+          onChange={(e) => setFormData({ ...formData, roleplay: { ...formData.roleplay, gender: e } })}
         />
       </Grid>
       <Grid size={12}>

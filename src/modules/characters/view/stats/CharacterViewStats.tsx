@@ -1,131 +1,31 @@
-import React, { Dispatch, FC, Fragment, SetStateAction, useState } from 'react';
-import { Chip, Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { CategorySeparator, Character, LevelUpButton, StatKey, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
-import StatLevelUpDialog from './StatLevelUpDialog';
-
-const LEVEL_UP_STAT_COST = 4;
+import React, { Dispatch, FC, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Box } from '@mui/material';
+import { Grid } from '@mui/system';
+import { CategorySeparator, Character } from '@labcabrera-rmu/rmu-react-shared-lib';
+import CharacterViewStatsChart from './CharacterViewStatsChart';
+import CharacterViewStatsTable from './CharacterViewStatsTable';
 
 const CharacterViewStats: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
 }> = ({ character, setCharacter }) => {
-  if (!character) return <div>Loading...</div>;
-
-  const [levelUpStatDialogOpen, setLevelUpStatDialogOpen] = useState<boolean>(false);
-  const [levelUpStat, setLevelUpStat] = useState<StatKey>();
-
-  const onLevelUpButtonClick = (stat: StatKey) => {
-    setLevelUpStat(stat);
-    setLevelUpStatDialogOpen(true);
-  };
-
-  const onCloseLevelUpDialog = () => {
-    setLevelUpStatDialogOpen(false);
-    setLevelUpStat(undefined);
-  };
+  const { t } = useTranslation();
 
   return (
-    <>
-      <CategorySeparator text={t('Statistics')} />
-      <Paper sx={{ width: 'fit-content', padding: 2 }}>
-        <Table sx={{ minWidth: 650, maxWidth: 800 }} aria-label="stats table" size="small">
-          <TableHead
-            sx={{
-              '& .MuiTableCell-root': {
-                color: 'primary.main',
-                fontWeight: 'bold',
-              },
-            }}
-          >
-            <TableRow>
-              <TableCell align="left">Stat</TableCell>
-              <TableCell align="right">{t('potential-short')}</TableCell>
-              <TableCell align="right">{t('temporary-short')}</TableCell>
-              <TableCell align="right">{t('bonus')}</TableCell>
-              <TableCell align="right">{t('racial')}</TableCell>
-              <TableCell align="right">{t('custom')}</TableCell>
-              <TableCell align="right">{t('total')}</TableCell>
-              <TableCell align="right">
-                {character.experience.availableStatLevelUp > 0 && (
-                  <Chip label={`+${character.experience.availableStatLevelUp}`} color="success" />
-                )}
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {STATS.map((key, index) => (
-              <Fragment key={index}>
-                <CharacterViewStatsEntry stat={key} character={character} onLevelUp={onLevelUpButtonClick} />
-              </Fragment>
-            ))}
-          </TableBody>
-        </Table>
-      </Paper>
-      <StatLevelUpDialog
-        character={character}
-        stat={levelUpStat}
-        open={levelUpStatDialogOpen}
-        setCharacter={setCharacter}
-        onClose={() => onCloseLevelUpDialog()}
-      />
-    </>
-  );
-};
-
-const CharacterViewStatsEntry: FC<{
-  stat: StatKey;
-  character: Character;
-  onLevelUp: (stat: StatKey) => void;
-}> = ({ stat, character, onLevelUp }) => {
-  if (!character.statistics[stat].modifiers) return;
-  const potential = character.statistics[stat].potential;
-  const temporary = character.statistics[stat].temporary;
-  const statBonus = character.statistics[stat].modifiers['stat'] || 0;
-  const racial = character.statistics[stat].modifiers['racial'] || 0;
-  const trait = character.statistics[stat].modifiers['trait'] || 0;
-  const totalBonus = character.statistics[stat].totalBonus;
-  const freeUpdate = character.experience.availableStatLevelUp > 0;
-
-  const getColor = (value: number) => {
-    if (value < 0) return 'error.main';
-    if (value > 0) return 'success.main';
-    return 'inherit';
-  };
-
-  const getStatColor = (value: number) => {
-    if (value > 75) return 'success.main';
-    if (value < 45) return 'error.main';
-    return 'inherit';
-  };
-
-  return (
-    <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-      <TableCell>{t(stat)}</TableCell>
-      <TableCell align="right" sx={{ color: getStatColor(potential) }}>
-        {potential}
-      </TableCell>
-      <TableCell align="right" sx={{ color: getStatColor(temporary) }}>
-        {temporary}
-      </TableCell>
-      <TableCell align="right" sx={{ color: getColor(statBonus) }}>
-        {statBonus}
-      </TableCell>
-      <TableCell align="right" sx={{ color: getColor(racial) }}>
-        {racial}
-      </TableCell>
-      <TableCell align="right" sx={{ color: getColor(trait) }}>
-        {trait}
-      </TableCell>
-      <TableCell align="right" sx={{ color: getColor(totalBonus), fontWeight: 'bold' }}>
-        {totalBonus}
-      </TableCell>
-      <TableCell align="right">
-        {character.experience.availableDevPoints >= LEVEL_UP_STAT_COST && (
-          <LevelUpButton onClick={() => onLevelUp(stat)} color={freeUpdate ? 'success' : undefined} />
-        )}
-      </TableCell>
-    </TableRow>
+    <Grid container spacing={1}>
+      <Grid size={12}>
+        <CategorySeparator text={t('statistics')} />
+      </Grid>
+      <Grid size={{ xs: 12, md: 6 }}>
+        <CharacterViewStatsTable character={character} setCharacter={setCharacter} />
+      </Grid>
+      <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex', alignItems: 'stretch' }}>
+        <Box sx={{ flex: 1 }}>
+          <CharacterViewStatsChart stats={character.statistics} />
+        </Box>
+      </Grid>
+    </Grid>
   );
 };
 

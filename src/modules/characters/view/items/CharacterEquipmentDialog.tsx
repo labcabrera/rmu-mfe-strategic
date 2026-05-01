@@ -1,36 +1,40 @@
-import React, { FC, useMemo } from 'react';
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
+import { Box, Button, CardMedia, Tooltip } from '@mui/material';
 import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  CardMedia,
-  Typography,
-  Tooltip,
-} from '@mui/material';
-import { Character, EquipmentSlot, StrategicItem, equipItem, unequipItem } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
+  Character,
+  EquipmentSlot,
+  RmuDialog,
+  StrategicItem,
+  equipItem,
+  unequipItem,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../../ErrorContext';
 import { imageBaseUrl } from '../../../services/config';
 import { itemFilter } from '../../../services/display';
 
 const imageSize = 100;
 
-const CharacterEquipmentDialog: FC<{
+export default function CharacterEquipmentDialog({
+  open,
+  character,
+  items,
+  slot,
+  onClose,
+  onEquip,
+}: {
   open: boolean;
   character: Character;
   items: StrategicItem[];
   slot: EquipmentSlot | undefined;
   onClose: () => void;
-  onEquip?: (character: Character) => void;
-}> = ({ open, character, items, slot, onClose, onEquip }) => {
+  onEquip: (character: Character) => void;
+}) {
+  const auth = useAuth();
+  const { t } = useTranslation();
   const { showError } = useError();
-
-  if (!slot) return;
-
-  const slotItemId = character.equipment.slots[slot];
+  const slotItemId = slot ? character.equipment.slots[slot] : undefined;
 
   const isArmorSlot = (item: StrategicItem, s: string) => {
     return item.armor && item.armor.slot === s;
@@ -40,29 +44,31 @@ const CharacterEquipmentDialog: FC<{
     return item.weapon && item.weapon.modes.filter((m) => m.type === 'one-hand').length > 0;
   };
 
-  const getSlotOptions = (character: Character, s: string): StrategicItem[] => {
-    if (s === 'mainHand') {
+  const getSlotOptions = (slot: EquipmentSlot | undefined): StrategicItem[] => {
+    if (slot === 'mainHand') {
       return items.filter((e) => e.category === 'weapon');
-    } else if (s === 'offHand') {
+    } else if (slot === 'offHand') {
       return items.filter((e) => e.category === 'shield' || (e.category === 'weapon' && isOneHandedWeapon(e)));
-    } else if (s === 'body' || s === 'head' || s === 'arms' || s === 'legs') {
-      return items.filter((e) => isArmorSlot(e, s));
+    } else if (slot === 'body' || slot === 'head' || slot === 'arms' || slot === 'legs') {
+      return items.filter((e) => isArmorSlot(e, slot));
     }
     return [];
   };
 
-  const slotOptions = useMemo(() => getSlotOptions(character, slot), [character, slot]);
+  const slotOptions = useMemo(() => getSlotOptions(slot), [character, slot]);
+
+  if (!slot) return null;
 
   const handleEquip = (item: StrategicItem | null) => {
     if (item) {
-      equipItem(character.id, slot, item.id)
+      equipItem(character.id, slot, item.id, auth)
         .then((data) => {
           if (onEquip) onEquip(data);
           onClose();
         })
         .catch((err) => showError(err.message));
     } else {
-      unequipItem(character.id, slotItemId!)
+      unequipItem(character.id, slotItemId!, auth)
         .then((data) => {
           if (onEquip) onEquip(data);
           onClose();
@@ -71,15 +77,12 @@ const CharacterEquipmentDialog: FC<{
     }
   };
 
+  const buttons = [<Button onClick={onClose}>{t('cancel')}</Button>];
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
-      <DialogTitle>
-        <Typography variant="h6" component="div">
-          {t(slot)}
-        </Typography>
-      </DialogTitle>
-      <DialogContent>
-        <Box display="flex" flexDirection="row" flexWrap="wrap" gap={2}>
+    <RmuDialog open={open} title={t(slot)} buttons={buttons}>
+      <>
+        <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 2 }}>
           <Box
             onClick={() => handleEquip(null)}
             sx={{
@@ -129,12 +132,7 @@ const CharacterEquipmentDialog: FC<{
             );
           })}
         </Box>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>{t('cancel')}</Button>
-      </DialogActions>
-    </Dialog>
+      </>
+    </RmuDialog>
   );
-};
-
-export default CharacterEquipmentDialog;
+}

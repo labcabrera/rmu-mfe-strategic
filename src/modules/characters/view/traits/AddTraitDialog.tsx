@@ -1,4 +1,6 @@
 import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import {
   Box,
   Button,
@@ -14,11 +16,16 @@ import {
   Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { addCharacterTrait, AddTraitDto, Character, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
+import {
+  addCharacterTrait,
+  AddTraitDto,
+  Character,
+  fetchTraits,
+  TechnicalInfo,
+  Trait,
+  traitCategories,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../../ErrorContext';
-import { fetchTraits } from '../../../api/trait';
-import { Trait, traitCategories } from '../../../api/trait.dto';
 import SelectTraitSpecialization from './SelectTraitSpecialization';
 
 const AddTraitDialog: FC<{
@@ -27,6 +34,8 @@ const AddTraitDialog: FC<{
   open: boolean;
   onClose: () => void;
 }> = ({ character, setCharacter, open, onClose }) => {
+  const auth = useAuth();
+  const { t } = useTranslation();
   const { showError } = useError();
   const theme = useTheme();
 
@@ -36,13 +45,13 @@ const AddTraitDialog: FC<{
   const [selectedTraitCategory, setSelectedTraitCategory] = useState<string>();
 
   const bindTraits = () => {
-    fetchTraits(`category==${selectedTraitCategory}`, 0, 200)
-      .then((data: Trait[]) => setTraits(data))
+    fetchTraits(`category==${selectedTraitCategory}`, 0, 200, auth)
+      .then((data) => setTraits(data.content))
       .catch((error) => showError(error.message));
   };
 
   const onAddTrait = () => {
-    addCharacterTrait(character.id, formData)
+    addCharacterTrait(character.id, formData, auth)
       .then((updatedCharacter) => {
         setCharacter(updatedCharacter);
         reset();
@@ -79,11 +88,11 @@ const AddTraitDialog: FC<{
     }
   }, [selectedTraitCategory]);
 
-  if (!traits) return <p>Loading...</p>;
+  if (!traits || !traitCategories) return <p>Loading...</p>;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
-      <DialogTitle>{t('Add trait')}</DialogTitle>
+      <DialogTitle>{t('add-trait')}</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 1 }}>
           <Grid size={4}>
@@ -113,9 +122,9 @@ const AddTraitDialog: FC<{
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onCloseClick}>{t('Cancel')}</Button>
+        <Button onClick={onCloseClick}>{t('cancel')}</Button>
         <Button onClick={onAddTrait} variant="contained" disabled={false}>
-          {t('Add')}
+          {t('add')}
         </Button>
       </DialogActions>
     </Dialog>
@@ -159,6 +168,8 @@ const TraitForm: FC<{
   formData: AddTraitDto;
   setFormData: Dispatch<SetStateAction<AddTraitDto>>;
 }> = ({ trait, formData, setFormData }) => {
+  const { t } = useTranslation();
+
   if (!trait) return;
 
   return (
@@ -167,7 +178,7 @@ const TraitForm: FC<{
         <Grid size={12}>
           <TextField
             select
-            label={t('Tier')}
+            label={t('tier')}
             value={formData.tier || null}
             onChange={(e) => setFormData({ ...formData, tier: Number.parseInt(e.target.value) })}
             fullWidth
@@ -196,7 +207,7 @@ const TraitForm: FC<{
         {trait.isTierBased && (
           <>
             <Typography variant="body2" color="secondary">
-              Cost: {trait.adquisitionCost} + ({trait.tierCost} x tier)
+              {t('cost')}: {trait.adquisitionCost} + ({trait.tierCost} x tier)
             </Typography>
           </>
         )}

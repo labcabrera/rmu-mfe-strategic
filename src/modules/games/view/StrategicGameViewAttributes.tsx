@@ -1,36 +1,35 @@
-import React, { FC } from 'react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Grid } from '@mui/material';
 import { RmuTextCard, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { imageBaseUrl } from '../../services/config';
 import { gridSizeCard } from '../../services/display';
 
 const grayscale = 0.7;
-const gridSize = { xs: 10, md: 3 } as const;
 
-const StrategicGameViewAttributes: FC<{
-  strategicGame: StrategicGame;
-}> = ({ strategicGame }) => {
+export default function StrategicGameViewAttributes({ strategicGame }: { strategicGame: StrategicGame }) {
+  const { t } = useTranslation();
+
   const DATA = [
     {
       value: strategicGame.options.experienceMultiplier,
-      subtitle: t('Experience multiplier'),
+      subtitle: t('experience-multiplier'),
       image: `${imageBaseUrl}images/generic/experience.png`,
     },
     {
       value: strategicGame.options.fatigueMultiplier,
-      subtitle: t('Fatigue multiplier'),
+      subtitle: t('fatigue-multiplier'),
       image: `${imageBaseUrl}images/generic/stat-co.png`,
     },
     {
       value: strategicGame.options.boardScaleMultiplier,
-      subtitle: t('Board scale'),
+      subtitle: t('board-scale'),
       image: `${imageBaseUrl}images/generic/realm.png`,
       applyColor: false,
     },
     {
       value: strategicGame.options.letality,
-      subtitle: t('Letality'),
+      subtitle: t('letality'),
       image: `${imageBaseUrl}images/generic/physical.png`,
     },
   ];
@@ -50,6 +49,4 @@ const StrategicGameViewAttributes: FC<{
       ))}
     </Grid>
   );
-};
-
-export default StrategicGameViewAttributes;
+}

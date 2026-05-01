@@ -1,4 +1,6 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
 import {
   RmuBreadcrumbs,
@@ -10,25 +12,29 @@ import {
   fetchStrategicGame,
   deleteStrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 
-const StrategicGameViewActions: FC<{
+export default function StrategicGameViewActions({
+  strategicGame,
+  setStrategicGame,
+}: {
   strategicGame: StrategicGame;
   setStrategicGame: Dispatch<SetStateAction<StrategicGame>>;
-}> = ({ strategicGame, setStrategicGame }) => {
+}) {
   const navigate = useNavigate();
+  const auth = useAuth();
+  const { t } = useTranslation();
   const { showError } = useError();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const breadcrumbs = [
     { name: t('strategic'), link: '/strategic' },
-    { name: t('games'), link: '/strategic/games' },
+    { name: t('strategic-games'), link: '/strategic/games' },
   ];
 
   if (!strategicGame) return <p>Loading...</p>;
 
   const onRefresh = () => {
-    fetchStrategicGame(strategicGame.id)
+    fetchStrategicGame(strategicGame.id, auth)
       .then((data) => setStrategicGame(data))
       .catch((err: Error) => showError(err.message));
   };
@@ -38,7 +44,7 @@ const StrategicGameViewActions: FC<{
   };
 
   const onDelete = () => {
-    deleteStrategicGame(strategicGame.id)
+    deleteStrategicGame(strategicGame.id, auth)
       .then(() => navigate('/strategic/games'))
       .catch((err) => showError(err.message));
     setDeleteDialogOpen(false);
@@ -59,6 +65,4 @@ const StrategicGameViewActions: FC<{
       />
     </>
   );
-};
-
-export default StrategicGameViewActions;
+}

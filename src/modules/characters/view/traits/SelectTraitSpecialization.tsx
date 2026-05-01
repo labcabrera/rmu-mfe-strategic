@@ -1,8 +1,8 @@
 import React, { useState, useEffect, FC } from 'react';
-import { fetchEnumerations } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
+import { fetchEnumerations, Trait } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../../ErrorContext';
-import { Trait } from '../../../api/trait.dto';
 import RmuSelect from '../../../shared/selects/RmuSelect';
 
 const SelectTraitSpecialization: FC<{
@@ -10,11 +10,13 @@ const SelectTraitSpecialization: FC<{
   trait: Trait;
   onChange: (value: string) => void;
 }> = ({ value, trait, onChange }) => {
+  const auth = useAuth();
   const { showError } = useError();
+  const { t } = useTranslation();
   const [availableSpecializations, setAvailableSpecializations] = useState<string[]>();
 
   const bindSpecializations = () => {
-    fetchEnumerations(`category==${trait.specialization}`, 0, 100)
+    fetchEnumerations(`category==${trait.specialization}`, 0, 100, auth)
       .then((response) => setAvailableSpecializations(response.content.map((e) => e.key)))
       .catch((err) => showError(err.message));
   };

@@ -1,11 +1,12 @@
 import React, { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { AddButton, RefreshButton, RmuBreadcrumbs } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 
 const StrategicGameListActions: FC = () => {
   const navigate = useNavigate();
-  const breadcrumbs = [{ name: t('Strategic'), link: '/strategic' }, { name: t('Games') }];
+  const { t } = useTranslation();
+  const breadcrumbs = [{ name: t('strategic'), link: '/strategic' }, { name: t('strategic-games') }];
 
   const onCreateNewGame = () => {
     navigate('/strategic/games/create');

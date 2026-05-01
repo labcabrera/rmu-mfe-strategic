@@ -1,13 +1,14 @@
 import React, { FC, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import { Box, IconButton, List, ListItem, ListItemText, Paper, Typography } from '@mui/material';
-import { t } from 'i18next';
 
 export const CharacterCreateSortCombat: FC<{
   items: string[];
   onChange?: (newOrder: string[]) => void;
 }> = ({ items, onChange }) => {
+  const { t } = useTranslation();
   const [order, setOrder] = useState<string[]>(items);
 
   const moveItem = (index: number, direction: 'up' | 'down') => {

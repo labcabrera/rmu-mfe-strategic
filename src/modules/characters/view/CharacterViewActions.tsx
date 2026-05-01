@@ -1,4 +1,6 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import {
@@ -15,7 +17,6 @@ import {
   levelUpCharacter,
   LevelUpButton,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
 
 const CharacterViewActions: FC<{
@@ -23,31 +24,33 @@ const CharacterViewActions: FC<{
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   game: StrategicGame;
 }> = ({ character, setCharacter, game }) => {
+  const auth = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { showError } = useError();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
   const levelUpAvailable = character.experience.level < character.experience.availableLevel;
   const breadcrumbs = [
-    { name: t('Strategic'), link: '/strategic' },
-    { name: t('Faction'), link: `/strategic/factions/view/${character.faction.id}` },
-    { name: t('Character') },
+    { name: t('strategic'), link: '/strategic' },
+    { name: t('faction'), link: `/strategic/factions/view/${character.faction.id}` },
+    { name: t('character') },
   ];
 
   const onRefresh = () => {
-    fetchCharacter(character.id)
+    fetchCharacter(character.id, auth)
       .then((data) => setCharacter(data))
       .catch((err) => showError(err.message));
   };
 
   const onDelete = () => {
-    deleteCharacter(character.id)
+    deleteCharacter(character.id, auth)
       .then(() => navigate(`/strategic/factions/view/${character.faction.id}`))
       .catch((err) => showError(err.message));
   };
 
   const onLevelUp = (force: boolean) => {
-    levelUpCharacter(character.id, force)
+    levelUpCharacter(character.id, force, auth)
       .then((updated) => {
         setCharacter(updated);
         setLevelUpDialogOpen(false);

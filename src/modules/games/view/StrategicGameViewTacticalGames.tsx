@@ -1,10 +1,8 @@
 import React, { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Grid, Typography } from '@mui/material';
-import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
-import { Faction } from '../../api/faction.dto';
-import { TacticalGame } from '../../api/tactical-games';
+import { Faction, RmuTextCard, TacticalGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { imageBaseUrl } from '../../services/config';
 import { gridSizeCard } from '../../services/display';
 
@@ -13,6 +11,7 @@ const StrategicGameViewTacticalGames: FC<{
   factions: Faction[];
 }> = ({ tacticalGames, factions }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const getFactionNames = (tacticalGame: TacticalGame) => {
     if (!tacticalGame.factions || tacticalGame.factions.length === 0) {

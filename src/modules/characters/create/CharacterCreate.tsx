@@ -1,24 +1,28 @@
 import React, { useState, useEffect, FC } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import { useSearchParams } from 'react-router-dom';
 import OutboundIcon from '@mui/icons-material/Outbound';
-import { Grid, IconButton, TextField, Badge } from '@mui/material';
+import { Grid, IconButton, TextField, Badge, Paper, Box } from '@mui/material';
 import {
   CategorySeparator,
+  Character,
   CreateCharacterDto,
   EditableAvatar,
   Faction,
   fetchFaction,
   fetchRaces,
   fetchStrategicGame,
+  NumericInput,
   Profession,
   Race,
   RefreshButton,
+  RmuSelect,
   StrategicGame,
   TechnicalInfo,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
 import { useError } from '../../../ErrorContext';
-import { characterCreationTemplate, defaultStats } from '../../data/character-create';
+import { defaultStats } from '../../data/character-create';
 import { imageBaseUrl } from '../../services/config';
 import { gridSizeResume, gridSizeMain } from '../../services/display';
 import { getAvatarImages } from '../../services/image-service';
@@ -26,13 +30,130 @@ import { randomizeStats } from '../../services/randomize-stats';
 import CharacterViewStatsChart from '../view/stats/CharacterViewStatsChart';
 import CharacterCreateActions from './CharacterCreateActions';
 import CharacterCreateBoostOptionsDialog from './CharacterCreateBoostOptionsDialog';
+import CharacterCreateMainForm from './CharacterCreateMainForm';
 import CharacterCreateProfessionalSkills from './CharacterCreateProfessionalSkills';
-import CharacterCreateResume from './CharacterCreateResume';
 import CharacterCreateSkillCosts from './CharacterCreateSkillCosts';
 import { CharacterCreateSortCombat } from './CharacterCreateSortCombat';
 import CharacterCreateStats from './CharacterCreateStats';
 
 const defaultImage = `${imageBaseUrl}images/races/unknown-alt.png`;
+
+export const CHARACTER_EMPTY_TEMPLATE = {
+  name: '',
+  gameId: '',
+  factionId: '',
+  info: {
+    raceId: '',
+    professionId: '',
+    realmType: '',
+    height: 7,
+    weight: 120,
+  },
+  roleplay: {
+    gender: 'male',
+    age: 20,
+  },
+  level: 1,
+  weaponDevelopment: ['melee', 'ranged', 'shield', 'unarmed'],
+  statistics: {
+    ag: {
+      potential: 50,
+      temporary: 50,
+      racial: 0,
+    },
+    co: {
+      potential: 50,
+      temporary: 50,
+      racial: 0,
+    },
+    em: {
+      potential: 50,
+      temporary: 50,
+      racial: 0,
+    },
+    in: {
+      potential: 50,
+      temporary: 50,
+      racial: 0,
+    },
+    me: {
+      potential: 50,
+      temporary: 50,
+      racial: 0,
+    },
+    pr: {
+      potential: 50,
+      temporary: 50,
+      racial: 0,
+    },
+    qu: {
+      potential: 50,
+      temporary: 50,
+      racial: 0,
+    },
+    re: {
+      potential: 50,
+      temporary: 50,
+      racial: 0,
+    },
+    sd: {
+      potential: 50,
+      temporary: 50,
+      racial: 0,
+    },
+    st: {
+      potential: 50,
+      temporary: 50,
+      racial: 0,
+    },
+  },
+  movement: {
+    strideCustomBonus: 1,
+  },
+  defense: {},
+  endurance: {
+    customBonus: 5,
+  },
+  power: {
+    max: 0,
+  },
+  initiative: {
+    customBonus: 1,
+  },
+  skills: [
+    {
+      skillId: 'body-development',
+      ranks: 0,
+    },
+    {
+      skillId: 'armor-maneuver',
+      ranks: 0,
+    },
+    {
+      skillId: 'perception',
+      ranks: 0,
+    },
+    {
+      skillId: 'jumping',
+      ranks: 0,
+    },
+    {
+      skillId: 'running',
+      ranks: 0,
+    },
+    {
+      skillId: 'leadership',
+      ranks: 0,
+    },
+    {
+      skillId: 'medicine',
+      ranks: 0,
+    },
+  ],
+  items: [],
+  description: '',
+  imageUrl: `${imageBaseUrl}images/generic/races.png`,
+} as unknown as CreateCharacterDto;
 
 export interface StatBonus {
   potential: number;
@@ -44,19 +165,21 @@ export interface StatBonusFormData {
 }
 
 const CharacterCreate: FC = () => {
+  const auth = useAuth();
+  const { t } = useTranslation();
   const { showError } = useError();
 
   const [searchParams] = useSearchParams();
   const gameId = searchParams.get('gameId');
   const factionId = searchParams.get('factionId');
-  const [faction, setFaction] = useState<Faction | null>(null);
+  const [faction, setFaction] = useState<Faction>();
 
   const [game, setGame] = useState<StrategicGame | null>(null);
   const [profession, setProfession] = useState<Profession>();
   const [races, setRaces] = useState<Race[]>([]);
   const [selectedRace, setSelectedRace] = useState<Race>();
 
-  const [formData, setFormData] = useState<CreateCharacterDto>(characterCreationTemplate);
+  const [formData, setFormData] = useState<CreateCharacterDto>(CHARACTER_EMPTY_TEMPLATE);
   const [statBonusFormData, setStatBonusFormData] = useState<StatBonusFormData>(defaultStats);
   const [isValid, setIsValid] = useState<boolean>(false);
   const [boostDialogOpen, setBoostDialogOpen] = useState<boolean>(false);
@@ -79,7 +202,7 @@ const CharacterCreate: FC = () => {
 
   const bindStrategicGame = () => {
     if (gameId) {
-      fetchStrategicGame(gameId)
+      fetchStrategicGame(gameId, auth)
         .then((game) => setGame(game))
         .catch((err) => showError(err.message));
     }
@@ -98,7 +221,7 @@ const CharacterCreate: FC = () => {
 
   useEffect(() => {
     if (game) {
-      fetchRaces(`realm.id==${game.realmId}`, 0, 100)
+      fetchRaces(`realmId==${game.realmId}`, 0, 100, auth)
         .then((data) => setRaces(data.content))
         .catch((err) => showError(err.message));
     }
@@ -116,7 +239,7 @@ const CharacterCreate: FC = () => {
 
   useEffect(() => {
     if (factionId) {
-      fetchFaction(factionId)
+      fetchFaction(factionId, auth)
         .then((response) => {
           setFaction(response);
           setFormData((prevState) => ({ ...prevState, factionId: factionId }));
@@ -129,8 +252,6 @@ const CharacterCreate: FC = () => {
 
   return (
     <>
-      <CharacterCreateActions formData={formData} game={game} faction={faction} isValid={isValid} />
-
       <Grid container spacing={1}>
         <Grid size={gridSizeResume}>
           <EditableAvatar
@@ -138,70 +259,93 @@ const CharacterCreate: FC = () => {
             onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl })}
             images={getAvatarImages()}
           />
-          <CharacterCreateResume
-            formData={formData}
-            setFormData={setFormData}
-            setProfession={setProfession}
-            selectedRace={selectedRace}
-            races={races}
-            setSelectedRace={setSelectedRace}
-            profession={profession}
-          />
         </Grid>
-
         <Grid size={gridSizeMain}>
-          <CategorySeparator text={t('Stats')}>
-            <RefreshButton onClick={onRandomStats} />
-            <Badge badgeContent={2} color="success">
-              <IconButton onClick={() => setBoostDialogOpen(true)} color="primary">
-                <OutboundIcon />
-              </IconButton>
-            </Badge>
-          </CategorySeparator>
-
-          <Grid container spacing={1}>
-            <Grid size={5}>
-              <CharacterCreateStats formData={formData} statBonusFormData={statBonusFormData} />
-            </Grid>
-            <Grid size={5} sx={{ display: 'flex', alignItems: 'flex-start' }}>
-              <CharacterViewStatsChart stats={formData.statistics} />
-            </Grid>
-          </Grid>
-
-          <CategorySeparator text={t('Weapon development order')} />
-          <Grid size={12}>
-            <CharacterCreateSortCombat items={formData.weaponDevelopment || []} onChange={handleWeaponOrderChange} />
-          </Grid>
-
-          {profession && (
-            <Grid size={12}>
-              <>
-                <CategorySeparator text={t('Skill development costs')} />
-                <CharacterCreateSkillCosts profession={profession} />
-                <CategorySeparator text={t('Professional skills')} />
-                <CharacterCreateProfessionalSkills profession={profession} />
-              </>
-            </Grid>
-          )}
-
-          <CategorySeparator text={t('lore')} />
-          <Grid size={12}>
-            <TextField
-              label={t('Description')}
-              name="description"
-              value={formData.description}
-              onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-              fullWidth
-              multiline
-              maxRows={4}
+          <CharacterCreateActions formData={formData} game={game} faction={faction} isValid={isValid} />
+          <Paper sx={{ p: 2 }}>
+            <CharacterCreateMainForm
+              formData={formData}
+              setFormData={setFormData}
+              setProfession={setProfession}
+              selectedRace={selectedRace}
+              races={races}
+              setSelectedRace={setSelectedRace}
+              profession={profession}
             />
-          </Grid>
+            <CategorySeparator text={t('Stats')}>
+              <RefreshButton onClick={onRandomStats} />
+              <Badge badgeContent={2} color="success">
+                <IconButton onClick={() => setBoostDialogOpen(true)} color="primary">
+                  <OutboundIcon />
+                </IconButton>
+              </Badge>
+            </CategorySeparator>
 
-          <Grid size={12} mt={2}>
-            <TechnicalInfo>
-              <pre>{JSON.stringify(formData, null, 2)}</pre>
-            </TechnicalInfo>
-          </Grid>
+            <Grid container spacing={1}>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <CharacterCreateStats formData={formData} statBonusFormData={statBonusFormData} />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex', alignItems: 'stretch' }}>
+                <Box sx={{ flex: 1 }}>
+                  <CharacterViewStatsChart stats={formData.statistics} minHeight={320} />
+                </Box>
+              </Grid>
+            </Grid>
+
+            <CategorySeparator text={t('Weapon development order')} />
+            <Grid size={12}>
+              <CharacterCreateSortCombat items={formData.weaponDevelopment || []} onChange={handleWeaponOrderChange} />
+            </Grid>
+
+            {profession && (
+              <Grid size={12}>
+                <>
+                  <CategorySeparator text={t('skill-development-costs')} />
+                  <CharacterCreateSkillCosts profession={profession} />
+                  <CategorySeparator text={t('professional-skills')} />
+                  <CharacterCreateProfessionalSkills profession={profession} />
+                </>
+              </Grid>
+            )}
+
+            <CategorySeparator text={t('lore')} />
+            <Grid size={12}>
+              <TextField
+                label={t('description')}
+                name="description"
+                value={formData.description}
+                onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+                fullWidth
+                multiline
+                maxRows={4}
+              />
+            </Grid>
+            <Grid size={4}>
+              <RmuSelect
+                value={formData.roleplay.gender}
+                label={t('gender')}
+                options={['male', 'female', 'other']}
+                onChange={(value: string) =>
+                  setFormData((prev) => ({ ...prev, roleplay: { ...prev.roleplay, gender: value } }))
+                }
+              />
+            </Grid>
+            <Grid size={4}>
+              <NumericInput
+                label={t('age')}
+                name="age"
+                value={formData.roleplay.age}
+                onChange={(value) => setFormData((prev) => ({ ...prev, roleplay: { ...prev.roleplay, age: value! } }))}
+                integer
+                allowNegatives={false}
+              />
+            </Grid>
+            <Grid size={12}>
+              <TechnicalInfo>
+                <pre>{JSON.stringify(formData, null, 2)}</pre>
+              </TechnicalInfo>
+            </Grid>
+          </Paper>
         </Grid>
       </Grid>
 

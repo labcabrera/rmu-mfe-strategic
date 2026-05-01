@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
+import { useAuth } from 'react-oidc-context';
 import { useLocation, useParams } from 'react-router-dom';
-import { Grid } from '@mui/material';
+import { Grid, Paper } from '@mui/material';
 import {
   Character,
   EditableAvatar,
@@ -18,7 +19,8 @@ import { getAvatarImages } from '../../services/image-service';
 import CharacterUpdateActions from './CharacterUpdateActions';
 import CharacterUpdateAttributes from './CharacterUpdateAttributes';
 
-const CharacterUpdate: FC = () => {
+export default function CharacterUpdate() {
+  const auth = useAuth();
   const location = useLocation();
   const { showError } = useError();
   const { characterId } = useParams<{ characterId: string }>();
@@ -28,15 +30,15 @@ const CharacterUpdate: FC = () => {
   const [formData, setFormData] = useState<UpdateCharacterDto>();
 
   const onImageChange = (image: string) => {
-    setFormData({ ...formData, imageUrl: image });
+    setFormData({ ...formData, imageUrl: image! });
   };
 
   useEffect(() => {
     if (character) {
-      fetchStrategicGame(character.gameId)
+      fetchStrategicGame(character.gameId, auth)
         .then((game: StrategicGame) => setStrategicGame(game))
         .catch((err) => showError(err.message));
-      fetchFaction(character.faction.id)
+      fetchFaction(character.faction.id, auth)
         .then((faction: Faction) => setFaction(faction))
         .catch((err) => showError(err.message));
       setFormData({
@@ -50,7 +52,7 @@ const CharacterUpdate: FC = () => {
           gender: character?.roleplay?.gender || '',
           age: character?.roleplay?.age || 0,
         },
-      });
+      } as UpdateCharacterDto);
     }
   }, [character]);
 
@@ -58,7 +60,7 @@ const CharacterUpdate: FC = () => {
     if (location.state?.character) {
       setCharacter(location.state.character);
     } else if (characterId) {
-      fetchCharacter(characterId)
+      fetchCharacter(characterId, auth)
         .then((data) => setCharacter(data))
         .catch((err) => showError(err.message));
     }
@@ -78,7 +80,9 @@ const CharacterUpdate: FC = () => {
           />
         </Grid>
         <Grid size={gridSizeMain}>
-          <CharacterUpdateAttributes formData={formData} setFormData={setFormData} />
+          <Paper sx={{ p: 2 }}>
+            <CharacterUpdateAttributes formData={formData} setFormData={setFormData} />
+          </Paper>
           <TechnicalInfo>
             <pre>FormData: {JSON.stringify(formData, null, 2)}</pre>
           </TechnicalInfo>
@@ -86,6 +90,4 @@ const CharacterUpdate: FC = () => {
       </Grid>
     </>
   );
-};
-
-export default CharacterUpdate;
+}

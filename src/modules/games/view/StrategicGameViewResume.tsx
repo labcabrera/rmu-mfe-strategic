@@ -1,8 +1,9 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
-import { Link as RouterLink, useLocation, useParams } from 'react-router-dom';
+import React, { Dispatch, FC, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
+import { Link as RouterLink } from 'react-router-dom';
 import { Link, Typography } from '@mui/material';
-import { EditableAvatar, StrategicGame, updateStrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { t } from 'i18next';
+import { EditableAvatar, RmuTextCard, StrategicGame, updateStrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
 import { imageBaseUrl } from '../../services/config';
 import { getAvatarImages } from '../../services/image-service';
@@ -13,12 +14,13 @@ const StrategicGameViewResume: FC<{
   strategicGame: StrategicGame;
   setStrategicGame: Dispatch<SetStateAction<StrategicGame>>;
 }> = ({ strategicGame, setStrategicGame: setGame }) => {
+  const auth = useAuth();
+  const { t } = useTranslation();
   const { showError } = useError();
-  const [imageDialogOpen, setImageDialogOpen] = useState(false);
 
   const onImageUpdated = (imageId: string) => {
-    console.log(`Image selected: ${imageId}`);
-    updateStrategicGame(strategicGame.id, { ...strategicGame, imageUrl: imageId })
+    const dto = { imageUrl: imageId };
+    updateStrategicGame(strategicGame.id, dto, auth)
       .then(() => setGame({ ...strategicGame, imageUrl: imageId }))
       .catch((error: Error) => showError(error.message));
   };
@@ -31,8 +33,9 @@ const StrategicGameViewResume: FC<{
         images={getAvatarImages()}
       />
       <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
-        {t(strategicGame.name)}
+        {strategicGame.name}
       </Typography>
+
       <Typography variant="body1" sx={{ mt: 2 }}>
         <Link
           component={RouterLink}
