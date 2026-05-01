@@ -18,7 +18,7 @@ const StrategicGameViewFactions: FC<{
         <Grid key={faction.id} size={gridSizeCard}>
           <RmuTextCard
             value={faction.name}
-            subtitle={faction.shortDescription}
+            subtitle={faction.shortDescription || 'No description provided'}
             image={faction.imageUrl || ''}
             onClick={() => navigate(`/strategic/factions/view/${faction.id}`, { state: { faction } })}
           />
