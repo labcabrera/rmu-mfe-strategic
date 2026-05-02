@@ -5,6 +5,7 @@ import { NamedEntity } from './common.dto';
 
 export interface Item {
   id: string;
+  name?: string;
   realm: NamedEntity;
   category: string;
   armor?: ItemArmor;
