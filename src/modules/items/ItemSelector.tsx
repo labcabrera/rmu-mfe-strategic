@@ -391,8 +391,16 @@ function ItemResume({ item }: { item: Item }) {
           <>
             <StatRow label={t('at')} value={item.armor.at} />
             <StatRow label={t('enc')} value={`${item.armor.enc}%`} negative={item.armor.enc > 0} />
-            <StatRow label={t('penalty')} value={item.armor.maneuver} negative={item.armor.maneuver < 0} />
-            <StatRow label="Perception penalty" value={item.armor.perception} negative={item.armor.perception < 0} />
+            <StatRow
+              label={t('penalty')}
+              value={item.armor.maneuverPenalty}
+              negative={item.armor.maneuverPenalty < 0}
+            />
+            <StatRow
+              label="Perception penalty"
+              value={item.armor.perceptionPenalty}
+              negative={item.armor.perceptionPenalty < 0}
+            />
             <StatRow label="Ranged penalty" value={item.armor.rangedPenalty} negative={item.armor.rangedPenalty < 0} />
             <StatRow label="Base difficulty" value={t(item.armor.baseDifficulty)} />
           </>

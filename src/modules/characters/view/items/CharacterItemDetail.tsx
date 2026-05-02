@@ -61,8 +61,8 @@ const CharacterItemDetail: FC<{
                 <KeyValueEntry label={t('Armor type')} value={item.armor.at} />
                 <KeyValueEntry label={t('Slot')} value={t(item.armor.slot)} />
                 <KeyValueEntry label={t('Base difficulty')} value={t(item.armor.baseDifficulty)} />
-                <KeyValueEntry label={t('Maneuver penalty')} value={item.armor.maneuver} applyColor />
-                <KeyValueEntry label={t('Perception penalty')} value={item.armor.perception} applyColor />
+                <KeyValueEntry label={t('Maneuver penalty')} value={item.armor.maneuverPenalty} applyColor />
+                <KeyValueEntry label={t('Perception penalty')} value={item.armor.perceptionPenalty} applyColor />
                 <KeyValueEntry label={t('Ranged penalty')} value={item.armor.rangedPenalty} applyColor />
                 <KeyValueEntry label={t('Encumbrance')} value={item.armor.enc} />
               </Grid>

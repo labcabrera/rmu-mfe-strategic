@@ -17,7 +17,7 @@ export interface ItemArmor {
   slot: string;
   at: number;
   enc: number;
-  maneuver: number;
+  maneuverPenalty: number;
   rangedPenalty: number;
   perceptionPenalty: number;
   baseDifficulty: string;
@@ -52,6 +52,8 @@ export interface ItemInfo {
   weightPercent?: number;
   strength?: number;
   productionHours?: number;
+  rarity?: 'common' | 'uncommon' | 'rare' | 'very-rare';
+  unique?: boolean;
 }
 
 export interface ItemCost {
