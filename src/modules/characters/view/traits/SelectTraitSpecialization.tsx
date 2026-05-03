@@ -1,9 +1,8 @@
 import React, { useState, useEffect, FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { fetchEnumerations, Trait } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { fetchEnumerations, RmuSelect, Trait } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../../ErrorContext';
-import RmuSelect from '../../../shared/selects/RmuSelect';
 
 const SelectTraitSpecialization: FC<{
   value: any;
