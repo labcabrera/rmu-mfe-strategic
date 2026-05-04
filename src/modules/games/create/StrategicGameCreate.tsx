@@ -1,20 +1,23 @@
 import React, { FC, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { Grid, Paper } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import {
+  CancelButton,
+  createStrategicGame,
   CreateStrategicGameDto,
   EditableAvatar,
   fetchRealms,
+  LayoutBase,
   Realm,
+  SaveButton,
   StrategicGame,
   TechnicalInfo,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
 import { imageBaseUrl } from '../../services/config';
-import { gridSizeResume, gridSizeMain } from '../../services/display';
 import { DEFAULT_REALM_IMAGE, getAvatarImages } from '../../services/image-service';
-import StrategicGameForm from '../shared/StrategicGameForm';
-import StrategicGameCreateActions from './StrategicGameCreateActions';
+import StrategicGameForm from '../form/StrategicGameForm';
 
 const EMPTY_STRATEGIC_GAME = {
   name: '',
@@ -38,14 +41,22 @@ const EMPTY_STRATEGIC_GAME = {
 } as StrategicGame;
 
 const StrategicGameCreate: FC = () => {
-  const { showError } = useError();
   const auth = useAuth();
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { showError } = useError();
   const [realms, setRealms] = useState<Realm[]>([]);
   const [formData, setFormData] = useState<StrategicGame>(EMPTY_STRATEGIC_GAME);
   const [isValid, setIsValid] = useState<boolean>(false);
 
   const validateForm = (formData: CreateStrategicGameDto) => {
     return !!formData.name && !!formData.realmId;
+  };
+
+  const onCreate = () => {
+    createStrategicGame(formData, auth)
+      .then((data) => navigate('/strategic/games/view/' + data.id, { state: { strategicGame: data } }))
+      .catch((err) => showError(err.message));
   };
 
   useEffect(() => {
@@ -61,24 +72,29 @@ const StrategicGameCreate: FC = () => {
   if (!realms) return <div>Loading...</div>;
 
   return (
-    <Grid container spacing={1}>
-      <Grid size={gridSizeResume}>
+    <LayoutBase
+      breadcrumbs={[
+        { name: t('home'), link: '/' },
+        { name: t('strategic-games'), link: '/strategic/games' },
+        { name: t('create') },
+      ]}
+      actions={[
+        <CancelButton onClick={() => navigate('/strategic/games')} />,
+        <SaveButton onClick={() => onCreate()} disabled={!isValid} />,
+      ]}
+      leftPanel={
         <EditableAvatar
           imageUrl={formData.imageUrl || DEFAULT_REALM_IMAGE}
           onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl })}
           images={getAvatarImages()}
         />
-      </Grid>
-      <Grid size={gridSizeMain}>
-        <StrategicGameCreateActions formData={formData} isValid={isValid} />
-        <Paper sx={{ p: 2 }}>
-          <StrategicGameForm formData={formData} setFormData={setFormData} realms={realms} />
-        </Paper>
-        <TechnicalInfo>
-          <pre>{JSON.stringify(formData, null, 2)}</pre>
-        </TechnicalInfo>
-      </Grid>
-    </Grid>
+      }
+    >
+      <StrategicGameForm formData={formData} setFormData={setFormData} realms={realms} />
+      <TechnicalInfo>
+        <pre>{JSON.stringify(formData, null, 2)}</pre>
+      </TechnicalInfo>
+    </LayoutBase>
   );
 };
 
