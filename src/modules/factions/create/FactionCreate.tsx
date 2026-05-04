@@ -13,7 +13,7 @@ import { useError } from '../../../ErrorContext';
 import { imageBaseUrl } from '../../services/config';
 import { gridSizeMain, gridSizeResume } from '../../services/display';
 import { getAvatarImages } from '../../services/image-service';
-import FactionForm from '../shared/FactionForm';
+import FactionForm from '../form/FactionForm';
 import FactionCreateActions from './FactionCreateActions';
 
 export const EMPTY_FACTION = {

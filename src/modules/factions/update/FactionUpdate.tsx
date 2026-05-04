@@ -4,7 +4,7 @@ import { Grid, Paper } from '@mui/material';
 import { EditableAvatar, Faction, StrategicGame, UpdateFactionDto } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { gridSizeMain, gridSizeResume } from '../../services/display';
 import { getAvatarImages } from '../../services/image-service';
-import FactionForm from '../shared/FactionForm';
+import FactionForm from '../form/FactionForm';
 import FactionUpdateActions from './FactionUpdateActions';
 
 const FactionUpdate: FC = () => {

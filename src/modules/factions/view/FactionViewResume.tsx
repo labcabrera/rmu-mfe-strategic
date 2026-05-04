@@ -1,26 +1,27 @@
 import React, { FC, useState } from 'react';
 import { useAuth } from 'react-oidc-context';
-import { Typography } from '@mui/material';
+import { CircularProgress, Typography } from '@mui/material';
 import { EditableAvatar, Faction, StrategicGame, updateFaction } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
 import { getAvatarImages } from '../../services/image-service';
 
 const FactionViewResume: FC<{
-  faction: Faction;
+  game?: StrategicGame;
+  faction?: Faction;
   setFaction: (faction: Faction) => void;
-  game: StrategicGame;
 }> = ({ faction, setFaction, game }) => {
   const auth = useAuth();
   const { showError } = useError();
 
   const onImageUpdated = (imageId: string) => {
+    if (!faction) return;
     const dto = { imageUrl: imageId };
     updateFaction(faction.id, dto, auth)
       .then(() => setFaction({ ...faction, imageUrl: imageId }))
       .catch((error: Error) => showError(error.message));
   };
 
-  if (!faction || !game) return <div>Loading...</div>;
+  if (!faction || !game) return <CircularProgress />;
 
   return (
     <>

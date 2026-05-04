@@ -1,18 +1,19 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { CircularProgress } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { Character, Faction, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { gridSizeCard } from '../../services/display';
 
 const FactionViewCharacters: FC<{
-  faction: Faction;
-  characters: Character[];
+  faction?: Faction;
+  characters?: Character[];
 }> = ({ faction, characters }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  if (!faction || !characters) return <>Loading...</>;
+  if (!faction || !characters) return <CircularProgress />;
 
   return (
     <Grid container spacing={1}>

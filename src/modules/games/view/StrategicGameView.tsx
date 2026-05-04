@@ -72,8 +72,6 @@ export default function StrategicGameView() {
     }
   }, [location.state, gameId]);
 
-  // if (!strategicGame || !factions || !tacticalGames) return <div>Loading...</div>;
-
   return (
     <>
       <LayoutBase
