@@ -13,6 +13,10 @@ import {
   fetchFactions,
   fetchTacticalGames,
   TacticalGame,
+  LayoutBase,
+  RefreshButton,
+  EditButton,
+  DeleteButton,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
 import { gridSizeMain, gridSizeResume } from '../../services/display';
@@ -33,6 +37,7 @@ export default function StrategicGameView() {
   const [strategicGame, setStrategicGame] = useState<StrategicGame>(location.state?.strategicGame);
   const [factions, setFactions] = useState<Faction[]>();
   const [tacticalGames, setTacticalGames] = useState<TacticalGame[]>();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const onCreateFaction = () => {
     navigate(`/strategic/factions/create?gameId=${strategicGame.id}`, { state: { strategicGame } });
@@ -40,6 +45,12 @@ export default function StrategicGameView() {
 
   const onCreateTacticalGame = () => {
     navigate(`/tactical/games/create?strategicGame=${strategicGame.id}`);
+  };
+
+  const bindStrategicGame = (gameId: string) => {
+    fetchStrategicGame(gameId, auth)
+      .then((data) => setStrategicGame(data))
+      .catch((err) => showError(err.message));
   };
 
   useEffect(() => {
@@ -57,21 +68,29 @@ export default function StrategicGameView() {
     if (location.state?.strategicGame) {
       setStrategicGame(location.state.strategicGame);
     } else if (gameId) {
-      fetchStrategicGame(gameId, auth)
-        .then((data) => setStrategicGame(data))
-        .catch((err) => showError(err.message));
+      bindStrategicGame(gameId);
     }
-  }, [location.state, gameId, showError]);
+  }, [location.state, gameId]);
 
-  if (!strategicGame || !factions || !tacticalGames) return <div>Loading...</div>;
+  // if (!strategicGame || !factions || !tacticalGames) return <div>Loading...</div>;
 
   return (
-    <Grid container spacing={1}>
-      <Grid size={gridSizeResume}>
-        <StrategicGameViewResume strategicGame={strategicGame} setStrategicGame={setStrategicGame} />
-      </Grid>
-      <Grid size={gridSizeMain}>
-        <StrategicGameViewActions strategicGame={strategicGame} setStrategicGame={setStrategicGame} />
+    <>
+      <LayoutBase
+        breadcrumbs={[
+          { name: t('home'), link: '/' },
+          { name: t('strategic-games'), link: '/strategic/games' },
+          { name: t('view') },
+        ]}
+        actions={[
+          <RefreshButton onClick={() => bindStrategicGame(strategicGame!.id)} />,
+          <EditButton
+            onClick={() => navigate(`/strategic/games/edit/${strategicGame.id}`, { state: { strategicGame } })}
+          />,
+          <DeleteButton onClick={() => setDeleteDialogOpen(true)} />,
+        ]}
+        leftPanel={<StrategicGameViewResume strategicGame={strategicGame} setStrategicGame={setStrategicGame} />}
+      >
         <CategorySeparator text={t('settings')} />
         <StrategicGameViewAttributes strategicGame={strategicGame} />
         <CategorySeparator text={t('power-level')} />
@@ -87,7 +106,13 @@ export default function StrategicGameView() {
         <TechnicalInfo>
           <pre>StrategicGame: {JSON.stringify(strategicGame, null, 2)}</pre>
         </TechnicalInfo>
+      </LayoutBase>
+      <Grid container spacing={1}>
+        <Grid size={gridSizeResume}></Grid>
+        <Grid size={gridSizeMain}>
+          <StrategicGameViewActions strategicGame={strategicGame} setStrategicGame={setStrategicGame} />
+        </Grid>
       </Grid>
-    </Grid>
+    </>
   );
 }

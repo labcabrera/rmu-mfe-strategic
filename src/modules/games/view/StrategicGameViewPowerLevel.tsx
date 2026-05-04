@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Grid } from '@mui/material';
+import { CircularProgress, Grid } from '@mui/material';
 import { RmuTextCard, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { imageBaseUrl } from '../../services/config';
 import { gridSizeCard } from '../../services/display';
@@ -8,9 +8,11 @@ import { gridSizeCard } from '../../services/display';
 const grayscale = 0.7;
 
 const StrategicGameViewPowerLevel: FC<{
-  strategicGame: StrategicGame;
+  strategicGame?: StrategicGame;
 }> = ({ strategicGame }) => {
   const { t } = useTranslation();
+
+  if (!strategicGame) return <CircularProgress />;
 
   const DATA = [
     {

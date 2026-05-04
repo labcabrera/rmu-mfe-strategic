@@ -11,7 +11,7 @@ import { getAvatarImages } from '../../services/image-service';
 const defaultGameImage = `${imageBaseUrl}images/generic/strategic.png`;
 
 const StrategicGameViewResume: FC<{
-  strategicGame: StrategicGame;
+  strategicGame?: StrategicGame;
   setStrategicGame: Dispatch<SetStateAction<StrategicGame>>;
 }> = ({ strategicGame, setStrategicGame: setGame }) => {
   const auth = useAuth();
@@ -19,6 +19,7 @@ const StrategicGameViewResume: FC<{
   const { showError } = useError();
 
   const onImageUpdated = (imageId: string) => {
+    if (!strategicGame) return;
     const dto = { imageUrl: imageId };
     updateStrategicGame(strategicGame.id, dto, auth)
       .then(() => setGame({ ...strategicGame, imageUrl: imageId }))
@@ -28,12 +29,12 @@ const StrategicGameViewResume: FC<{
   return (
     <>
       <EditableAvatar
-        imageUrl={strategicGame.imageUrl || defaultGameImage}
+        imageUrl={strategicGame?.imageUrl || defaultGameImage}
         onImageChange={onImageUpdated}
         images={getAvatarImages()}
       />
       <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
-        {strategicGame.name}
+        {strategicGame?.name || ''}
       </Typography>
 
       <Typography variant="body1" sx={{ mt: 2 }}>
@@ -41,13 +42,13 @@ const StrategicGameViewResume: FC<{
           component={RouterLink}
           underline="hover"
           color="inherit"
-          to={`/core/realms/view/${strategicGame.realmId}`}
+          to={`/core/realms/view/${strategicGame?.realmId}`}
         >
-          {strategicGame.realmName}
+          {strategicGame?.realmName}
         </Link>
       </Typography>
       <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
-        {strategicGame.description}
+        {strategicGame?.description}
       </Typography>
     </>
   );

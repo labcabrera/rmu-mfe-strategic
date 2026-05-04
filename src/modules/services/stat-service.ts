@@ -1,4 +1,4 @@
-export const getStatBonus = (temporary) => {
+export const getStatBonus = (temporary: number) => {
   switch (temporary) {
     case 1:
       return -15;

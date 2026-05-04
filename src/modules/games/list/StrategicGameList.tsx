@@ -1,83 +1,77 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
-import { Grid } from '@mui/material';
-import { fetchStrategicGames, RmuPagination, RmuTextCard, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CircularProgress, Grid } from '@mui/material';
+import {
+  AddButton,
+  fetchStrategicGames,
+  LayoutBase,
+  Page,
+  RefreshButton,
+  RmuPagination,
+  RmuTextCard,
+  StrategicGame,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
-import { gridSizeMain, gridSizeResume, gridSizeCard } from '../../services/display';
-import StrategicGameListActions from './StrategicGameListActions';
+import { gridSizeCard } from '../../services/display';
 import StrategicGameListSearch from './StrategicGameListSearch';
 
-const StrategicGameList: FC = () => {
-  const navigate = useNavigate();
+export default function StrategicGameList() {
   const auth = useAuth();
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const { showError } = useError();
-  const [strategicGames, setStrategicGames] = useState<StrategicGame[]>([]);
-  const [queryString, setQueryString] = useState<string>('');
+  const [pageData, setPageData] = useState<Page<StrategicGame>>();
+  const [rsql, setRsql] = useState<string>('');
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(24);
-  const [totalCount, setTotalCount] = useState(0);
-  const [loading, setLoading] = useState<boolean>(true);
-  const totalPages = Math.ceil(totalCount / pageSize);
 
   const bindStrategicGames = () => {
-    fetchStrategicGames(queryString, page, pageSize, auth)
-      .then((response) => {
-        setStrategicGames(response.content);
-        setTotalCount(response.pagination.totalElements);
-      })
+    fetchStrategicGames(rsql, page, pageSize, auth)
+      .then((response) => setPageData(response))
       .catch((err) => showError(err.message));
   };
 
   useEffect(() => {
     bindStrategicGames();
-  }, [queryString, page, pageSize]);
+  }, [rsql, page, pageSize]);
 
   return (
-    <>
+    <LayoutBase
+      breadcrumbs={[{ name: t('home'), link: '/' }, { name: t('strategic-games') }]}
+      actions={[
+        <RefreshButton onClick={() => bindStrategicGames()} />,
+        <AddButton onClick={() => navigate('/strategic/games/create')} />,
+      ]}
+    >
+      <StrategicGameListSearch setRsql={setRsql} />
       <Grid container spacing={1}>
-        <Grid size={gridSizeResume}></Grid>
-        <Grid size={gridSizeMain}>
-          <StrategicGameListActions />
-          <Grid container spacing={1}>
-            <Grid size={12}>
-              <StrategicGameListSearch setQueryString={setQueryString} />
-            </Grid>
-            <Grid size={12}>
-              <Grid container spacing={1}>
-                {strategicGames === undefined ? (
-                  <>loading...</>
-                ) : (
-                  <>
-                    {strategicGames.map((game, index) => (
-                      <Grid key={index} size={gridSizeCard}>
-                        <RmuTextCard
-                          value={game.name}
-                          subtitle={game.realmName}
-                          image={game.imageUrl || ''}
-                          onClick={() => navigate(`/strategic/games/view/${game.id}`, { state: { game } })}
-                        />
-                      </Grid>
-                    ))}
-                  </>
-                )}
-                {strategicGames && strategicGames.length === 0 && <>No games found.</>}
+        {pageData === undefined ? (
+          <CircularProgress />
+        ) : (
+          <>
+            {pageData.content.map((game, index) => (
+              <Grid key={index} size={gridSizeCard} sx={{ mt: 2 }}>
+                <RmuTextCard
+                  value={game.name}
+                  subtitle={game.realmName}
+                  image={game.imageUrl || ''}
+                  onClick={() => navigate(`/strategic/games/view/${game.id}`, { state: { game } })}
+                />
               </Grid>
-            </Grid>
-            <Grid size={12}>
-              <RmuPagination
-                page={page}
-                pageSize={pageSize}
-                totalPages={totalPages}
-                setPage={setPage}
-                setPageSize={setPageSize}
-              />
-            </Grid>
-          </Grid>
-        </Grid>
+            ))}
+            {pageData.content.length === 0 && <>No games found.</>}
+            <RmuPagination
+              page={page}
+              pageSize={pageSize}
+              totalPages={pageData.pagination.totalPages}
+              setPage={setPage}
+              setPageSize={setPageSize}
+            />
+          </>
+        )}
       </Grid>
-    </>
+    </LayoutBase>
   );
-};
-
-export default StrategicGameList;
+}
