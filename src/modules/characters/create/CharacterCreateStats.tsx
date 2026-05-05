@@ -1,12 +1,12 @@
-import React, { FC, useTransition } from 'react';
+import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { CreateCharacterDto, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CreateCharacterDto, StatKey, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { StatBonusFormData } from './CharacterCreate';
 
 const CharacterStats: FC<{
   key: string;
-  statKey: string;
+  statKey: StatKey;
   statName: string;
   formData: CreateCharacterDto;
   statBonusFormData: StatBonusFormData;
@@ -22,7 +22,9 @@ const CharacterStats: FC<{
   const getTotal = (): number => {
     const stat = formData.statistics[statKey];
     const bonus = statBonusFormData[statKey];
-    return stat.racial || 0 + bonus.temporary;
+    //TODO
+    const racial = 0;
+    return racial + bonus.temporary;
   };
 
   return (

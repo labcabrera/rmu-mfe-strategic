@@ -9,6 +9,7 @@ import {
   Race,
   STATS,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { useError } from '../../../ErrorContext';
 import NameTextField from '../../shared/inputs/NameTextField';
 import SelectProfession from '../../shared/selects/SelectProfession';
 import SelectRace from '../../shared/selects/SelectRace';
@@ -21,36 +22,36 @@ const CharacterCreateMainForm: FC<{
   setFormData: Dispatch<SetStateAction<CreateCharacterDto>>;
   setProfession: Dispatch<SetStateAction<Profession | undefined>>;
   setSelectedRace: Dispatch<SetStateAction<Race | undefined>>;
-  selectedRace: Race | undefined;
+  selectedRace?: Race;
   races: Race[];
   profession: Profession | undefined;
 }> = ({ formData, setFormData, setProfession, setSelectedRace, selectedRace, races, profession }) => {
   const { t } = useTranslation();
+  const { showError } = useError();
 
   const onRaceChange = (race: Race) => {
-    if (race) {
-      setSelectedRace(race);
-      const stats = { ...formData.statistics };
-      STATS.forEach((key) => {
-        stats[key].racial = race.stats[key];
-      });
-      setFormData((prevState) => ({
-        ...prevState,
-        info: {
-          ...prevState.info,
-          raceId: race.id,
-          raceName: race.name,
-          sizeId: race.sizeId,
-          height: race.averageHeight.male,
-          weight: race.averageWeight.male,
-        },
-        movement: {
-          ...prevState.movement,
-          strideRacialBonus: race.strideBonus,
-        },
-        statistics: stats,
-      }));
-    }
+    if (!race) return;
+    setSelectedRace(race);
+    const stats = { ...formData.statistics };
+    STATS.forEach((key) => {
+      stats[key].racial = race.stats[key];
+    });
+    setFormData((prevState) => ({
+      ...prevState,
+      info: {
+        ...prevState.info,
+        raceId: race.id,
+        raceName: race.name,
+        sizeId: race.sizeId,
+        height: race.averageHeight.male,
+        weight: race.averageWeight.male,
+      },
+      movement: {
+        ...prevState.movement,
+        strideRacialBonus: race.strideBonus,
+      },
+      statistics: stats,
+    }));
   };
 
   const onProfessionChange = (professionId: string, profession: Profession) => {
@@ -83,20 +84,21 @@ const CharacterCreateMainForm: FC<{
       <Grid size={12}>
         <CategorySeparator text={t('information')} />
       </Grid>
-      <Grid size={gridFormSize}>
-        <SelectRace label={t('race')} value={formData.info.raceId} onChange={onRaceChange} races={races} />
-      </Grid>
-      <Grid size={gridFormSize}>
-        <SelectProfession value={formData.info.professionId} onChange={(e, p) => onProfessionChange(e, p!)} />
-      </Grid>
-      <Grid size={gridFormSize}>
+      <Grid size={12}>
         <NameTextField
           label={t('name')}
           value={formData.name}
           gender={formData.roleplay.gender}
           onChange={(value: string) => setFormData((prev) => ({ ...prev, name: value }))}
           generateRandomRaceValue={selectedRace?.archetype ?? ''}
+          onError={(e) => showError(e)}
         />
+      </Grid>
+      <Grid size={gridFormSize}>
+        <SelectRace label={t('race')} value={formData.info.raceId} onChange={onRaceChange} races={races} />
+      </Grid>
+      <Grid size={gridFormSize}>
+        <SelectProfession value={formData.info.professionId} onChange={(e, p) => onProfessionChange(e, p!)} />
       </Grid>
       <Grid size={gridFormSize}>
         <SelectRealmType

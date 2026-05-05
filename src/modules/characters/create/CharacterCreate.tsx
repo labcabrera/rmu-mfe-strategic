@@ -3,16 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useSearchParams } from 'react-router-dom';
 import OutboundIcon from '@mui/icons-material/Outbound';
-import { Grid, IconButton, TextField, Badge, Paper, Box } from '@mui/material';
+import { Grid, IconButton, TextField, Badge, Box } from '@mui/material';
 import {
   CategorySeparator,
-  Character,
   CreateCharacterDto,
   EditableAvatar,
   Faction,
   fetchFaction,
   fetchRaces,
   fetchStrategicGame,
+  LayoutBase,
   NumericInput,
   Profession,
   Race,
@@ -164,7 +164,7 @@ export interface StatBonusFormData {
   [key: string]: StatBonus;
 }
 
-const CharacterCreate: FC = () => {
+export default function CharacterCreate() {
   const auth = useAuth();
   const { t } = useTranslation();
   const { showError } = useError();
@@ -188,16 +188,18 @@ const CharacterCreate: FC = () => {
     randomizeStats(setFormData, setStatBonusFormData);
   };
 
-  const checkValidForm = (formData: CreateCharacterDto) => {
+  const validate = (): boolean => {
+    if (!formData) return false;
     let valid = true;
     if (!formData.gameId) valid = false;
+    // if (!formData.name || formData.name.trim() === '') valid = false;
     if (!formData.name || formData.name.trim() === '') valid = false;
     if (!formData.info?.raceId) valid = false;
     if (!formData.info?.professionId) valid = false;
     if (!formData.info?.realmType) valid = false;
     if (!formData.info?.weight) valid = false;
     if (!formData.level) valid = false;
-    setIsValid(valid);
+    return valid;
   };
 
   const bindStrategicGame = () => {
@@ -216,7 +218,7 @@ const CharacterCreate: FC = () => {
   };
 
   useEffect(() => {
-    checkValidForm(formData);
+    setIsValid(validate());
   }, [formData]);
 
   useEffect(() => {
@@ -252,112 +254,111 @@ const CharacterCreate: FC = () => {
 
   return (
     <>
-      <Grid container spacing={1}>
-        <Grid size={gridSizeResume}>
+      <LayoutBase
+        breadcrumbs={[]}
+        actions={[]}
+        leftPanel={
           <EditableAvatar
             imageUrl={formData.imageUrl || defaultImage}
             onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl })}
             images={getAvatarImages()}
           />
+        }
+      >
+        <CharacterCreateMainForm
+          formData={formData}
+          setFormData={setFormData}
+          setProfession={setProfession}
+          selectedRace={selectedRace}
+          races={races}
+          setSelectedRace={setSelectedRace}
+          profession={profession}
+        />
+        <CategorySeparator text={t('Stats')}>
+          <RefreshButton onClick={onRandomStats} />
+          <Badge badgeContent={2} color="success">
+            <IconButton onClick={() => setBoostDialogOpen(true)} color="primary">
+              <OutboundIcon />
+            </IconButton>
+          </Badge>
+        </CategorySeparator>
+
+        <Grid container spacing={1}>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <CharacterCreateStats formData={formData} statBonusFormData={statBonusFormData} />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex', alignItems: 'stretch' }}>
+            <Box sx={{ flex: 1 }}>
+              <CharacterViewStatsChart stats={formData.statistics} minHeight={320} />
+            </Box>
+          </Grid>
         </Grid>
+
+        <CategorySeparator text={t('Weapon development order')} />
+        <Grid size={12}>
+          <CharacterCreateSortCombat items={formData.weaponDevelopment || []} onChange={handleWeaponOrderChange} />
+        </Grid>
+
+        {profession && (
+          <Grid size={12}>
+            <>
+              <CategorySeparator text={t('skill-development-costs')} />
+              <CharacterCreateSkillCosts profession={profession} />
+              <CategorySeparator text={t('professional-skills')} />
+              <CharacterCreateProfessionalSkills profession={profession} />
+            </>
+          </Grid>
+        )}
+
+        <CategorySeparator text={t('lore')} />
+        <Grid size={12}>
+          <TextField
+            label={t('description')}
+            name="description"
+            value={formData.description}
+            onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+            fullWidth
+            multiline
+            maxRows={4}
+          />
+        </Grid>
+        <Grid size={4}>
+          <RmuSelect
+            value={formData.roleplay.gender}
+            label={t('gender')}
+            options={['male', 'female', 'other']}
+            onChange={(value: string) =>
+              setFormData((prev) => ({ ...prev, roleplay: { ...prev.roleplay, gender: value } }))
+            }
+          />
+        </Grid>
+        <Grid size={4}>
+          <NumericInput
+            label={t('age')}
+            name="age"
+            value={formData.roleplay.age}
+            onChange={(value) => setFormData((prev) => ({ ...prev, roleplay: { ...prev.roleplay, age: value! } }))}
+            integer
+            allowNegatives={false}
+          />
+        </Grid>
+        <CharacterCreateBoostOptionsDialog
+          open={boostDialogOpen}
+          onClose={() => setBoostDialogOpen(false)}
+          strategicGame={game}
+          formData={formData}
+          setFormData={setFormData}
+        />
+        <TechnicalInfo>
+          <pre>{JSON.stringify(formData, null, 2)}</pre>
+        </TechnicalInfo>
+      </LayoutBase>
+      <Grid container spacing={1}>
+        <Grid size={gridSizeResume}></Grid>
         <Grid size={gridSizeMain}>
           <CharacterCreateActions formData={formData} game={game} faction={faction} isValid={isValid} />
-          <Paper sx={{ p: 2 }}>
-            <CharacterCreateMainForm
-              formData={formData}
-              setFormData={setFormData}
-              setProfession={setProfession}
-              selectedRace={selectedRace}
-              races={races}
-              setSelectedRace={setSelectedRace}
-              profession={profession}
-            />
-            <CategorySeparator text={t('Stats')}>
-              <RefreshButton onClick={onRandomStats} />
-              <Badge badgeContent={2} color="success">
-                <IconButton onClick={() => setBoostDialogOpen(true)} color="primary">
-                  <OutboundIcon />
-                </IconButton>
-              </Badge>
-            </CategorySeparator>
-
-            <Grid container spacing={1}>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <CharacterCreateStats formData={formData} statBonusFormData={statBonusFormData} />
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex', alignItems: 'stretch' }}>
-                <Box sx={{ flex: 1 }}>
-                  <CharacterViewStatsChart stats={formData.statistics} minHeight={320} />
-                </Box>
-              </Grid>
-            </Grid>
-
-            <CategorySeparator text={t('Weapon development order')} />
-            <Grid size={12}>
-              <CharacterCreateSortCombat items={formData.weaponDevelopment || []} onChange={handleWeaponOrderChange} />
-            </Grid>
-
-            {profession && (
-              <Grid size={12}>
-                <>
-                  <CategorySeparator text={t('skill-development-costs')} />
-                  <CharacterCreateSkillCosts profession={profession} />
-                  <CategorySeparator text={t('professional-skills')} />
-                  <CharacterCreateProfessionalSkills profession={profession} />
-                </>
-              </Grid>
-            )}
-
-            <CategorySeparator text={t('lore')} />
-            <Grid size={12}>
-              <TextField
-                label={t('description')}
-                name="description"
-                value={formData.description}
-                onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-                fullWidth
-                multiline
-                maxRows={4}
-              />
-            </Grid>
-            <Grid size={4}>
-              <RmuSelect
-                value={formData.roleplay.gender}
-                label={t('gender')}
-                options={['male', 'female', 'other']}
-                onChange={(value: string) =>
-                  setFormData((prev) => ({ ...prev, roleplay: { ...prev.roleplay, gender: value } }))
-                }
-              />
-            </Grid>
-            <Grid size={4}>
-              <NumericInput
-                label={t('age')}
-                name="age"
-                value={formData.roleplay.age}
-                onChange={(value) => setFormData((prev) => ({ ...prev, roleplay: { ...prev.roleplay, age: value! } }))}
-                integer
-                allowNegatives={false}
-              />
-            </Grid>
-            <Grid size={12}>
-              <TechnicalInfo>
-                <pre>{JSON.stringify(formData, null, 2)}</pre>
-              </TechnicalInfo>
-            </Grid>
-          </Paper>
         </Grid>
       </Grid>
-
-      <CharacterCreateBoostOptionsDialog
-        open={boostDialogOpen}
-        onClose={() => setBoostDialogOpen(false)}
-        strategicGame={game}
-        formData={formData}
-        setFormData={setFormData}
-      />
     </>
   );
-};
-
-export default CharacterCreate;
+}

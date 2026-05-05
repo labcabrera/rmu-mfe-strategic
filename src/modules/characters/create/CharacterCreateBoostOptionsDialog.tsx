@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Dialog,
@@ -14,11 +15,10 @@ import {
   Box,
   Typography,
 } from '@mui/material';
-import { CreateCharacterDto, STATS, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CreateCharacterDto, StatKey, STATS, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { getStatBonus } from '../../services/stat-service';
 import { StatBonus } from './CharacterCreate';
 import CharacterCreateStatsActions from './CharacterCreateStatsActions';
-import { useTranslation } from 'react-i18next';
 
 const CharacterCreateBoostOptionsDialog: FC<{
   open: boolean;
@@ -50,9 +50,9 @@ const CharacterCreateBoostOptionsDialog: FC<{
     }
   }, [strategicGame]);
 
-  const [selectedStats, setSelectedStats] = useState<string[]>([]);
+  const [selectedStats, setSelectedStats] = useState<StatKey[]>([]);
 
-  const toggleSelect = (stat: string) => {
+  const toggleSelect = (stat: StatKey) => {
     setSelectedStats((prev) => {
       if (prev.includes(stat)) return prev.filter((s) => s !== stat);
       // allow up to 2

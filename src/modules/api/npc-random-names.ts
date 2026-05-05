@@ -8,5 +8,10 @@ export async function fetchRandomName(
   auth: AuthContextProps
 ): Promise<string> {
   const url = `${apiNpcNames}/random-names?race=${race || 'generic'}&gender=${gender || 'male'}`;
-  return callApi(auth, url, { method: 'GET' });
+  return callApi(auth, url, { method: 'GET' })
+    .then((response) => {
+      console.log('api name response: ', response);
+      return response;
+    })
+    .then((response) => response.name);
 }

@@ -1,4 +1,5 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FC } from 'react';
+import { useAuth } from 'react-oidc-context';
 import CachedIcon from '@mui/icons-material/Cached';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -8,23 +9,32 @@ import { fetchRandomName } from '../../api/npc-random-names';
 interface NameTextFieldProps {
   label: string;
   value?: string;
-  onChange: (value: string) => void;
   required?: boolean;
   generateRandomRaceValue?: string;
   gender: string | undefined;
+  onChange: (value: string) => void;
+  onError: (value: string) => void;
 }
 
 const NameTextField: FC<NameTextFieldProps> = ({
   label,
   value = '',
-  onChange,
   required = true,
   generateRandomRaceValue,
   gender,
+  onChange,
+  onError,
 }) => {
-  const handleRandomNameClick = async () => {
-    const name = await fetchRandomName(generateRandomRaceValue, gender);
-    onChange(name);
+  const auth = useAuth();
+
+  const handleRandomNameClick = () => {
+    fetchRandomName(generateRandomRaceValue, gender, auth)
+      .then((name) => {
+        console.log('name: ', name);
+        return name;
+      })
+      .then((name) => onChange(name))
+      .catch((err) => onError(err.message));
   };
 
   return (
