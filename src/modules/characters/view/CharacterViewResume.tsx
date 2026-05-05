@@ -71,17 +71,7 @@ export default function CharacterViewResume({
       <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
         {character.description}
       </Typography>
-      <Box
-        sx={{
-          // width: 280,
-          // minWidth: 280,
-          // height: '100%',
-          p: 1,
-          borderRight: 1,
-          borderColor: 'divider',
-          bgcolor: 'background.default',
-        }}
-      >
+      <Box>
         <EditableAvatar
           imageUrl={character.imageUrl || defaultCharacterImage}
           onImageChange={onImageUpdated}

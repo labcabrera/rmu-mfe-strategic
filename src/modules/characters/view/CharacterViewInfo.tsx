@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { Badge, Grid, Tooltip, Typography } from '@mui/material';
+import { Grid, Tooltip, Typography } from '@mui/material';
 import { CategorySeparator, Character, RmuTextCard, STATS, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { imageBaseUrl } from '../../services/config';
 
@@ -129,7 +128,7 @@ const CharacterViewInfo: FC<{
             <div>
               <RmuTextCard
                 value={`${character.movement.baseMovementRate}' /rnd`}
-                subtitle={t('base-movement-rate')}
+                subtitle={t('bmr')}
                 image={`${imageBaseUrl}images/generic/stride-bonus.png`}
                 grayscale={grayscale}
               />
@@ -138,7 +137,7 @@ const CharacterViewInfo: FC<{
         </Grid>
         <Grid size={gridSizeCard}>
           <RmuTextCard
-            value={character.movement.modifiers['racial'] || 0}
+            value={character.movement.modifiers ? character.movement.modifiers['racial'] : 0}
             subtitle={t('stride-racial-bonus')}
             image={`${imageBaseUrl}images/generic/stride-bonus.png`}
             grayscale={grayscale}
@@ -147,7 +146,7 @@ const CharacterViewInfo: FC<{
         </Grid>
         <Grid size={gridSizeCard}>
           <RmuTextCard
-            value={character.movement.modifiers['qu']}
+            value={character.movement.modifiers ? character.movement.modifiers['qu'] : 0}
             subtitle={t('stride-stat-bonus')}
             image={`${imageBaseUrl}images/generic/stride-bonus.png`}
             grayscale={grayscale}

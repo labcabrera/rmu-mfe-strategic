@@ -1,20 +1,22 @@
 import React, { FC, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { useSearchParams, useLocation } from 'react-router-dom';
-import { Grid, Paper } from '@mui/material';
+import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import {
+  CancelButton,
+  createFaction,
   EditableAvatar,
   Faction,
   fetchStrategicGame,
+  LayoutBase,
+  SaveButton,
   StrategicGame,
   TechnicalInfo,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
 import { imageBaseUrl } from '../../services/config';
-import { gridSizeMain, gridSizeResume } from '../../services/display';
 import { getAvatarImages } from '../../services/image-service';
 import FactionForm from '../form/FactionForm';
-import FactionCreateActions from './FactionCreateActions';
 
 export const EMPTY_FACTION = {
   gameId: '',
@@ -28,9 +30,11 @@ export const EMPTY_FACTION = {
   imageUrl: `${imageBaseUrl}images/generic/faction.png`,
 } as Faction;
 
-const FactionCreate: FC = () => {
+export default function FactionCreate() {
   const auth = useAuth();
+  const { t } = useTranslation();
   const location = useLocation();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { showError } = useError();
   const gameId = searchParams.get('gameId');
@@ -58,28 +62,38 @@ const FactionCreate: FC = () => {
     }
   }, [location.state, gameId]);
 
+  const onCreate = () => {
+    createFaction(formData, auth)
+      .then((data: { id: string }) => navigate(`/strategic/factions/view/${data.id}`, { state: { faction: data } }))
+      .catch((err) => showError(err.message));
+  };
+
   if (!strategicGame) return <div>Loading...</div>;
 
   return (
-    <Grid container spacing={1}>
-      <Grid size={gridSizeResume}>
+    <LayoutBase
+      breadcrumbs={[
+        { name: t('home'), link: '/home' },
+        { name: t('strategic-games'), link: '/strategic/games' },
+        { name: t('strategic-game'), link: `/strategic/games/view/${strategicGame.id}` },
+        { name: t('create-faction') },
+      ]}
+      actions={[
+        <CancelButton onClick={() => navigate(`/strategic/games/view/${strategicGame.id}`)} />,
+        <SaveButton onClick={() => onCreate()} disabled={!isValid} />,
+      ]}
+      leftPanel={
         <EditableAvatar
           imageUrl={formData.imageUrl || `${imageBaseUrl}images/generic/faction.png`}
           onImageChange={(newImageUrl) => setFormData({ ...formData, imageUrl: newImageUrl })}
           images={getAvatarImages()}
         />
-      </Grid>
-      <Grid size={gridSizeMain}>
-        <FactionCreateActions formData={formData} strategicGame={strategicGame} isValid={isValid} />
-        <Paper sx={{ p: 2 }}>
-          <FactionForm formData={formData} setFormData={setFormData} />
-        </Paper>
-        <TechnicalInfo>
-          <pre>{JSON.stringify(formData, null, 2)}</pre>
-        </TechnicalInfo>
-      </Grid>
-    </Grid>
+      }
+    >
+      <FactionForm formData={formData} setFormData={setFormData} />
+      <TechnicalInfo>
+        <pre>{JSON.stringify(formData, null, 2)}</pre>
+      </TechnicalInfo>
+    </LayoutBase>
   );
-};
-
-export default FactionCreate;
+}
