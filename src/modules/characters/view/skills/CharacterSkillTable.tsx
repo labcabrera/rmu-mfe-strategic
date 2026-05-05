@@ -1,4 +1,6 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import CropSquareIcon from '@mui/icons-material/CropSquare';
@@ -33,17 +35,19 @@ import {
   setUpProfessionalSkill,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../../ErrorContext';
-import { useAuth } from 'react-oidc-context';
-import { useTranslation } from 'react-i18next';
 
 const maxProfessionalSkills = 10;
 const maxKnackSkills = 2;
 
-const CharacterSkillTable: FC<{
+export default function CharacterSkillTable({
+  character,
+  setCharacter,
+  profession,
+}: {
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   profession?: Profession;
-}> = ({ character, setCharacter, profession }) => {
+}) {
   const { t } = useTranslation();
   const currentKnackSkills = character.skills.filter((s) => s.professional?.includes('knack')).length;
   const currentProfessionalSkills = character.skills.filter((s) => s.professional?.includes('professional')).length;
@@ -139,18 +143,25 @@ const CharacterSkillTable: FC<{
       </Table>
     </Paper>
   );
-};
+}
 
-const CharacterViewSkillsEntry: FC<{
+function CharacterViewSkillsEntry({
+  character,
+  setCharacter,
+  skill,
+  profession,
+  currentKnackSkills,
+  currentProfessionalSkills,
+}: {
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   skill: CharacterSkill;
   profession?: Profession;
   currentKnackSkills: number;
   currentProfessionalSkills: number;
-}> = ({ character, setCharacter, skill, profession, currentKnackSkills, currentProfessionalSkills }) => {
+}) {
   const auth = useAuth();
-  const { t } = useTranslation(); 
+  const { t } = useTranslation();
   const { showError } = useError();
   const isProfessional = skill.professional?.includes('professional');
   const isKnack = skill.professional?.includes('knack');
@@ -340,6 +351,4 @@ const CharacterViewSkillsEntry: FC<{
       </TableCell>
     </TableRow>
   );
-};
-
-export default CharacterSkillTable;
+}
