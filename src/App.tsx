@@ -4,6 +4,7 @@ import { Box, ThemeProvider } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { NotFound } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { ErrorProvider } from './ErrorContext';
+import HomePage from './HomePage';
 import CharacterCreate from './modules/characters/create/CharacterCreate';
 import CharacterList from './modules/characters/list/CharacterList';
 import CharacterUpdate from './modules/characters/update/CharacterUpdate';
@@ -23,7 +24,7 @@ const App: FC = () => {
       <ErrorProvider>
         <Box sx={{ p: 2 }}>
           <Routes>
-            <Route path="/" element={<StrategicGameList />} />
+            <Route path="/" element={<HomePage />} />
             <Route path="/games" element={<StrategicGameList />} />
             <Route path="/games/view/:gameId" element={<StrategicGameView />} />
             <Route path="/games/edit/:gameId" element={<StrategicGameEdit />} />
