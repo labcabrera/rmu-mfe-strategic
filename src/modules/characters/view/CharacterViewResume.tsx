@@ -81,7 +81,7 @@ export default function CharacterViewResume({
           imageUrl={character.imageUrl || defaultCharacterImage}
           onImageChange={onImageUpdated}
           images={getAvatarImages()}
-          variant="rounded"
+          variant="circular"
         />
 
         <Stack spacing={2}>
@@ -166,7 +166,7 @@ export default function CharacterViewResume({
                   label={t('hit-points')}
                   value={`${character.hp.current} / ${character.hp.max}`}
                   progress={hpPercent}
-                  color="success"
+                  color={character.hp.current > 0 ? 'success' : 'error'}
                 />
               </Stack>
             </CardContent>

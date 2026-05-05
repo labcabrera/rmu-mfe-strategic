@@ -38,6 +38,7 @@ export default function FactionView() {
   const { t } = useTranslation();
   const location = useLocation();
   const { showError } = useError();
+
   const { factionId } = useParams<{ factionId: string }>();
   const [faction, setFaction] = useState<Faction>();
   const [game, setGame] = useState<StrategicGame>();
@@ -152,7 +153,7 @@ export default function FactionView() {
         <FactionViewCharacters faction={faction} characters={characters} />
       )}
       <DeleteDialog
-        message={`Are you sure you want to delete ${faction?.name} character? All characters in the faction will be eliminated. This action cannot be undone.`}
+        message={t('delete-confirmation')}
         onDelete={() => onDelete()}
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}

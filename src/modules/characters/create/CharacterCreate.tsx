@@ -314,7 +314,6 @@ export default function CharacterCreate() {
         </Grid>
       </Grid>
 
-      <CategorySeparator text={t('weapon-development-order')} />
       <Grid size={12}>
         <CharacterCreateSortCombat items={formData.weaponDevelopment || []} onChange={handleWeaponOrderChange} />
       </Grid>

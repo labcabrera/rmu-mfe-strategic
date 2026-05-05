@@ -26,31 +26,33 @@ export default function CharacterCreateSortCombat({
 
   return (
     <Grid container spacing={1}>
-      <CategorySeparator text={t('Weapon development order')} />
-      <List>
-        {order.map((item, i) => (
-          <ListItem
-            key={item}
-            secondaryAction={
-              <Box>
-                <IconButton aria-label="up" size="small" onClick={() => moveItem(i, 'up')} disabled={i === 0}>
-                  <ArrowUpwardIcon fontSize="small" />
-                </IconButton>
-                <IconButton
-                  aria-label="down"
-                  size="small"
-                  onClick={() => moveItem(i, 'down')}
-                  disabled={i === order.length - 1}
-                >
-                  <ArrowDownwardIcon fontSize="small" />
-                </IconButton>
-              </Box>
-            }
-          >
-            <ListItemText primary={t(item)} />
-          </ListItem>
-        ))}
-      </List>
+      <Grid size={12}>
+        <CategorySeparator text={t('weapon-development-order')} />
+        <List>
+          {order.map((item, i) => (
+            <ListItem
+              key={item}
+              secondaryAction={
+                <Box>
+                  <IconButton aria-label="up" size="small" onClick={() => moveItem(i, 'up')} disabled={i === 0}>
+                    <ArrowUpwardIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    aria-label="down"
+                    size="small"
+                    onClick={() => moveItem(i, 'down')}
+                    disabled={i === order.length - 1}
+                  >
+                    <ArrowDownwardIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              }
+            >
+              <ListItemText primary={t(item)} />
+            </ListItem>
+          ))}
+        </List>
+      </Grid>
     </Grid>
   );
 }
