@@ -1,13 +1,17 @@
-import React, { FC, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import { Box, IconButton, List, ListItem, ListItemText, Paper, Typography } from '@mui/material';
+import { Box, Grid, IconButton, List, ListItem, ListItemText } from '@mui/material';
+import { CategorySeparator } from '@labcabrera-rmu/rmu-react-shared-lib';
 
-export const CharacterCreateSortCombat: FC<{
+export default function CharacterCreateSortCombat({
+  items,
+  onChange,
+}: {
   items: string[];
   onChange?: (newOrder: string[]) => void;
-}> = ({ items, onChange }) => {
+}) {
   const { t } = useTranslation();
   const [order, setOrder] = useState<string[]>(items);
 
@@ -21,29 +25,32 @@ export const CharacterCreateSortCombat: FC<{
   };
 
   return (
-    <List>
-      {order.map((item, i) => (
-        <ListItem
-          key={item}
-          secondaryAction={
-            <Box>
-              <IconButton aria-label="up" size="small" onClick={() => moveItem(i, 'up')} disabled={i === 0}>
-                <ArrowUpwardIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                aria-label="down"
-                size="small"
-                onClick={() => moveItem(i, 'down')}
-                disabled={i === order.length - 1}
-              >
-                <ArrowDownwardIcon fontSize="small" />
-              </IconButton>
-            </Box>
-          }
-        >
-          <ListItemText primary={t(item)} />
-        </ListItem>
-      ))}
-    </List>
+    <Grid container spacing={1}>
+      <CategorySeparator text={t('Weapon development order')} />
+      <List>
+        {order.map((item, i) => (
+          <ListItem
+            key={item}
+            secondaryAction={
+              <Box>
+                <IconButton aria-label="up" size="small" onClick={() => moveItem(i, 'up')} disabled={i === 0}>
+                  <ArrowUpwardIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  aria-label="down"
+                  size="small"
+                  onClick={() => moveItem(i, 'down')}
+                  disabled={i === order.length - 1}
+                >
+                  <ArrowDownwardIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            }
+          >
+            <ListItemText primary={t(item)} />
+          </ListItem>
+        ))}
+      </List>
+    </Grid>
   );
-};
+}

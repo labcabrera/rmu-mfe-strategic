@@ -28,10 +28,9 @@ export default function CharacterViewStatsChart({
         <RadarChart data={data} cx="50%" cy="50%" outerRadius="70%">
           <PolarGrid stroke="#363a3eff" strokeWidth={1} />
           <PolarAngleAxis dataKey="label" />
-          <PolarRadiusAxis tick={false} axisLine={false} />
+          <PolarRadiusAxis tick={false} axisLine={false} domain={[0, 100]} />
           <Radar name={t('statPotential')} dataKey="statPotential" stroke="#90A4AE" fill="#90A4AE" fillOpacity={0.6} />
           <Radar name={t('potential')} dataKey="potential" stroke="#757575" fill="#757575" fillOpacity={0.4} />
-          <Tooltip />
         </RadarChart>
       </ResponsiveContainer>
     </Box>

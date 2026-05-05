@@ -1,6 +1,6 @@
 import React, { useState, SyntheticEvent, ReactNode, FC, Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Tab, Tabs } from '@mui/material';
+import { Box, CircularProgress, Tab, Tabs } from '@mui/material';
 import { Character, StrategicGame, Profession } from '@labcabrera-rmu/rmu-react-shared-lib';
 import CharacterViewAttacks from './CharacterViewAttacks';
 import CharacterViewInfo from './CharacterViewInfo';
@@ -32,9 +32,9 @@ function a11yProps(index: number) {
 }
 
 const CharacterViewTabs: FC<{
-  character: Character;
-  strategicGame: StrategicGame;
-  profession: Profession;
+  character?: Character;
+  strategicGame?: StrategicGame;
+  profession?: Profession;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
 }> = ({ character, strategicGame, profession, setCharacter }) => {
   const { t } = useTranslation();
@@ -43,6 +43,8 @@ const CharacterViewTabs: FC<{
   const handleChange = (_event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
+  if (!character || !strategicGame || !profession) return <CircularProgress />;
 
   return (
     <Box sx={{ width: '100%' }}>

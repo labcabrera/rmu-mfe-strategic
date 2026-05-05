@@ -1,26 +1,30 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { useLocation, useParams } from 'react-router-dom';
-import { Grid, Paper } from '@mui/material';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
+  CancelButton,
   Character,
   EditableAvatar,
   Faction,
   fetchCharacter,
   fetchFaction,
   fetchStrategicGame,
+  LayoutBase,
+  SaveButton,
   StrategicGame,
   TechnicalInfo,
+  updateCharacter,
   UpdateCharacterDto,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
-import { gridSizeResume, gridSizeMain } from '../../services/display';
 import { getAvatarImages } from '../../services/image-service';
-import CharacterUpdateActions from './CharacterUpdateActions';
 import CharacterUpdateAttributes from './CharacterUpdateAttributes';
 
 export default function CharacterUpdate() {
   const auth = useAuth();
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const location = useLocation();
   const { showError } = useError();
   const { characterId } = useParams<{ characterId: string }>();
@@ -29,31 +33,40 @@ export default function CharacterUpdate() {
   const [strategicGame, setStrategicGame] = useState<StrategicGame>();
   const [formData, setFormData] = useState<UpdateCharacterDto>();
 
-  const onImageChange = (image: string) => {
-    setFormData({ ...formData, imageUrl: image! });
+  const onUpdate = () => {
+    updateCharacter(character!.id, formData as Partial<Character>, auth)
+      .then((data: Character) => navigate(`/strategic/characters/view/${data.id}`, { state: { character: data } }))
+      .catch((err) => showError(err.message));
+  };
+
+  const onCancel = () => {
+    navigate(`/strategic/characters/view/${character!.id}`, { state: { character: character } });
+  };
+
+  const onImageChange = (imageUrl: string) => {
+    setFormData({ ...formData, imageUrl } as UpdateCharacterDto);
   };
 
   useEffect(() => {
-    if (character) {
-      fetchStrategicGame(character.gameId, auth)
-        .then((game: StrategicGame) => setStrategicGame(game))
-        .catch((err) => showError(err.message));
-      fetchFaction(character.faction.id, auth)
-        .then((faction: Faction) => setFaction(faction))
-        .catch((err) => showError(err.message));
-      setFormData({
-        name: character?.name || '',
-        description: character?.description || '',
-        info: {
-          weight: character?.info?.weight || 0,
-          height: character?.info?.height || 0,
-        },
-        roleplay: {
-          gender: character?.roleplay?.gender || '',
-          age: character?.roleplay?.age || 0,
-        },
-      } as UpdateCharacterDto);
-    }
+    if (!character) return;
+    fetchStrategicGame(character.gameId, auth)
+      .then((game: StrategicGame) => setStrategicGame(game))
+      .catch((err) => showError(err.message));
+    fetchFaction(character.faction.id, auth)
+      .then((faction: Faction) => setFaction(faction))
+      .catch((err) => showError(err.message));
+    setFormData({
+      name: character?.name || '',
+      description: character?.description || '',
+      info: {
+        weight: character?.info?.weight || 0,
+        height: character?.info?.height || 0,
+      },
+      roleplay: {
+        gender: character?.roleplay?.gender || '',
+        age: character?.roleplay?.age || 0,
+      },
+    } as UpdateCharacterDto);
   }, [character]);
 
   useEffect(() => {
@@ -69,25 +82,28 @@ export default function CharacterUpdate() {
   if (!character || !strategicGame || !faction || !formData) return <div>Loading...</div>;
 
   return (
-    <>
-      <CharacterUpdateActions character={character} formData={formData} game={strategicGame} faction={faction} />
-      <Grid container spacing={1}>
-        <Grid size={gridSizeResume}>
-          <EditableAvatar
-            imageUrl={character.imageUrl || ''}
-            onImageChange={onImageChange}
-            images={getAvatarImages()}
-          />
-        </Grid>
-        <Grid size={gridSizeMain}>
-          <Paper sx={{ p: 2 }}>
-            <CharacterUpdateAttributes formData={formData} setFormData={setFormData} />
-          </Paper>
-          <TechnicalInfo>
-            <pre>FormData: {JSON.stringify(formData, null, 2)}</pre>
-          </TechnicalInfo>
-        </Grid>
-      </Grid>
-    </>
+    <LayoutBase
+      breadcrumbs={[
+        { name: t('home'), link: '/' },
+        { name: t('strategic-games'), link: '/strategic/games' },
+        { name: t('strategic-game'), link: `/strategic/games/view/${strategicGame?.id}` },
+        { name: t('faction'), link: `/strategic/factions/view/${faction?.id}` },
+        { name: t('character-edit') },
+      ]}
+      actions={[<CancelButton onClick={onCancel} />, <SaveButton onClick={onUpdate} />]}
+      leftPanel={
+        <EditableAvatar
+          imageUrl={character.imageUrl || ''}
+          onImageChange={onImageChange}
+          images={getAvatarImages()}
+          variant="rounded"
+        />
+      }
+    >
+      <CharacterUpdateAttributes formData={formData} setFormData={setFormData} />
+      <TechnicalInfo>
+        <pre>FormData: {JSON.stringify(formData, null, 2)}</pre>
+      </TechnicalInfo>
+    </LayoutBase>
   );
 }

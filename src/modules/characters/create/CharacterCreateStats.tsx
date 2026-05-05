@@ -4,7 +4,38 @@ import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
 import { CreateCharacterDto, StatKey, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { StatBonusFormData } from './CharacterCreate';
 
-const CharacterStats: FC<{
+export default function CharacterCreateStats({
+  formData,
+  statBonusFormData,
+}: {
+  formData: CreateCharacterDto;
+  statBonusFormData: StatBonusFormData;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <Table sx={{ minWidth: 650 }} aria-label="stats table" size="small">
+      <TableHead>
+        <TableRow>
+          <TableCell align="left">Stat</TableCell>
+          <TableCell align="right">{t('potential-short')}</TableCell>
+          <TableCell align="right">{t('potential-bonus-short')}</TableCell>
+          <TableCell align="right">{t('temporary-short')}</TableCell>
+          <TableCell align="right">{t('temporary-bonus-short')}</TableCell>
+          <TableCell align="right">{t('racial')}</TableCell>
+          <TableCell align="right">{t('total')}</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {STATS.map((key) => (
+          <Row key={key} statKey={key} statName={t(key)} formData={formData} statBonusFormData={statBonusFormData} />
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+const Row: FC<{
   key: string;
   statKey: StatKey;
   statName: string;
@@ -74,39 +105,3 @@ const CharacterStats: FC<{
     </>
   );
 };
-
-const CharacterCreateStats: FC<{
-  formData: CreateCharacterDto;
-  statBonusFormData: StatBonusFormData;
-}> = ({ formData, statBonusFormData }) => {
-  const { t } = useTranslation();
-
-  return (
-    <Table sx={{ minWidth: 650 }} aria-label="stats table" size="small">
-      <TableHead>
-        <TableRow>
-          <TableCell align="left">Stat</TableCell>
-          <TableCell align="right">{t('potential-short')}</TableCell>
-          <TableCell align="right">{t('potential-bonus-short')}</TableCell>
-          <TableCell align="right">{t('temporary-short')}</TableCell>
-          <TableCell align="right">{t('temporary-bonus-short')}</TableCell>
-          <TableCell align="right">{t('racial')}</TableCell>
-          <TableCell align="right">{t('total')}</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {STATS.map((key) => (
-          <CharacterStats
-            key={key}
-            statKey={key}
-            statName={t(key)}
-            formData={formData}
-            statBonusFormData={statBonusFormData}
-          />
-        ))}
-      </TableBody>
-    </Table>
-  );
-};
-
-export default CharacterCreateStats;

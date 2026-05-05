@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import List from '@mui/material/List';
-import { RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { List, Grid } from '@mui/material';
+import { LayoutBase, RmuTextCard, Page } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
-import CharacterListActions from './CharacterListActions';
 
-const CharacterList = () => {
+export default function CharacterList() {
   const { showError } = useError();
+
+  const [pageData, setPageData] = useState([]);
   const [characters, setCharacters] = useState([]);
 
   useEffect(() => {
@@ -15,8 +16,7 @@ const CharacterList = () => {
   }, [showError]);
 
   return (
-    <>
-      <CharacterListActions />
+    <LayoutBase breadcrumbs={[{ label: 'home', path: '/' }, { label: 'characters' }]}>
       <Grid container spacing={1}>
         {characters?.map((item) => (
           <Grid size={12} key={item.id}>
@@ -24,8 +24,6 @@ const CharacterList = () => {
           </Grid>
         ))}
       </Grid>
-    </>
+    </LayoutBase>
   );
-};
-
-export default CharacterList;
+}

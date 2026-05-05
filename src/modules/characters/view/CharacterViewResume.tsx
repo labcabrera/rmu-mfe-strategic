@@ -31,7 +31,7 @@ export default function CharacterViewResume({
   faction,
   setCharacter,
 }: {
-  character: Character;
+  character?: Character;
   race?: Race;
   profession?: Profession;
   strategicGame?: StrategicGame;
@@ -42,19 +42,24 @@ export default function CharacterViewResume({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { showError } = useError();
-  const hpPercent = (character.hp.current / character.hp.max) * 100;
-  const levelStr =
-    character.experience.level < character.experience.availableLevel
+  const hpPercent = character ? (character.hp.current / character.hp.max) * 100 : 100;
+  const levelStr = character
+    ? character.experience.level < character.experience.availableLevel
       ? `${character.experience.level} / ${character.experience.availableLevel}`
-      : `${character.experience.availableLevel}`;
+      : `${character.experience.availableLevel}`
+    : '';
   //TODO
   const nextLevelXp = 1000000;
-  const armor = character.defense.armor;
-  const armorType = armor.at ? `${armor.at}` : `${armor.headAt} / ${armor.bodyAt} / ${armor.armsAt} / ${armor.legsAt}`;
+  const armor = character?.defense.armor || '';
+  const armorType = armor
+    ? armor.at
+      ? `${armor.at}`
+      : `${armor.headAt} / ${armor.bodyAt} / ${armor.armsAt} / ${armor.legsAt}`
+    : '';
 
   const onImageUpdated = (imageId: string) => {
     const dto = { imageUrl: imageId };
-    updateCharacter(character.id, dto, auth)
+    updateCharacter(character!.id, dto, auth)
       .then((character) => setCharacter(character))
       .catch((error) => showError(error.message));
   };

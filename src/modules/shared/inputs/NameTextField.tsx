@@ -50,7 +50,7 @@ const NameTextField: FC<NameTextFieldProps> = ({
           input: {
             endAdornment: (
               <InputAdornment position="start">
-                <IconButton onClick={handleRandomNameClick} aria-label="generate random name">
+                <IconButton onClick={handleRandomNameClick} color="primary">
                   <CachedIcon />
                 </IconButton>
               </InputAdornment>
