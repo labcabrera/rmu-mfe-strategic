@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Grid } from '@mui/material';
 import {
   CategorySeparator,
   AddButton,
@@ -17,10 +16,10 @@ import {
   RefreshButton,
   EditButton,
   DeleteButton,
+  DeleteDialog,
+  deleteStrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
-import { gridSizeMain, gridSizeResume } from '../../services/display';
-import StrategicGameViewActions from './StrategicGameViewActions';
 import StrategicGameViewAttributes from './StrategicGameViewAttributes';
 import StrategicGameViewFactions from './StrategicGameViewFactions';
 import StrategicGameViewPowerLevel from './StrategicGameViewPowerLevel';
@@ -45,6 +44,12 @@ export default function StrategicGameView() {
 
   const onCreateTacticalGame = () => {
     navigate(`/tactical/games/create?strategicGame=${strategicGame.id}`);
+  };
+
+  const onDelete = () => {
+    deleteStrategicGame(strategicGame.id, auth)
+      .then(() => navigate('/strategic/games'))
+      .catch((err) => showError(err.message));
   };
 
   const bindStrategicGame = (gameId: string) => {
@@ -73,44 +78,44 @@ export default function StrategicGameView() {
   }, [location.state, gameId]);
 
   return (
-    <>
-      <LayoutBase
-        breadcrumbs={[
-          { name: t('home'), link: '/' },
-          { name: t('strategic-games'), link: '/strategic/games' },
-          { name: t('view') },
-        ]}
-        actions={[
-          <RefreshButton onClick={() => bindStrategicGame(strategicGame!.id)} />,
-          <EditButton
-            onClick={() => navigate(`/strategic/games/edit/${strategicGame.id}`, { state: { strategicGame } })}
-          />,
-          <DeleteButton onClick={() => setDeleteDialogOpen(true)} />,
-        ]}
-        leftPanel={<StrategicGameViewResume strategicGame={strategicGame} setStrategicGame={setStrategicGame} />}
-      >
-        <CategorySeparator text={t('settings')} />
-        <StrategicGameViewAttributes strategicGame={strategicGame} />
-        <CategorySeparator text={t('power-level')} />
-        <StrategicGameViewPowerLevel strategicGame={strategicGame} />
-        <CategorySeparator text={t('factions')}>
-          <AddButton onClick={onCreateFaction} />
-        </CategorySeparator>
-        <StrategicGameViewFactions factions={factions} />
-        <CategorySeparator text={t('tactical-games')}>
-          <AddButton onClick={onCreateTacticalGame} />
-        </CategorySeparator>
-        <StrategicGameViewTacticalGames tacticalGames={tacticalGames} factions={factions} />
-        <TechnicalInfo>
-          <pre>StrategicGame: {JSON.stringify(strategicGame, null, 2)}</pre>
-        </TechnicalInfo>
-      </LayoutBase>
-      <Grid container spacing={1}>
-        <Grid size={gridSizeResume}></Grid>
-        <Grid size={gridSizeMain}>
-          <StrategicGameViewActions strategicGame={strategicGame} setStrategicGame={setStrategicGame} />
-        </Grid>
-      </Grid>
-    </>
+    <LayoutBase
+      breadcrumbs={[
+        { name: t('home'), link: '/' },
+        { name: t('strategic-games'), link: '/strategic/games' },
+        { name: t('view') },
+      ]}
+      actions={[
+        <RefreshButton onClick={() => bindStrategicGame(strategicGame!.id)} />,
+        <EditButton
+          onClick={() => navigate(`/strategic/games/edit/${strategicGame.id}`, { state: { strategicGame } })}
+        />,
+        <DeleteButton onClick={() => setDeleteDialogOpen(true)} />,
+      ]}
+      leftPanel={<StrategicGameViewResume strategicGame={strategicGame} setStrategicGame={setStrategicGame} />}
+    >
+      <CategorySeparator text={t('settings')} />
+      <StrategicGameViewAttributes strategicGame={strategicGame} />
+      <CategorySeparator text={t('power-level')} />
+      <StrategicGameViewPowerLevel strategicGame={strategicGame} />
+      <CategorySeparator text={t('factions')}>
+        <AddButton onClick={onCreateFaction} />
+      </CategorySeparator>
+      <StrategicGameViewFactions factions={factions} />
+      <CategorySeparator text={t('tactical-games')}>
+        <AddButton onClick={onCreateTacticalGame} />
+      </CategorySeparator>
+      <StrategicGameViewTacticalGames tacticalGames={tacticalGames} factions={factions} />
+      <DeleteDialog
+        message={t('delete-confirmation')}
+        open={deleteDialogOpen}
+        onDelete={onDelete}
+        onClose={function (): void {
+          throw new Error('Function not implemented.');
+        }}
+      />
+      <TechnicalInfo>
+        <pre>StrategicGame: {JSON.stringify(strategicGame, null, 2)}</pre>
+      </TechnicalInfo>
+    </LayoutBase>
   );
 }

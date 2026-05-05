@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
-import { Grid, CircularProgress, Autocomplete, AutocompleteRenderInputParams, TextField } from '@mui/material';
+import { Grid, CircularProgress, Autocomplete, TextField } from '@mui/material';
 import {
   LayoutBase,
   RmuTextCard,
@@ -14,6 +14,8 @@ import {
   StrategicGame,
   fetchStrategicGames,
   TechnicalInfo,
+  Faction,
+  fetchFactions,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
 import { gridSizeCard } from '../../services/display';
@@ -31,6 +33,7 @@ export default function CharacterList() {
   const [searchFormData, setSearchFormData] = useState<any>({ name: '', gameId: '' });
 
   const [games, setGames] = useState<StrategicGame[]>([]);
+  const [factions, setFactions] = useState<Faction[]>([]);
 
   const append = (rsql: string, predicate: string) => {
     if (rsql === '') return predicate;
@@ -55,6 +58,9 @@ export default function CharacterList() {
     fetchStrategicGames('', 0, 100, auth)
       .then((response) => setGames(response.content))
       .catch((err) => showError(err.message));
+    fetchFactions('', 0, 100, auth)
+      .then((response) => setFactions(response.content))
+      .catch((err) => showError(err.message));
   }, []);
 
   return (
@@ -67,7 +73,7 @@ export default function CharacterList() {
           <Autocomplete
             options={games}
             getOptionLabel={(option) => option?.name || ''}
-            value={searchFormData.gameId || ''}
+            value={games.find((option) => option.id === searchFormData.gameId) || null}
             onChange={(_, newValue) => setSearchFormData({ ...searchFormData, gameId: newValue?.id || '' })}
             isOptionEqualToValue={(option, val) => option.id === val.id}
             fullWidth
@@ -76,7 +82,20 @@ export default function CharacterList() {
             noOptionsText={t('no-options')}
           />
         </Grid>
-        <Grid size={gridSizeCard}>todo: faction</Grid>
+        <Grid size={gridSizeCard}>
+          {' '}
+          <Autocomplete
+            options={factions}
+            getOptionLabel={(option) => option?.name || ''}
+            value={factions.find((option) => option.id === searchFormData.factionId) || null}
+            onChange={(_, newValue) => setSearchFormData({ ...searchFormData, factionId: newValue?.id || '' })}
+            isOptionEqualToValue={(option, val) => option.id === val.id}
+            fullWidth
+            size="small"
+            renderInput={(params) => <TextField {...params} label={t('faction')} />}
+            noOptionsText={t('no-options')}
+          />
+        </Grid>
       </Grid>
 
       {!pageData ? (
