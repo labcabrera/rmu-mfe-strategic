@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { CircularProgress } from '@mui/material';
 import {
   CancelButton,
   Character,
@@ -79,7 +80,7 @@ export default function CharacterUpdate() {
     }
   }, [location.state, characterId, showError]);
 
-  if (!character || !strategicGame || !faction || !formData) return <div>Loading...</div>;
+  // if (!character || !strategicGame || !faction || !formData) return <div>Loading...</div>;
 
   return (
     <LayoutBase
@@ -93,17 +94,23 @@ export default function CharacterUpdate() {
       actions={[<CancelButton onClick={onCancel} />, <SaveButton onClick={onUpdate} />]}
       leftPanel={
         <EditableAvatar
-          imageUrl={character.imageUrl || ''}
+          imageUrl={character?.imageUrl || ''}
           onImageChange={onImageChange}
           images={getAvatarImages()}
           variant="rounded"
         />
       }
     >
-      <CharacterUpdateAttributes formData={formData} setFormData={setFormData} />
-      <TechnicalInfo>
-        <pre>FormData: {JSON.stringify(formData, null, 2)}</pre>
-      </TechnicalInfo>
+      {!formData ? (
+        <CircularProgress />
+      ) : (
+        <>
+          <CharacterUpdateAttributes formData={formData} setFormData={setFormData} />
+          <TechnicalInfo>
+            <pre>FormData: {JSON.stringify(formData, null, 2)}</pre>
+          </TechnicalInfo>
+        </>
+      )}
     </LayoutBase>
   );
 }

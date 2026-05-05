@@ -1,15 +1,19 @@
-import React, { FC, useState } from 'react';
+import React from 'react';
 import { useAuth } from 'react-oidc-context';
-import { CircularProgress, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import { EditableAvatar, Faction, StrategicGame, updateFaction } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
 import { getAvatarImages } from '../../services/image-service';
 
-const FactionViewResume: FC<{
+export default function FactionViewResume({
+  faction,
+  setFaction,
+  game,
+}: {
   game?: StrategicGame;
   faction?: Faction;
   setFaction: (faction: Faction) => void;
-}> = ({ faction, setFaction, game }) => {
+}) {
   const auth = useAuth();
   const { showError } = useError();
 
@@ -21,19 +25,18 @@ const FactionViewResume: FC<{
       .catch((error: Error) => showError(error.message));
   };
 
-  if (!faction || !game) return <CircularProgress />;
-
   return (
     <>
-      <EditableAvatar imageUrl={faction.imageUrl || ''} onImageChange={onImageUpdated} images={getAvatarImages()} />
+      <EditableAvatar imageUrl={faction?.imageUrl || ''} onImageChange={onImageUpdated} images={getAvatarImages()} />
       <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
-        {faction.name}
+        {faction?.name}
+      </Typography>
+      <Typography variant="body1" color="primary" sx={{ mt: 2 }}>
+        {game?.name}
       </Typography>
       <Typography variant="body1" color="textSecondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
-        {faction.description}
+        {faction?.description}
       </Typography>
     </>
   );
-};
-
-export default FactionViewResume;
+}

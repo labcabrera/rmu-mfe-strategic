@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -24,8 +24,7 @@ import {
   DeleteButton,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
-import { gridSizeResume, gridSizeMain, gridSizeCard } from '../../services/display';
-import FactionViewActions from './FactionViewActions';
+import { gridSizeCard } from '../../services/display';
 import FactionViewAttributes from './FactionViewAttributes';
 import FactionViewCharactersTable from './FactionViewCharacterTable';
 import FactionViewCharacters from './FactionViewCharacters';
@@ -101,76 +100,66 @@ export default function FactionView() {
   }, [location.state, factionId]);
 
   return (
-    <>
-      <LayoutBase
-        breadcrumbs={[
-          { name: t('home'), link: '/' },
-          { name: t('strategic-games'), link: `/strategic/games` },
-          { name: t('strategic-game'), link: `/strategic/games/view/${game?.id}` },
-          { name: t('faction') },
-        ]}
-        actions={[
-          <RefreshButton onClick={() => bindFaction(faction!.id)} />,
-          <EditButton onClick={() => onEdit()} />,
-          <DeleteButton onClick={() => setDeleteDialogOpen(true)} />,
-        ]}
-        leftPanel={<FactionViewResume faction={faction} setFaction={setFaction} game={game} />}
-      >
-        <CategorySeparator text={t('strategic-game')} />
-        <Grid container spacing={1}>
-          <Grid size={gridSizeCard}>
-            <RmuTextCard
-              value={game?.name || ''}
-              subtitle={t('strategic-game')}
-              image={game?.imageUrl || ''}
-              onClick={() => navigate(`/strategic/games/view/${game?.id}`, { state: { strategicGame: game } })}
-            />
-          </Grid>
+    <LayoutBase
+      breadcrumbs={[
+        { name: t('home'), link: '/' },
+        { name: t('strategic-games'), link: `/strategic/games` },
+        { name: t('strategic-game'), link: `/strategic/games/view/${game?.id}` },
+        { name: t('faction') },
+      ]}
+      actions={[
+        <RefreshButton onClick={() => bindFaction(faction!.id)} />,
+        <EditButton onClick={() => onEdit()} />,
+        <DeleteButton onClick={() => setDeleteDialogOpen(true)} />,
+      ]}
+      leftPanel={<FactionViewResume faction={faction} setFaction={setFaction} game={game} />}
+    >
+      <CategorySeparator text={t('strategic-game')} />
+      <Grid container spacing={1}>
+        <Grid size={gridSizeCard}>
+          <RmuTextCard
+            value={game?.name || ''}
+            subtitle={t('strategic-game')}
+            image={game?.imageUrl || ''}
+            onClick={() => navigate(`/strategic/games/view/${game?.id}`, { state: { strategicGame: game } })}
+          />
         </Grid>
-        <CategorySeparator text={t('faction')} />
-        <FactionViewAttributes faction={faction} characters={characters} />
-        <CategorySeparator text={t('characters')}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-            <AddButton onClick={onCharacterCreate} />
-            <ToggleButtonGroup
-              value={displayCharacterTable ? 'table' : 'list'}
-              exclusive
-              size="small"
-              onChange={handleViewModeChange}
-              aria-label="view-mode"
-            >
-              <ToggleButton value="list" aria-label="list">
-                <ViewListIcon fontSize="small" />
-              </ToggleButton>
-              <ToggleButton value="table" aria-label="table">
-                <TableRowsIcon fontSize="small" />
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Box>
-        </CategorySeparator>
-        {displayCharacterTable ? (
-          <FactionViewCharactersTable characters={characters} />
-        ) : (
-          <FactionViewCharacters faction={faction} characters={characters} />
-        )}
-        <DeleteDialog
-          message={`Are you sure you want to delete ${faction?.name} character? All characters in the faction will be eliminated. This action cannot be undone.`}
-          onDelete={() => onDelete()}
-          open={deleteDialogOpen}
-          onClose={() => setDeleteDialogOpen(false)}
-        />
-        <TechnicalInfo>
-          <pre>Faction: {JSON.stringify(faction, null, 2)}</pre>
-        </TechnicalInfo>
-      </LayoutBase>
-      {/* <Grid container spacing={1}>
-        <Grid size={gridSizeResume}>
-          <FactionViewResume faction={faction} setFaction={setFaction} game={game} />
-        </Grid>
-        <Grid size={gridSizeMain}>
-          <FactionViewActions faction={faction} setFaction={setFaction} strategicGame={game} />
-          
-      </Grid> */}
-    </>
+      </Grid>
+      <CategorySeparator text={t('faction')} />
+      <FactionViewAttributes faction={faction} characters={characters} />
+      <CategorySeparator text={t('characters')}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+          <AddButton onClick={onCharacterCreate} />
+          <ToggleButtonGroup
+            value={displayCharacterTable ? 'table' : 'list'}
+            exclusive
+            size="small"
+            onChange={handleViewModeChange}
+            aria-label="view-mode"
+          >
+            <ToggleButton value="list" aria-label="list">
+              <ViewListIcon fontSize="small" />
+            </ToggleButton>
+            <ToggleButton value="table" aria-label="table">
+              <TableRowsIcon fontSize="small" />
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+      </CategorySeparator>
+      {displayCharacterTable ? (
+        <FactionViewCharactersTable characters={characters} />
+      ) : (
+        <FactionViewCharacters faction={faction} characters={characters} />
+      )}
+      <DeleteDialog
+        message={`Are you sure you want to delete ${faction?.name} character? All characters in the faction will be eliminated. This action cannot be undone.`}
+        onDelete={() => onDelete()}
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      />
+      <TechnicalInfo>
+        <pre>Faction: {JSON.stringify(faction, null, 2)}</pre>
+      </TechnicalInfo>
+    </LayoutBase>
   );
 }

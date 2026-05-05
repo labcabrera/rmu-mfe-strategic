@@ -1,12 +1,15 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Grid, TextField } from '@mui/material';
 import { NumericInput, RmuSelect, UpdateCharacterDto } from '@labcabrera-rmu/rmu-react-shared-lib';
 
-const CharacterUpdateAttributes: FC<{
+export default function CharacterUpdateAttributes({
+  formData,
+  setFormData,
+}: {
   formData: UpdateCharacterDto;
   setFormData: Dispatch<SetStateAction<UpdateCharacterDto | undefined>>;
-}> = ({ formData, setFormData }) => {
+}) {
   const { t } = useTranslation();
 
   return (
@@ -27,7 +30,7 @@ const CharacterUpdateAttributes: FC<{
           label={t('Height')}
           name="height"
           value={formData.info?.height || 0}
-          onChange={(e) => setFormData({ ...formData, info: { ...formData.info, height: e || 0 } })}
+          onChange={(e) => setFormData({ ...formData, info: { ...formData.info!, height: e || 0 } })}
           allowNegatives={false}
           maxFractionDigits={2}
         />
@@ -37,7 +40,7 @@ const CharacterUpdateAttributes: FC<{
           label={t('weight')}
           name="weight"
           value={formData.info?.weight || 0}
-          onChange={(e) => setFormData({ ...formData, info: { ...formData.info, weight: e || 0 } })}
+          onChange={(e) => setFormData({ ...formData, info: { ...formData.info!, weight: e || 0 } })}
           allowNegatives={false}
           maxFractionDigits={2}
         />
@@ -47,7 +50,7 @@ const CharacterUpdateAttributes: FC<{
           label={t('age')}
           name="age"
           value={formData.roleplay?.age || 0}
-          onChange={(e) => setFormData({ ...formData, roleplay: { ...formData.roleplay, age: e } })}
+          onChange={(e) => setFormData({ ...formData, roleplay: { ...formData.roleplay!, age: e || 20 } })}
           allowNegatives={false}
           maxFractionDigits={2}
         />
@@ -57,7 +60,7 @@ const CharacterUpdateAttributes: FC<{
           value={formData.roleplay?.gender || ''}
           label={t('gender')}
           options={['male', 'female', 'other']}
-          onChange={(e) => setFormData({ ...formData, roleplay: { ...formData.roleplay, gender: e } })}
+          onChange={(e) => setFormData({ ...formData, roleplay: { ...formData.roleplay!, gender: e } })}
         />
       </Grid>
       <Grid size={12}>
@@ -73,6 +76,4 @@ const CharacterUpdateAttributes: FC<{
       </Grid>
     </Grid>
   );
-};
-
-export default CharacterUpdateAttributes;
+}
