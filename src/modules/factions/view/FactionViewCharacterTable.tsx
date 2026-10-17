@@ -14,7 +14,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { Character } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Character, resolveAssetUrl } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 type SortField = 'name' | 'level' | null;
 type SortDirection = 'asc' | 'desc';
@@ -121,7 +121,12 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
               <TableCell>
                 <Tooltip title={c.description || ''}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Avatar src={c.imageUrl} alt={c.name} sx={{ width: 45, height: 45 }} variant="square" />
+                    <Avatar
+                      src={resolveAssetUrl(c.imageUrl)}
+                      alt={c.name}
+                      sx={{ width: 45, height: 45 }}
+                      variant="square"
+                    />
                     <Typography variant="body2">{c.name}</Typography>
                   </div>
                 </Tooltip>

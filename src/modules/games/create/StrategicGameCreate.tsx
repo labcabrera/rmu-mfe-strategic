@@ -15,7 +15,6 @@ import {
   TechnicalInfo,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../../ErrorContext';
-import { imageBaseUrl } from '../../services/config';
 import { DEFAULT_REALM_IMAGE } from '../../services/image-service';
 import StrategicGameForm from '../form/StrategicGameForm';
 
@@ -37,7 +36,7 @@ const EMPTY_STRATEGIC_GAME = {
     statCreationSwap: 2,
   },
   description: '',
-  imageUrl: `${imageBaseUrl}images/generic/strategic.png`,
+  imageUrl: 'images/generic/strategic.png',
 } as StrategicGame;
 
 const StrategicGameCreate: FC = () => {

@@ -22,7 +22,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { AddItemDto, fetchItems, Item, NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { AddItemDto, fetchItems, Item, NumericInput, resolveAssetUrl } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useError } from '../../ErrorContext';
 import { imageBaseUrl } from '../services/config';
 import { itemFilter } from '../services/display';
@@ -222,7 +222,7 @@ export function ItemSelector({
                     <Box sx={{ position: 'relative' }}>
                       <CardMedia
                         component="img"
-                        image={e.imageUrl || `${imageBaseUrl}images/items/${e.id}.png`}
+                        image={resolveAssetUrl(e.imageUrl) || `${imageBaseUrl}images/items/${e.id}.png`}
                         alt={e.name}
                         sx={{
                           aspectRatio: '1 / 1',
@@ -333,7 +333,7 @@ function ItemResume({ item }: { item: Item }) {
       <Stack direction="row" spacing={2}>
         <Box
           component="img"
-          src={item.imageUrl || `${imageBaseUrl}images/items/${item.id}.png`}
+          src={resolveAssetUrl(item.imageUrl) || `${imageBaseUrl}images/items/${item.id}.png`}
           alt={item.name}
           sx={{
             width: 96,

@@ -152,7 +152,7 @@ export const CHARACTER_EMPTY_TEMPLATE = {
   ],
   items: [],
   description: '',
-  imageUrl: `${imageBaseUrl}images/generic/races.png`,
+  imageUrl: 'images/generic/races.png',
 } as unknown as CreateCharacterDto;
 
 export interface StatBonus {
