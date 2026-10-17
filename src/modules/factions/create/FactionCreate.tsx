@@ -26,7 +26,7 @@ export const EMPTY_FACTION = {
   },
   shortDescription: '',
   description: '',
-  imageUrl: `${imageBaseUrl}images/generic/faction.png`,
+  imageUrl: 'images/generic/faction.png',
 } as Faction;
 
 export default function FactionCreate() {
