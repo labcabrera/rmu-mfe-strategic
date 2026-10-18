@@ -22,14 +22,12 @@ const CharacterViewTraits: FC<{
   const { t } = useTranslation();
   const [openAddTraitDialog, setOpenAddTraitDialog] = useState(false);
   const [openTraitDialog, setOpenTraitDialog] = useState(false);
-  const [traitId, setTraitId] = useState<string | null>(null);
   const [characterTrait, setCharacterTrait] = useState<CharacterTrait>();
 
   if (!character) return <LoadingState />;
 
   const handleTraitView = (trait: CharacterTrait) => {
     setCharacterTrait(trait);
-    setTraitId(traitId);
     setOpenTraitDialog(true);
   };
 

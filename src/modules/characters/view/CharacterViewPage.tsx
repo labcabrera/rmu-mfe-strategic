@@ -1,30 +1,47 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import React, { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Box, Chip, Stack } from '@mui/material';
 import {
   Character,
   ConfirmDialog,
   deleteCharacter,
   DetailPage,
   DownloadButton,
-  Faction,
+  enterSx,
   fetchCharacter,
-  fetchFaction,
   fetchProfession,
-  fetchRace,
   fetchStrategicGame,
+  ImageSelectorDialog,
+  imageBaseUrl,
   LevelUpButton,
   levelUpCharacter,
   Profession,
-  Race,
+  ResourceBar,
+  SectionNav,
+  StatPill,
   StrategicGame,
+  updateCharacter,
   useEntity,
   useNotify,
+  useSectionParam,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import CharacterViewResume from './CharacterViewResume';
-import CharacterViewTabs from './CharacterViewTabs';
+import { armorLabel } from './sections/CharacterPanels';
+import {
+  CharacterAttributes,
+  CharacterCombat,
+  CharacterEquipment,
+  CharacterOverview,
+  CharacterProgression,
+  CharacterSectionId,
+  characterSectionIds,
+} from './sections/CharacterSections';
+import CharacterViewSkills from './skills/CharacterViewSkills';
+
+const defaultCharacterImage = `${imageBaseUrl}images/npcs/unknown.png`;
+const sectionIds = [...characterSectionIds];
 
 /** Downloads the character as a JSON file. */
 const downloadCharacter = (character: Character) => {
@@ -53,11 +70,11 @@ export default function CharacterViewPage() {
     onError: notify.error,
   });
   const character = state.entity;
-  const [faction, setFaction] = useState<Faction>();
   const [strategicGame, setStrategicGame] = useState<StrategicGame>();
-  const [race, setRace] = useState<Race>();
   const [profession, setProfession] = useState<Profession>();
   const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [section, setSection] = useSectionParam(sectionIds);
 
   // The character panels expect a state setter; they never pass an updater function.
   const setCharacter: Dispatch<SetStateAction<Character | undefined>> = (value) => {
@@ -69,9 +86,7 @@ export default function CharacterViewPage() {
     if (!character) return;
     fetchStrategicGame(character.gameId, auth).then(setStrategicGame).catch(notify.error);
     fetchProfession(character.info.professionId, auth).then(setProfession).catch(notify.error);
-    fetchFaction(character.faction.id, auth).then(setFaction).catch(notify.error);
-    fetchRace(character.info.race.id, auth).then(setRace).catch(notify.error);
-  }, [character]);
+  }, [character?.gameId, character?.info.professionId]);
 
   const onLevelUp = (entity: Character, force: boolean) => {
     levelUpCharacter(entity.id, force, auth)
@@ -98,16 +113,32 @@ export default function CharacterViewPage() {
       .then(() => navigate(`/strategic/factions/view/${entity.faction.id}`, { replace: true }))
       .catch(notify.error);
 
+  const onImageSelected = (entity: Character, imageUrl: string) =>
+    updateCharacter(entity.id, { imageUrl }, auth).then(state.setEntity).catch(notify.error);
+
+  const levelLabel = (entity: Character) => {
+    const { level, availableLevel } = entity.experience;
+    return level < availableLevel ? `${level} / ${availableLevel}` : `${level}`;
+  };
+
+  const renderSection = (entity: Character): Record<CharacterSectionId, ReactNode> => ({
+    overview: <CharacterOverview character={entity} strategicGame={strategicGame} go={setSection} />,
+    attributes: <CharacterAttributes character={entity} setCharacter={setCharacter} />,
+    skills: <CharacterViewSkills character={entity} setCharacter={setCharacter} profession={profession} />,
+    combat: <CharacterCombat character={entity} strategicGame={strategicGame} />,
+    equipment: <CharacterEquipment character={entity} setCharacter={setCharacter} />,
+    progression: <CharacterProgression character={entity} setCharacter={setCharacter} strategicGame={strategicGame} />,
+  });
+
   return (
     <DetailPage
       breadcrumbs={[
         { name: t('home'), link: '/' },
         { name: t('strategic-module'), link: '/strategic' },
         { name: t('characters'), link: '/strategic/characters' },
-        { name: t('view') },
+        { name: character?.name ?? t('view') },
       ]}
       entity={state}
-      summaryTitle={(entity) => t(entity.name)}
       technicalInfo={false}
       actions={(entity) => [
         ...(entity.experience.availableLevel > entity.experience.level
@@ -117,34 +148,126 @@ export default function CharacterViewPage() {
       ]}
       onEdit={(entity) => navigate(`/strategic/characters/edit/${entity.id}`, { state: { character: entity } })}
       onDelete={onDelete}
-      leftPanel={(entity) => (
-        <CharacterViewResume
-          character={entity}
-          race={race}
-          profession={profession}
-          strategicGame={strategicGame}
-          faction={faction}
-          setCharacter={setCharacter}
-        />
-      )}
+      hero={(entity) => ({
+        title: entity.name,
+        overline: `${t('level')} ${levelLabel(entity)} · ${t(entity.info.professionId)}`,
+        image: entity.imageUrl || defaultCharacterImage,
+        onImageClick: () => setImageDialogOpen(true),
+        imageActionLabel: t('change-image'),
+        chips: [
+          <Chip
+            key="race"
+            label={t(entity.info.race.name)}
+            onClick={() => navigate(`/core/races/view/${entity.info.race.id}`)}
+          />,
+          <Chip key="realm" label={t(entity.info.realmType)} variant="outlined" />,
+          <Chip
+            key="faction"
+            label={entity.faction.name}
+            variant="outlined"
+            onClick={() => navigate(`/strategic/factions/view/${entity.faction.id}`)}
+          />,
+          ...(strategicGame
+            ? [
+                <Chip
+                  key="game"
+                  label={strategicGame.name}
+                  variant="outlined"
+                  onClick={() => navigate(`/strategic/games/view/${strategicGame.id}`)}
+                />,
+              ]
+            : []),
+          ...(entity.experience.availableStatLevelUp > 0
+            ? [
+                <Chip
+                  key="stat-updates"
+                  color="success"
+                  label={t('stat-updates-available', { count: entity.experience.availableStatLevelUp })}
+                  onClick={() => setSection('attributes')}
+                />,
+              ]
+            : []),
+        ],
+        resources: [
+          <ResourceBar
+            key="hp"
+            label={t('hit-points')}
+            current={entity.hp.current}
+            max={entity.hp.max}
+            kind="hp"
+            dense
+          />,
+          ...(entity.power
+            ? [
+                <ResourceBar
+                  key="pp"
+                  label={t('power')}
+                  current={entity.power.current}
+                  max={entity.power.max}
+                  kind="pp"
+                  dense
+                />,
+              ]
+            : []),
+          <ResourceBar
+            key="dp"
+            label={t('dev-points')}
+            current={entity.experience.availableDevPoints}
+            max={entity.experience.devPoints}
+            kind="xp"
+            dense
+          />,
+        ],
+        pills: [
+          <StatPill key="db" label={t('bd')} hint={t('db')} value={entity.defense.defensiveBonus} signed />,
+          <StatPill key="at" label={t('at-short')} hint={t('at')} value={armorLabel(entity)} />,
+          <StatPill
+            key="ini"
+            label={t('initiative-short')}
+            hint={t('initiative')}
+            value={entity.initiative.totalBonus}
+            signed
+          />,
+          <StatPill key="bmr" label={t('bmr')} value={entity.movement.baseMovementRate} />,
+          <StatPill
+            key="mp"
+            label={t('maneuver-penalty-short')}
+            hint={t('maneuver-penalty')}
+            value={entity.equipment.maneuverPenalty}
+            signed
+          />,
+        ],
+      })}
     >
       {(entity) => (
-        <>
-          <CharacterViewTabs
-            character={entity}
-            setCharacter={setCharacter}
-            strategicGame={strategicGame}
-            profession={profession}
+        <Stack spacing={2}>
+          <SectionNav
+            label={t('character-sections')}
+            value={section}
+            onChange={setSection}
+            sections={sectionIds.map((id) => ({ id, label: t(id) }))}
           />
+          <Box key={section} sx={enterSx()}>
+            {renderSection(entity)[section as CharacterSectionId]}
+          </Box>
           <ConfirmDialog
             open={levelUpDialogOpen}
             title={t('level-up')}
-            message={`${entity.name} has ${entity.experience.availableDevPoints} available development points. Are you sure you want to level up ${entity.name}? This action cannot be undone.`}
+            message={t('level-up-confirmation', {
+              name: entity.name,
+              points: entity.experience.availableDevPoints,
+            })}
             confirmLabel={t('level-up')}
             onClose={() => setLevelUpDialogOpen(false)}
             onConfirm={() => onLevelUp(entity, true)}
           />
-        </>
+          <ImageSelectorDialog
+            value={entity.imageUrl || defaultCharacterImage}
+            open={imageDialogOpen}
+            onClose={() => setImageDialogOpen(false)}
+            onSelect={(image) => onImageSelected(entity, image)}
+          />
+        </Stack>
       )}
     </DetailPage>
   );

@@ -92,7 +92,6 @@ const CharacterViewMovement: FC<{
   const isDisabledPace = (pace: Pace): boolean => {
     const index = movementTable.findIndex((e) => pace === e.pace);
     const maxIndex = movementTable.findIndex((e) => character.movement.maxPace === e.pace);
-    console.log(`${pace} ${index} ${maxIndex}`);
     return index > maxIndex;
   };
 

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import TableRowsIcon from '@mui/icons-material/TableRows';
-import ViewListIcon from '@mui/icons-material/ViewList';
+import ViewAgendaIcon from '@mui/icons-material/ViewAgenda';
 import {
   alpha,
   Box,
@@ -15,9 +15,9 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
-import { AddButton, Character, Profession } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { AddButton, Character, CharacterSkill, Profession, SkillGroupList } from '@labcabrera-rmu/rmu-react-shared-lib';
 import AddSkillDialog from './AddSkillDialog';
-import CharacterSkillList from './CharacterSkillList';
+import CharacterSkillBreakdown from './CharacterSkillBreakdown';
 import CharacterSkillTable from './CharacterSkillTable';
 
 const STORAGE_KEY = 'character-display-skill-table';
@@ -30,6 +30,7 @@ const CharacterViewSkills: FC<{
   const { t } = useTranslation();
   const [openAddSkillDialog, setOpenAddSkillDialog] = useState(false);
   const [skillNameFilter, setSkillNameFilter] = useState('');
+  const [selectedSkill, setSelectedSkill] = useState<CharacterSkill | null>(null);
   const [displaySkillTable, setDisplaySkillTable] = useState<boolean>(() => {
     try {
       return localStorage.getItem(STORAGE_KEY) === 'true';
@@ -123,8 +124,8 @@ const CharacterViewSkills: FC<{
               onChange={handleViewModeChange}
               aria-label={t('view-mode')}
             >
-              <ToggleButton value="list" aria-label={t('list')}>
-                <ViewListIcon fontSize="small" />
+              <ToggleButton value="list" aria-label={t('view-grouped')}>
+                <ViewAgendaIcon fontSize="small" />
               </ToggleButton>
               <ToggleButton value="table" aria-label={t('table')}>
                 <TableRowsIcon fontSize="small" />
@@ -147,8 +148,9 @@ const CharacterViewSkills: FC<{
           profession={profession}
         />
       ) : (
-        <CharacterSkillList character={character} skills={filteredSkills} />
+        <SkillGroupList skills={filteredSkills} onSelect={setSelectedSkill} searchable={false} />
       )}
+      <CharacterSkillBreakdown skill={selectedSkill} onClose={() => setSelectedSkill(null)} />
       <AddSkillDialog
         open={openAddSkillDialog}
         character={character}
