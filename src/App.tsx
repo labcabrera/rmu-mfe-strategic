@@ -1,50 +1,39 @@
 import React, { FC } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { Box, ThemeProvider } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { NotFound } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { ErrorProvider } from './ErrorContext';
+import { MfeRoot, NotFound } from '@labcabrera-rmu/rmu-react-shared-lib';
 import HomePage from './HomePage';
-import CharacterCreate from './modules/characters/create/CharacterCreate';
-import CharacterList from './modules/characters/list/CharacterList';
-import CharacterUpdate from './modules/characters/update/CharacterUpdate';
-import CharacterView from './modules/characters/view/CharacterView';
-import FactionCreate from './modules/factions/create/FactionCreate';
-import FactionList from './modules/factions/list/FactionList';
-import FactionUpdate from './modules/factions/update/FactionUpdate';
-import FactionView from './modules/factions/view/FactionView';
-import StrategicGameCreate from './modules/games/create/StrategicGameCreate';
-import StrategicGameList from './modules/games/list/StrategicGameList';
-import StrategicGameEdit from './modules/games/update/StrategicGameUpdate';
-import StrategicGameView from './modules/games/view/StrategicGameView';
+import CharacterCreatePage from './modules/characters/create/CharacterCreatePage';
+import CharacterEditPage from './modules/characters/form/CharacterEditPage';
+import CharacterListPage from './modules/characters/list/CharacterListPage';
+import CharacterViewPage from './modules/characters/view/CharacterViewPage';
+import FactionFormPage from './modules/factions/form/FactionFormPage';
+import FactionListPage from './modules/factions/list/FactionListPage';
+import FactionViewPage from './modules/factions/view/FactionViewPage';
+import StrategicGameFormPage from './modules/games/form/StrategicGameFormPage';
+import StrategicGameListPage from './modules/games/list/StrategicGameListPage';
+import StrategicGameViewPage from './modules/games/view/StrategicGameViewPage';
 import TradeView from './modules/trade/TradeView';
 
-const App: FC = () => {
-  return (
-    <ThemeProvider theme={useTheme()}>
-      <ErrorProvider>
-        <Box sx={{ p: 2 }}>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/games" element={<StrategicGameList />} />
-            <Route path="/games/view/:gameId" element={<StrategicGameView />} />
-            <Route path="/games/edit/:gameId" element={<StrategicGameEdit />} />
-            <Route path="/games/create" element={<StrategicGameCreate />} />
-            <Route path="/factions" element={<FactionList />} />
-            <Route path="/factions/view/:factionId" element={<FactionView />} />
-            <Route path="/factions/edit/:factionId" element={<FactionUpdate />} />
-            <Route path="/factions/create" element={<FactionCreate />} />
-            <Route path="/characters" element={<CharacterList />} />
-            <Route path="/characters/view/:characterId" element={<CharacterView />} />
-            <Route path="/characters/create" element={<CharacterCreate />} />
-            <Route path="/characters/edit/:characterId" element={<CharacterUpdate />} />
-            <Route path="/characters/trade/:characterId" element={<TradeView />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Box>
-      </ErrorProvider>
-    </ThemeProvider>
-  );
-};
+const App: FC = () => (
+  <MfeRoot sx={{ p: 2 }}>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/games" element={<StrategicGameListPage />} />
+      <Route path="/games/view/:gameId" element={<StrategicGameViewPage />} />
+      <Route path="/games/edit/:gameId" element={<StrategicGameFormPage key="edit" mode="edit" />} />
+      <Route path="/games/create" element={<StrategicGameFormPage key="create" mode="create" />} />
+      <Route path="/factions" element={<FactionListPage />} />
+      <Route path="/factions/view/:factionId" element={<FactionViewPage />} />
+      <Route path="/factions/edit/:factionId" element={<FactionFormPage key="edit" mode="edit" />} />
+      <Route path="/factions/create" element={<FactionFormPage key="create" mode="create" />} />
+      <Route path="/characters" element={<CharacterListPage />} />
+      <Route path="/characters/view/:characterId" element={<CharacterViewPage />} />
+      <Route path="/characters/create" element={<CharacterCreatePage />} />
+      <Route path="/characters/edit/:characterId" element={<CharacterEditPage />} />
+      <Route path="/characters/trade/:characterId" element={<TradeView />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  </MfeRoot>
+);
 
 export default App;

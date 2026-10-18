@@ -2,14 +2,14 @@ import React, { Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Grid } from '@mui/material';
 import {
-  CategorySeparator,
   CreateCharacterDto,
+  LoadingState,
   NumericInput,
   Profession,
   Race,
   STATS,
+  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../../ErrorContext';
 import NameTextField from '../../shared/inputs/NameTextField';
 import SelectProfession from '../../shared/selects/SelectProfession';
 import SelectRace from '../../shared/selects/SelectRace';
@@ -27,7 +27,7 @@ const CharacterCreateMainForm: FC<{
   profession: Profession | undefined;
 }> = ({ formData, setFormData, setProfession, setSelectedRace, selectedRace, races, profession }) => {
   const { t } = useTranslation();
-  const { showError } = useError();
+  const notify = useNotify();
 
   const onRaceChange = (race: Race) => {
     if (!race) return;
@@ -77,7 +77,7 @@ const CharacterCreateMainForm: FC<{
     }));
   };
 
-  if (!races) return <p>Loading...</p>;
+  if (!races) return <LoadingState />;
 
   return (
     <Grid container spacing={2}>
@@ -88,7 +88,7 @@ const CharacterCreateMainForm: FC<{
           gender={formData.roleplay.gender}
           onChange={(value: string) => setFormData((prev) => ({ ...prev, name: value }))}
           generateRandomRaceValue={selectedRace?.archetype ?? ''}
-          onError={(e) => showError(e)}
+          onError={(e) => notify.error(e)}
         />
       </Grid>
       <Grid size={gridFormSize}>

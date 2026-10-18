@@ -1,9 +1,19 @@
-import React, { FC, Fragment } from 'react';
+import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import { CategorySeparator, Character, Pace, RmuTextCard, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { imageBaseUrl } from '../../services/config';
-import { gridSizeCard, greyScale } from '../../services/display';
+import {
+  CategorySeparator,
+  Character,
+  gridSizeCard,
+  imageBaseUrl,
+  LoadingState,
+  Pace,
+  RmuTextCard,
+  StrategicGame,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
+
+/** Grayscale applied to the pace cards that are not available. */
+const greyScale = 0.7;
 
 interface TableItem {
   pace: Pace;
@@ -70,7 +80,7 @@ const CharacterViewMovement: FC<{
   strategicGame: StrategicGame;
 }> = ({ character, strategicGame }) => {
   const { t } = useTranslation();
-  if (!character || !strategicGame) return <div>Loading...</div>;
+  if (!character || !strategicGame) return <LoadingState />;
 
   const bmr = character.movement.baseMovementRate;
   const scale = strategicGame.options?.boardScaleMultiplier || 1;
@@ -140,21 +150,21 @@ const CharacterViewMovement: FC<{
           />
         </Grid>
       </Grid>
-      <CategorySeparator text={t('Speed table')} />
+      <CategorySeparator text={t('speed-table')} />
       <TableContainer component={Paper}>
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Pace</TableCell>
-              <TableCell align="right">Round</TableCell>
-              <TableCell align="right">Phase</TableCell>
-              <TableCell align="right">Penalty</TableCell>
-              <TableCell align="right">AP</TableCell>
-              <TableCell align="right">Load limit</TableCell>
-              <TableCell align="right">Round</TableCell>
-              <TableCell align="right">Phase</TableCell>
-              <TableCell align="right">Round Scaled</TableCell>
-              <TableCell align="right">Phase Scaled</TableCell>
+              <TableCell>{t('pace')}</TableCell>
+              <TableCell align="right">{t('round')}</TableCell>
+              <TableCell align="right">{t('phase')}</TableCell>
+              <TableCell align="right">{t('penalty')}</TableCell>
+              <TableCell align="right">{t('action-points-short')}</TableCell>
+              <TableCell align="right">{t('load-limit')}</TableCell>
+              <TableCell align="right">{t('round')}</TableCell>
+              <TableCell align="right">{t('phase')}</TableCell>
+              <TableCell align="right">{t('round-scaled')}</TableCell>
+              <TableCell align="right">{t('phase-scaled')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -170,8 +180,8 @@ const CharacterViewMovement: FC<{
                   }}
                 >
                   <TableCell>{t(item.pace)}</TableCell>
-                  <TableCell align="right">{item.roundModifier}x BMR</TableCell>
-                  <TableCell align="right">{item.phaseModifier}x BMR</TableCell>
+                  <TableCell align="right">{t('bmr-multiplier', { value: item.roundModifier })}</TableCell>
+                  <TableCell align="right">{t('bmr-multiplier', { value: item.phaseModifier })}</TableCell>
                   <TableCell align="right">{item.penalty || '-'}</TableCell>
                   <TableCell align="right">{item.ap || '-'}</TableCell>
                   <TableCell align="right">{item.loadLimit ? `${item.loadLimit}%` : '-'}</TableCell>

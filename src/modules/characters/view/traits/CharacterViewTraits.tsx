@@ -1,9 +1,16 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Grid, Stack, Typography } from '@mui/material';
-import { CategorySeparator, AddButton, RmuCard, Character, CharacterTrait } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { imageBaseUrl } from '../../../services/config';
-import { gridSizeCard } from '../../../services/display';
+import {
+  AddButton,
+  CategorySeparator,
+  Character,
+  CharacterTrait,
+  gridSizeCard,
+  imageBaseUrl,
+  LoadingState,
+  RmuCard,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { toRoman } from '../../../services/roman-number-service';
 import AddTraitDialog from './AddTraitDialog';
 import CharacterViewTraitDialog from './CharacterViewTraitDialog';
@@ -18,7 +25,7 @@ const CharacterViewTraits: FC<{
   const [traitId, setTraitId] = useState<string | null>(null);
   const [characterTrait, setCharacterTrait] = useState<CharacterTrait>();
 
-  if (!character) return <div>Loading for character...</div>;
+  if (!character) return <LoadingState />;
 
   const handleTraitView = (trait: CharacterTrait) => {
     setCharacterTrait(trait);
@@ -30,7 +37,7 @@ const CharacterViewTraits: FC<{
     <>
       <Grid container spacing={1}>
         <Grid size={12}>
-          <CategorySeparator text={t('Traits')}>
+          <CategorySeparator text={t('traits')}>
             <AddButton onClick={() => setOpenAddTraitDialog(true)} />
           </CategorySeparator>
         </Grid>
@@ -52,14 +59,14 @@ const CharacterViewTraits: FC<{
                       {t(trait.traitId)} {toRoman(trait.tier)}
                     </Typography>
                     <Typography color="secondary">
-                      <em>{trait.specialization ? t(trait.specialization) : 'None'}</em>
+                      <em>{trait.specialization ? t(trait.specialization) : t('none')}</em>
                     </Typography>
                   </Stack>
                 </RmuCard>
               </Grid>
             ))}
           </Grid>
-          {character.traits.length === 0 && <div>This character has no traits.</div>}
+          {character.traits.length === 0 && <div>{t('character-no-traits')}</div>}
         </Grid>
       </Grid>
       <AddTraitDialog

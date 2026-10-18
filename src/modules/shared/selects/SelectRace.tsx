@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { TextField, Autocomplete } from '@mui/material';
-import { Race } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { LoadingState, Race } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const SelectRace: FC<{
   races: Race[];
@@ -8,7 +8,7 @@ const SelectRace: FC<{
   value: string | null | undefined;
   onChange: (race: Race) => void;
 }> = ({ label, value, onChange, races }) => {
-  if (!races) return <p>Loading...</p>;
+  if (!races) return <LoadingState />;
 
   const selectedRace = races.find((r) => r.id === value) ?? null;
 

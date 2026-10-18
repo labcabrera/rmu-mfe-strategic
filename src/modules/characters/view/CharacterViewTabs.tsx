@@ -1,12 +1,18 @@
 import React, { useState, SyntheticEvent, ReactNode, FC, Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, CircularProgress, Tab, Tabs } from '@mui/material';
-import { Character, StrategicGame, Profession, TechnicalInfo } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Box, Tab, Tabs } from '@mui/material';
+import {
+  Character,
+  LoadingState,
+  Profession,
+  StrategicGame,
+  TechnicalInfo,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import CharacterViewAttacks from './CharacterViewAttacks';
-import CharacterHealingPanel from './healing/CharacterHealingPanel';
 import CharacterViewInfo from './CharacterViewInfo';
 import CharacterViewMovement from './CharacterViewMovement';
 import CharacterViewResistances from './CharacterViewResistances';
+import CharacterHealingPanel from './healing/CharacterHealingPanel';
 import CharacterEquipmentButtons from './items/CharacterEquipmentButtons';
 import CharacterEquipmentPanel from './items/CharacterEquipmentPanel';
 import CharacterViewSkills from './skills/CharacterViewSkills';
@@ -19,7 +25,7 @@ function CustomTabPanel(props: { children?: ReactNode; value: number; index: num
 
   return (
     <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} {...other}>
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ px: { xs: 0, sm: 2, md: 3 }, py: { xs: 2, md: 3 } }}>{children}</Box>}
     </div>
   );
 }
@@ -44,7 +50,7 @@ const CharacterViewTabs: FC<{
     setValue(newValue);
   };
 
-  if (!character || !strategicGame || !profession) return <CircularProgress />;
+  if (!character || !strategicGame || !profession) return <LoadingState />;
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -105,7 +111,7 @@ const CharacterViewTabs: FC<{
       </CustomTabPanel>
 
       <TechnicalInfo>
-        <pre>Character: {JSON.stringify(character, null, 2)}</pre>
+        <pre>{`Character: ${JSON.stringify(character, null, 2)}`}</pre>
       </TechnicalInfo>
     </Box>
   );

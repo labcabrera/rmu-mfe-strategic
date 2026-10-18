@@ -2,9 +2,7 @@ import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Grid } from '@mui/material';
-import { LayoutBase, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { imageBaseUrl } from './modules/services/config';
-import { gridSizeCard } from './modules/services/display';
+import { gridSizeCard, imageBaseUrl, LayoutBase, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const OPTIONS = [
   {

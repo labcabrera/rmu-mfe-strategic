@@ -4,14 +4,14 @@ import { useAuth } from 'react-oidc-context';
 import { Grid, Stack, Typography } from '@mui/material';
 import {
   Character,
+  gridSizeCard,
   NumericInput,
   RmuDialog,
   StatKey,
   updateCharacterTemporaryStat,
   UpdateTemporaryStatDto,
+  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../../../ErrorContext';
-import { gridSizeCard } from '../../../services/display';
 
 const StatLevelUpDialog: FC<{
   character: Character;
@@ -22,7 +22,7 @@ const StatLevelUpDialog: FC<{
 }> = ({ character, stat, open, setCharacter, onClose }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const { showError } = useError();
+  const notify = useNotify();
   const [roll, setRoll] = useState<number>();
   const [minRoll, setMinRoll] = useState<number>();
   const [maxRoll, setMaxRoll] = useState<number>();
@@ -40,7 +40,7 @@ const StatLevelUpDialog: FC<{
         setCharacter(response);
         onClose();
       })
-      .catch((err) => showError(err.message));
+      .catch((err) => notify.error(err));
   };
 
   const calculateDiceRoll = () => {
@@ -83,38 +83,35 @@ const StatLevelUpDialog: FC<{
         <Grid size={gridSizeCard}>
           <Stack>
             <Typography>{stat}</Typography>
-            <Typography color="secondary">{t('Stat')}</Typography>
+            <Typography color="secondary">{t('stat')}</Typography>
           </Stack>
         </Grid>
         <Grid size={gridSizeCard}>
           <Stack>
             <Typography>{potential}</Typography>
-            <Typography color="secondary">{t('Potential')}</Typography>
+            <Typography color="secondary">{t('potential')}</Typography>
           </Stack>
         </Grid>
         <Grid size={gridSizeCard}>
           <Stack>
             <Typography>{temporary}</Typography>
-            <Typography color="secondary">{t('Temporary')}</Typography>
+            <Typography color="secondary">{t('temporary')}</Typography>
           </Stack>
         </Grid>
         <Grid size={gridSizeCard}>
           <Stack>
             <Typography>{diceRoll}</Typography>
-            <Typography color="secondary">{t('Roll type')}</Typography>
+            <Typography color="secondary">{t('roll-type')}</Typography>
           </Stack>
         </Grid>
         <Grid size={12}>
           <Typography variant="body2" color="secondary">
-            Every time a character goes up a level, or for level 2 and above when creating a character beyond 1st level,
-            pick two stats to get a stat gain roll (or one stat to get two rolls). Stats cannot be raised above their
-            spent (e.g., a human who spends nothing on talents potential value. Stat gains may also be purchased with
-            Development Points. For 4 DP, a character can make one additional Stat Gain roll.
+            {t('stat-level-up-help')}
           </Typography>
         </Grid>
         <Grid size={gridSizeCard}>
           <NumericInput
-            label={`${t('Roll')} ${diceRoll}`}
+            label={`${t('roll')} ${diceRoll}`}
             value={roll}
             onChange={(v) => setRoll(v || undefined)}
             min={minRoll}

@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
 import { CreateCharacterDto, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { StatBonusFormData } from '../characters/create/CharacterCreate';
+import { StatBonusFormData } from '../characters/create/CharacterCreatePage';
 import { getStatBonus } from './stat-service';
 
 export const randomizeStats = (

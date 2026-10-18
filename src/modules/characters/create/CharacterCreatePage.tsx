@@ -1,32 +1,36 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import OutboundIcon from '@mui/icons-material/Outbound';
 import { Grid, IconButton, Badge, Box, Typography } from '@mui/material';
 import {
-  CancelButton,
   Character,
   createCharacter,
   CreateCharacterDto,
   EditableAvatar,
+  ErrorState,
   Faction,
   fetchFaction,
   fetchRaces,
   fetchStrategicGame,
-  LayoutBase,
+  FormPage,
+  imageBaseUrl,
+  LoadingState,
+  NotFound,
   Profession,
   Race,
   RefreshButton,
-  SaveButton,
   Section,
   StrategicGame,
   TechnicalInfo,
+  useEntity,
+  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../../ErrorContext';
 import { defaultStats } from '../../data/character-create';
-import { imageBaseUrl } from '../../services/config';
 import { randomizeStats } from '../../services/randomize-stats';
+import StrategicGamePicker from '../../shared/StrategicGamePicker';
 import CharacterViewStatsChart from '../view/stats/CharacterViewStatsChart';
 import CharacterCreateBoostOptionsDialog from './CharacterCreateBoostOptionsDialog';
 import CharacterCreateLore from './CharacterCreateLore';
@@ -38,7 +42,7 @@ import CharacterCreateStats from './CharacterCreateStats';
 
 const defaultImage = `${imageBaseUrl}images/races/unknown-alt.png`;
 
-export const CHARACTER_EMPTY_TEMPLATE = {
+const CHARACTER_EMPTY_TEMPLATE = {
   name: '',
   gameId: '',
   factionId: '',
@@ -164,58 +168,58 @@ export interface StatBonusFormData {
   [key: string]: StatBonus;
 }
 
-export default function CharacterCreate() {
+/**
+ * Character creation wizard. It needs the strategic game (`gameId` query param) and asks for it when
+ * it is missing; `factionId` is optional.
+ */
+export default function CharacterCreatePage() {
   const auth = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { showError } = useError();
+  const location = useLocation();
+  const notify = useNotify();
 
-  const [searchParams] = useSearchParams();
-  const gameId = searchParams.get('gameId');
-  const factionId = searchParams.get('factionId');
-  const [faction, setFaction] = useState<Faction>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const gameId = searchParams.get('gameId') || undefined;
+  const factionId = searchParams.get('factionId') || undefined;
+  const initialFaction: Faction | undefined = location.state?.faction;
+  const gameState = useEntity<StrategicGame>(gameId, (id) => fetchStrategicGame(id, auth), { onError: notify.error });
+  const factionState = useEntity<Faction>(factionId, (id) => fetchFaction(id, auth), {
+    initial: initialFaction && initialFaction.id === factionId ? initialFaction : undefined,
+    onError: notify.error,
+  });
+  const game = gameState.entity;
+  const faction = factionState.entity;
 
-  const [game, setGame] = useState<StrategicGame | null>(null);
   const [profession, setProfession] = useState<Profession>();
   const [races, setRaces] = useState<Race[]>([]);
   const [selectedRace, setSelectedRace] = useState<Race>();
 
   const [formData, setFormData] = useState<CreateCharacterDto>(CHARACTER_EMPTY_TEMPLATE);
   const [statBonusFormData, setStatBonusFormData] = useState<StatBonusFormData>(defaultStats);
-  const [isValid, setIsValid] = useState<boolean>(false);
   const [boostDialogOpen, setBoostDialogOpen] = useState<boolean>(false);
 
   const onRandomStats = () => {
     randomizeStats(setFormData, setStatBonusFormData);
   };
 
-  const validate = (): boolean => {
-    if (!formData) return false;
-    let valid = true;
-    if (!formData.gameId) valid = false;
-    if (!formData.name) valid = false;
-    if (!formData.info?.raceId) valid = false;
-    if (!formData.info?.professionId) valid = false;
-    if (!formData.info?.realmType) valid = false;
-    if (!formData.info?.weight) valid = false;
-    if (!formData.level) valid = false;
-    return valid;
-  };
+  const isValid =
+    !!formData.gameId &&
+    !!formData.name &&
+    !!formData.info?.raceId &&
+    !!formData.info?.professionId &&
+    !!formData.info?.realmType &&
+    !!formData.info?.weight &&
+    !!formData.level;
 
-  const bindStrategicGame = () => {
-    if (gameId) {
-      fetchStrategicGame(gameId, auth)
-        .then((game) => setGame(game))
-        .catch((err) => showError(err.message));
-    }
-  };
-
-  const onCreate = async () => {
+  const onCreate = () => {
     const dto = formData as unknown as Partial<Character>;
     createCharacter(dto, auth)
       .then((data) => navigate('/strategic/characters/view/' + data.id, { state: { character: data, game: game } }))
-      .catch((err) => showError(err.message));
+      .catch(notify.error);
   };
+
+  const onCancel = () => navigate(factionId ? `/strategic/factions/view/${factionId}` : '/strategic/characters');
 
   const handleWeaponOrderChange = (newOrder: string[]) => {
     setFormData((prevState) => ({
@@ -225,52 +229,61 @@ export default function CharacterCreate() {
   };
 
   useEffect(() => {
-    setIsValid(validate());
-  }, [formData]);
-
-  useEffect(() => {
     if (game) {
       fetchRaces(`realmId==${game.realmId}`, 0, 100, auth)
         .then((data) => setRaces(data.content))
-        .catch((err) => showError(err.message));
+        .catch(notify.error);
     }
   }, [game]);
 
   useEffect(() => {
-    if (gameId) {
-      bindStrategicGame();
-      setFormData((prevState) => ({
-        ...prevState,
-        gameId: gameId,
-      }));
-    }
+    if (gameId) setFormData((prevState) => ({ ...prevState, gameId }));
   }, [gameId]);
 
   useEffect(() => {
-    if (factionId) {
-      fetchFaction(factionId, auth)
-        .then((response) => {
-          setFaction(response);
-          setFormData((prevState) => ({ ...prevState, factionId: factionId }));
-        })
-        .catch((err) => showError(err.message));
-    }
-  }, [factionId]);
+    if (faction) setFormData((prevState) => ({ ...prevState, factionId: faction.id }));
+  }, [faction]);
 
-  if (!game || !formData) return <div>Loading....</div>;
+  const breadcrumbs = [
+    { name: t('home'), link: '/' },
+    { name: t('strategic-module'), link: '/strategic' },
+    { name: t('characters'), link: '/strategic/characters' },
+    { name: t('create') },
+  ];
+
+  if (!gameId)
+    return (
+      <StrategicGamePicker
+        breadcrumbs={breadcrumbs}
+        message={t('select-campaign-to-continue')}
+        onCancel={() => navigate('/strategic/characters')}
+        onSelect={(id) =>
+          setSearchParams((params) => {
+            params.set('gameId', id);
+            return params;
+          })
+        }
+      />
+    );
+
+  if (!game) {
+    let state = <LoadingState variant="detail" />;
+    if (gameState.notFound) state = <NotFound />;
+    else if (gameState.error) state = <ErrorState error={gameState.error} onRetry={gameState.refresh} />;
+    return (
+      <FormPage breadcrumbs={breadcrumbs} onSave={onCreate} onCancel={onCancel} saveDisabled>
+        {state}
+      </FormPage>
+    );
+  }
 
   return (
-    <LayoutBase
-      breadcrumbs={[
-        { name: t('home'), link: '/' },
-        { name: t('strategic-module'), link: '/strategic' },
-        { name: t('characters'), link: '/strategic/characters' },
-        { name: t('create') },
-      ]}
-      actions={[
-        <CancelButton onClick={() => navigate(`/strategic/factions/view/${faction?.id}`)} />,
-        <SaveButton onClick={onCreate} disabled={!isValid} />,
-      ]}
+    <FormPage
+      breadcrumbs={breadcrumbs}
+      onSave={onCreate}
+      onCancel={onCancel}
+      saveDisabled={!isValid}
+      dirty={!!formData.name}
       leftPanel={
         <>
           <EditableAvatar
@@ -347,9 +360,6 @@ export default function CharacterCreate() {
         )}
       </Grid>
 
-      {/* <Grid size={12}> */}
-      {/* </Grid> */}
-
       <CharacterCreateBoostOptionsDialog
         open={boostDialogOpen}
         onClose={() => setBoostDialogOpen(false)}
@@ -360,6 +370,6 @@ export default function CharacterCreate() {
       <TechnicalInfo>
         <pre>{JSON.stringify(formData, null, 2)}</pre>
       </TechnicalInfo>
-    </LayoutBase>
+    </FormPage>
   );
 }

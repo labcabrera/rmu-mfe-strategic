@@ -2,8 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Grid, Typography } from '@mui/material';
-import { Faction, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { gridSizeCard } from '../../services/display';
+import { Faction, gridSizeCard, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 export default function StrategicGameViewFactions({ factions }: { factions: Faction[] | undefined }) {
   const navigate = useNavigate();
@@ -17,7 +16,7 @@ export default function StrategicGameViewFactions({ factions }: { factions: Fact
         <Grid key={faction.id} size={gridSizeCard}>
           <RmuTextCard
             value={faction.name}
-            subtitle={faction.shortDescription || 'No description provided'}
+            subtitle={faction.shortDescription || t('no-description')}
             image={faction.imageUrl || ''}
             onClick={() => navigate(`/strategic/factions/view/${faction.id}`, { state: { faction } })}
           />
@@ -26,7 +25,7 @@ export default function StrategicGameViewFactions({ factions }: { factions: Fact
       <Grid size={12}>
         {factions.length === 0 && (
           <Typography variant="body1" color="secondary">
-            <em>{t('No factions have been created')}</em>
+            <em>{t('no-factions-have-been-created')}</em>
           </Typography>
         )}
       </Grid>

@@ -10,8 +10,7 @@ const CharacterViewStatsTable: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
 }> = ({ character, setCharacter }) => {
-  if (!character) return <div>Loading...</div>;
-
+  const { t } = useTranslation();
   const [levelUpStatDialogOpen, setLevelUpStatDialogOpen] = useState<boolean>(false);
   const [levelUpStat, setLevelUpStat] = useState<StatKey>();
 
@@ -27,17 +26,17 @@ const CharacterViewStatsTable: FC<{
 
   return (
     <>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{ maxWidth: '100%', overflowX: 'auto' }}>
         <Table sx={{ minWidth: 650 }}>
           <TableHead>
             <TableRow>
-              <TableCell align="left">Stat</TableCell>
-              <TableCell align="right">P</TableCell>
-              <TableCell align="right">T</TableCell>
-              <TableCell align="right">Bon</TableCell>
-              <TableCell align="right">Rac</TableCell>
-              <TableCell align="right">Cus</TableCell>
-              <TableCell align="right">Tot</TableCell>
+              <TableCell align="left">{t('stat')}</TableCell>
+              <TableCell align="right">{t('potential-short')}</TableCell>
+              <TableCell align="right">{t('temporary-short')}</TableCell>
+              <TableCell align="right">{t('bonus-short')}</TableCell>
+              <TableCell align="right">{t('racial-short')}</TableCell>
+              <TableCell align="right">{t('custom-short')}</TableCell>
+              <TableCell align="right">{t('total-short')}</TableCell>
               <TableCell align="right">
                 {character.experience.availableStatLevelUp > 0 && (
                   <Chip label={`+${character.experience.availableStatLevelUp}`} color="success" />

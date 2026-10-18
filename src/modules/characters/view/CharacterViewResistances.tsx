@@ -1,8 +1,7 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Paper, Stack, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { CategorySeparator, Character } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { imageBaseUrl } from '../../services/config';
+import { CategorySeparator, Character, imageBaseUrl } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const CharacterViewResistances: FC<{
   character: Character;
@@ -29,8 +28,8 @@ const CharacterViewResistances: FC<{
 
   return (
     <>
-      <CategorySeparator text={t('Resistances')} />
-      <Paper sx={{ width: 'fit-content', overflow: 'hidden' }}>
+      <CategorySeparator text={t('resistances')} />
+      <Paper sx={{ width: 'fit-content', maxWidth: '100%', overflowX: 'auto' }}>
         <Table
           size="small"
           sx={{
@@ -44,7 +43,7 @@ const CharacterViewResistances: FC<{
               height: 44,
             },
           }}
-          aria-label="stats table"
+          aria-label={t('stats-table')}
         >
           <TableHead
             sx={{

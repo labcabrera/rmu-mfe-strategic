@@ -35,7 +35,7 @@ const SelectRealmType: FC<{
       onChange={(_event, newValue) => onChange(newValue ?? '')}
       isOptionEqualToValue={(option, val) => option === val}
       readOnly={options.length === 1}
-      noOptionsText={t('No options')}
+      noOptionsText={t('no-options')}
       fullWidth
       renderInput={(params) => <TextField {...params} label={t('realm')} error={error} required={required} />}
     />

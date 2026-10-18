@@ -4,26 +4,56 @@ import { useAuth } from 'react-oidc-context';
 import { Badge, Box, Button, Divider, Grid, Paper, Stack, Typography } from '@mui/material';
 import {
   AddButton,
+  addCharacterXP,
+  Character,
+  imageBaseUrl,
+  LoadingState,
   NumericInput,
   RmuDialog,
   RmuTextCard,
-  addCharacterXP,
-  Character,
-  StrategicGame,
   Section,
+  StrategicGame,
+  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../../../ErrorContext';
-import { imageBaseUrl } from '../../../services/config';
 
 const grayscale = 0.7;
 const gridSizeCard = { xs: 10, sm: 5, md: 5, lg: 3, xl: 2 } as const;
+const numberFormat = new Intl.NumberFormat('en-US');
+
+/** XP award ranges per event type, shown as a reference in the add-XP dialog. */
+const xpEventGroups = [
+  {
+    title: 'personal-events',
+    events: [
+      { label: 'minor-personal-event', min: 10, max: 100 },
+      { label: 'moderate-personal-event', min: 100, max: 500 },
+      { label: 'major-personal-event', min: 500, max: 1000 },
+    ],
+  },
+  {
+    title: 'session-events',
+    events: [
+      { label: 'minor-session-event', min: 100, max: 500 },
+      { label: 'moderate-session-event', min: 500, max: 1000 },
+      { label: 'major-session-event', min: 1000, max: 5000 },
+    ],
+  },
+  {
+    title: 'story-events',
+    events: [
+      { label: 'minor-story-event', min: 10, max: 100 },
+      { label: 'moderate-story-event', min: 100, max: 500 },
+      { label: 'major-story-event', min: 500, max: 1000 },
+    ],
+  },
+];
 
 const CharacterViewExperience: FC<{
   character: Character;
   strategicGame: StrategicGame;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
 }> = ({ character, strategicGame, setCharacter }) => {
-  const { showError } = useError();
+  const notify = useNotify();
   const { t } = useTranslation();
   const auth = useAuth();
   const [openAddXpDialog, setOpenAddXpDialog] = useState(false);
@@ -32,7 +62,7 @@ const CharacterViewExperience: FC<{
   const experienceMultiplier = strategicGame.options?.experienceMultiplier || 1;
   const totalXp = Math.max(0, Math.round((baseXp || 0) * experienceMultiplier));
 
-  if (!character) return <div>Loading...</div>;
+  if (!character) return <LoadingState />;
 
   function handleClose() {
     setOpenAddXpDialog(false);
@@ -50,7 +80,7 @@ const CharacterViewExperience: FC<{
         setCharacter(response);
         handleClose();
       })
-      .catch((err) => showError(err.message));
+      .catch((err) => notify.error(err));
   }
 
   return (
@@ -82,7 +112,7 @@ const CharacterViewExperience: FC<{
           </Grid>
           <Grid size={gridSizeCard}>
             <RmuTextCard
-              value={new Intl.NumberFormat('en-US').format(character.experience.xp)}
+              value={numberFormat.format(character.experience.xp)}
               subtitle={t('xp')}
               image={`${imageBaseUrl}images/generic/experience.png`}
               grayscale={grayscale}
@@ -111,7 +141,7 @@ const CharacterViewExperience: FC<{
         subtitle={`${t('experience-multiplier')}: x${experienceMultiplier}`}
         buttons={[
           <Button variant="contained" onClick={handleClose}>
-            Close
+            {t('close')}
           </Button>,
           <Button
             variant="contained"
@@ -119,69 +149,31 @@ const CharacterViewExperience: FC<{
             color="success"
             disabled={!baseXp || baseXp < 1 || totalXp < 1}
           >
-            Add
+            {t('add')}
           </Button>,
         ]}
       >
         <Stack spacing={2}>
           <Typography variant="body1" color="text.secondary">
-            Personal events award experience when the character fulfills a personal desire or learns from a meaningful
-            failure. Use the base award and the game multiplier to calculate the final XP.
+            {t('xp-award-help')}
           </Typography>
           <Typography variant="body1" color="secondary">
-            More info in <em>12.4. Awarding Experience</em> in Core Law.
+            {t('more-info-in-core-law', { section: '12.4' })}
           </Typography>
-          <Paper elevation={-2} sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              {t('personal-events')}
-            </Typography>
-            <Stack spacing={1}>
-              <Typography variant="body1">
-                <strong>Minor Personal Event:</strong> 10-100 EP. Achieving one of the character's desires without a
-                specific plan.
+          {xpEventGroups.map((group) => (
+            <Paper key={group.title} elevation={-2} sx={{ p: 2 }}>
+              <Typography variant="h6" gutterBottom>
+                {t(group.title)}
               </Typography>
-              <Typography variant="body1">
-                <strong>Moderate Personal Event:</strong> 100-500 EP. Character was specifically working to achieve that
-                desire when it happened.
-              </Typography>
-              <Typography variant="body1">
-                <strong>Major Personal Event:</strong> 500-1000 EP. Something that has required longer-range planning
-                and effort to achieve.
-              </Typography>
-            </Stack>
-          </Paper>
-          <Paper elevation={-2} sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              {t('sesion-events')}
-            </Typography>
-            <Stack spacing={1}>
-              <Typography variant="body1">
-                <strong>Minor Session Event:</strong> 100-500 EP.
-              </Typography>
-              <Typography variant="body1">
-                <strong>Moderate Session Event:</strong> 500-1000 EP.
-              </Typography>
-              <Typography variant="body1">
-                <strong>Major Session Event:</strong> 1000-5000 EP.
-              </Typography>
-            </Stack>
-          </Paper>
-          <Paper elevation={-2} sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              {t('story-events')}
-            </Typography>
-            <Stack spacing={1}>
-              <Typography variant="body1">
-                <strong>Minor Story Event:</strong> 10-100 EP.
-              </Typography>
-              <Typography variant="body1">
-                <strong>Moderate Story Event:</strong> 100-500 EP.
-              </Typography>
-              <Typography variant="body1">
-                <strong>Major Story Event:</strong> 500-1000 EP.
-              </Typography>
-            </Stack>
-          </Paper>
+              <Stack spacing={1}>
+                {group.events.map((event) => (
+                  <Typography key={event.label} variant="body1">
+                    <strong>{t(event.label)}:</strong> {t('xp-range', { min: event.min, max: event.max })}
+                  </Typography>
+                ))}
+              </Stack>
+            </Paper>
+          ))}
           <Divider />
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
@@ -202,13 +194,13 @@ const CharacterViewExperience: FC<{
               />
             </Box>
             <Typography variant="body2" color="text.secondary">
-              x {experienceMultiplier}
+              {`x ${experienceMultiplier}`}
             </Typography>
-            <Typography variant="h6">{new Intl.NumberFormat('en-US').format(totalXp)} XP</Typography>
+            <Typography variant="h6">{t('xp-value', { value: numberFormat.format(totalXp) })}</Typography>
           </Stack>
           {error && (
             <Typography variant="body2" color="error">
-              Enter a base experience value greater than zero.
+              {t('xp-base-required')}
             </Typography>
           )}
         </Stack>

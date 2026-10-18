@@ -1,9 +1,8 @@
-import React, { useState, useEffect, ChangeEvent, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { TextField, Autocomplete } from '@mui/material';
-import { Profession, fetchProfessions } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../../ErrorContext';
+import { fetchProfessions, Profession, useNotify } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const SelectProfession: React.FC<{
   value?: string | null;
@@ -12,7 +11,7 @@ const SelectProfession: React.FC<{
 }> = ({ value, onChange, required = true }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const { showError } = useError();
+  const notify = useNotify();
   const [professions, setProfessions] = useState<Profession[]>([]);
   const isValueEmpty = value === undefined || value === null || value === '';
   const error = required && isValueEmpty;
@@ -22,7 +21,7 @@ const SelectProfession: React.FC<{
   useEffect(() => {
     fetchProfessions('', 0, 100, auth)
       .then((data) => setProfessions(data.content))
-      .catch((err) => showError(err?.message || String(err)));
+      .catch((err) => notify.error(err?.message || String(err)));
   }, []);
 
   return (

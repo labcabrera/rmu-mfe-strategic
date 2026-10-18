@@ -1,9 +1,7 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CircularProgress } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { Character, Faction, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { imageBaseUrl } from '../../services/config';
+import { Character, Faction, imageBaseUrl, LoadingState, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const FactionViewAttributes: FC<{
   faction?: Faction;
@@ -11,7 +9,7 @@ const FactionViewAttributes: FC<{
 }> = ({ faction, characters }) => {
   const { t } = useTranslation();
 
-  if (!faction) return <CircularProgress />;
+  if (!faction) return <LoadingState />;
 
   const getTotalLevels = (): number => {
     if (!characters || characters.length === 0) return 0;

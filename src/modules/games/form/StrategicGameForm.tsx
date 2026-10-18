@@ -32,8 +32,6 @@ const StrategicGameForm: FC<{
     }));
   };
 
-  if (!formData) return <div>Loading...</div>;
-
   return (
     <Grid container spacing={1}>
       <Grid size={12}>
@@ -111,7 +109,7 @@ const StrategicGameForm: FC<{
         </Section>
       </Grid>
       <Grid size={12}>
-        <Section title={t('Power level')}>
+        <Section title={t('power-level')}>
           <Grid container spacing={2}>
             <Grid size={gridSize}>
               <NumericInput

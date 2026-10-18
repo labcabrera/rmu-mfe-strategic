@@ -1,28 +1,30 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { FC } from 'react';
 import { useAuth } from 'react-oidc-context';
 import { Link as RouterLink } from 'react-router-dom';
 import { Link, Typography } from '@mui/material';
-import { EditableAvatar, RmuTextCard, StrategicGame, updateStrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../../ErrorContext';
-import { imageBaseUrl } from '../../services/config';
+import {
+  EditableAvatar,
+  imageBaseUrl,
+  StrategicGame,
+  updateStrategicGame,
+  useNotify,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const defaultGameImage = `${imageBaseUrl}images/generic/strategic.png`;
 
 const StrategicGameViewResume: FC<{
   strategicGame?: StrategicGame;
-  setStrategicGame: Dispatch<SetStateAction<StrategicGame>>;
+  setStrategicGame: (strategicGame: StrategicGame) => void;
 }> = ({ strategicGame, setStrategicGame: setGame }) => {
   const auth = useAuth();
-  const { t } = useTranslation();
-  const { showError } = useError();
+  const notify = useNotify();
 
   const onImageUpdated = (imageId: string) => {
     if (!strategicGame) return;
     const dto = { imageUrl: imageId };
     updateStrategicGame(strategicGame.id, dto, auth)
       .then(() => setGame({ ...strategicGame, imageUrl: imageId }))
-      .catch((error: Error) => showError(error.message));
+      .catch((error: Error) => notify.error(error));
   };
 
   return (

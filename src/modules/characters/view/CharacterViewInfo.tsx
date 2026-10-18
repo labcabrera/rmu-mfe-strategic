@@ -1,8 +1,15 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Grid, Tooltip, Typography } from '@mui/material';
-import { Character, RmuTextCard, Section, STATS, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { imageBaseUrl } from '../../services/config';
+import {
+  Character,
+  imageBaseUrl,
+  LoadingState,
+  RmuTextCard,
+  Section,
+  STATS,
+  StrategicGame,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const grayscale = 0.7;
 const gridSizeCard = { xs: 10, sm: 5, md: 5, lg: 3, xl: 2 } as const;
@@ -34,7 +41,7 @@ export default function CharacterViewInfo({
     }
   };
 
-  if (!character || !strategicGame) return <div>Loading...</div>;
+  if (!character || !strategicGame) return <LoadingState />;
 
   return (
     <>
@@ -130,7 +137,7 @@ export default function CharacterViewInfo({
                   title={
                     <React.Fragment>
                       <Typography color="inherit">
-                        <em>BMR = 20' + Qu/2 + Stride bonus</em>
+                        <em>{t('bmr-formula')}</em>
                       </Typography>
                     </React.Fragment>
                   }
@@ -208,7 +215,7 @@ export default function CharacterViewInfo({
           <Section title={t('resistances')} elevation={0}>
             <Grid container spacing={1} columns={10}>
               {character.resistances.map((resistance) => (
-                <Grid key={resistance.resistance} size={{ xs: 12, md: 2 }}>
+                <Grid key={resistance.resistance} size={gridSizeCard}>
                   <RmuTextCard
                     key={resistance.resistance}
                     value={resistance.totalBonus}

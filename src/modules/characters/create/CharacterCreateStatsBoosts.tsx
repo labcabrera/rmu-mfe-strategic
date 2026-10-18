@@ -1,30 +1,31 @@
-import React, { useState, useEffect, FC, Dispatch, SetStateAction, useTransition } from 'react';
+import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Grid, MenuItem, TextField, Typography } from '@mui/material';
-import { CreateCharacterDto, STATS, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CreateCharacterDto, StatKey, STATS, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { getStatBonus } from '../../services/stat-service';
-import { StatBonus } from './CharacterCreate';
+import { StatBonus } from './CharacterCreatePage';
 
 const StatButton: FC<{ text: string; onClick: () => void }> = ({ text, onClick }) => {
   return <Button onClick={onClick}>{text}</Button>;
 };
 
 const StatSelect: FC<{
+  id: string;
   name: string;
-  value: string;
-  setValue: (value: string) => void;
-}> = ({ name, value, setValue }) => {
+  value: StatKey | '';
+  setValue: (value: StatKey) => void;
+}> = ({ id, name, value, setValue }) => {
   const { t } = useTranslation();
 
   return (
     <TextField
       select
       label={name}
-      id={`select-${name}`}
+      id={`select-${id}`}
       value={value}
       variant="standard"
       fullWidth
-      onChange={(e) => setValue(e.target.value)}
+      onChange={(e) => setValue(e.target.value as StatKey)}
     >
       {STATS.map((option) => (
         <MenuItem key={option} value={option}>
@@ -35,7 +36,7 @@ const StatSelect: FC<{
   );
 };
 
-const CharacterCreateStatsActions: FC<{
+const CharacterCreateStatsBoosts: FC<{
   strategicGame: StrategicGame;
   formData: CreateCharacterDto;
   setFormData: React.Dispatch<React.SetStateAction<CreateCharacterDto>>;
@@ -46,9 +47,9 @@ const CharacterCreateStatsActions: FC<{
   setSwaps: Dispatch<SetStateAction<number>>;
 }> = ({ strategicGame, formData, setFormData, setStatBonusFormData, boosts, setBoosts, swaps, setSwaps }) => {
   const { t } = useTranslation();
-  const [sourceBoostStat, setSourceBoostStat] = useState<string>('');
-  const [targetBoostStat, setTargetBoostStat] = useState<string>('');
-  const [replaceBoostStat, setReplaceBoostStat] = useState<string>('');
+  const [sourceBoostStat, setSourceBoostStat] = useState<StatKey | ''>('');
+  const [targetBoostStat, setTargetBoostStat] = useState<StatKey | ''>('');
+  const [replaceBoostStat, setReplaceBoostStat] = useState<StatKey | ''>('');
 
   const handleSwapStats = () => {
     if (swaps > 0 && sourceBoostStat && targetBoostStat) {
@@ -125,17 +126,16 @@ const CharacterCreateStatsActions: FC<{
     }
   };
 
-  const handleBoostHighest = () => {
-    const highestStat = Object.entries(formData.statistics || {}).reduce(
-      (max, entry) => (entry[1].temporary > max[1].temporary ? entry : max),
-      ['', { temporary: -Infinity } as any]
-    )[0];
-    if (highestStat) {
-      updateStat(highestStat, 90, 90);
+  // Raises the stat with the n-th highest temporary value (0 = highest, 1 = second highest).
+  const handleBoostRanked = (rank: number) => {
+    const ranked = Object.entries(formData.statistics || {}).sort((a, b) => b[1].temporary - a[1].temporary);
+    const target = ranked[rank]?.[0] as StatKey | undefined;
+    if (target) {
+      updateStat(target, 90, 90);
     }
   };
 
-  const updateStat = (key: string, potentialValue: number, temporaryValue: number) => {
+  const updateStat = (key: StatKey, potentialValue: number, temporaryValue: number) => {
     setFormData((prevState) => {
       const stat = prevState.statistics[key];
       return {
@@ -176,38 +176,50 @@ const CharacterCreateStatsActions: FC<{
       </Typography>
       <Grid container spacing={1}>
         <Grid size={3}>
-          <TextField label="Boosts" value={boosts} InputProps={{ readOnly: true }} variant="standard" fullWidth />
+          <TextField
+            label={t('stat-creation-boosts')}
+            value={boosts}
+            slotProps={{ input: { readOnly: true } }}
+            variant="standard"
+            fullWidth
+          />
         </Grid>
         <Grid size={3}>
-          <TextField label="Swaps" value={swaps} InputProps={{ readOnly: true }} variant="standard" fullWidth />
+          <TextField
+            label={t('stat-creation-swaps')}
+            value={swaps}
+            slotProps={{ input: { readOnly: true } }}
+            variant="standard"
+            fullWidth
+          />
         </Grid>
         <Grid size={3}>
-          <StatButton text="Boost 1th" onClick={handleBoostHighest} />
+          <StatButton text={t('stat-boost-first')} onClick={() => handleBoostRanked(0)} />
         </Grid>
         <Grid size={3}>
-          <StatButton text="Boost 2th" onClick={handleBoostHighest} />
+          <StatButton text={t('stat-boost-second')} onClick={() => handleBoostRanked(1)} />
         </Grid>
 
         <Grid size={3}>
-          <StatSelect name="Source" value={sourceBoostStat} setValue={setSourceBoostStat} />
+          <StatSelect id="swap-source" name={t('source')} value={sourceBoostStat} setValue={setSourceBoostStat} />
         </Grid>
         <Grid size={3}>
-          <StatSelect name="Target" value={targetBoostStat} setValue={setTargetBoostStat} />
+          <StatSelect id="swap-target" name={t('target')} value={targetBoostStat} setValue={setTargetBoostStat} />
         </Grid>
         <Grid size={6}>
-          <StatButton text="Swap" onClick={handleSwapStats} />
+          <StatButton text={t('swap-values')} onClick={handleSwapStats} />
         </Grid>
 
         <Grid size={3}>
-          <StatSelect name="Target" value={replaceBoostStat} setValue={setReplaceBoostStat} />
+          <StatSelect id="replace-target" name={t('target')} value={replaceBoostStat} setValue={setReplaceBoostStat} />
         </Grid>
         <Grid size={3}></Grid>
         <Grid size={6}>
-          <StatButton text="Replace" onClick={handleReplacePotential} />
+          <StatButton text={t('replace')} onClick={handleReplacePotential} />
         </Grid>
       </Grid>
     </>
   );
 };
 
-export default CharacterCreateStatsActions;
+export default CharacterCreateStatsBoosts;

@@ -1,10 +1,16 @@
-import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
 import { Button, Stack } from '@mui/material';
-import { StrategicItem, createStrategicItem, Character, fetchCharacter } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../../../ErrorContext';
+import {
+  Character,
+  createStrategicItem,
+  fetchCharacter,
+  LoadingState,
+  StrategicItem,
+  useNotify,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import CharacterViewAddItemDialog from './CharacterAddItemDialog';
 
 export default function CharacterEquipmentButtons({
@@ -17,7 +23,7 @@ export default function CharacterEquipmentButtons({
   const auth = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { showError } = useError();
+  const notify = useNotify();
   const [openAddItemDialog, setOpenAddItemDialog] = useState(false);
 
   const onItemAdded = (formData: Partial<StrategicItem>) => {
@@ -27,16 +33,16 @@ export default function CharacterEquipmentButtons({
       .then(() => {
         bindCharacter();
       })
-      .catch((err) => showError(err.message));
+      .catch((err) => notify.error(err));
   };
 
   const bindCharacter = () => {
     fetchCharacter(character.id, auth)
       .then((response) => setCharacter(response))
-      .catch((err) => showError(err.message));
+      .catch((err) => notify.error(err));
   };
 
-  if (!setCharacter) return <p>Loading...</p>;
+  if (!setCharacter) return <LoadingState />;
 
   return (
     <>

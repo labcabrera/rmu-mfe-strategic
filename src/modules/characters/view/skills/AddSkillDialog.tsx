@@ -10,8 +10,8 @@ import {
   RmuDialog,
   Skill,
   SkillSelector,
+  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../../../ErrorContext';
 
 export default function AddSkillDialog({
   open,
@@ -26,7 +26,7 @@ export default function AddSkillDialog({
 }) {
   const auth = useAuth();
   const { t } = useTranslation();
-  const { showError } = useError();
+  const notify = useNotify();
   const [formData, setFormData] = useState<AddSkill>({ ranks: 0 } as AddSkill);
   const [validFormData, setValidFormData] = useState<boolean>(false);
   const [selectedSkill, setSelectedSkill] = useState<Skill>();
@@ -43,7 +43,7 @@ export default function AddSkillDialog({
         setSelectedSkill(response);
         setFormData({ ...formData, skillId });
       })
-      .catch((err) => showError(err.message));
+      .catch((err) => notify.error(err));
   };
 
   const onAddSkill = async () => {
@@ -52,7 +52,7 @@ export default function AddSkillDialog({
         setCharacter(response);
         reset();
       })
-      .catch((err) => showError(err.message));
+      .catch((err) => notify.error(err));
   };
 
   const isValid = (): boolean => {
@@ -87,7 +87,7 @@ export default function AddSkillDialog({
           <SkillSelector
             onSkillChange={(v) => onSelectedSkill(v || '')}
             onSpecializationChange={(v) => setFormData({ ...formData, specialization: v })}
-            onError={(err) => showError(err)}
+            onError={(err) => notify.error(err)}
           />
         </Grid>
       </Grid>

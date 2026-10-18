@@ -44,6 +44,9 @@ export default (_env: unknown, argv: { mode?: string }): Configuration => {
 
     resolve: {
       extensions: ['.tsx', '.ts', '.jsx', '.js', '.json'],
+      // rmu-react-shared-lib is a file: link outside this folder: resolve its peer dependencies (react,
+      // MUI…) from this app first so the bundle has a single copy of each.
+      modules: [path.resolve(__dirname, 'node_modules'), 'node_modules'],
     },
 
     devServer: {
@@ -147,7 +150,8 @@ export default (_env: unknown, argv: { mode?: string }): Configuration => {
           '@emotion/react': { singleton: true, requiredVersion: deps['@emotion/react'] },
           '@emotion/styled': { singleton: true, requiredVersion: deps['@emotion/styled'] },
           'react-oidc-context': { singleton: true, requiredVersion: deps['react-oidc-context'] },
-          'oidc-client-ts': { singleton: true, requiredVersion: deps['react-oidc-context'] },
+          'oidc-client-ts': { singleton: true, requiredVersion: deps['oidc-client-ts'] },
+          i18next: { singleton: true, requiredVersion: deps.i18next },
           'react-i18next': { singleton: true, requiredVersion: deps['react-i18next'] },
         },
       }),

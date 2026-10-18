@@ -1,8 +1,7 @@
 import React from 'react';
 import { useAuth } from 'react-oidc-context';
 import { Typography } from '@mui/material';
-import { EditableAvatar, Faction, StrategicGame, updateFaction } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../../ErrorContext';
+import { EditableAvatar, Faction, StrategicGame, updateFaction, useNotify } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 export default function FactionViewResume({
   faction,
@@ -14,14 +13,14 @@ export default function FactionViewResume({
   setFaction: (faction: Faction) => void;
 }) {
   const auth = useAuth();
-  const { showError } = useError();
+  const notify = useNotify();
 
   const onImageUpdated = (imageId: string) => {
     if (!faction) return;
     const dto = { imageUrl: imageId };
     updateFaction(faction.id, dto, auth)
       .then(() => setFaction({ ...faction, imageUrl: imageId }))
-      .catch((error: Error) => showError(error.message));
+      .catch((error: Error) => notify.error(error));
   };
 
   return (

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Grid, TextField } from '@mui/material';
 import { NumericInput, RmuSelect, UpdateCharacterDto } from '@labcabrera-rmu/rmu-react-shared-lib';
 
-export default function CharacterUpdateAttributes({
+export default function CharacterEditAttributes({
   formData,
   setFormData,
 }: {
@@ -27,7 +27,7 @@ export default function CharacterUpdateAttributes({
       <Grid size={12}></Grid>
       <Grid size={{ xs: 12, md: 2 }}>
         <NumericInput
-          label={t('Height')}
+          label={t('height')}
           name="height"
           value={formData.info?.height || 0}
           onChange={(e) => setFormData({ ...formData, info: { ...formData.info!, height: e || 0 } })}

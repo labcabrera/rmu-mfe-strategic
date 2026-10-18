@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useEffect, useState } from 'react';
+import React, { SyntheticEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useParams } from 'react-router-dom';
@@ -6,12 +6,16 @@ import { Box, Grid, Tab, Tabs, Typography } from '@mui/material';
 import {
   AddItemDto,
   Character,
+  ErrorState,
   fetchCharacter,
   GenericAvatar,
   LayoutBase,
+  LoadingState,
+  NotFound,
   TechnicalInfo,
+  useEntity,
+  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../ErrorContext';
 import TradeManeuverForm from './TradeManeuverForm';
 import TradeViewItemSearch from './TradeViewItemSearch';
 import TradeViewOptions from './TradeViewOptions';
@@ -22,10 +26,10 @@ const tradeOptions: TradeViewFormData['option'][] = ['buy', 'sell'];
 export default function TradeView() {
   const auth = useAuth();
   const { t } = useTranslation();
-  const { showError } = useError();
+  const notify = useNotify();
   const { characterId } = useParams<{ characterId: string }>();
-  const [character, setCharacter] = useState<Character>();
-  const [loading, setLoading] = useState<boolean>(true);
+  const state = useEntity<Character>(characterId, (id) => fetchCharacter(id, auth), { onError: notify.error });
+  const character = state.entity;
   const [formData, setFormData] = useState<TradeViewFormData>({
     option: 'buy',
     communications: 'normal',
@@ -36,16 +40,6 @@ export default function TradeView() {
     languageOptions: 'none',
   });
   const [itemFormData, setItemFormData] = useState<AddItemDto>({} as AddItemDto);
-
-  useEffect(() => {
-    if (characterId) {
-      setLoading(true);
-      fetchCharacter(characterId, auth)
-        .then((c) => setCharacter(c))
-        .catch((err) => showError(err.message))
-        .finally(() => setLoading(false));
-    }
-  }, [characterId]);
 
   const onTradeOptionChange = (_event: SyntheticEvent, option: TradeViewFormData['option']) => {
     setFormData({ ...formData, option });
@@ -66,8 +60,14 @@ export default function TradeView() {
         </>
       }
     >
-      {loading ? (
-        <p>{t('loading')}...</p>
+      {!character ? (
+        state.notFound ? (
+          <NotFound />
+        ) : state.error ? (
+          <ErrorState error={state.error} onRetry={state.refresh} />
+        ) : (
+          <LoadingState />
+        )
       ) : (
         <Box sx={{ width: '100%' }}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>

@@ -21,11 +21,12 @@ import {
   AddTraitDto,
   Character,
   fetchTraits,
+  LoadingState,
   TechnicalInfo,
   Trait,
   traitCategories,
+  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../../../ErrorContext';
 import SelectTraitSpecialization from './SelectTraitSpecialization';
 
 const AddTraitDialog: FC<{
@@ -36,7 +37,7 @@ const AddTraitDialog: FC<{
 }> = ({ character, setCharacter, open, onClose }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const { showError } = useError();
+  const notify = useNotify();
   const theme = useTheme();
 
   const [traits, setTraits] = useState<Trait[]>([]);
@@ -47,7 +48,7 @@ const AddTraitDialog: FC<{
   const bindTraits = () => {
     fetchTraits(`category==${selectedTraitCategory}`, 0, 200, auth)
       .then((data) => setTraits(data.content))
-      .catch((error) => showError(error.message));
+      .catch((error) => notify.error(error));
   };
 
   const onAddTrait = () => {
@@ -57,7 +58,7 @@ const AddTraitDialog: FC<{
         reset();
         onClose();
       })
-      .catch((err) => showError(err.message));
+      .catch((err) => notify.error(err));
   };
 
   const handleTraitChange = (trait: Trait) => {
@@ -88,7 +89,7 @@ const AddTraitDialog: FC<{
     }
   }, [selectedTraitCategory]);
 
-  if (!traits || !traitCategories) return <p>Loading...</p>;
+  if (!traits || !traitCategories) return <LoadingState />;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
@@ -116,8 +117,8 @@ const AddTraitDialog: FC<{
             <TraitForm trait={selectedTrait} formData={formData} setFormData={setFormData} />
           </Grid>
           <TechnicalInfo>
-            <pre>Trait: {JSON.stringify(selectedTrait, null, 2)}</pre>
-            <pre>FormData: {JSON.stringify(formData, null, 2)}</pre>
+            <pre>{`Trait: ${JSON.stringify(selectedTrait, null, 2)}`}</pre>
+            <pre>{`FormData: ${JSON.stringify(formData, null, 2)}`}</pre>
           </TechnicalInfo>
         </Grid>
       </DialogContent>
@@ -179,11 +180,11 @@ const TraitForm: FC<{
           <TextField
             select
             label={t('tier')}
-            value={formData.tier || null}
+            value={formData.tier || ''}
             onChange={(e) => setFormData({ ...formData, tier: Number.parseInt(e.target.value) })}
             fullWidth
           >
-            {Array.from({ length: trait.maxTier }, (_, i) => i).map((option, index) => (
+            {Array.from({ length: trait.maxTier ?? 0 }, (_, i) => i).map((option, index) => (
               <MenuItem key={index} value={option + 1}>
                 {option + 1}
               </MenuItem>
@@ -207,7 +208,7 @@ const TraitForm: FC<{
         {trait.isTierBased && (
           <>
             <Typography variant="body2" color="secondary">
-              {t('cost')}: {trait.adquisitionCost} + ({trait.tierCost} x tier)
+              {t('trait-tier-cost', { cost: trait.adquisitionCost, tierCost: trait.tierCost })}
             </Typography>
           </>
         )}

@@ -2,7 +2,7 @@ import React, { Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box } from '@mui/material';
 import { Grid } from '@mui/system';
-import { CategorySeparator, Character, Section } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CategorySeparator, Character } from '@labcabrera-rmu/rmu-react-shared-lib';
 import CharacterViewStatsChart from './CharacterViewStatsChart';
 import CharacterViewStatsTable from './CharacterViewStatsTable';
 

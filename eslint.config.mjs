@@ -1,12 +1,12 @@
 import js from '@eslint/js';
-import importPlugin from 'eslint-plugin-import';
-import jsxA11y from 'eslint-plugin-jsx-a11y';
-import react from 'eslint-plugin-react';
+import i18next from 'eslint-plugin-i18next';
 import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
+// Shared by the shared lib, the shell and every MFE: keep the copies identical.
 export default [
+  { ignores: ['dist/**', 'node_modules/**', 'storybook-static/**', 'coverage/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -25,15 +25,10 @@ export default [
       },
     },
     plugins: {
-      react,
       'react-hooks': reactHooks,
-      'jsx-a11y': jsxA11y,
-      import: importPlugin,
+      i18next,
     },
     rules: {
-      'react/react-in-jsx-scope': 'off',
-      'react/prop-types': 'off',
-
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
 
@@ -42,16 +37,22 @@ export default [
       'no-unused-vars': 'warn',
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       eqeqeq: ['error', 'always'],
-    },
-    settings: {
-      react: {
-        version: 'detect',
-      },
-      'import/resolver': {
-        node: {
-          extensions: ['.js', '.jsx', '.ts', '.tsx'],
+
+      // Every visible string goes through i18n: JSX text and the attributes users see or hear.
+      'i18next/no-literal-string': [
+        'error',
+        {
+          mode: 'jsx-only',
+          'jsx-attributes': {
+            include: ['label', 'title', 'placeholder', 'aria-label', 'helperText', 'alt', 'subtitle', 'text'],
+          },
         },
-      },
+      ],
     },
+  },
+  {
+    // Stories and tests hold sample data, not UI text.
+    files: ['**/*.stories.{ts,tsx}', '**/*.test.{ts,tsx}', 'src/test/**', '.storybook/**'],
+    rules: { 'i18next/no-literal-string': 'off' },
   },
 ];

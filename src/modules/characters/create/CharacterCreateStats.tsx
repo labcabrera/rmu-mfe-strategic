@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { CreateCharacterDto, StatKey, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { StatBonusFormData } from './CharacterCreate';
+import { StatBonusFormData } from './CharacterCreatePage';
 
 export default function CharacterCreateStats({
   formData,
@@ -14,24 +14,26 @@ export default function CharacterCreateStats({
   const { t } = useTranslation();
 
   return (
-    <Table sx={{ minWidth: 650, '& .MuiTableCell-root': { typography: 'body1' } }} aria-label="stats table">
-      <TableHead>
-        <TableRow>
-          <TableCell align="left">Stat</TableCell>
-          <TableCell align="right">{t('potential-short')}</TableCell>
-          <TableCell align="right">{t('potential-bonus-short')}</TableCell>
-          <TableCell align="right">{t('temporary-short')}</TableCell>
-          <TableCell align="right">{t('temporary-bonus-short')}</TableCell>
-          <TableCell align="right">{t('racial')}</TableCell>
-          <TableCell align="right">{t('total')}</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {STATS.map((key) => (
-          <Row key={key} statKey={key} statName={t(key)} formData={formData} statBonusFormData={statBonusFormData} />
-        ))}
-      </TableBody>
-    </Table>
+    <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto' }}>
+      <Table sx={{ minWidth: 650, '& .MuiTableCell-root': { typography: 'body1' } }} aria-label={t('stats-table')}>
+        <TableHead>
+          <TableRow>
+            <TableCell align="left">{t('stat')}</TableCell>
+            <TableCell align="right">{t('potential-short')}</TableCell>
+            <TableCell align="right">{t('potential-bonus-short')}</TableCell>
+            <TableCell align="right">{t('temporary-short')}</TableCell>
+            <TableCell align="right">{t('temporary-bonus-short')}</TableCell>
+            <TableCell align="right">{t('racial')}</TableCell>
+            <TableCell align="right">{t('total')}</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {STATS.map((key) => (
+            <Row key={key} statKey={key} statName={t(key)} formData={formData} statBonusFormData={statBonusFormData} />
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 }
 

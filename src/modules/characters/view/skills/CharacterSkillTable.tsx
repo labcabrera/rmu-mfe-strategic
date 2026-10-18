@@ -21,6 +21,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TableRow,
   Tooltip,
@@ -35,8 +36,8 @@ import {
   levelUpSkill,
   Profession,
   setUpProfessionalSkill,
+  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../../../ErrorContext';
 
 const maxProfessionalSkills = 10;
 const maxKnackSkills = 2;
@@ -58,51 +59,51 @@ export default function CharacterSkillTable({
   const currentProfessionalSkills = character.skills.filter((s) => s.professional?.includes('professional')).length;
 
   return (
-    <Paper>
+    <TableContainer component={Paper} sx={{ maxWidth: '100%', overflowX: 'auto' }}>
       <Table size="small">
         <TableHead>
           <TableRow>
             <TableCell align="left" sx={{ width: 44 }} />
             <TableCell align="left" sx={{ minWidth: 180 }}>
-              {t('Skill')}
+              {t('skill')}
             </TableCell>
             <TableCell align="left" sx={{ minWidth: 120 }}>
-              <Tooltip title={t('Specializacion')}>
+              <Tooltip title={t('specialization')}>
                 <Typography variant="body2">
-                  <b>Spec</b>
+                  <b>{t('spec')}</b>
                 </Typography>
               </Tooltip>
             </TableCell>
             <TableCell align="left" sx={{ minWidth: 90 }}>
-              Stats
+              {t('stats')}
             </TableCell>
 
             <TableCell align="right" sx={{ width: 64 }}>
-              <Tooltip title={t('Developed ranks')}>
+              <Tooltip title={t('developed-ranks')}>
                 <Typography variant="body2">
-                  <b>{t('Ranks')}</b>
+                  <b>{t('ranks')}</b>
                 </Typography>
               </Tooltip>
             </TableCell>
             <TableCell align="right" sx={{ width: 72 }}>
-              Total
+              {t('total')}
             </TableCell>
             <TableCell align="left" sx={{ minWidth: 88 }}>
-              <Tooltip title={t('Developed ranks')}>
+              <Tooltip title={t('developed-ranks')}>
                 <Typography variant="body2">
-                  <b>{t('Dev Ranks')}</b>
+                  <b>{t('dev-ranks')}</b>
                 </Typography>
               </Tooltip>
             </TableCell>
             <TableCell align="right" sx={{ minWidth: 72 }}>
-              <Tooltip title={t('Development cost')}>
+              <Tooltip title={t('development-cost')}>
                 <Typography variant="body2">
-                  <b>Dev</b>
+                  <b>{t('development-cost-short')}</b>
                 </Typography>
               </Tooltip>
             </TableCell>
             <TableCell align="left" sx={{ minWidth: 220 }}>
-              {t('Actions')}
+              {t('actions')}
             </TableCell>
           </TableRow>
         </TableHead>
@@ -129,7 +130,7 @@ export default function CharacterSkillTable({
           )}
         </TableBody>
       </Table>
-    </Paper>
+    </TableContainer>
   );
 }
 
@@ -150,7 +151,7 @@ function SkillRow({
 }) {
   const auth = useAuth();
   const { t } = useTranslation();
-  const { showError } = useError();
+  const notify = useNotify();
   const [open, setOpen] = useState(false);
   const isProfessional = skill.professional?.includes('professional');
   const isKnack = skill.professional?.includes('knack');
@@ -158,13 +159,13 @@ function SkillRow({
   const handleLevelUp = () => {
     levelUpSkill(character.id, skill.skillId, skill.specialization, auth)
       .then((updated) => setCharacter(updated))
-      .catch((error: any) => showError(error.message));
+      .catch((error: any) => notify.error(error));
   };
 
   const handleLevelDown = () => {
     levelDownSkill(character.id, skill.skillId, skill.specialization, auth)
       .then((updated) => setCharacter(updated))
-      .catch((error: any) => showError(error.message));
+      .catch((error: any) => notify.error(error));
   };
 
   const handleSetUpProfessionalSkill = (skillObj: CharacterSkill) => {
@@ -181,7 +182,7 @@ function SkillRow({
     }
     setUpProfessionalSkill(character.id, skillObj.skillId, skillObj.specialization, array, auth)
       .then((updated) => setCharacter(updated))
-      .catch((error: any) => showError(error.message));
+      .catch((error: any) => notify.error(error));
   };
 
   const handleSetUpKnackSkill = (skillObj: CharacterSkill) => {
@@ -198,13 +199,13 @@ function SkillRow({
     }
     setUpProfessionalSkill(character.id, skillObj.skillId, skillObj.specialization, array, auth)
       .then((updated) => setCharacter(updated))
-      .catch((error: any) => showError(error.message));
+      .catch((error: any) => notify.error(error));
   };
 
   const handleDeleteSkill = (skill: CharacterSkill) => {
     deleteCharacterSkill(character.id, skill.skillId, skill.specialization, auth)
       .then((updated) => setCharacter(updated))
-      .catch((error) => showError(error.message));
+      .catch((error) => notify.error(error));
   };
 
   const isLevelUpDisabled = () => {
@@ -238,17 +239,17 @@ function SkillRow({
   };
 
   const detailItems = [
-    { label: t('Rank'), value: skill.developmentBonus, color: getColor(skill.developmentBonus) },
-    { label: t('Stat'), value: skill.statBonus, color: getColor(skill.statBonus) },
-    { label: t('Racial'), value: skill.racialBonus, color: getColor(skill.racialBonus) },
-    { label: t('Proffesion'), value: skill.professionalBonus, color: getColor(skill.professionalBonus) },
+    { label: t('rank'), value: skill.developmentBonus, color: getColor(skill.developmentBonus) },
+    { label: t('stat'), value: skill.statBonus, color: getColor(skill.statBonus) },
+    { label: t('racial'), value: skill.racialBonus, color: getColor(skill.racialBonus) },
+    { label: t('profession'), value: skill.professionalBonus, color: getColor(skill.professionalBonus) },
     {
-      label: t('Custom'),
+      label: t('custom'),
       value: skill.customBonus,
       color: skill.customBonus === 0 ? 'text.primary' : skill.customBonus > 0 ? 'success.main' : 'error.main',
     },
     {
-      label: t('Dev Ranks'),
+      label: t('dev-ranks'),
       value: '',
       color: 'text.primary',
     },
@@ -258,7 +259,11 @@ function SkillRow({
     <Fragment>
       <TableRow>
         <TableCell align="left" sx={{ width: 44, px: 0.5 }}>
-          <IconButton aria-label="toggle-skill-details" onClick={() => setOpen((current) => !current)} size="small">
+          <IconButton
+            aria-label={t('toggle-skill-details')}
+            onClick={() => setOpen((current) => !current)}
+            size="small"
+          >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
@@ -308,9 +313,9 @@ function SkillRow({
             <DeleteButton onClick={() => handleDeleteSkill(skill)} disabled={isDeletedDisabled()} />
             {isAvailableProfessionSkill(skill) && (
               <>
-                <Tooltip title={t('Professional skill')}>
+                <Tooltip title={t('professional-skill')}>
                   <IconButton
-                    aria-label="set-professional"
+                    aria-label={t('professional-skill')}
                     onClick={() => handleSetUpProfessionalSkill(skill)}
                     disabled={!isProfessional && currentProfessionalSkills >= maxProfessionalSkills}
                     color="primary"
@@ -318,9 +323,9 @@ function SkillRow({
                     {isProfessional ? <TurnedInIcon /> : <TurnedInNotIcon />}
                   </IconButton>
                 </Tooltip>
-                <Tooltip title={t('Knack skill')}>
+                <Tooltip title={t('knack-skill')}>
                   <IconButton
-                    aria-label="set-knack"
+                    aria-label={t('knack-skill')}
                     onClick={() => handleSetUpKnackSkill(skill)}
                     color="primary"
                     disabled={!isKnack && currentKnackSkills >= maxKnackSkills}
@@ -338,7 +343,7 @@ function SkillRow({
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Stack spacing={1} sx={{ py: 1.5 }}>
               {detailItems
-                .filter((item) => item.label !== t('Dev Ranks'))
+                .filter((item) => item.label !== t('dev-ranks'))
                 .map((item) => (
                   <Stack key={item.label} direction="row" spacing={2} sx={{ justifyContent: 'space-between' }}>
                     <Typography variant="body2" color="text.secondary">

@@ -11,14 +11,15 @@ import {
   Character,
   EditableAvatar,
   Faction,
+  imageBaseUrl,
+  LoadingState,
   Profession,
   Race,
   RmuTextCard,
   StrategicGame,
   updateCharacter,
+  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../../ErrorContext';
-import { imageBaseUrl } from '../../services/config';
 
 const defaultCharacterImage = `${imageBaseUrl}images/npcs/unknown.png`;
 const grayscale = 0.7;
@@ -41,15 +42,13 @@ export default function CharacterViewResume({
   const auth = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { showError } = useError();
+  const notify = useNotify();
   const hpPercent = character ? (character.hp.current / character.hp.max) * 100 : 100;
   const levelStr = character
     ? character.experience.level < character.experience.availableLevel
       ? `${character.experience.level} / ${character.experience.availableLevel}`
       : `${character.experience.availableLevel}`
     : '';
-  //TODO
-  const nextLevelXp = 1000000;
   const armor = character?.defense.armor || '';
   const armorType = armor
     ? armor.at
@@ -61,10 +60,10 @@ export default function CharacterViewResume({
     const dto = { imageUrl: imageId };
     updateCharacter(character!.id, dto, auth)
       .then((character) => setCharacter(character))
-      .catch((error) => showError(error.message));
+      .catch((error) => notify.error(error));
   };
 
-  if (!character) return <div>Loading...</div>;
+  if (!character) return <LoadingState />;
 
   return (
     <>
@@ -127,7 +126,7 @@ export default function CharacterViewResume({
           <RmuTextCard
             value={faction?.name || '...'}
             subtitle={t('faction')}
-            image={faction?.imageUrl || 'loading...'}
+            image={faction?.imageUrl || ''}
             grayscale={grayscale}
             onClick={() => navigate(`/strategic/factions/view/${faction?.id}`)}
           />

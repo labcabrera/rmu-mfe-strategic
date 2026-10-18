@@ -1,16 +1,20 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { CircularProgress, Grid } from '@mui/material';
-import { RmuTextCard, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { imageBaseUrl } from '../../services/config';
-import { gridSizeCard } from '../../services/display';
+import { Grid } from '@mui/material';
+import {
+  gridSizeCard,
+  imageBaseUrl,
+  LoadingState,
+  RmuTextCard,
+  StrategicGame,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const grayscale = 0.7;
 
 export default function StrategicGameViewAttributes({ strategicGame }: { strategicGame?: StrategicGame }) {
   const { t } = useTranslation();
 
-  if (!strategicGame) return <CircularProgress />;
+  if (!strategicGame) return <LoadingState />;
 
   const DATA = [
     {

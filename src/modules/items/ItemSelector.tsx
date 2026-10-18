@@ -22,10 +22,16 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { AddItemDto, fetchItems, Item, NumericInput, resolveAssetUrl } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../ErrorContext';
-import { imageBaseUrl } from '../services/config';
-import { itemFilter } from '../services/display';
+import {
+  AddItemDto,
+  fetchItems,
+  imageBaseUrl,
+  Item,
+  itemFilter,
+  NumericInput,
+  resolveAssetUrl,
+  useNotify,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const categories = [
   { id: 'weapon', label: 'Armas', icon: <ListIcon /> },
@@ -59,7 +65,7 @@ export function ItemSelector({
 }) {
   const auth = useAuth();
   const { t } = useTranslation();
-  const { showError } = useError();
+  const notify = useNotify();
   const [category, setCategory] = useState<string | undefined>('weapon');
   const [subcategories, setSubcategories] = useState<string[]>([]);
   const [subcategory, setSubcategory] = useState<string>();
@@ -80,7 +86,7 @@ export function ItemSelector({
     }
     fetchItems(rsql, 0, 250, auth)
       .then((response) => setItems(response.content))
-      .catch((err) => showError(err.menssage));
+      .catch((err) => notify.error(err.menssage));
   };
 
   const toggleSubcategory = (option: string) => {
@@ -174,7 +180,7 @@ export function ItemSelector({
           })}
         </Stack>
         <SubcategorySelector
-          title="subcategory"
+          titleKey="subcategory"
           options={subcategories}
           selectedOption={subcategory}
           onClick={(e) => toggleSubcategory(e)}
@@ -182,7 +188,7 @@ export function ItemSelector({
         {category === 'armor' && (
           <>
             <SubcategorySelector
-              title="armor-type"
+              titleKey="armor-type"
               options={armorTypes}
               selectedOption={armorType}
               onClick={(e) => toggleArmorType(e)}
@@ -194,8 +200,8 @@ export function ItemSelector({
           {t('filters')}
         </Typography>
         <Stack>
-          <FormControlLabel control={<Checkbox size="small" defaultChecked />} label="Available" />
-          <FormControlLabel control={<Checkbox size="small" defaultChecked />} label="Unique" />
+          <FormControlLabel control={<Checkbox size="small" defaultChecked />} label={t('available')} />
+          <FormControlLabel control={<Checkbox size="small" defaultChecked />} label={t('unique')} />
         </Stack>
       </Box>
 
@@ -284,12 +290,12 @@ export function ItemSelector({
 }
 
 function SubcategorySelector({
-  title,
+  titleKey,
   options,
   selectedOption,
   onClick,
 }: {
-  title: string;
+  titleKey: string;
   options: string[];
   selectedOption: string | undefined;
   onClick: (option: string) => void;
@@ -300,7 +306,7 @@ function SubcategorySelector({
     <>
       <Divider sx={{ my: 3 }} />
       <Typography variant="overline" color="text.secondary">
-        {t(title)}
+        {t(titleKey)}
       </Typography>
       <Stack spacing={1} sx={{ mt: 1 }}>
         {options.map((e, index) => {
@@ -350,7 +356,7 @@ function ItemResume({ item }: { item: Item }) {
           <Typography variant="body2" color="text.secondary">
             {t(item.category)}
           </Typography>
-          <Chip size="small" label="Común" color="success" sx={{ mt: 1 }} />
+          <Chip size="small" label={t('common')} color="success" sx={{ mt: 1 }} />
         </Box>
       </Stack>
       <Typography variant="body2" color="text.secondary">
@@ -368,16 +374,19 @@ function ItemResume({ item }: { item: Item }) {
         </Typography>
         {item && item.weapon && (
           <>
-            <StatRow label="Skill" value={t(item.weapon.skillId.split('@')[1])} />
-            <StatRow label="Fumble" value={item.weapon.fumble} />
-            {item.weapon.modes.map((mode, index) => {
-              <>
-                <StatRow key={index} label="Size adj" value={mode.attackTypes.join(', ')} />;
-                <StatRow key={index} label="Modes" value={mode.attackTable} />;
-                <StatRow key={index} label="Size adj" value={mode.fumbleTable} />;
-                <StatRow key={index} label="Size adj" value={mode.sizeAdjustment} />;
-              </>;
-            })}
+            <StatRow label={t('skill')} value={t(item.weapon.skillId.split('@')[1])} />
+            <StatRow label={t('fumble')} value={item.weapon.fumble} />
+            {item.weapon.modes.map((mode, index) => (
+              <React.Fragment key={index}>
+                <StatRow
+                  label={t('attack-types')}
+                  value={mode.attackTypes.map((attackType) => t(attackType)).join(', ')}
+                />
+                <StatRow label={t('attack-table')} value={mode.attackTable} />
+                <StatRow label={t('fumble-table')} value={mode.fumbleTable} />
+                <StatRow label={t('size-adjustment')} value={mode.sizeAdjustment} />
+              </React.Fragment>
+            ))}
           </>
         )}
         {item && item.armor && (
@@ -390,20 +399,24 @@ function ItemResume({ item }: { item: Item }) {
               negative={item.armor.maneuverPenalty < 0}
             />
             <StatRow
-              label="Perception penalty"
+              label={t('perception-penalty')}
               value={item.armor.perceptionPenalty}
               negative={item.armor.perceptionPenalty < 0}
             />
-            <StatRow label="Ranged penalty" value={item.armor.rangedPenalty} negative={item.armor.rangedPenalty < 0} />
-            <StatRow label="Base difficulty" value={t(item.armor.baseDifficulty)} />
+            <StatRow
+              label={t('ranged-penalty')}
+              value={item.armor.rangedPenalty}
+              negative={item.armor.rangedPenalty < 0}
+            />
+            <StatRow label={t('base-difficulty')} value={t(item.armor.baseDifficulty)} />
           </>
         )}
         <StatRow label={t('weight')} value={item.info.weight || '-'} />
         <StatRow label={t('length')} value={item.info.length || '-'} />
-        <StatRow label="Min cost" value={item.info.cost?.min || 0} />
-        <StatRow label="Avg cost" value={item.info.cost?.average || 0} />
-        <StatRow label="Max cost" value={item.info.cost?.max || 0} />
-        <StatRow label="Production hours" value={item.info.productionHours || '-'} />
+        <StatRow label={t('cost-min')} value={item.info.cost?.min || 0} />
+        <StatRow label={t('cost-average')} value={item.info.cost?.average || 0} />
+        <StatRow label={t('cost-max')} value={item.info.cost?.max || 0} />
+        <StatRow label={t('production-hours')} value={item.info.productionHours || '-'} />
       </Box>
     </Stack>
   );

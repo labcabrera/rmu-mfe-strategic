@@ -34,8 +34,8 @@ const CharacterViewAttacks: FC<{
   return (
     <>
       <CategorySeparator text={t('attacks')} />
-      <Paper sx={{ width: 'fit-content', padding: 2 }}>
-        <Table aria-label="item table">
+      <Paper sx={{ width: 'fit-content', maxWidth: '100%', overflowX: 'auto', padding: 2 }}>
+        <Table aria-label={t('attacks-table')}>
           <TableHead
             sx={{
               '& .MuiTableCell-root': {

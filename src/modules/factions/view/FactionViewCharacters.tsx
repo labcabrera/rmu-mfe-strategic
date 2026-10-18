@@ -1,10 +1,8 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { CircularProgress } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { Character, Faction, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { gridSizeCard } from '../../services/display';
+import { Character, Faction, gridSizeCard, LoadingState, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const FactionViewCharacters: FC<{
   faction?: Faction;
@@ -13,7 +11,7 @@ const FactionViewCharacters: FC<{
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  if (!faction || !characters) return <CircularProgress />;
+  if (!faction || !characters) return <LoadingState />;
 
   return (
     <Grid container spacing={1}>
@@ -27,7 +25,7 @@ const FactionViewCharacters: FC<{
           />
         </Grid>
       ))}
-      <Grid size={12}>{characters.length === 0 && <p>{t('No characters have been created')}</p>}</Grid>
+      <Grid size={12}>{characters.length === 0 && <p>{t('no-characters-have-been-created')}</p>}</Grid>
     </Grid>
   );
 };

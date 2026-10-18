@@ -26,12 +26,12 @@ import {
   EquipmentSlot,
   fetchCharacter,
   fetchStrategicItems,
+  imageBaseUrl,
+  itemFilter,
   StrategicItem,
   updateCarriedStatus,
+  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../../../ErrorContext';
-import { imageBaseUrl } from '../../../services/config';
-import { itemFilter } from '../../../services/display';
 import CharacterEquipmentDialog from './CharacterEquipmentDialog';
 import CharacterViewTransferGold from './CharacterViewTransferGold';
 
@@ -45,7 +45,7 @@ export default function CharacterEquipmentPanel({
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
 }) {
   const auth = useAuth();
-  const { showError } = useError();
+  const notify = useNotify();
   const [items, setItems] = useState<StrategicItem[]>([]);
   const [dialogEquipSlot, setDialogEquipSlot] = useState<EquipmentSlot>();
   const [dialogEquipOpen, setDialogEquipOpen] = useState<boolean>(false);
@@ -58,7 +58,7 @@ export default function CharacterEquipmentPanel({
   const bindItems = (characterId: string) => {
     fetchStrategicItems(`characterId==${characterId}`, 0, 100, auth)
       .then((response) => setItems(response.content))
-      .catch((err) => showError(err.message));
+      .catch((err) => notify.error(err));
   };
 
   const bindCharacter = () => {
@@ -67,13 +67,13 @@ export default function CharacterEquipmentPanel({
         setCharacter(response);
         bindItems(response.id);
       })
-      .catch((err) => showError(err.message));
+      .catch((err) => notify.error(err));
   };
 
   const onItemDeleted = (itemId: string) => {
     deleteStrategicItem(itemId, auth)
       .then(() => bindCharacter())
-      .catch((err) => showError(err.message));
+      .catch((err) => notify.error(err));
   };
 
   useEffect(() => {
@@ -186,6 +186,7 @@ function SlotCard({
   items: StrategicItem[];
   onClick: (slot: EquipmentSlot) => void;
 }) {
+  const { t } = useTranslation();
   const item = items.find((e) => e.id === itemId) || undefined;
   const image = item ? `${imageBaseUrl}images/items/${item.itemTypeId}.png` : `${imageBaseUrl}images/items/no-item.png`;
   return (
@@ -207,7 +208,7 @@ function SlotCard({
         <Box
           component="img"
           src={image}
-          alt={item ? item.name : 'empty'}
+          alt={item ? item.name : t('empty-slot')}
           onClick={() => onClick(slot)}
           sx={{
             width: '100%',
@@ -274,9 +275,9 @@ function StatsPanel({ character }: { character: Character }) {
           <Stack spacing={2} sx={{ mt: 2 }}>
             <Box>
               <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
-                <Typography variant="body2">Carga</Typography>
+                <Typography variant="body2">{t('encumbrance')}</Typography>
                 <Typography variant="body2" color="error.main">
-                  {eq.weight} / {eq.weightAllowance} lbs
+                  {`${eq.weight} / ${eq.weightAllowance} lbs`}
                 </Typography>
               </Stack>
 
@@ -287,7 +288,7 @@ function StatsPanel({ character }: { character: Character }) {
                 sx={{ mt: 1, height: 8, borderRadius: 99 }}
               />
             </Box>
-            {overload > 0 && <StatRow label="Overload" value={`${overload.toFixed(2)} lbs`} danger />}
+            {overload > 0 && <StatRow label={t('overload')} value={`${overload.toFixed(2)} lbs`} danger />}
           </Stack>
         </CardContent>
       </Card>
@@ -349,7 +350,7 @@ function ItemList({
 }) {
   const auth = useAuth();
   const { t } = useTranslation();
-  const { showError } = useError();
+  const notify = useNotify();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuItemId, setMenuItemId] = useState<string | null>(null);
 
@@ -369,7 +370,7 @@ function ItemList({
         setCharacter(response);
         handleCloseMenu();
       })
-      .catch((err) => showError(err.message));
+      .catch((err) => notify.error(err));
   };
 
   if (items.length < 1) return;
@@ -443,7 +444,7 @@ function ItemList({
               </Box>
               <Typography variant="body2">{item.amount ?? 1}</Typography>
               <Typography variant="body2" sx={{ textAlign: 'right' }}>
-                {item.info.weight} lbs
+                {`${item.info.weight} lbs`}
               </Typography>
 
               <IconButton
@@ -461,7 +462,7 @@ function ItemList({
                   <ListItemIcon>
                     <DeleteIcon fontSize="small" />
                   </ListItemIcon>
-                  <ListItemText>{t('Delete')}</ListItemText>
+                  <ListItemText>{t('delete')}</ListItemText>
                 </MenuItem>
                 <MenuItem onClick={() => handleToggleCarried(item.id)}>
                   <ListItemIcon>{carried ? <ArrowDownwardIcon /> : <ArrowUpwardIcon />}</ListItemIcon>

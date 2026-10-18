@@ -4,15 +4,15 @@ import { useAuth } from 'react-oidc-context';
 import { Box, Button, CardMedia, Tooltip } from '@mui/material';
 import {
   Character,
+  equipItem,
   EquipmentSlot,
+  imageBaseUrl,
+  itemFilter,
   RmuDialog,
   StrategicItem,
-  equipItem,
   unequipItem,
+  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../../../ErrorContext';
-import { imageBaseUrl } from '../../../services/config';
-import { itemFilter } from '../../../services/display';
 
 const imageSize = 100;
 
@@ -33,7 +33,7 @@ export default function CharacterEquipmentDialog({
 }) {
   const auth = useAuth();
   const { t } = useTranslation();
-  const { showError } = useError();
+  const notify = useNotify();
   const slotItemId = slot ? character.equipment.slots[slot] : undefined;
 
   const isArmorSlot = (item: StrategicItem, s: string) => {
@@ -66,14 +66,14 @@ export default function CharacterEquipmentDialog({
           if (onEquip) onEquip(data);
           onClose();
         })
-        .catch((err) => showError(err.message));
+        .catch((err) => notify.error(err));
     } else {
       unequipItem(character.id, slotItemId!, auth)
         .then((data) => {
           if (onEquip) onEquip(data);
           onClose();
         })
-        .catch((err) => showError(err.message));
+        .catch((err) => notify.error(err));
     }
   };
 

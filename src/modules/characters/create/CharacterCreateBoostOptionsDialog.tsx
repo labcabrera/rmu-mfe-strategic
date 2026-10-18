@@ -8,6 +8,7 @@ import {
   DialogTitle,
   Table,
   TableBody,
+  TableContainer,
   TableCell,
   TableHead,
   TableRow,
@@ -17,8 +18,8 @@ import {
 } from '@mui/material';
 import { CreateCharacterDto, StatKey, STATS, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { getStatBonus } from '../../services/stat-service';
-import { StatBonus } from './CharacterCreate';
-import CharacterCreateStatsActions from './CharacterCreateStatsActions';
+import { StatBonus } from './CharacterCreatePage';
+import CharacterCreateStatsBoosts from './CharacterCreateStatsBoosts';
 
 const CharacterCreateBoostOptionsDialog: FC<{
   open: boolean;
@@ -28,7 +29,7 @@ const CharacterCreateBoostOptionsDialog: FC<{
   setFormData: React.Dispatch<React.SetStateAction<CreateCharacterDto>>;
 }> = ({ open, onClose, strategicGame, formData, setFormData }) => {
   const { t } = useTranslation();
-  const [statBonusFormData, setStatBonusFormData] = useState<{ [key: string]: StatBonus }>({} as any);
+  const [, setStatBonusFormData] = useState<{ [key: string]: StatBonus }>({} as any);
   const [boosts, setBoosts] = useState<number>(strategicGame?.powerLevel.statCreationBoost || 0);
   const [swaps, setSwaps] = useState<number>(strategicGame?.powerLevel.statCreationSwap || 0);
 
@@ -142,7 +143,7 @@ const CharacterCreateBoostOptionsDialog: FC<{
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle color="primary">{t('statistics-boosts')}</DialogTitle>
       <DialogContent>
-        <CharacterCreateStatsActions
+        <CharacterCreateStatsBoosts
           strategicGame={strategicGame}
           formData={formData}
           setFormData={setFormData}
@@ -156,34 +157,36 @@ const CharacterCreateBoostOptionsDialog: FC<{
           <Typography variant="subtitle1" sx={{ mb: 1 }}>
             {t('statistics')}
           </Typography>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell></TableCell>
-                <TableCell>{t('stat')}</TableCell>
-                <TableCell align="right">{t('potential')}</TableCell>
-                <TableCell align="right">{t('temporary')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {STATS.map((s) => (
-                <TableRow
-                  key={s}
-                  hover
-                  onClick={() => toggleSelect(s)}
-                  sx={{ cursor: 'pointer' }}
-                  selected={selectedStats.includes(s)}
-                >
-                  <TableCell padding="checkbox">
-                    <Checkbox checked={selectedStats.includes(s)} onChange={() => toggleSelect(s)} />
-                  </TableCell>
-                  <TableCell>{t(s)}</TableCell>
-                  <TableCell align="right">{formData.statistics?.[s]?.potential ?? '-'}</TableCell>
-                  <TableCell align="right">{formData.statistics?.[s]?.temporary ?? '-'}</TableCell>
+          <TableContainer>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell>{t('stat')}</TableCell>
+                  <TableCell align="right">{t('potential')}</TableCell>
+                  <TableCell align="right">{t('temporary')}</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHead>
+              <TableBody>
+                {STATS.map((s) => (
+                  <TableRow
+                    key={s}
+                    hover
+                    onClick={() => toggleSelect(s)}
+                    sx={{ cursor: 'pointer' }}
+                    selected={selectedStats.includes(s)}
+                  >
+                    <TableCell padding="checkbox">
+                      <Checkbox checked={selectedStats.includes(s)} onChange={() => toggleSelect(s)} />
+                    </TableCell>
+                    <TableCell>{t(s)}</TableCell>
+                    <TableCell align="right">{formData.statistics?.[s]?.potential ?? '-'}</TableCell>
+                    <TableCell align="right">{formData.statistics?.[s]?.temporary ?? '-'}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Box>
       </DialogContent>
       <DialogActions>

@@ -10,8 +10,8 @@ import {
   fetchTrait,
   TechnicalInfo,
   Trait,
+  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../../../ErrorContext';
 
 const CharacterViewTraitDialog: FC<{
   character: Character;
@@ -22,7 +22,7 @@ const CharacterViewTraitDialog: FC<{
 }> = ({ character, setCharacter, characterTrait, open, onClose }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const { showError } = useError();
+  const notify = useNotify();
   const [trait, setTrait] = useState<Trait | null>(null);
 
   const onDeleteTrait = () => {
@@ -35,14 +35,14 @@ const CharacterViewTraitDialog: FC<{
         setCharacter(updatedCharacter);
         onClose();
       })
-      .catch((error) => showError(error.message));
+      .catch((error) => notify.error(error));
   };
 
   useEffect(() => {
     if (characterTrait) {
       fetchTrait(characterTrait.traitId, auth)
         .then((data) => setTrait(data))
-        .catch((error) => showError(error.message));
+        .catch((error) => notify.error(error));
     }
   }, [characterTrait]);
 
@@ -58,8 +58,8 @@ const CharacterViewTraitDialog: FC<{
           </Typography>
         </Grid>
         <TechnicalInfo>
-          <pre>CharacterTrait: {JSON.stringify(characterTrait, null, 2)}</pre>
-          <pre>Trait: {JSON.stringify(trait, null, 2)}</pre>
+          <pre>{`CharacterTrait: ${JSON.stringify(characterTrait, null, 2)}`}</pre>
+          <pre>{`Trait: ${JSON.stringify(trait, null, 2)}`}</pre>
         </TechnicalInfo>
       </DialogContent>
       <DialogActions>

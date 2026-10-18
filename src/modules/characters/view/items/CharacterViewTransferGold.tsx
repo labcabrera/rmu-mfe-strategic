@@ -6,12 +6,12 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Button, Card, CardContent, Stack, Typography } from '@mui/material';
 import {
   Character,
-  StrategicItem,
   Faction,
-  transferFactionGold,
   fetchFaction,
+  StrategicItem,
+  transferFactionGold,
+  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../../../ErrorContext';
 
 const goldCoin = 'gold-coin';
 
@@ -27,7 +27,7 @@ export default function CharacterViewTransferGold({
   const auth = useAuth();
   const { t } = useTranslation();
   const [faction, setFaction] = useState<Faction | null>(null);
-  const { showError } = useError();
+  const notify = useNotify();
 
   const characterAmount: number =
     items
@@ -38,13 +38,13 @@ export default function CharacterViewTransferGold({
   const handleTransfer = (amount: number) => {
     transferFactionGold(character.id, amount, auth)
       .then((data) => setCharacter(data))
-      .catch((err) => showError(err.message));
+      .catch((err) => notify.error(err));
   };
 
   useEffect(() => {
     fetchFaction(character.faction.id, auth)
       .then((factionData) => setFaction(factionData))
-      .catch((err) => showError(err.message));
+      .catch((err) => notify.error(err));
   }, [character, items]);
 
   if (!character || !faction) return null;
@@ -65,7 +65,7 @@ export default function CharacterViewTransferGold({
             startIcon={<ChevronLeftIcon />}
             disabled={faction.management.availableGold < 1}
           >
-            1G
+            {`1G`}
           </Button>
           <Button
             onClick={() => handleTransfer(10)}
@@ -73,7 +73,7 @@ export default function CharacterViewTransferGold({
             startIcon={<ChevronLeftIcon />}
             disabled={faction.management.availableGold < 10}
           >
-            10G
+            {`10G`}
           </Button>
           <Button
             onClick={() => handleTransfer(-10)}
@@ -81,7 +81,7 @@ export default function CharacterViewTransferGold({
             endIcon={<ChevronRightIcon />}
             disabled={characterAmount < 10}
           >
-            10G
+            {`10G`}
           </Button>
           <Button
             onClick={() => handleTransfer(-1)}
@@ -89,7 +89,7 @@ export default function CharacterViewTransferGold({
             endIcon={<ChevronRightIcon />}
             disabled={characterAmount < 1}
           >
-            1G
+            {`1G`}
           </Button>
           <Typography>
             {t('faction')} ({faction.management.availableGold})

@@ -25,8 +25,6 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
-  if (!characters) return <p>Loading...</p>;
-
   const sortedCharacters = useMemo(() => {
     if (!characters) return [] as Character[];
     const list = [...characters];
@@ -64,7 +62,7 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
 
   return (
     <TableContainer component={Paper} sx={{ width: '100%' }}>
-      <Table size="small" aria-label="faction characters table">
+      <Table size="small" aria-label={t('faction-characters-table')}>
         <TableHead>
           <TableRow>
             <TableCell>
@@ -105,9 +103,9 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
             <TableCell>{t('attacks')}</TableCell>
             <TableCell align="right">DB</TableCell>
             <TableCell align="right">AT</TableCell>
-            <TableCell align="right">Ini</TableCell>
+            <TableCell align="right">{t('initiative-short')}</TableCell>
             <TableCell align="right">BMR</TableCell>
-            <TableCell align="right">Pen</TableCell>
+            <TableCell align="right">{t('penalty-short')}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -159,7 +157,7 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
           ))}
           {characters.length === 0 && (
             <TableRow>
-              <TableCell colSpan={7}>{t('No characters have been created')}</TableCell>
+              <TableCell colSpan={7}>{t('no-characters-have-been-created')}</TableCell>
             </TableRow>
           )}
         </TableBody>

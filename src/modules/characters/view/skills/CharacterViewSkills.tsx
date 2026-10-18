@@ -33,7 +33,7 @@ const CharacterViewSkills: FC<{
   const [displaySkillTable, setDisplaySkillTable] = useState<boolean>(() => {
     try {
       return localStorage.getItem(STORAGE_KEY) === 'true';
-    } catch (ignore) {
+    } catch {
       return false;
     }
   });
@@ -44,7 +44,9 @@ const CharacterViewSkills: FC<{
     setDisplaySkillTable(table);
     try {
       localStorage.setItem(STORAGE_KEY, table ? 'true' : 'false');
-    } catch (ignore) {}
+    } catch {
+      // localStorage may be unavailable (private mode, blocked storage): keep the in-memory value
+    }
   };
 
   const normalizedFilter = skillNameFilter.trim().toLowerCase();
@@ -119,12 +121,12 @@ const CharacterViewSkills: FC<{
               exclusive
               size="small"
               onChange={handleViewModeChange}
-              aria-label="view-mode"
+              aria-label={t('view-mode')}
             >
-              <ToggleButton value="list" aria-label="list">
+              <ToggleButton value="list" aria-label={t('list')}>
                 <ViewListIcon fontSize="small" />
               </ToggleButton>
-              <ToggleButton value="table" aria-label="table">
+              <ToggleButton value="table" aria-label={t('table')}>
                 <TableRowsIcon fontSize="small" />
               </ToggleButton>
             </ToggleButtonGroup>
@@ -172,7 +174,7 @@ function DevelopmentPointsProgress({ available, total }: { available: number; to
       <Stack
         direction="row"
         spacing={0.25}
-        aria-label="development-points-progress"
+        aria-label={t('development-points-progress')}
         sx={{
           width: { xs: '100%', sm: 220 },
           height: 8,
