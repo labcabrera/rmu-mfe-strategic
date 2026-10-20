@@ -49,6 +49,11 @@ const StrategicGameViewPowerLevel: FC<{
       subtitle: t('stat-creation-swaps'),
       image: `${imageBaseUrl}images/generic/stat-st.png`,
     },
+    {
+      value: strategicGame.powerLevel.maxTraitCost ?? 20,
+      subtitle: t('max-trait-cost'),
+      image: `${imageBaseUrl}images/generic/trait.png`,
+    },
   ];
 
   return (

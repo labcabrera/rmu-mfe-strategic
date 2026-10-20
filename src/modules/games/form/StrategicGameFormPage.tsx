@@ -38,6 +38,7 @@ const EMPTY_STRATEGIC_GAME = {
     statBoostTemporary: 56,
     statCreationBoost: 2,
     statCreationSwap: 2,
+    maxTraitCost: 20,
   },
   description: '',
   imageUrl: 'images/generic/strategic.png',

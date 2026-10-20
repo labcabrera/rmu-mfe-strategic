@@ -1,7 +1,7 @@
 import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography } from '@mui/material';
+import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography } from '@mui/material';
 import {
   Character,
   CharacterTrait,
@@ -10,8 +10,8 @@ import {
   fetchTrait,
   TechnicalInfo,
   Trait,
-  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { useStrategicNotify } from '../../../services/notify-service';
 
 const CharacterViewTraitDialog: FC<{
   character: Character;
@@ -22,7 +22,7 @@ const CharacterViewTraitDialog: FC<{
 }> = ({ character, setCharacter, characterTrait, open, onClose }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useNotify();
+  const notify = useStrategicNotify();
   const [trait, setTrait] = useState<Trait | null>(null);
 
   const onDeleteTrait = () => {
@@ -52,6 +52,9 @@ const CharacterViewTraitDialog: FC<{
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle color="primary">{t(trait.name)}</DialogTitle>
       <DialogContent>
+        {characterTrait.source === 'race' && (
+          <Chip label={t('trait-source-race')} size="small" color="primary" variant="outlined" />
+        )}
         <Grid container spacing={1} sx={{ mt: 1 }}>
           <Typography variant="body2" color="textSecondary" gutterBottom>
             {trait.description}
@@ -63,9 +66,11 @@ const CharacterViewTraitDialog: FC<{
         </TechnicalInfo>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onDeleteTrait} color="error">
-          {t('delete')}
-        </Button>
+        {characterTrait.source !== 'race' && (
+          <Button onClick={onDeleteTrait} color="error">
+            {t('delete')}
+          </Button>
+        )}
         <Button onClick={onClose}>{t('cancel')}</Button>
       </DialogActions>
     </Dialog>

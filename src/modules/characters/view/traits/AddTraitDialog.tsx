@@ -25,8 +25,8 @@ import {
   TechnicalInfo,
   Trait,
   traitCategories,
-  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { useStrategicNotify } from '../../../services/notify-service';
 import SelectTraitSpecialization from './SelectTraitSpecialization';
 
 const AddTraitDialog: FC<{
@@ -37,7 +37,7 @@ const AddTraitDialog: FC<{
 }> = ({ character, setCharacter, open, onClose }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useNotify();
+  const notify = useStrategicNotify();
   const theme = useTheme();
 
   const [traits, setTraits] = useState<Trait[]>([]);
