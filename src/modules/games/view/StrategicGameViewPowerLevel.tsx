@@ -8,6 +8,7 @@ import {
   RmuTextCard,
   StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { resolvePowerLevel } from '../../services/game-rules';
 
 const grayscale = 0.7;
 
@@ -18,41 +19,68 @@ const StrategicGameViewPowerLevel: FC<{
 
   if (!strategicGame) return <LoadingState />;
 
+  const powerLevel = resolvePowerLevel(strategicGame.powerLevel);
+
   const DATA = [
     {
-      value: strategicGame.powerLevel.baseDevPoints,
+      value: powerLevel.baseDevPoints,
       subtitle: t('dev-points'),
       image: `${imageBaseUrl}images/generic/trait-combat.png`,
     },
     {
-      value: strategicGame.powerLevel.statRandomMin,
+      value: powerLevel.statRandomMin,
       subtitle: t('stat-random-min'),
       image: `${imageBaseUrl}images/generic/stat-st.png`,
     },
     {
-      value: strategicGame.powerLevel.statBoostPotential,
+      value: powerLevel.statBoostPotential,
       subtitle: t('stat-boost-potential'),
       image: `${imageBaseUrl}images/generic/stat-st.png`,
     },
     {
-      value: strategicGame.powerLevel.statBoostTemporary,
+      value: powerLevel.statBoostTemporary,
       subtitle: t('stat-boost-temporary'),
       image: `${imageBaseUrl}images/generic/stat-st.png`,
     },
     {
-      value: strategicGame.powerLevel.statCreationBoost,
+      value: powerLevel.statCreationBoost,
       subtitle: t('stat-creation-boosts'),
       image: `${imageBaseUrl}images/generic/stat-st.png`,
     },
     {
-      value: strategicGame.powerLevel.statCreationSwap,
+      value: powerLevel.statCreationSwap,
       subtitle: t('stat-creation-swaps'),
       image: `${imageBaseUrl}images/generic/stat-st.png`,
     },
     {
-      value: strategicGame.powerLevel.maxTraitCost ?? 20,
+      value: powerLevel.maxTraitCost,
       subtitle: t('max-trait-cost'),
       image: `${imageBaseUrl}images/generic/trait.png`,
+    },
+    {
+      value: powerLevel.raceDevPointsPerLevel,
+      subtitle: t('race-dev-points-per-level'),
+      image: `${imageBaseUrl}images/generic/dev-points.png`,
+    },
+    {
+      value: powerLevel.creationBonusDevPoints,
+      subtitle: t('creation-bonus-dev-points'),
+      image: `${imageBaseUrl}images/generic/dev-points.png`,
+    },
+    {
+      value: powerLevel.statPoints,
+      subtitle: t('stat-points'),
+      image: `${imageBaseUrl}images/generic/stat-st.png`,
+    },
+    {
+      value: powerLevel.knackCount,
+      subtitle: t('knack-count'),
+      image: `${imageBaseUrl}images/generic/skills.png`,
+    },
+    {
+      value: powerLevel.knackBonus,
+      subtitle: t('knack-bonus'),
+      image: `${imageBaseUrl}images/generic/skills.png`,
     },
   ];
 

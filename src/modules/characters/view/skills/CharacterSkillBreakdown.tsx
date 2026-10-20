@@ -27,6 +27,7 @@ export default function CharacterSkillBreakdown({
       {skill && (
         <Stack>
           <Row label={t('ranks')} value={skill.ranks} />
+          {(skill.cultureRanks ?? 0) > 0 && <Row label={t('culture-ranks')} value={skill.cultureRanks ?? 0} />}
           <Row label={t('stats')} value={skill.statistics.map((stat) => stat.toUpperCase()).join('/')} />
           <Divider sx={{ my: 1 }} />
           <Row label={t('stat')} value={formatBonus(skill.statBonus)} />

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
@@ -9,11 +9,14 @@ import {
   Character,
   createCharacter,
   CreateCharacterDto,
+  Culture,
   EditableAvatar,
   ErrorState,
   Faction,
+  fetchCultures,
   fetchFaction,
   fetchRaces,
+  fetchSkills,
   fetchStrategicGame,
   FormPage,
   imageBaseUrl,
@@ -23,18 +26,32 @@ import {
   Race,
   RefreshButton,
   Section,
+  Skill,
+  STATS,
   StrategicGame,
   TechnicalInfo,
   useEntity,
-  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { defaultStats } from '../../data/character-create';
-import { randomizeStats } from '../../services/randomize-stats';
+import {
+  CultureAssignmentRow,
+  isCultureValid,
+  toAssignments,
+  validateCulture,
+} from '../../services/culture-assignments';
+import { resolveOptions, resolvePowerLevel } from '../../services/game-rules';
+import { useStrategicNotify } from '../../services/notify-service';
+import { CreationStats, randomizePointBuyStats, randomizeStats } from '../../services/randomize-stats';
+import { safeStatBonus } from '../../services/stat-service';
 import StrategicGamePicker from '../../shared/StrategicGamePicker';
 import CharacterViewStatsChart from '../view/stats/CharacterViewStatsChart';
-import CharacterCreateBoostOptionsDialog from './CharacterCreateBoostOptionsDialog';
+import CharacterCreateBoostOptionsDialog, {
+  initialStatCreationBudget,
+  StatCreationBudget,
+} from './CharacterCreateBoostOptionsDialog';
+import CharacterCreateCulture, { initialCultureRows } from './CharacterCreateCulture';
 import CharacterCreateLore from './CharacterCreateLore';
 import CharacterCreateMainForm from './CharacterCreateMainForm';
+import CharacterCreatePointBuy, { pointBuySpent } from './CharacterCreatePointBuy';
 import CharacterCreateProfessionalSkills from './CharacterCreateProfessionalSkills';
 import CharacterCreateSkillCosts from './CharacterCreateSkillCosts';
 import CharacterCreateSortCombat from './CharacterCreateSortCombat';
@@ -177,7 +194,7 @@ export default function CharacterCreatePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const notify = useNotify();
+  const notify = useStrategicNotify();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const gameId = searchParams.get('gameId') || undefined;
@@ -196,12 +213,50 @@ export default function CharacterCreatePage() {
   const [selectedRace, setSelectedRace] = useState<Race>();
 
   const [formData, setFormData] = useState<CreateCharacterDto>(CHARACTER_EMPTY_TEMPLATE);
-  const [statBonusFormData, setStatBonusFormData] = useState<StatBonusFormData>(defaultStats);
   const [boostDialogOpen, setBoostDialogOpen] = useState<boolean>(false);
+  const [statBudget, setStatBudget] = useState<StatCreationBudget>({ boosts: 0, swaps: 0, gainRolls: 0 });
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [cultures, setCultures] = useState<Culture[]>([]);
+  const [culture, setCulture] = useState<Culture>();
+  const [cultureRows, setCultureRows] = useState<CultureAssignmentRow[]>([]);
+
+  const powerLevel = resolvePowerLevel(game?.powerLevel);
+  const pointBuy = resolveOptions(game?.options).statGeneration === 'point-buy';
+
+  const statBonusFormData = useMemo<StatBonusFormData>(() => {
+    const bonuses: StatBonusFormData = {};
+    STATS.forEach((key) => {
+      const stat = formData.statistics[key];
+      bonuses[key] = { potential: safeStatBonus(stat?.potential), temporary: safeStatBonus(stat?.temporary) };
+    });
+    return bonuses;
+  }, [formData.statistics]);
+
+  const cultureValidation = useMemo(
+    () => validateCulture(culture, cultureRows, skills),
+    [culture, cultureRows, skills]
+  );
+
+  const setStatistics = (statistics: CreationStats) => setFormData((prev) => ({ ...prev, statistics }));
 
   const onRandomStats = () => {
-    randomizeStats(setFormData, setStatBonusFormData);
+    setFormData((prev) => ({
+      ...prev,
+      statistics: pointBuy
+        ? randomizePointBuyStats(prev.statistics, powerLevel.statRandomMin)
+        : randomizeStats(prev.statistics, powerLevel.statRandomMin),
+    }));
+    // New rolls get the boosts and swaps of the power level again
+    if (game) setStatBudget(initialStatCreationBudget(game));
   };
+
+  const onCultureChange = (selected: Culture | undefined) => {
+    setCulture(selected);
+    setCultureRows(initialCultureRows(selected, skills));
+  };
+
+  const statsValid = STATS.every((key) => formData.statistics[key].temporary <= formData.statistics[key].potential);
+  const pointBuyValid = !pointBuy || pointBuySpent(formData.statistics) <= powerLevel.statPoints;
 
   const isValid =
     !!formData.gameId &&
@@ -210,10 +265,16 @@ export default function CharacterCreatePage() {
     !!formData.info?.professionId &&
     !!formData.info?.realmType &&
     !!formData.info?.weight &&
-    !!formData.level;
+    !!formData.level &&
+    statsValid &&
+    pointBuyValid &&
+    (!culture || isCultureValid(cultureValidation));
 
   const onCreate = () => {
-    const dto = formData as unknown as Partial<Character>;
+    const request: CreateCharacterDto = culture
+      ? { ...formData, culture: { cultureId: culture.id, assignments: toAssignments(culture, cultureRows, skills) } }
+      : formData;
+    const dto = request as unknown as Partial<Character>;
     createCharacter(dto, auth)
       .then((data) => navigate('/strategic/characters/view/' + data.id, { state: { character: data, game: game } }))
       .catch(notify.error);
@@ -235,6 +296,19 @@ export default function CharacterCreatePage() {
         .catch(notify.error);
     }
   }, [game]);
+
+  useEffect(() => {
+    if (game) setStatBudget(initialStatCreationBudget(game));
+  }, [game]);
+
+  useEffect(() => {
+    fetchCultures('', 0, 100, auth)
+      .then((data) => setCultures(data.content))
+      .catch(notify.error);
+    fetchSkills('', 0, 500, auth)
+      .then((data) => setSkills(data.content))
+      .catch(notify.error);
+  }, []);
 
   useEffect(() => {
     if (gameId) setFormData((prevState) => ({ ...prevState, gameId }));
@@ -314,15 +388,40 @@ export default function CharacterCreatePage() {
             actions={
               <>
                 <RefreshButton onClick={onRandomStats} />
-                <Badge badgeContent={2} color="success">
-                  <IconButton onClick={() => setBoostDialogOpen(true)} color="primary">
-                    <OutboundIcon />
-                  </IconButton>
-                </Badge>
+                {!pointBuy && (
+                  <Badge badgeContent={statBudget.boosts + statBudget.swaps + statBudget.gainRolls} color="success">
+                    <IconButton
+                      onClick={() => setBoostDialogOpen(true)}
+                      color="primary"
+                      aria-label={t('statistics-boosts')}
+                    >
+                      <OutboundIcon />
+                    </IconButton>
+                  </Badge>
+                )}
               </>
             }
           >
             <Grid container spacing={1}>
+              <Grid size={12}>
+                <Typography variant="body2" color="text.secondary">
+                  {pointBuy
+                    ? t('stat-generation-point-buy-help', {
+                        min: powerLevel.statRandomMin,
+                        points: powerLevel.statPoints,
+                      })
+                    : t('stat-generation-roll-help', { min: powerLevel.statRandomMin })}
+                </Typography>
+              </Grid>
+              {pointBuy && (
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <CharacterCreatePointBuy
+                    statistics={formData.statistics}
+                    statPoints={powerLevel.statPoints}
+                    onChange={setStatistics}
+                  />
+                </Grid>
+              )}
               <Grid size={{ xs: 12, md: 6 }}>
                 <CharacterCreateStats formData={formData} statBonusFormData={statBonusFormData} />
               </Grid>
@@ -337,6 +436,21 @@ export default function CharacterCreatePage() {
         <Grid size={12}>
           <Section title={t('weapon-development-order')}>
             <CharacterCreateSortCombat items={formData.weaponDevelopment || []} onChange={handleWeaponOrderChange} />
+          </Section>
+        </Grid>
+        <Grid size={12}>
+          <Section title={t('culture')}>
+            <CharacterCreateCulture
+              realmId={game.realmId}
+              cultures={cultures}
+              culture={culture}
+              onCultureChange={onCultureChange}
+              rows={cultureRows}
+              setRows={setCultureRows}
+              skills={skills}
+              validation={cultureValidation}
+              onError={notify.error}
+            />
           </Section>
         </Grid>
         <Grid size={12}>
@@ -364,8 +478,10 @@ export default function CharacterCreatePage() {
         open={boostDialogOpen}
         onClose={() => setBoostDialogOpen(false)}
         strategicGame={game}
-        formData={formData}
-        setFormData={setFormData}
+        statistics={formData.statistics}
+        onChange={setStatistics}
+        budget={statBudget}
+        setBudget={setStatBudget}
       />
       <TechnicalInfo>
         <pre>{JSON.stringify(formData, null, 2)}</pre>

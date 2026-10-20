@@ -2,14 +2,15 @@ import React, { Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box } from '@mui/material';
 import { Grid } from '@mui/system';
-import { CategorySeparator, Character } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CategorySeparator, Character, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import CharacterViewStatsChart from './CharacterViewStatsChart';
 import CharacterViewStatsTable from './CharacterViewStatsTable';
 
 const CharacterViewStats: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
-}> = ({ character, setCharacter }) => {
+  strategicGame?: StrategicGame;
+}> = ({ character, setCharacter, strategicGame }) => {
   const { t } = useTranslation();
 
   return (
@@ -18,7 +19,7 @@ const CharacterViewStats: FC<{
         <CategorySeparator text={t('statistics')} />
       </Grid>
       <Grid size={{ xs: 12, md: 7 }}>
-        <CharacterViewStatsTable character={character} setCharacter={setCharacter} />
+        <CharacterViewStatsTable character={character} setCharacter={setCharacter} strategicGame={strategicGame} />
       </Grid>
       <Grid size={{ xs: 12, md: 5 }} sx={{ display: 'flex', alignItems: 'stretch' }}>
         <Box sx={{ flex: 1 }}>

@@ -10,8 +10,9 @@ import {
   StatKey,
   updateCharacterTemporaryStat,
   UpdateTemporaryStatDto,
-  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { useStrategicNotify } from '../../../services/notify-service';
+import { getStatGainRoll } from '../../../services/stat-service';
 
 const StatLevelUpDialog: FC<{
   character: Character;
@@ -22,7 +23,7 @@ const StatLevelUpDialog: FC<{
 }> = ({ character, stat, open, setCharacter, onClose }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useNotify();
+  const notify = useStrategicNotify();
   const [roll, setRoll] = useState<number>();
   const [minRoll, setMinRoll] = useState<number>();
   const [maxRoll, setMaxRoll] = useState<number>();
@@ -46,13 +47,8 @@ const StatLevelUpDialog: FC<{
   const calculateDiceRoll = () => {
     if (temporary === undefined) return;
 
-    if (temporary < 7) updateDiceRoll('d3 - 1', 0, 2);
-    else if (temporary < 9) updateDiceRoll('d3', 1, 3);
-    else if (temporary < 19) updateDiceRoll('d6', 1, 6);
-    else if (temporary < 82) updateDiceRoll('d10', 1, 10);
-    else if (temporary < 91) updateDiceRoll('d6', 1, 6);
-    else if (temporary < 93) updateDiceRoll('d3', 1, 3);
-    else updateDiceRoll('d3 - 1', 0, 2);
+    const die = getStatGainRoll(temporary);
+    updateDiceRoll(die.dice, die.min, die.max);
   };
 
   const updateDiceRoll = (diceRoll?: string, min?: number, max?: number) => {
@@ -73,7 +69,7 @@ const StatLevelUpDialog: FC<{
 
   return (
     <RmuDialog
-      title={`Level up temporary stat`}
+      title={t('stat-level-up-title')}
       open={open}
       onCancel={onClose}
       onConfirm={onLevelUp}

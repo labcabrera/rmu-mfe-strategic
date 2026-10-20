@@ -15,7 +15,15 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
-import { AddButton, Character, CharacterSkill, Profession, SkillGroupList } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  AddButton,
+  Character,
+  CharacterSkill,
+  Profession,
+  SkillGroupList,
+  StrategicGame,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
+import { resolvePowerLevel } from '../../../services/game-rules';
 import AddSkillDialog from './AddSkillDialog';
 import CharacterSkillBreakdown from './CharacterSkillBreakdown';
 import CharacterSkillTable from './CharacterSkillTable';
@@ -26,7 +34,8 @@ const CharacterViewSkills: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   profession?: Profession;
-}> = ({ character, setCharacter, profession }) => {
+  strategicGame?: StrategicGame;
+}> = ({ character, setCharacter, profession, strategicGame }) => {
   const { t } = useTranslation();
   const [openAddSkillDialog, setOpenAddSkillDialog] = useState(false);
   const [skillNameFilter, setSkillNameFilter] = useState('');
@@ -138,6 +147,7 @@ const CharacterViewSkills: FC<{
           available={character.experience.availableDevPoints}
           total={character.experience.devPoints}
         />
+        <BonusDevPointsSummary character={character} strategicGame={strategicGame} />
       </Stack>
 
       {displaySkillTable ? (
@@ -146,6 +156,7 @@ const CharacterViewSkills: FC<{
           skills={filteredSkills}
           setCharacter={setCharacter}
           profession={profession}
+          strategicGame={strategicGame}
         />
       ) : (
         <SkillGroupList skills={filteredSkills} onSelect={setSelectedSkill} searchable={false} />
@@ -160,6 +171,35 @@ const CharacterViewSkills: FC<{
     </>
   );
 };
+
+/** Bonus development points (race and game master) with the spent / limit of the level, and the flaw points. */
+export function BonusDevPointsSummary({
+  character,
+  strategicGame,
+}: {
+  character: Character;
+  strategicGame?: StrategicGame;
+}) {
+  const { t } = useTranslation();
+  const { availableBonusDevPoints = 0, bonusDevPointsSpentThisLevel = 0, flawDevPoints = 0 } = character.experience;
+  const limit = resolvePowerLevel(strategicGame?.powerLevel).raceDevPointsPerLevel;
+  if (availableBonusDevPoints <= 0 && bonusDevPointsSpentThisLevel <= 0 && flawDevPoints <= 0) return null;
+  return (
+    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ alignItems: { xs: 'stretch', sm: 'center' } }}>
+      <Typography variant="body2" color="text.secondary">
+        {t('bonus-dev-points')}: <b>{availableBonusDevPoints}</b>
+      </Typography>
+      <Typography variant="body2" color="text.secondary">
+        {t('bonus-dev-points-spent-this-level')}: <b>{bonusDevPointsSpentThisLevel}</b> / {limit}
+      </Typography>
+      {flawDevPoints > 0 && (
+        <Typography variant="body2" color="text.secondary">
+          {t('flaw-dev-points')}: <b>{flawDevPoints}</b>
+        </Typography>
+      )}
+    </Stack>
+  );
+}
 
 function DevelopmentPointsProgress({ available, total }: { available: number; total: number }) {
   const { t } = useTranslation();

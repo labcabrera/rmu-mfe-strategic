@@ -36,22 +36,25 @@ import {
   levelUpSkill,
   Profession,
   setUpProfessionalSkill,
-  useNotify,
+  StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { maxRanksPerLevel, resolvePowerLevel, spendableDevPoints } from '../../../services/game-rules';
+import { useStrategicNotify } from '../../../services/notify-service';
 
 const maxProfessionalSkills = 10;
-const maxKnackSkills = 2;
 
 export default function CharacterSkillTable({
   character,
   skills,
   setCharacter,
   profession,
+  strategicGame,
 }: {
   character: Character;
   skills?: CharacterSkill[];
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   profession?: Profession;
+  strategicGame?: StrategicGame;
 }) {
   const { t } = useTranslation();
   const displayedSkills = skills ?? character.skills;
@@ -115,6 +118,7 @@ export default function CharacterSkillTable({
               character={character}
               setCharacter={setCharacter}
               profession={profession}
+              strategicGame={strategicGame}
               currentKnackSkills={currentKnackSkills}
               currentProfessionalSkills={currentProfessionalSkills}
             />
@@ -139,6 +143,7 @@ function SkillRow({
   setCharacter,
   skill,
   profession,
+  strategicGame,
   currentKnackSkills,
   currentProfessionalSkills,
 }: {
@@ -146,13 +151,17 @@ function SkillRow({
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   skill: CharacterSkill;
   profession?: Profession;
+  strategicGame?: StrategicGame;
   currentKnackSkills: number;
   currentProfessionalSkills: number;
 }) {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useNotify();
+  const notify = useStrategicNotify();
   const [open, setOpen] = useState(false);
+  const maxRanks = maxRanksPerLevel(strategicGame);
+  const maxKnackSkills = resolvePowerLevel(strategicGame?.powerLevel).knackCount;
+  const cultureRanks = skill.cultureRanks ?? 0;
   const isProfessional = skill.professional?.includes('professional');
   const isKnack = skill.professional?.includes('knack');
 
@@ -208,15 +217,16 @@ function SkillRow({
       .catch((error) => notify.error(error));
   };
 
+  // Up to 2 ranks per level (3 with the game's allowThirdRank option); the third rank costs the same as the second
   const isLevelUpDisabled = () => {
-    //TODO read allow 3rd rank from game settings
-    const rank = Math.min(skill.ranksDeveloped, 1);
-    const cost = skill.development[rank];
-    return character.experience.availableDevPoints < cost || skill.ranksDeveloped > 2;
+    if (skill.ranksDeveloped >= maxRanks) return true;
+    const cost = skill.development[Math.min(skill.ranksDeveloped, skill.development.length - 1, 1)];
+    return cost === undefined || spendableDevPoints(character, strategicGame) < cost;
   };
 
+  // Culture ranks cannot be removed
   const isLevelDownDisabled = () => {
-    return skill.ranksDeveloped < 1;
+    return skill.ranksDeveloped < 1 || skill.ranks - 1 < cultureRanks;
   };
 
   const isDeletedDisabled = () => {
@@ -239,6 +249,7 @@ function SkillRow({
   };
 
   const detailItems = [
+    ...(cultureRanks > 0 ? [{ label: t('culture-ranks'), value: cultureRanks, color: 'text.primary' }] : []),
     { label: t('rank'), value: skill.developmentBonus, color: getColor(skill.developmentBonus) },
     { label: t('stat'), value: skill.statBonus, color: getColor(skill.statBonus) },
     { label: t('racial'), value: skill.racialBonus, color: getColor(skill.racialBonus) },
@@ -276,9 +287,20 @@ function SkillRow({
         </TableCell>
         <TableCell align="left">{getStatistics(skill)}</TableCell>
         <TableCell align="right">
-          <Typography variant="body2">
-            <b>{skill.ranks}</b>
-          </Typography>
+          {cultureRanks > 0 ? (
+            <Tooltip title={t('culture-ranks-breakdown', { culture: cultureRanks, total: skill.ranks })}>
+              <Typography variant="body2">
+                <b>{skill.ranks}</b>
+                <Typography component="span" variant="caption" color="text.secondary">
+                  {` (${cultureRanks})`}
+                </Typography>
+              </Typography>
+            </Tooltip>
+          ) : (
+            <Typography variant="body2">
+              <b>{skill.ranks}</b>
+            </Typography>
+          )}
         </TableCell>
         <TableCell
           align="right"
@@ -291,7 +313,7 @@ function SkillRow({
         </TableCell>
         <TableCell align="left">
           <Stack direction="row" spacing={0}>
-            {Array.from({ length: 3 }, (_, idx) => idx + 1).map((rank) => (
+            {Array.from({ length: maxRanks }, (_, idx) => idx + 1).map((rank) => (
               <Box key={rank} component="span" sx={{ display: 'inline-flex', mx: 0, p: 0 }}>
                 {rank <= skill.ranksDeveloped ? (
                   <SquareIcon sx={{ mx: 0, p: 0 }} fontSize="small" />

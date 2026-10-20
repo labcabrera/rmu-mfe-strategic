@@ -1,15 +1,15 @@
 import React, { Dispatch, FC, Fragment, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Chip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import { Character, LevelUpButton, StatKey, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Character, LevelUpButton, StatKey, STATS, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { spendableDevPoints, STAT_GAIN_DEV_POINTS_COST } from '../../../services/game-rules';
 import StatLevelUpDialog from './StatLevelUpDialog';
-
-const LEVEL_UP_STAT_COST = 4;
 
 const CharacterViewStatsTable: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
-}> = ({ character, setCharacter }) => {
+  strategicGame?: StrategicGame;
+}> = ({ character, setCharacter, strategicGame }) => {
   const { t } = useTranslation();
   const [levelUpStatDialogOpen, setLevelUpStatDialogOpen] = useState<boolean>(false);
   const [levelUpStat, setLevelUpStat] = useState<StatKey>();
@@ -47,7 +47,15 @@ const CharacterViewStatsTable: FC<{
           <TableBody>
             {STATS.map((key, index) => (
               <Fragment key={index}>
-                <CharacterViewStatsEntry stat={key} character={character} onLevelUp={onLevelUpButtonClick} />
+                <CharacterViewStatsEntry
+                  stat={key}
+                  character={character}
+                  canLevelUp={
+                    character.experience.availableStatLevelUp > 0 ||
+                    spendableDevPoints(character, strategicGame) >= STAT_GAIN_DEV_POINTS_COST
+                  }
+                  onLevelUp={onLevelUpButtonClick}
+                />
               </Fragment>
             ))}
           </TableBody>
@@ -67,8 +75,9 @@ const CharacterViewStatsTable: FC<{
 const CharacterViewStatsEntry: FC<{
   stat: StatKey;
   character: Character;
+  canLevelUp: boolean;
   onLevelUp: (stat: StatKey) => void;
-}> = ({ stat, character, onLevelUp }) => {
+}> = ({ stat, character, canLevelUp, onLevelUp }) => {
   const { t } = useTranslation();
 
   if (!character.statistics[stat].modifiers) return;
@@ -114,9 +123,7 @@ const CharacterViewStatsEntry: FC<{
         {totalBonus}
       </TableCell>
       <TableCell align="right">
-        {character.experience.availableDevPoints >= LEVEL_UP_STAT_COST && (
-          <LevelUpButton onClick={() => onLevelUp(stat)} color={freeUpdate ? 'success' : undefined} />
-        )}
+        {canLevelUp && <LevelUpButton onClick={() => onLevelUp(stat)} color={freeUpdate ? 'success' : undefined} />}
       </TableCell>
     </TableRow>
   );

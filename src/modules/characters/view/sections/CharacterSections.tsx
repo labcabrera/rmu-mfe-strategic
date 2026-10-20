@@ -106,13 +106,13 @@ export const CharacterOverview = ({
 };
 
 /** Stats (with their level up), resistances and traits. */
-export const CharacterAttributes = ({ character, setCharacter }: SectionProps) => {
+export const CharacterAttributes = ({ character, setCharacter, strategicGame }: SectionProps) => {
   const { t } = useTranslation();
   return (
     <Bento>
       <Box sx={span(12, 8)}>
         <Panel title={t('statistics')}>
-          <CharacterViewStats character={character} setCharacter={setCharacter} />
+          <CharacterViewStats character={character} setCharacter={setCharacter} strategicGame={strategicGame} />
         </Panel>
       </Box>
       <Box sx={span(12, 4)}>
