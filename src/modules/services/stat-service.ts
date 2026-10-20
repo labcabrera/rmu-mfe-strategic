@@ -135,3 +135,43 @@ export const getStatBonus = (temporary: number) => {
       throw new Error('Temporary value out of range (1-100)');
   }
 };
+
+/** Bonus of a stat value, 0 for values out of the 1-100 range (stats not rolled yet). */
+export const safeStatBonus = (value: number | undefined): number =>
+  value && value >= 1 && value <= 100 ? getStatBonus(value) : 0;
+
+export interface StatGainRoll {
+  /** Die label, for example 'd10' or 'd3 - 1'. */
+  dice: string;
+  min: number;
+  max: number;
+}
+
+/** Die of a stat gain roll by the current temporary value (the API validates the same bands). */
+export const getStatGainRoll = (temporary: number): StatGainRoll => {
+  if (temporary < 7) return { dice: 'd3 - 1', min: 0, max: 2 };
+  if (temporary < 9) return { dice: 'd3', min: 1, max: 3 };
+  if (temporary < 19) return { dice: 'd6', min: 1, max: 6 };
+  if (temporary < 82) return { dice: 'd10', min: 1, max: 10 };
+  if (temporary < 91) return { dice: 'd6', min: 1, max: 6 };
+  if (temporary < 93) return { dice: 'd3', min: 1, max: 3 };
+  return { dice: 'd3 - 1', min: 0, max: 2 };
+};
+
+export interface StatBonusBand {
+  bonus: number;
+  min: number;
+  max: number;
+}
+
+/** Ranges of stat values that share a bonus, from the lowest bonus to the highest. */
+export const STAT_BONUS_BANDS: StatBonusBand[] = Array.from({ length: 100 }, (_, i) => i + 1).reduce<StatBonusBand[]>(
+  (bands, value) => {
+    const bonus = getStatBonus(value);
+    const last = bands[bands.length - 1];
+    if (last && last.bonus === bonus) last.max = value;
+    else bands.push({ bonus, min: value, max: value });
+    return bands;
+  },
+  []
+);

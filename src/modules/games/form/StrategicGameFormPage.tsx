@@ -19,27 +19,15 @@ import {
   useEntity,
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { DEFAULT_OPTIONS, DEFAULT_POWER_LEVEL, withGameDefaults } from '../../services/game-rules';
 import { DEFAULT_REALM_IMAGE } from '../../services/image-service';
 import StrategicGameForm from './StrategicGameForm';
 
 const EMPTY_STRATEGIC_GAME = {
   name: '',
   realmId: '',
-  options: {
-    experienceMultiplier: 1,
-    fatigueMultiplier: 1,
-    boardScaleMultiplier: 1,
-    letality: 0,
-  },
-  powerLevel: {
-    baseDevPoints: 60,
-    statRandomMin: 11,
-    statBoostPotential: 78,
-    statBoostTemporary: 56,
-    statCreationBoost: 2,
-    statCreationSwap: 2,
-    maxTraitCost: 20,
-  },
+  options: { ...DEFAULT_OPTIONS },
+  powerLevel: { ...DEFAULT_POWER_LEVEL },
   description: '',
   imageUrl: 'images/generic/strategic.png',
 } as StrategicGame;
@@ -68,7 +56,8 @@ export default function StrategicGameFormPage({ mode }: { mode: 'create' | 'edit
       if (!existing.entity) return;
       // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
       const { id, owner, ...rest } = existing.entity;
-      data = rest as StrategicGame;
+      // The API fills the defaults, but an update must send the full power level and options anyway
+      data = withGameDefaults(rest as StrategicGame);
     }
     setFormData(data);
     setInitialData(JSON.stringify(data));

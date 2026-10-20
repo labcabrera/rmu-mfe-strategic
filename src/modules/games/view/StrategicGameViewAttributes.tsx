@@ -8,6 +8,7 @@ import {
   RmuTextCard,
   StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { resolveOptions } from '../../services/game-rules';
 
 const grayscale = 0.7;
 
@@ -15,6 +16,8 @@ export default function StrategicGameViewAttributes({ strategicGame }: { strateg
   const { t } = useTranslation();
 
   if (!strategicGame) return <LoadingState />;
+
+  const options = resolveOptions(strategicGame.options);
 
   const DATA = [
     {
@@ -37,6 +40,26 @@ export default function StrategicGameViewAttributes({ strategicGame }: { strateg
       value: strategicGame.options.letality,
       subtitle: t('letality'),
       image: `${imageBaseUrl}images/generic/physical.png`,
+    },
+    {
+      value: t(`talent-policy-${options.talentPolicy}`),
+      subtitle: t('talent-policy'),
+      image: `${imageBaseUrl}images/generic/trait.png`,
+    },
+    {
+      value: t(`stat-generation-${options.statGeneration}`),
+      subtitle: t('stat-generation'),
+      image: `${imageBaseUrl}images/generic/stat-st.png`,
+    },
+    {
+      value: t(options.allowThirdRank ? 'yes' : 'no'),
+      subtitle: t('allow-third-rank'),
+      image: `${imageBaseUrl}images/generic/skills.png`,
+    },
+    {
+      value: t(options.bonusDevPointsCapAtCreation ? 'yes' : 'no'),
+      subtitle: t('bonus-dev-points-cap-at-creation'),
+      image: `${imageBaseUrl}images/generic/dev-points.png`,
     },
   ];
 

@@ -34,7 +34,7 @@ const CharacterCreateMainForm: FC<{
     setSelectedRace(race);
     const stats = { ...formData.statistics };
     STATS.forEach((key) => {
-      stats[key].racial = race.stats[key];
+      stats[key] = { ...stats[key], racial: race.stats[key] };
     });
     setFormData((prevState) => ({
       ...prevState,

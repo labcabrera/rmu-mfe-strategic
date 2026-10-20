@@ -15,6 +15,7 @@ import {
   StrategicGame,
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { resolvePowerLevel } from '../../../services/game-rules';
 
 const grayscale = 0.7;
 const gridSizeCard = { xs: 10, sm: 5, md: 5, lg: 3, xl: 2 } as const;
@@ -61,6 +62,7 @@ const CharacterViewExperience: FC<{
   const [error, setError] = useState<boolean>(false);
   const experienceMultiplier = strategicGame.options?.experienceMultiplier || 1;
   const totalXp = Math.max(0, Math.round((baseXp || 0) * experienceMultiplier));
+  const bonusDevPointsPerLevel = resolvePowerLevel(strategicGame.powerLevel).raceDevPointsPerLevel;
 
   if (!character) return <LoadingState />;
 
@@ -133,6 +135,32 @@ const CharacterViewExperience: FC<{
               />
             </Badge>
           </Grid>
+          <Grid size={gridSizeCard}>
+            <RmuTextCard
+              value={character.experience.availableBonusDevPoints ?? 0}
+              subtitle={t('bonus-dev-points')}
+              image={`${imageBaseUrl}images/generic/dev-points.png`}
+              grayscale={grayscale}
+            />
+          </Grid>
+          <Grid size={gridSizeCard}>
+            <RmuTextCard
+              value={`${character.experience.bonusDevPointsSpentThisLevel ?? 0} / ${bonusDevPointsPerLevel}`}
+              subtitle={t('bonus-dev-points-spent-this-level')}
+              image={`${imageBaseUrl}images/generic/dev-points.png`}
+              grayscale={grayscale}
+            />
+          </Grid>
+          {(character.experience.flawDevPoints ?? 0) > 0 && (
+            <Grid size={gridSizeCard}>
+              <RmuTextCard
+                value={character.experience.flawDevPoints}
+                subtitle={t('flaw-dev-points')}
+                image={`${imageBaseUrl}images/generic/trait.png`}
+                grayscale={grayscale}
+              />
+            </Grid>
+          )}
         </Grid>
       </Section>
       <RmuDialog

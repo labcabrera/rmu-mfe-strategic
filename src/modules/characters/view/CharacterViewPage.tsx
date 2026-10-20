@@ -7,11 +7,13 @@ import { Box, Chip, Stack } from '@mui/material';
 import {
   Character,
   ConfirmDialog,
+  Culture,
   deleteCharacter,
   DetailPage,
   DownloadButton,
   enterSx,
   fetchCharacter,
+  fetchCulture,
   fetchProfession,
   fetchStrategicGame,
   ImageSelectorDialog,
@@ -72,6 +74,7 @@ export default function CharacterViewPage() {
   const character = state.entity;
   const [strategicGame, setStrategicGame] = useState<StrategicGame>();
   const [profession, setProfession] = useState<Profession>();
+  const [culture, setCulture] = useState<Culture>();
   const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [section, setSection] = useSectionParam(sectionIds);
@@ -87,6 +90,15 @@ export default function CharacterViewPage() {
     fetchStrategicGame(character.gameId, auth).then(setStrategicGame).catch(notify.error);
     fetchProfession(character.info.professionId, auth).then(setProfession).catch(notify.error);
   }, [character?.gameId, character?.info.professionId]);
+
+  useEffect(() => {
+    const cultureId = character?.info.cultureId;
+    if (!cultureId) {
+      setCulture(undefined);
+      return;
+    }
+    fetchCulture(cultureId, auth).then(setCulture).catch(notify.error);
+  }, [character?.info.cultureId]);
 
   const onLevelUp = (entity: Character, force: boolean) => {
     levelUpCharacter(entity.id, force, auth)
@@ -123,8 +135,15 @@ export default function CharacterViewPage() {
 
   const renderSection = (entity: Character): Record<CharacterSectionId, ReactNode> => ({
     overview: <CharacterOverview character={entity} strategicGame={strategicGame} go={setSection} />,
-    attributes: <CharacterAttributes character={entity} setCharacter={setCharacter} />,
-    skills: <CharacterViewSkills character={entity} setCharacter={setCharacter} profession={profession} />,
+    attributes: <CharacterAttributes character={entity} setCharacter={setCharacter} strategicGame={strategicGame} />,
+    skills: (
+      <CharacterViewSkills
+        character={entity}
+        setCharacter={setCharacter}
+        profession={profession}
+        strategicGame={strategicGame}
+      />
+    ),
     combat: <CharacterCombat character={entity} strategicGame={strategicGame} />,
     equipment: <CharacterEquipment character={entity} setCharacter={setCharacter} />,
     progression: <CharacterProgression character={entity} setCharacter={setCharacter} strategicGame={strategicGame} />,
@@ -160,6 +179,16 @@ export default function CharacterViewPage() {
             label={t(entity.info.race.name)}
             onClick={() => navigate(`/core/races/view/${entity.info.race.id}`)}
           />,
+          ...(entity.info.cultureId
+            ? [
+                <Chip
+                  key="culture"
+                  label={culture ? t(culture.name) : t('culture')}
+                  variant="outlined"
+                  onClick={() => navigate(`/core/cultures/view/${entity.info.cultureId}`)}
+                />,
+              ]
+            : []),
           <Chip key="realm" label={t(entity.info.realmType)} variant="outlined" />,
           <Chip
             key="faction"

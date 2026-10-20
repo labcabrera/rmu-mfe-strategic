@@ -1,162 +1,163 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  Box,
   Button,
+  Checkbox,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  Stack,
   Table,
   TableBody,
-  TableContainer,
   TableCell,
+  TableContainer,
   TableHead,
   TableRow,
-  Checkbox,
-  Box,
   Typography,
 } from '@mui/material';
-import { CreateCharacterDto, StatKey, STATS, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { getStatBonus } from '../../services/stat-service';
-import { StatBonus } from './CharacterCreatePage';
-import CharacterCreateStatsBoosts from './CharacterCreateStatsBoosts';
+import { StatKey, STATS, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { resolvePowerLevel } from '../../services/game-rules';
+import {
+  applyStatGainRoll,
+  boostRanked,
+  boostToAverage,
+  CreationStats,
+  rankedStat,
+  swapStats,
+} from '../../services/randomize-stats';
+import { getStatGainRoll } from '../../services/stat-service';
 
+/** Creation boosts and swaps left, and the stat gain rolls granted by a boost and not applied yet. */
+export interface StatCreationBudget {
+  boosts: number;
+  swaps: number;
+  gainRolls: number;
+}
+
+export const initialStatCreationBudget = (game: StrategicGame): StatCreationBudget => {
+  const powerLevel = resolvePowerLevel(game.powerLevel);
+  return { boosts: powerLevel.statCreationBoost, swaps: powerLevel.statCreationSwap, gainRolls: 0 };
+};
+
+const HIGHEST_BOOST_VALUE = 90;
+const SECOND_BOOST_VALUE = 85;
+const GAIN_ROLLS_PER_BOOST = 2;
+
+/**
+ * Stat boosts of the power level (statCreationBoost), each one chosen among: a stat to the average values
+ * (statBoostTemporary / statBoostPotential), the highest temporary to 90 or the second highest to 85 (potential +10 up
+ * to 100), or two stat gain rolls. Swaps (statCreationSwap) exchange the values of two stats.
+ */
 const CharacterCreateBoostOptionsDialog: FC<{
   open: boolean;
   onClose: () => void;
   strategicGame: StrategicGame;
-  formData: CreateCharacterDto;
-  setFormData: React.Dispatch<React.SetStateAction<CreateCharacterDto>>;
-}> = ({ open, onClose, strategicGame, formData, setFormData }) => {
+  statistics: CreationStats;
+  onChange: (statistics: CreationStats) => void;
+  budget: StatCreationBudget;
+  setBudget: (budget: StatCreationBudget) => void;
+}> = ({ open, onClose, strategicGame, statistics, onChange, budget, setBudget }) => {
   const { t } = useTranslation();
-  const [, setStatBonusFormData] = useState<{ [key: string]: StatBonus }>({} as any);
-  const [boosts, setBoosts] = useState<number>(strategicGame?.powerLevel.statCreationBoost || 0);
-  const [swaps, setSwaps] = useState<number>(strategicGame?.powerLevel.statCreationSwap || 0);
-
-  useEffect(() => {
-    const initial: { [key: string]: StatBonus } = {} as any;
-    STATS.forEach((s) => {
-      const stat = formData.statistics?.[s];
-      const potential = stat?.potential ?? 0;
-      const temporary = stat?.temporary ?? 0;
-      initial[s] = { potential: getStatBonus(potential), temporary: getStatBonus(temporary) } as StatBonus;
-    });
-    setStatBonusFormData(initial);
-  }, [formData]);
-
-  useEffect(() => {
-    if (strategicGame) {
-      setBoosts(strategicGame.powerLevel.statCreationBoost);
-      setSwaps(strategicGame.powerLevel.statCreationSwap);
-    }
-  }, [strategicGame]);
-
+  const powerLevel = resolvePowerLevel(strategicGame.powerLevel);
   const [selectedStats, setSelectedStats] = useState<StatKey[]>([]);
+  const [lastRoll, setLastRoll] = useState<{ stat: StatKey; roll: number }>();
+  const highest = rankedStat(statistics, 0);
+  const second = rankedStat(statistics, 1);
 
   const toggleSelect = (stat: StatKey) => {
     setSelectedStats((prev) => {
       if (prev.includes(stat)) return prev.filter((s) => s !== stat);
-      // allow up to 2
       if (prev.length >= 2) return [prev[1], stat];
       return [...prev, stat];
     });
   };
 
-  const handleBoostSelected = () => {
-    if (selectedStats.length !== 1) return;
-    const key = selectedStats[0];
-    const potentialValue = strategicGame?.powerLevel.statBoostPotential || 78;
-    const temporaryValue = strategicGame?.powerLevel.statBoostTemporary || 56;
-    if (boosts <= 0) return;
-    setFormData((prevState) => {
-      const stat = prevState.statistics[key];
-      return {
-        ...prevState,
-        statistics: {
-          ...prevState.statistics,
-          [key]: {
-            ...stat,
-            potential: potentialValue,
-            temporary: temporaryValue,
-          },
-        },
-      };
-    });
-    setStatBonusFormData((prevState) => ({
-      ...prevState,
-      [key]: {
-        ...prevState[key],
-        potential: getStatBonus(potentialValue),
-        temporary: getStatBonus(temporaryValue),
-      },
-    }));
-    setBoosts((b) => Math.max(0, b - 1));
+  const spendBoost = (next: CreationStats, gainRolls = 0) => {
+    onChange(next);
+    setBudget({ ...budget, boosts: budget.boosts - 1, gainRolls: budget.gainRolls + gainRolls });
     setSelectedStats([]);
   };
 
-  const handleSwapSelected = () => {
-    if (selectedStats.length !== 2) return;
-    const [a, b] = selectedStats;
-    if (swaps <= 0) return;
-    setFormData((prevState) => {
-      const sa = prevState.statistics[a];
-      const sb = prevState.statistics[b];
-      return {
-        ...prevState,
-        statistics: {
-          ...prevState.statistics,
-          [a]: {
-            ...sa,
-            potential: sb.potential,
-            temporary: sb.temporary,
-          },
-          [b]: {
-            ...sb,
-            potential: sa.potential,
-            temporary: sa.temporary,
-          },
-        },
-      };
-    });
-    setStatBonusFormData((prevState) => {
-      const pa = prevState[a];
-      const pb = prevState[b];
-      return {
-        ...prevState,
-        [a]: {
-          ...pa,
-          potential: pb.potential,
-          temporary: pb.temporary,
-        },
-        [b]: {
-          ...pb,
-          potential: pa.potential,
-          temporary: pa.temporary,
-        },
-      };
-    });
-    setSwaps((s) => Math.max(0, s - 1));
+  const onAverage = () => {
+    if (selectedStats.length !== 1 || budget.boosts <= 0) return;
+    spendBoost(
+      boostToAverage(statistics, selectedStats[0], powerLevel.statBoostTemporary, powerLevel.statBoostPotential)
+    );
+  };
+
+  const onRanked = (rank: number, value: number) => {
+    if (budget.boosts <= 0) return;
+    spendBoost(boostRanked(statistics, rank, value));
+  };
+
+  const onGainRolls = () => {
+    if (budget.boosts <= 0) return;
+    spendBoost(statistics, GAIN_ROLLS_PER_BOOST);
+  };
+
+  const onApplyGainRoll = () => {
+    if (selectedStats.length !== 1 || budget.gainRolls <= 0) return;
+    const stat = selectedStats[0];
+    const result = applyStatGainRoll(statistics, stat);
+    onChange(result.statistics);
+    setLastRoll({ stat, roll: result.roll });
+    setBudget({ ...budget, gainRolls: budget.gainRolls - 1 });
+  };
+
+  const onSwap = () => {
+    if (selectedStats.length !== 2 || budget.swaps <= 0) return;
+    onChange(swapStats(statistics, selectedStats[0], selectedStats[1]));
+    setBudget({ ...budget, swaps: budget.swaps - 1 });
     setSelectedStats([]);
   };
+
+  const noBoosts = budget.boosts <= 0;
+  const oneSelected = selectedStats.length === 1;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle color="primary">{t('statistics-boosts')}</DialogTitle>
       <DialogContent>
-        <CharacterCreateStatsBoosts
-          strategicGame={strategicGame}
-          formData={formData}
-          setFormData={setFormData}
-          setStatBonusFormData={setStatBonusFormData}
-          boosts={boosts}
-          setBoosts={setBoosts}
-          swaps={swaps}
-          setSwaps={setSwaps}
-        />
-        <Box sx={{ mt: 2 }}>
-          <Typography variant="subtitle1" sx={{ mb: 1 }}>
-            {t('statistics')}
-          </Typography>
+        <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', rowGap: 1, mb: 1 }}>
+          <Chip color={noBoosts ? 'default' : 'success'} label={`${t('stat-creation-boosts')}: ${budget.boosts}`} />
+          <Chip
+            color={budget.swaps > 0 ? 'success' : 'default'}
+            label={`${t('stat-creation-swaps')}: ${budget.swaps}`}
+          />
+          {budget.gainRolls > 0 && (
+            <Chip color="warning" label={t('stat-gain-rolls-pending', { count: budget.gainRolls })} />
+          )}
+          {lastRoll && (
+            <Chip
+              variant="outlined"
+              label={t('stat-gain-roll-result', { stat: t(lastRoll.stat), roll: lastRoll.roll })}
+            />
+          )}
+        </Stack>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+          {t('stat-boosts-help')}
+        </Typography>
+        <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', rowGap: 1, mb: 2 }}>
+          <Button variant="outlined" onClick={onAverage} disabled={noBoosts || !oneSelected}>
+            {t('stat-boost-average', {
+              temporary: powerLevel.statBoostTemporary,
+              potential: powerLevel.statBoostPotential,
+            })}
+          </Button>
+          <Button variant="outlined" onClick={() => onRanked(0, HIGHEST_BOOST_VALUE)} disabled={noBoosts || !highest}>
+            {t('stat-boost-highest', { stat: highest ? t(highest) : '', value: HIGHEST_BOOST_VALUE })}
+          </Button>
+          <Button variant="outlined" onClick={() => onRanked(1, SECOND_BOOST_VALUE)} disabled={noBoosts || !second}>
+            {t('stat-boost-second-highest', { stat: second ? t(second) : '', value: SECOND_BOOST_VALUE })}
+          </Button>
+          <Button variant="outlined" onClick={onGainRolls} disabled={noBoosts}>
+            {t('stat-boost-gain-rolls', { count: GAIN_ROLLS_PER_BOOST })}
+          </Button>
+        </Stack>
+        <Box>
           <TableContainer>
             <Table size="small">
               <TableHead>
@@ -165,6 +166,7 @@ const CharacterCreateBoostOptionsDialog: FC<{
                   <TableCell>{t('stat')}</TableCell>
                   <TableCell align="right">{t('potential')}</TableCell>
                   <TableCell align="right">{t('temporary')}</TableCell>
+                  <TableCell align="right">{t('roll-type')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -180,8 +182,9 @@ const CharacterCreateBoostOptionsDialog: FC<{
                       <Checkbox checked={selectedStats.includes(s)} onChange={() => toggleSelect(s)} />
                     </TableCell>
                     <TableCell>{t(s)}</TableCell>
-                    <TableCell align="right">{formData.statistics?.[s]?.potential ?? '-'}</TableCell>
-                    <TableCell align="right">{formData.statistics?.[s]?.temporary ?? '-'}</TableCell>
+                    <TableCell align="right">{statistics[s]?.potential ?? '-'}</TableCell>
+                    <TableCell align="right">{statistics[s]?.temporary ?? '-'}</TableCell>
+                    <TableCell align="right">{getStatGainRoll(statistics[s]?.temporary ?? 0).dice}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -190,10 +193,10 @@ const CharacterCreateBoostOptionsDialog: FC<{
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleBoostSelected} disabled={selectedStats.length !== 1 || boosts <= 0}>
-          {t('boost-to-power-level')}
+        <Button onClick={onApplyGainRoll} disabled={budget.gainRolls <= 0 || !oneSelected}>
+          {t('stat-gain-roll-apply')}
         </Button>
-        <Button onClick={handleSwapSelected} disabled={selectedStats.length !== 2 || swaps <= 0}>
+        <Button onClick={onSwap} disabled={selectedStats.length !== 2 || budget.swaps <= 0}>
           {t('swap-values')}
         </Button>
         <Box sx={{ flex: 1 }} />
