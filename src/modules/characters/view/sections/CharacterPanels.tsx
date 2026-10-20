@@ -67,6 +67,11 @@ export const DefensePanel = ({ character }: { character: Character }) => {
       <Row label={t('arms')} value={armor.armsAt ?? '-'} />
       <Row label={t('legs')} value={armor.legsAt ?? '-'} />
       {shield && <Row label={t('shield-block-count')} value={shield.blockCount} />}
+      {Object.entries(character.defense.modifiers ?? {})
+        .filter(([, value]) => value !== 0)
+        .map(([key, value]) => (
+          <Row key={key} label={t(key)} value={formatBonus(value)} />
+        ))}
     </>
   );
 };

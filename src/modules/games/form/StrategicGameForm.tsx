@@ -171,6 +171,16 @@ const StrategicGameForm: FC<{
                 allowNegatives={false}
               />
             </Grid>
+            <Grid size={gridSize}>
+              <NumericInput
+                label={t('max-trait-cost')}
+                name="maxTraitCost"
+                value={formData.powerLevel.maxTraitCost ?? 20}
+                onChange={(e) => handlePowerLevelChange('maxTraitCost', e || 0)}
+                integer
+                allowNegatives={false}
+              />
+            </Grid>
           </Grid>
         </Section>
       </Grid>

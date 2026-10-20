@@ -33,6 +33,7 @@ export default function CharacterSkillBreakdown({
           <Row label={t('racial')} value={formatBonus(skill.racialBonus)} />
           <Row label={t('profession')} value={formatBonus(skill.professionalBonus)} />
           <Row label={t('developed-ranks')} value={formatBonus(skill.developmentBonus)} />
+          <Row label={t('trait-bonus')} value={formatBonus(skill.traitBonus ?? 0)} />
           <Row label={t('custom')} value={formatBonus(skill.customBonus)} />
           <Divider sx={{ my: 1 }} />
           <Row label={t('total')} value={formatBonus(skill.totalBonus)} />

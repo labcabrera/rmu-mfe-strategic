@@ -1,6 +1,6 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Grid, Stack, Typography } from '@mui/material';
+import { Chip, Grid, Stack, Typography } from '@mui/material';
 import {
   AddButton,
   CategorySeparator,
@@ -59,6 +59,15 @@ const CharacterViewTraits: FC<{
                     <Typography color="secondary">
                       <em>{trait.specialization ? t(trait.specialization) : t('none')}</em>
                     </Typography>
+                    {trait.source === 'race' && (
+                      <Chip
+                        label={t('trait-source-race')}
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                        sx={{ alignSelf: 'flex-start', mt: 0.5 }}
+                      />
+                    )}
                   </Stack>
                 </RmuCard>
               </Grid>

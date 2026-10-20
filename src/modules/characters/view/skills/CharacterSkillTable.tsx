@@ -243,6 +243,7 @@ function SkillRow({
     { label: t('stat'), value: skill.statBonus, color: getColor(skill.statBonus) },
     { label: t('racial'), value: skill.racialBonus, color: getColor(skill.racialBonus) },
     { label: t('profession'), value: skill.professionalBonus, color: getColor(skill.professionalBonus) },
+    { label: t('trait-bonus'), value: skill.traitBonus ?? 0, color: getColor(skill.traitBonus ?? 0) },
     {
       label: t('custom'),
       value: skill.customBonus,
