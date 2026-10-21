@@ -98,13 +98,29 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
                 {t('level')}
               </TableSortLabel>
             </TableCell>
-            <TableCell align="right">HP</TableCell>
+            <TableCell align="right">
+              <Tooltip title={t('hp')}>
+                <span>{t('hp-short')}</span>
+              </Tooltip>
+            </TableCell>
             <TableCell>{t('profession')}</TableCell>
             <TableCell>{t('attacks')}</TableCell>
-            <TableCell align="right">DB</TableCell>
-            <TableCell align="right">AT</TableCell>
+            <TableCell align="right">
+              <Tooltip title={t('defensive-bonus')}>
+                <span>{t('db-short')}</span>
+              </Tooltip>
+            </TableCell>
+            <TableCell align="right">
+              <Tooltip title={t('armor-type')}>
+                <span>{t('at-short')}</span>
+              </Tooltip>
+            </TableCell>
             <TableCell align="right">{t('initiative-short')}</TableCell>
-            <TableCell align="right">BMR</TableCell>
+            <TableCell align="right">
+              <Tooltip title={t('base-movement-rate')}>
+                <span>{t('bmr')}</span>
+              </Tooltip>
+            </TableCell>
             <TableCell align="right">{t('penalty-short')}</TableCell>
           </TableRow>
         </TableHead>
@@ -157,7 +173,7 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
           ))}
           {characters.length === 0 && (
             <TableRow>
-              <TableCell colSpan={7}>{t('no-characters-have-been-created')}</TableCell>
+              <TableCell colSpan={11}>{t('no-characters-have-been-created')}</TableCell>
             </TableRow>
           )}
         </TableBody>
