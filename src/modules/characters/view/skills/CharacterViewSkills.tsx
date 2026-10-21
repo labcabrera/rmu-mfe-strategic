@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import {
   AddButton,
+  BonusDevPointsSummary,
   Character,
   CharacterSkill,
   Profession,
@@ -147,7 +148,11 @@ const CharacterViewSkills: FC<{
           available={character.experience.availableDevPoints}
           total={character.experience.devPoints}
         />
-        <BonusDevPointsSummary character={character} strategicGame={strategicGame} />
+        <BonusDevPointsSummary
+          character={character}
+          strategicGame={strategicGame}
+          limit={resolvePowerLevel(strategicGame?.powerLevel).raceDevPointsPerLevel}
+        />
       </Stack>
 
       {displaySkillTable ? (
@@ -171,35 +176,6 @@ const CharacterViewSkills: FC<{
     </>
   );
 };
-
-/** Bonus development points (race and game master) with the spent / limit of the level, and the flaw points. */
-export function BonusDevPointsSummary({
-  character,
-  strategicGame,
-}: {
-  character: Character;
-  strategicGame?: StrategicGame;
-}) {
-  const { t } = useTranslation();
-  const { availableBonusDevPoints = 0, bonusDevPointsSpentThisLevel = 0, flawDevPoints = 0 } = character.experience;
-  const limit = resolvePowerLevel(strategicGame?.powerLevel).raceDevPointsPerLevel;
-  if (availableBonusDevPoints <= 0 && bonusDevPointsSpentThisLevel <= 0 && flawDevPoints <= 0) return null;
-  return (
-    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ alignItems: { xs: 'stretch', sm: 'center' } }}>
-      <Typography variant="body2" color="text.secondary">
-        {t('bonus-dev-points')}: <b>{availableBonusDevPoints}</b>
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        {t('bonus-dev-points-spent-this-level')}: <b>{bonusDevPointsSpentThisLevel}</b> / {limit}
-      </Typography>
-      {flawDevPoints > 0 && (
-        <Typography variant="body2" color="text.secondary">
-          {t('flaw-dev-points')}: <b>{flawDevPoints}</b>
-        </Typography>
-      )}
-    </Stack>
-  );
-}
 
 function DevelopmentPointsProgress({ available, total }: { available: number; total: number }) {
   const { t } = useTranslation();

@@ -37,7 +37,7 @@ export default function FactionListFilters({ onChange }: { onChange: (rsql: stri
   }, []);
 
   return (
-    <FilterBar>
+    <FilterBar activeCount={gameId ? 1 : 0}>
       <SearchField value={name} onChange={setName} />
       <Autocomplete
         options={games}

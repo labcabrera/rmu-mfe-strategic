@@ -24,6 +24,7 @@ export default function CharacterListFilters({ onChange }: { onChange: (rsql: st
   const [factionId, setFactionId] = useState('');
   const [games, setGames] = useState<StrategicGame[]>([]);
   const [factions, setFactions] = useState<Faction[]>([]);
+  const gameFactions = gameId ? factions.filter((faction) => faction.gameId === gameId) : factions;
 
   useEffect(() => {
     onChange(
@@ -45,22 +46,28 @@ export default function CharacterListFilters({ onChange }: { onChange: (rsql: st
   }, []);
 
   return (
-    <FilterBar>
+    <FilterBar activeCount={[gameId, factionId].filter(Boolean).length}>
       <SearchField value={name} onChange={setName} />
       <Autocomplete
         options={games}
         getOptionLabel={(option) => option?.name || ''}
         value={games.find((option) => option.id === gameId) || null}
-        onChange={(_, newValue) => setGameId(newValue?.id || '')}
+        onChange={(_, newValue) => {
+          const nextGameId = newValue?.id || '';
+          setGameId(nextGameId);
+          // The faction filter only offers the factions of the chosen game: drop a faction of another one.
+          if (nextGameId && factions.find((faction) => faction.id === factionId)?.gameId !== nextGameId)
+            setFactionId('');
+        }}
         isOptionEqualToValue={(option, val) => option.id === val.id}
         fullWidth
         renderInput={(params) => <TextField {...params} label={t('strategic-game')} />}
         noOptionsText={t('no-options')}
       />
       <Autocomplete
-        options={factions}
+        options={gameFactions}
         getOptionLabel={(option) => option?.name || ''}
-        value={factions.find((option) => option.id === factionId) || null}
+        value={gameFactions.find((option) => option.id === factionId) || null}
         onChange={(_, newValue) => setFactionId(newValue?.id || '')}
         isOptionEqualToValue={(option, val) => option.id === val.id}
         fullWidth

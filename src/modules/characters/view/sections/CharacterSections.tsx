@@ -121,7 +121,7 @@ export const CharacterAttributes = ({ character, setCharacter, strategicGame }: 
         </Panel>
       </Box>
       <Box sx={span(12, 12)}>
-        <CharacterViewTraits character={character} setCharacter={setCharacter} />
+        <CharacterViewTraits character={character} setCharacter={setCharacter} strategicGame={strategicGame} />
       </Box>
     </Bento>
   );

@@ -3,12 +3,12 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import TableRowsIcon from '@mui/icons-material/TableRows';
-import ViewListIcon from '@mui/icons-material/ViewList';
-import { Box, Grid, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 import {
   AddButton,
   Character,
+  CollectionModeSwitch,
+  CollectionMode,
   deleteFaction,
   DetailPage,
   Faction,
@@ -19,6 +19,7 @@ import {
   RmuTextCard,
   Section,
   StrategicGame,
+  useCollectionMode,
   useEntity,
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
@@ -27,7 +28,7 @@ import FactionViewCharactersTable from './FactionViewCharacterTable';
 import FactionViewCharacters from './FactionViewCharacters';
 import FactionViewResume from './FactionViewResume';
 
-const STORAGE_KEY = 'faction-display-character-table';
+const CHARACTER_VIEW_MODES: CollectionMode[] = ['cards', 'table'];
 
 export default function FactionViewPage() {
   const navigate = useNavigate();
@@ -43,13 +44,10 @@ export default function FactionViewPage() {
   const faction = state.entity;
   const [game, setGame] = useState<StrategicGame>();
   const [characters, setCharacters] = useState<Character[]>([]);
-  const [displayCharacterTable, setDisplayCharacterTable] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem(STORAGE_KEY) === 'true';
-    } catch {
-      return false;
-    }
-  });
+  const [characterViewMode, setCharacterViewMode] = useCollectionMode(
+    'strategic.faction-characters',
+    CHARACTER_VIEW_MODES
+  );
 
   useEffect(() => {
     if (!faction) return;
@@ -65,17 +63,6 @@ export default function FactionViewPage() {
     deleteFaction(entity.id, auth)
       .then(() => navigate(`/strategic/games/view/${entity.gameId}`, { replace: true }))
       .catch(notify.error);
-
-  const handleViewModeChange = (_e: unknown, val: string | null) => {
-    if (val === null) return;
-    const table = val === 'table';
-    setDisplayCharacterTable(table);
-    try {
-      localStorage.setItem(STORAGE_KEY, table ? 'true' : 'false');
-    } catch {
-      // Storage may be unavailable (private mode): the choice is just not remembered.
-    }
-  };
 
   return (
     <DetailPage
@@ -129,27 +116,18 @@ export default function FactionViewPage() {
                       })
                     }
                   />
-                  <ToggleButtonGroup
-                    value={displayCharacterTable ? 'table' : 'list'}
-                    exclusive
-                    size="small"
-                    onChange={handleViewModeChange}
-                    aria-label="view-mode"
-                  >
-                    <ToggleButton value="list" aria-label="list">
-                      <ViewListIcon fontSize="small" />
-                    </ToggleButton>
-                    <ToggleButton value="table" aria-label="table">
-                      <TableRowsIcon fontSize="small" />
-                    </ToggleButton>
-                  </ToggleButtonGroup>
+                  <CollectionModeSwitch
+                    modes={CHARACTER_VIEW_MODES}
+                    value={characterViewMode}
+                    onChange={setCharacterViewMode}
+                  />
                 </Box>
               }
             >
-              {displayCharacterTable ? (
+              {characterViewMode === 'table' ? (
                 <FactionViewCharactersTable characters={characters} />
               ) : (
-                <FactionViewCharacters faction={entity} characters={characters} />
+                <FactionViewCharacters characters={characters} />
               )}
             </Section>
           </Grid>
