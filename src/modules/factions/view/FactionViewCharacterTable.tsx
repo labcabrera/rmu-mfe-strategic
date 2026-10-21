@@ -15,6 +15,7 @@ import {
   Typography,
 } from '@mui/material';
 import { Character, resolveAssetUrl } from '@labcabrera-rmu/rmu-react-shared-lib';
+import CharacterHealthChips from '../../shared/chips/CharacterHealthChips';
 
 type SortField = 'name' | 'level' | null;
 type SortDirection = 'asc' | 'desc';
@@ -141,7 +142,10 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
                       sx={{ width: 45, height: 45 }}
                       variant="square"
                     />
-                    <Typography variant="body2">{c.name}</Typography>
+                    <div>
+                      <Typography variant="body2">{c.name}</Typography>
+                      <CharacterHealthChips character={c} />
+                    </div>
                   </div>
                 </Tooltip>
               </TableCell>
