@@ -30,6 +30,7 @@ export const DEFAULT_OPTIONS: Required<StrategicGameOptions> = {
   talentPolicy: 'free',
   bonusDevPointsCapAtCreation: false,
   statGeneration: 'roll',
+  openRounds: true,
 };
 
 /** Ranks of a skill that can be developed in a single level. */

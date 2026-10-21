@@ -61,6 +61,11 @@ export default function StrategicGameViewAttributes({ strategicGame }: { strateg
       subtitle: t('bonus-dev-points-cap-at-creation'),
       image: `${imageBaseUrl}images/generic/dev-points.png`,
     },
+    {
+      value: t(options.openRounds ? 'yes' : 'no'),
+      subtitle: t('open-rounds'),
+      image: `${imageBaseUrl}images/generic/initiative.png`,
+    },
   ];
 
   return (

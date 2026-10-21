@@ -170,6 +170,18 @@ const StrategicGameForm: FC<{
                 label={t('bonus-dev-points-cap-at-creation')}
               />
             </Grid>
+            <Grid size={gridSize}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    name="openRounds"
+                    checked={formData.options.openRounds ?? true}
+                    onChange={(e) => handleOptionsChange('openRounds', e.target.checked)}
+                  />
+                }
+                label={t('open-rounds')}
+              />
+            </Grid>
           </Grid>
         </Section>
       </Grid>
