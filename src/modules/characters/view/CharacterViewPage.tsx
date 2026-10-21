@@ -1,8 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
+import React, { Dispatch, ReactElement, ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import BackpackIcon from '@mui/icons-material/Backpack';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import HealingIcon from '@mui/icons-material/Healing';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import SportsMmaIcon from '@mui/icons-material/SportsMma';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import { Box, Chip, Stack } from '@mui/material';
 import {
   Character,
@@ -30,6 +37,8 @@ import {
   useNotify,
   useSectionParam,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { healthChips } from '../../shared/chips/CharacterHealthChips';
+import CharacterHealthSection from './health/CharacterHealthSection';
 import { armorLabel } from './sections/CharacterPanels';
 import {
   CharacterAttributes,
@@ -44,6 +53,15 @@ import CharacterViewSkills from './skills/CharacterViewSkills';
 
 const defaultCharacterImage = `${imageBaseUrl}images/npcs/unknown.png`;
 const sectionIds = [...characterSectionIds];
+const sectionIcons: Record<CharacterSectionId, ReactElement> = {
+  overview: <DashboardIcon />,
+  attributes: <BarChartIcon />,
+  skills: <MenuBookIcon />,
+  combat: <SportsMmaIcon />,
+  health: <HealingIcon />,
+  equipment: <BackpackIcon />,
+  progression: <TrendingUpIcon />,
+};
 
 /** Downloads the character as a JSON file. */
 const downloadCharacter = (character: Character) => {
@@ -145,6 +163,7 @@ export default function CharacterViewPage() {
       />
     ),
     combat: <CharacterCombat character={entity} strategicGame={strategicGame} />,
+    health: <CharacterHealthSection character={entity} setCharacter={setCharacter} strategicGame={strategicGame} />,
     equipment: <CharacterEquipment character={entity} setCharacter={setCharacter} />,
     progression: <CharacterProgression character={entity} setCharacter={setCharacter} strategicGame={strategicGame} />,
   });
@@ -206,6 +225,15 @@ export default function CharacterViewPage() {
                 />,
               ]
             : []),
+          ...healthChips(entity, t).map((chip) => (
+            <Chip
+              key={`health-${chip.key}`}
+              color={chip.color}
+              label={chip.label}
+              icon={chip.key === 'injuries' ? <HealingIcon /> : undefined}
+              onClick={() => setSection('health')}
+            />
+          )),
           ...(entity.experience.availableStatLevelUp > 0
             ? [
                 <Chip
@@ -274,7 +302,7 @@ export default function CharacterViewPage() {
             label={t('character-sections')}
             value={section}
             onChange={setSection}
-            sections={sectionIds.map((id) => ({ id, label: t(id) }))}
+            sections={sectionIds.map((id) => ({ id, label: t(id), icon: sectionIcons[id] }))}
           />
           <Box key={section} sx={enterSx()}>
             {renderSection(entity)[section as CharacterSectionId]}

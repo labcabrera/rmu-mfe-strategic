@@ -11,7 +11,6 @@ import {
   StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import CharacterViewMovement from '../CharacterViewMovement';
-import CharacterHealingPanel from '../healing/CharacterHealingPanel';
 import CharacterEquipmentButtons from '../items/CharacterEquipmentButtons';
 import CharacterEquipmentPanel from '../items/CharacterEquipmentPanel';
 import CharacterViewStats from '../stats/CharacterViewStats';
@@ -19,7 +18,15 @@ import CharacterViewTraits from '../traits/CharacterViewTraits';
 import CharacterViewExperience from '../xp/CharacterViewXp';
 import { Bento, DefensePanel, formatFumble, formatMeleeRange, LoadPanel, Row, span } from './CharacterPanels';
 
-export const characterSectionIds = ['overview', 'attributes', 'skills', 'combat', 'equipment', 'progression'] as const;
+export const characterSectionIds = [
+  'overview',
+  'attributes',
+  'skills',
+  'combat',
+  'health',
+  'equipment',
+  'progression',
+] as const;
 export type CharacterSectionId = (typeof characterSectionIds)[number];
 
 type SectionProps = {
@@ -168,12 +175,11 @@ export const CharacterEquipment = ({ character, setCharacter }: SectionProps) =>
   </Stack>
 );
 
-/** Experience and level, then healing and permanent injuries. */
+/** Experience and level. */
 export const CharacterProgression = ({ character, setCharacter, strategicGame }: SectionProps) => (
   <Stack spacing={2}>
     {strategicGame && (
       <CharacterViewExperience character={character} strategicGame={strategicGame} setCharacter={setCharacter} />
     )}
-    <CharacterHealingPanel character={character} />
   </Stack>
 );
