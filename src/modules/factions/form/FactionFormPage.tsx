@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
+  addFactionGold,
+  addFactionXP,
   createFaction,
   EditableAvatar,
   ErrorState,
@@ -82,9 +84,24 @@ export default function FactionFormPage({ mode }: { mode: 'create' | 'edit' }) {
     setInitialData(JSON.stringify(data));
   }, [game.entity, existing.entity]);
 
+  /**
+   * rmu-api-strategic ignores `management` in the PATCH (spec 021, F-strategic-16): the gold and XP edited here are sent
+   * as the difference through add-gold and add-xp, which only the game owner or an admin may call.
+   */
+  const saveEdit = async (data: Faction): Promise<Faction> => {
+    const { management, ...rest } = data;
+    const before = existing.entity?.management;
+    let saved = await updateFaction(factionId!, rest, auth);
+    const gold = management.availableGold - (before?.availableGold ?? 0);
+    const xp = management.availableXP - (before?.availableXP ?? 0);
+    if (gold !== 0) saved = await addFactionGold(factionId!, gold, auth);
+    if (xp !== 0) saved = await addFactionXP(factionId!, xp, auth);
+    return saved;
+  };
+
   const onSave = () => {
     if (!formData) return;
-    const request = mode === 'create' ? createFaction(formData, auth) : updateFaction(factionId!, formData, auth);
+    const request = mode === 'create' ? createFaction(formData, auth) : saveEdit(formData);
     request
       .then((data: Faction) => navigate(`/strategic/factions/view/${data.id}`, { state: { faction: data } }))
       .catch(notify.error);
