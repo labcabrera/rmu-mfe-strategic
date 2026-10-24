@@ -175,7 +175,7 @@ function EquipmentSlots({
             gridTemplateColumns: '1fr 120px 1fr',
             gridTemplateRows: 'repeat(4, 110px)',
             gap: 1,
-            alignItems: 'center',
+            alignItems: 'start',
             justifyItems: 'center',
           }}
         >
@@ -231,12 +231,16 @@ function SlotCard({
     t('empty-slot')
   );
   return (
-    <Stack spacing={0.5} sx={{ alignItems: 'center' }}>
+    // Fixed size: the image always sits at the same height of its row, with or without badges below.
+    <Stack spacing={0.5} sx={{ alignItems: 'center', width: 110, height: 110 }}>
       <Tooltip title={tooltip}>
         <Box
+          onClick={() => onClick(slot)}
           sx={{
             width: 82,
             height: 82,
+            flexShrink: 0,
+            cursor: 'pointer',
             border: 0.5,
             borderColor: item ? 'primary.main' : 'divider',
             borderRadius: 0.5,
@@ -251,7 +255,6 @@ function SlotCard({
             component="img"
             src={image}
             alt={item ? item.name : t('empty-slot')}
-            onClick={() => onClick(slot)}
             sx={{
               width: '100%',
               height: '100%',
@@ -261,13 +264,15 @@ function SlotCard({
           />
         </Box>
       </Tooltip>
-      {item && (
-        <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
-          <ItemConditionChip condition={item.condition} />
-          {/* Breakage is already in the condition: the slot only adds the other kinds, folded. */}
-          <ItemModifierChips modifiers={modifiers.filter((modifier) => modifier.type !== 'breakage')} max={0} />
-        </Stack>
-      )}
+      <Stack
+        direction="row"
+        spacing={0.5}
+        sx={{ alignItems: 'center', justifyContent: 'center', height: 24, maxWidth: '100%', overflow: 'hidden' }}
+      >
+        {item && <ItemConditionChip condition={item.condition} />}
+        {/* Breakage is already in the condition: the slot only adds the other kinds, folded. */}
+        {item && <ItemModifierChips modifiers={modifiers.filter((modifier) => modifier.type !== 'breakage')} max={0} />}
+      </Stack>
     </Stack>
   );
 }
@@ -489,10 +494,7 @@ function ItemList({
               />
 
               <Box>
-                <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-                  <Typography variant="body2">{item.name}</Typography>
-                  <ItemConditionChip condition={item.condition} />
-                </Stack>
+                <Typography variant="body2">{item.name}</Typography>
                 {item.modifiers && item.modifiers.length > 0 && (
                   <Box sx={{ mt: 0.5 }}>
                     <ItemModifierChips modifiers={item.modifiers} max={3} />
