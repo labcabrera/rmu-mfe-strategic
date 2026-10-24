@@ -208,7 +208,6 @@ export default function CharacterViewPage() {
                 />,
               ]
             : []),
-          <Chip key="realm" label={t(entity.info.realmType)} variant="outlined" />,
           <Chip
             key="faction"
             label={entity.faction.name}
