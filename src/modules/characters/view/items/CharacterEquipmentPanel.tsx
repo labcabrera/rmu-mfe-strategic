@@ -19,6 +19,7 @@ import {
   Menu,
   MenuItem,
   Stack,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import {
@@ -30,6 +31,7 @@ import {
   imageBaseUrl,
   ItemConditionChip,
   itemFilter,
+  ItemModifierChips,
   StrategicItem,
   updateCarriedStatus,
   useNotify,
@@ -209,36 +211,63 @@ function SlotCard({
   const { t } = useTranslation();
   const item = items.find((e) => e.id === itemId) || undefined;
   const image = item ? `${imageBaseUrl}images/items/${item.itemTypeId}.png` : `${imageBaseUrl}images/items/no-item.png`;
+  const modifiers = item?.modifiers || [];
+  const tooltip = item ? (
+    <Stack spacing={0.5}>
+      <Typography variant="subtitle2">{item.name}</Typography>
+      {modifiers.length > 0 ? (
+        modifiers.map((modifier) => (
+          <Typography key={modifier.id} variant="body2" component="span">
+            {`${t(`item-modifier-type-${modifier.type}`)} ${modifier.value > 0 ? '+' : ''}${modifier.value} · ${t(`item-modifier-target-${modifier.appliesTo}`)}`}
+          </Typography>
+        ))
+      ) : (
+        <Typography variant="body2" component="span">
+          {t('item-modifiers-none')}
+        </Typography>
+      )}
+    </Stack>
+  ) : (
+    t('empty-slot')
+  );
   return (
     <Stack spacing={0.5} sx={{ alignItems: 'center' }}>
-      <Box
-        sx={{
-          width: 82,
-          height: 82,
-          border: 0.5,
-          borderColor: item ? 'primary.main' : 'divider',
-          borderRadius: 0.5,
-          overflow: 'hidden',
-          bgcolor: 'action.hover',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+      <Tooltip title={tooltip}>
         <Box
-          component="img"
-          src={image}
-          alt={item ? item.name : t('empty-slot')}
-          onClick={() => onClick(slot)}
           sx={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            filter: itemFilter,
+            width: 82,
+            height: 82,
+            border: 0.5,
+            borderColor: item ? 'primary.main' : 'divider',
+            borderRadius: 0.5,
+            overflow: 'hidden',
+            bgcolor: 'action.hover',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
-        />
-      </Box>
-      {item && <ItemConditionChip condition={item.condition} />}
+        >
+          <Box
+            component="img"
+            src={image}
+            alt={item ? item.name : t('empty-slot')}
+            onClick={() => onClick(slot)}
+            sx={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              filter: itemFilter,
+            }}
+          />
+        </Box>
+      </Tooltip>
+      {item && (
+        <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
+          <ItemConditionChip condition={item.condition} />
+          {/* Breakage is already in the condition: the slot only adds the other kinds, folded. */}
+          <ItemModifierChips modifiers={modifiers.filter((modifier) => modifier.type !== 'breakage')} max={0} />
+        </Stack>
+      )}
     </Stack>
   );
 }
@@ -464,9 +493,11 @@ function ItemList({
                   <Typography variant="body2">{item.name}</Typography>
                   <ItemConditionChip condition={item.condition} />
                 </Stack>
-                <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                  {item.name}
-                </Typography>
+                {item.modifiers && item.modifiers.length > 0 && (
+                  <Box sx={{ mt: 0.5 }}>
+                    <ItemModifierChips modifiers={item.modifiers} max={3} />
+                  </Box>
+                )}
               </Box>
               <Typography variant="body2">{item.amount ?? 1}</Typography>
               <Typography variant="body2" sx={{ textAlign: 'right' }}>
