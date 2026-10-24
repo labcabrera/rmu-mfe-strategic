@@ -45,7 +45,9 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
 
   const getAttackDescription = (character: Character): string => {
     if (!character.attacks || character.attacks.length === 0) return '-';
-    return character.attacks.map((a) => `${t(a.attackTable || '')}: ${a.bo ?? ''}`.trim()).join(', ');
+    return character.attacks
+      .map((a) => `${t(a.attackTable || '')}: ${a.bo ?? ''}`.trim().replace(/ /g, '\u00a0'))
+      .join('\n');
   };
 
   const getArmorDescription = (character: Character): string => {
@@ -61,12 +63,15 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
     return `${c.experience.level}`;
   };
 
+  // The name column stays in place while the table scrolls sideways on narrow screens.
+  const stickySx = { position: 'sticky', left: 0, zIndex: 1, bgcolor: 'background.paper' } as const;
+
   return (
     <TableContainer component={Paper} sx={{ width: '100%' }}>
       <Table size="small" aria-label={t('faction-characters-table')}>
         <TableHead>
           <TableRow>
-            <TableCell>
+            <TableCell sx={stickySx}>
               <TableSortLabel
                 active={sortField === 'name'}
                 direction={sortField === 'name' ? sortDirection : 'asc'}
@@ -133,21 +138,24 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
               sx={{ cursor: 'pointer' }}
               onClick={() => navigate(`/strategic/characters/view/${c.id}`, { state: { character: c } })}
             >
-              <TableCell>
-                <Tooltip title={c.description || ''}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Avatar
-                      src={resolveAssetUrl(c.imageUrl)}
-                      alt={c.name}
-                      sx={{ width: 45, height: 45 }}
-                      variant="square"
-                    />
-                    <div>
-                      <Typography variant="body2">{c.name}</Typography>
-                      <CharacterHealthChips character={c} />
-                    </div>
+              <TableCell sx={stickySx}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Avatar
+                    src={resolveAssetUrl(c.imageUrl)}
+                    alt={c.name}
+                    sx={{ width: 45, height: 45 }}
+                    variant="square"
+                  />
+                  <div>
+                    <Tooltip title={c.description || ''}>
+                      <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }}>
+                        {c.name}
+                      </Typography>
+                    </Tooltip>
+                    {/* Compact badges: the full text on hover or tap, so the row keeps its height (spec 017). */}
+                    <CharacterHealthChips character={c} variant="compact" />
                   </div>
-                </Tooltip>
+                </div>
               </TableCell>
               <TableCell>{c.info?.race?.name}</TableCell>
               <TableCell align="right">{getExperienceLabel(c)}</TableCell>
@@ -155,7 +163,8 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
                 {c.hp.current === c.hp.max ? c.hp.max : `${c.hp.current}/${c.hp.max}`}
               </TableCell>
               <TableCell>{t(c.info?.professionId || '')}</TableCell>
-              <TableCell>{getAttackDescription(c)}</TableCell>
+              {/* One attack per line, never split inside a name or a bonus. */}
+              <TableCell sx={{ whiteSpace: 'pre-line', minWidth: 160 }}>{getAttackDescription(c)}</TableCell>
               <TableCell align="right">
                 <Typography color={c.defense.defensiveBonus < 0 ? 'error' : 'success'}>
                   {c.defense.defensiveBonus}

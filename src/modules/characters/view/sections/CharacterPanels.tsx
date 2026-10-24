@@ -22,15 +22,8 @@ export const Row = ({ label, value }: { label: string; value: ReactNode }) => (
   </Stack>
 );
 
-/** 12-column grid of the sections; children set their span with `span()`. */
-export const Bento = ({ children }: { children: ReactNode }) => (
-  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(12, minmax(0, 1fr))', gap: 2 }}>{children}</Box>
-);
-
-/** Column span from `sm` (tablet), `lg` and `xl` up; full width on phones. */
-export const span = (sm: number, lg: number, xl = lg) => ({
-  gridColumn: { xs: 'span 12', sm: `span ${sm}`, lg: `span ${lg}`, xl: `span ${xl}` },
-});
+// The grid moved to the shared layout (campaign and faction views use it too); re-exported for the sections.
+export { Bento, span } from '../../../shared/layout/Bento';
 
 /** Armor type: the single AT, or the AT of head / body / arms / legs. */
 export const armorLabel = (character: Character) => {

@@ -33,7 +33,11 @@ const FactionViewCharacters: FC<{ characters?: Character[] }> = ({ characters })
           image={character.imageUrl || DEFAULT_CHARACTER_IMAGE_PATH}
           imageRatio="square"
           description={character.description}
-          chips={healthChips(character, t).length > 0 ? <CharacterHealthChips character={character} /> : undefined}
+          chips={
+            healthChips(character, t).length > 0 ? (
+              <CharacterHealthChips character={character} variant="compact" />
+            ) : undefined
+          }
           metrics={[
             { label: t('level'), value: character.experience.level },
             { label: t('hp-short'), value: `${character.hp.current}/${character.hp.max}` },
