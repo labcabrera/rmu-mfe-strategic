@@ -1,86 +1,30 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Grid } from '@mui/material';
-import {
-  gridSizeCard,
-  imageBaseUrl,
-  LoadingState,
-  RmuTextCard,
-  StrategicGame,
-} from '@labcabrera-rmu/rmu-react-shared-lib';
+import { KeyValuePanel, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { resolveOptions } from '../../services/game-rules';
 
-const grayscale = 0.7;
-
-export default function StrategicGameViewAttributes({ strategicGame }: { strategicGame?: StrategicGame }) {
+/** Options of a campaign as label / value rows (multipliers, lethality and the creation and combat rules). */
+const StrategicGameViewAttributes: FC<{ strategicGame: StrategicGame }> = ({ strategicGame }) => {
   const { t } = useTranslation();
-
-  if (!strategicGame) return <LoadingState />;
-
   const options = resolveOptions(strategicGame.options);
-
-  const DATA = [
-    {
-      value: strategicGame.options.experienceMultiplier,
-      subtitle: t('experience-multiplier'),
-      image: `${imageBaseUrl}images/generic/experience.png`,
-    },
-    {
-      value: strategicGame.options.fatigueMultiplier,
-      subtitle: t('fatigue-multiplier'),
-      image: `${imageBaseUrl}images/generic/stat-co.png`,
-    },
-    {
-      value: strategicGame.options.boardScaleMultiplier,
-      subtitle: t('board-scale'),
-      image: `${imageBaseUrl}images/generic/realm.png`,
-      applyColor: false,
-    },
-    {
-      value: strategicGame.options.letality,
-      subtitle: t('letality'),
-      image: `${imageBaseUrl}images/generic/physical.png`,
-    },
-    {
-      value: t(`talent-policy-${options.talentPolicy}`),
-      subtitle: t('talent-policy'),
-      image: `${imageBaseUrl}images/generic/trait.png`,
-    },
-    {
-      value: t(`stat-generation-${options.statGeneration}`),
-      subtitle: t('stat-generation'),
-      image: `${imageBaseUrl}images/generic/stat-st.png`,
-    },
-    {
-      value: t(options.allowThirdRank ? 'yes' : 'no'),
-      subtitle: t('allow-third-rank'),
-      image: `${imageBaseUrl}images/generic/skills.png`,
-    },
-    {
-      value: t(options.bonusDevPointsCapAtCreation ? 'yes' : 'no'),
-      subtitle: t('bonus-dev-points-cap-at-creation'),
-      image: `${imageBaseUrl}images/generic/dev-points.png`,
-    },
-    {
-      value: t(options.openRounds ? 'yes' : 'no'),
-      subtitle: t('open-rounds'),
-      image: `${imageBaseUrl}images/generic/initiative.png`,
-    },
-  ];
+  const yesNo = (value: boolean) => t(value ? 'yes' : 'no');
 
   return (
-    <Grid container spacing={1}>
-      {DATA.map((e, index) => (
-        <Grid key={index} size={gridSizeCard}>
-          <RmuTextCard
-            value={e.value}
-            subtitle={e.subtitle}
-            image={e.image}
-            grayscale={grayscale}
-            applyColor={e.applyColor ?? false}
-          />
-        </Grid>
-      ))}
-    </Grid>
+    <KeyValuePanel
+      title={t('settings')}
+      rows={[
+        { label: t('experience-multiplier'), value: `×${strategicGame.options.experienceMultiplier}` },
+        { label: t('fatigue-multiplier'), value: `×${strategicGame.options.fatigueMultiplier}` },
+        { label: t('board-scale'), value: `×${strategicGame.options.boardScaleMultiplier}` },
+        { label: t('letality'), value: strategicGame.options.letality },
+        { label: t('talent-policy'), value: t(`talent-policy-${options.talentPolicy}`) },
+        { label: t('stat-generation'), value: t(`stat-generation-${options.statGeneration}`) },
+        { label: t('allow-third-rank'), value: yesNo(options.allowThirdRank) },
+        { label: t('bonus-dev-points-cap-at-creation'), value: yesNo(options.bonusDevPointsCapAtCreation) },
+        { label: t('open-rounds'), value: yesNo(options.openRounds) },
+      ]}
+    />
   );
-}
+};
+
+export default StrategicGameViewAttributes;

@@ -1,39 +1,45 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Box, Grid } from '@mui/material';
+import { Box, Chip, Stack, Typography } from '@mui/material';
 import {
   AddButton,
   Character,
-  CollectionModeSwitch,
   CollectionMode,
+  CollectionModeSwitch,
   deleteFaction,
   DetailPage,
   Faction,
   fetchCharacters,
   fetchFaction,
   fetchStrategicGame,
-  gridSizeCard,
-  RmuTextCard,
-  Section,
+  ImageSelectorDialog,
+  LoadingState,
+  Panel,
+  StatPill,
   StrategicGame,
+  updateFaction,
   useCollectionMode,
   useEntity,
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import FactionViewAttributes from './FactionViewAttributes';
+import { DEFAULT_FACTION_IMAGE_PATH } from '../../services/image-service';
+import { Bento, span } from '../../shared/layout/Bento';
 import FactionViewCharactersTable from './FactionViewCharacterTable';
 import FactionViewCharacters from './FactionViewCharacters';
-import FactionViewResume from './FactionViewResume';
 
 const CHARACTER_VIEW_MODES: CollectionMode[] = ['cards', 'table'];
 
+/**
+ * Faction view, with the layout of the character view (spec 017): a header with the image, the campaign and the
+ * key numbers (gold, experience, levels and characters), the description, and the characters as cards or a table.
+ */
 export default function FactionViewPage() {
   const navigate = useNavigate();
   const auth = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const notify = useNotify();
   const { factionId } = useParams<{ factionId: string }>();
@@ -43,11 +49,13 @@ export default function FactionViewPage() {
   });
   const faction = state.entity;
   const [game, setGame] = useState<StrategicGame>();
-  const [characters, setCharacters] = useState<Character[]>([]);
+  const [characters, setCharacters] = useState<Character[]>();
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [characterViewMode, setCharacterViewMode] = useCollectionMode(
     'strategic.faction-characters',
     CHARACTER_VIEW_MODES
   );
+  const numberFormat = useMemo(() => new Intl.NumberFormat(i18n.language), [i18n.language]);
 
   useEffect(() => {
     if (!faction) return;
@@ -57,12 +65,19 @@ export default function FactionViewPage() {
     fetchCharacters(`faction.id==${faction.id}`, 0, 100, auth)
       .then((data) => setCharacters(data.content))
       .catch(notify.error);
-  }, [faction]);
+  }, [faction?.id]);
 
   const onDelete = (entity: Faction) =>
     deleteFaction(entity.id, auth)
       .then(() => navigate(`/strategic/games/view/${entity.gameId}`, { replace: true }))
       .catch(notify.error);
+
+  const onImageSelected = (entity: Faction, imageUrl: string) =>
+    updateFaction(entity.id, { imageUrl }, auth)
+      .then(() => state.setEntity({ ...entity, imageUrl }))
+      .catch(notify.error);
+
+  const totalLevels = characters?.reduce((sum, c) => sum + (c.experience?.availableLevel ?? 0), 0);
 
   return (
     <DetailPage
@@ -70,45 +85,58 @@ export default function FactionViewPage() {
         { name: t('home'), link: '/' },
         { name: t('strategic-module'), link: '/strategic' },
         { name: t('factions'), link: '/strategic/factions' },
-        { name: t('view') },
+        { name: faction?.name ?? t('view') },
       ]}
       entity={state}
-      summaryTitle={(entity) => t(entity.name)}
       onEdit={(entity) =>
         navigate(`/strategic/factions/edit/${entity.id}`, { state: { faction: entity, strategicGame: game } })
       }
       onDelete={onDelete}
-      leftPanel={(entity) => <FactionViewResume faction={entity} setFaction={state.setEntity} game={game} />}
+      hero={(entity) => ({
+        title: entity.name,
+        overline: t('faction'),
+        image: entity.imageUrl || DEFAULT_FACTION_IMAGE_PATH,
+        onImageClick: () => setImageDialogOpen(true),
+        imageActionLabel: t('change-image'),
+        chips: game
+          ? [
+              <Chip
+                key="game"
+                label={game.name}
+                variant="outlined"
+                onClick={() => navigate(`/strategic/games/view/${game.id}`, { state: { strategicGame: game } })}
+              />,
+            ]
+          : undefined,
+        pills: [
+          <StatPill key="gold" label={t('gold')} value={numberFormat.format(entity.management.availableGold)} />,
+          <StatPill
+            key="xp"
+            label={t('xp')}
+            hint={t('experience')}
+            value={numberFormat.format(entity.management.availableXP)}
+          />,
+          <StatPill key="characters" label={t('characters')} value={characters?.length ?? '—'} />,
+          <StatPill key="levels" label={t('total-levels')} value={totalLevels ?? '—'} />,
+        ],
+      })}
     >
       {(entity) => (
-        <Grid container spacing={1}>
-          <Grid size={12}>
-            <Section title={t('strategic-game')} elevation={0}>
-              <Grid container spacing={1}>
-                <Grid size={gridSizeCard}>
-                  <RmuTextCard
-                    value={game?.name || ''}
-                    subtitle={t('strategic-game')}
-                    image={game?.imageUrl || ''}
-                    onClick={() =>
-                      navigate(`/strategic/games/view/${entity.gameId}`, { state: { strategicGame: game } })
-                    }
-                  />
-                </Grid>
-              </Grid>
-            </Section>
-          </Grid>
-          <Grid size={12}>
-            <Section title={t('information')} elevation={0}>
-              <FactionViewAttributes faction={entity} characters={characters} />
-            </Section>
-          </Grid>
-          <Grid size={12}>
-            <Section
+        <Bento>
+          {entity.description && (
+            <Box sx={span(12, 12)}>
+              <Panel title={t('description')}>
+                <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-line' }}>
+                  {entity.description}
+                </Typography>
+              </Panel>
+            </Box>
+          )}
+          <Box sx={span(12, 12)}>
+            <Panel
               title={t('characters')}
-              elevation={0}
-              actions={
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+              extra={
+                <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
                   <AddButton
                     onClick={() =>
                       navigate(`/strategic/characters/create?gameId=${entity.gameId}&factionId=${entity.id}`, {
@@ -121,17 +149,25 @@ export default function FactionViewPage() {
                     value={characterViewMode}
                     onChange={setCharacterViewMode}
                   />
-                </Box>
+                </Stack>
               }
             >
-              {characterViewMode === 'table' ? (
+              {!characters ? (
+                <LoadingState />
+              ) : characterViewMode === 'table' ? (
                 <FactionViewCharactersTable characters={characters} />
               ) : (
                 <FactionViewCharacters characters={characters} />
               )}
-            </Section>
-          </Grid>
-        </Grid>
+            </Panel>
+          </Box>
+          <ImageSelectorDialog
+            value={entity.imageUrl || DEFAULT_FACTION_IMAGE_PATH}
+            open={imageDialogOpen}
+            onClose={() => setImageDialogOpen(false)}
+            onSelect={(image) => onImageSelected(entity, image)}
+          />
+        </Bento>
       )}
     </DetailPage>
   );
