@@ -1,15 +1,7 @@
-import {
-  Character,
-  HealingType,
-  Injury,
-  InjuryStatus,
-  KeyValue,
-  MANEUVER_DIFFICULTIES,
-  TreatmentProcedure,
-} from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Character, HealingType, Injury, InjuryStatus, TreatmentProcedure } from '@labcabrera-rmu/rmu-react-shared-lib';
 
-// UI rules of the Health section (workspace spec 013 §6). The numbers of the healing tables come from rmu-api-core;
-// here there are only the procedure suggestions and their difficulty levels (Core Law ch. 13, paraphrased).
+// UI rules of the Health section (workspace spec 013 §6). The numbers of the healing tables come from rmu-api-core and
+// the treatment difficulties from rmu-api-strategic (spec 022); here there are only the procedure suggestions.
 
 export const MEDICINE_SKILL = 'medicine';
 export const HERBALISM_SKILL = 'herbalism';
@@ -28,30 +20,6 @@ export const ALL_PROCEDURES: TreatmentProcedure[] = [
   'herbs',
   'magic',
 ];
-
-/** Difficulty key (see MANEUVER_DIFFICULTIES) of each procedure when the injury type does not say otherwise. */
-const DEFAULT_DIFFICULTY: Record<TreatmentProcedure, string> = {
-  pressure: 'e',
-  stitches: 'm',
-  tourniquet: 'vh',
-  cauterize: 'r',
-  dress: 'r',
-  splint: 'e',
-  cast: 'm',
-  salve: 'l',
-  surgery: 'sf',
-  herbs: 'm',
-  magic: 'm',
-};
-
-/** Difficulty of a procedure that depends on the injury type. */
-const DIFFICULTY_BY_TYPE: Partial<Record<Injury['type'], Partial<Record<TreatmentProcedure, string>>>> = {
-  organ: { dress: 'vh', surgery: 'a' },
-  'cut-burn': { dress: 'e', surgery: 'xh' },
-};
-
-/** Cauterizing is harder for each point of bleeding. */
-export const CAUTERIZE_PENALTY_PER_BLEEDING = -5;
 
 /** Procedures that make sense for the injury: its type and severity, the bleeding and the location. */
 export const suggestedProcedures = (injury: Injury): TreatmentProcedure[] => {
@@ -93,17 +61,25 @@ export const suggestedProcedures = (injury: Injury): TreatmentProcedure[] => {
   return ALL_PROCEDURES.filter((procedure) => result.includes(procedure));
 };
 
-/** Default difficulty of the procedure on the injury: one step harder on the head. */
-export const defaultDifficulty = (injury: Injury, procedure: TreatmentProcedure): KeyValue => {
-  const key = DIFFICULTY_BY_TYPE[injury.type]?.[procedure] ?? DEFAULT_DIFFICULTY[procedure];
-  const index = MANEUVER_DIFFICULTIES.findIndex((difficulty) => difficulty.key === key);
-  const step = injury.location === 'head' ? 1 : 0;
-  return MANEUVER_DIFFICULTIES[Math.min(MANEUVER_DIFFICULTIES.length - 1, Math.max(0, index) + step)];
+/**
+ * The procedure can be sent for the injury: rmu-api-strategic refuses stitches on severe injuries and tourniquets off a
+ * limb. Whether the core table has a row for it comes from the treatment difficulty endpoint (`applicable`).
+ */
+export const isProcedureAllowed = (injury: Injury, procedure: TreatmentProcedure): boolean => {
+  if (procedure === 'stitches') return injury.severity !== 'severe';
+  if (procedure === 'tourniquet') return !injury.location || injury.location === 'arm' || injury.location === 'leg';
+  return true;
 };
 
-/** Extra difficulty of the procedure (cauterizing a bleeding wound). */
-export const procedureExtraDifficulty = (injury: Injury, procedure: TreatmentProcedure): number =>
-  procedure === 'cauterize' ? CAUTERIZE_PENALTY_PER_BLEEDING * (injury.bleeding ?? 0) : 0;
+/** Without care for the recovery roll: no treatment, or the latest one failed (spec 022). */
+export const isUntreated = (injury: Injury): boolean => {
+  const latest = latestTreatment(injury);
+  return !latest || latest.healingType === 'none';
+};
+
+/** The recovery roll was already made for the latest treatment: the API allows one per treatment (spec 022). */
+export const isRecoveryRolled = (injury: Injury): boolean =>
+  !!injury.recovery && injury.recovery.treatmentId === latestTreatment(injury)?.id;
 
 /** Choice of the type of healing in the treatment step; `medicine` lets the API derive it from the result. */
 export type HealingOption = 'medicine' | 'magic' | 'herbs' | 'magic-and-herbs';
@@ -140,8 +116,7 @@ export const bodyDevelopmentRanks = (character: Character): number =>
   character.skills.find((skill) => skill.skillId === BODY_DEVELOPMENT_SKILL)?.ranks ?? 0;
 
 /** Race recovery multiplier, exposed by rmu-api-strategic in the character info. */
-export const recoveryMultiplierOf = (character: Character): number | undefined =>
-  character.info.recoveryMultiplier;
+export const recoveryMultiplierOf = (character: Character): number | undefined => character.info.recoveryMultiplier;
 
 /** Latest treatment of the injury, which sets the type of healing of the recovery roll. */
 export const latestTreatment = (injury: Injury) =>

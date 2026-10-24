@@ -78,6 +78,13 @@ const CharacterHealthSection: FC<{
     toHealer(character),
     ...gameCharacters.filter((other) => other.id !== character.id && other.status !== 'dead').map(toHealer),
   ];
+  // Their own injury penalties, which rmu-api-strategic adds to their Medicine roll (spec 022).
+  const healerPenalties: Record<string, number> = Object.fromEntries(
+    [character, ...gameCharacters.filter((other) => other.id !== character.id)].map((healer) => [
+      healer.id,
+      healer.healthSummary?.injuryPenalty || 0,
+    ])
+  );
 
   const injuries = character.injuries || [];
   const conditions = activeConditions(character);
@@ -205,6 +212,7 @@ const CharacterHealthSection: FC<{
         injuryId={healing?.injuryId}
         initialStep={healing?.step}
         healers={healers}
+        healerPenalties={healerPenalties}
         open={!!healing}
         onClose={() => setHealing(undefined)}
         onUpdated={setCharacter}
