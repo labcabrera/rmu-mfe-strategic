@@ -5,6 +5,9 @@ import { Character, LevelUpButton, StatKey, STATS, StrategicGame } from '@labcab
 import { spendableDevPoints, STAT_GAIN_DEV_POINTS_COST } from '../../../services/game-rules';
 import StatLevelUpDialog from './StatLevelUpDialog';
 
+/** Width that fits every column of the compact stats table (8 columns); narrower panels scroll it. */
+export const STATS_TABLE_MIN_WIDTH = 520;
+
 const CharacterViewStatsTable: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
@@ -26,8 +29,8 @@ const CharacterViewStatsTable: FC<{
 
   return (
     <>
-      <TableContainer component={Paper} sx={{ maxWidth: '100%', overflowX: 'auto' }}>
-        <Table sx={{ minWidth: 650 }}>
+      <TableContainer component={Paper} variant="outlined" sx={{ maxWidth: '100%', overflowX: 'auto' }}>
+        <Table size="small" sx={{ minWidth: STATS_TABLE_MIN_WIDTH }}>
           <TableHead>
             <TableRow>
               <TableCell align="left">{t('stat')}</TableCell>
