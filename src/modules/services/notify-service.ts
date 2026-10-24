@@ -2,11 +2,13 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isApiError, Notify, useNotify } from '@labcabrera-rmu/rmu-react-shared-lib';
 
-/** Domain error code of an rmu-api-strategic error body (`{ errorCode, message }`), when it is a translatable one. */
+/** Domain error code of an rmu-api-strategic error body (`{ code, message }`), when it is a translatable one.
+ * Falls back to the deprecated `errorCode` alias that images released before workspace spec 021 still send. */
 export const apiErrorCode = (error: unknown): string | undefined => {
   if (!isApiError(error)) return undefined;
   try {
-    const code = JSON.parse(error.body)?.errorCode;
+    const body = JSON.parse(error.body);
+    const code = body?.code ?? body?.errorCode;
     return typeof code === 'string' && code.startsWith('err-') ? code : undefined;
   } catch {
     return undefined;
