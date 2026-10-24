@@ -5,6 +5,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import TuneIcon from '@mui/icons-material/Tune';
 import {
   Box,
   Card,
@@ -27,12 +28,14 @@ import {
   fetchCharacter,
   fetchStrategicItems,
   imageBaseUrl,
+  ItemConditionChip,
   itemFilter,
   StrategicItem,
   updateCarriedStatus,
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import CharacterEquipmentDialog from './CharacterEquipmentDialog';
+import CharacterItemModifiersDialog from './CharacterItemModifiersDialog';
 import CharacterViewTransferGold from './CharacterViewTransferGold';
 
 const borderRadius = 1;
@@ -49,6 +52,7 @@ export default function CharacterEquipmentPanel({
   const [items, setItems] = useState<StrategicItem[]>([]);
   const [dialogEquipSlot, setDialogEquipSlot] = useState<EquipmentSlot>();
   const [dialogEquipOpen, setDialogEquipOpen] = useState<boolean>(false);
+  const [modifiersItem, setModifiersItem] = useState<StrategicItem>();
 
   const openDialog = (slot: EquipmentSlot) => {
     setDialogEquipSlot(slot);
@@ -74,6 +78,12 @@ export default function CharacterEquipmentPanel({
     deleteStrategicItem(itemId, auth)
       .then(() => bindCharacter())
       .catch((err) => notify.error(err));
+  };
+
+  /** A modifier changes the attacks, defense or penalties of the character: the API reprocesses it. */
+  const onItemModified = (item: StrategicItem) => {
+    setModifiersItem(item);
+    bindCharacter();
   };
 
   useEffect(() => {
@@ -103,6 +113,7 @@ export default function CharacterEquipmentPanel({
               items={items.filter((e) => e.carried)}
               setCharacter={setCharacter}
               onItemDeleted={(e) => onItemDeleted(e)}
+              onItemModifiers={(e) => setModifiersItem(e)}
             />
             <ItemList
               character={character}
@@ -110,6 +121,7 @@ export default function CharacterEquipmentPanel({
               items={items.filter((e) => !e.carried)}
               setCharacter={setCharacter}
               onItemDeleted={(e) => onItemDeleted(e)}
+              onItemModifiers={(e) => setModifiersItem(e)}
             />
           </Stack>
         </Box>
@@ -121,6 +133,14 @@ export default function CharacterEquipmentPanel({
             slot={dialogEquipSlot}
             onClose={() => setDialogEquipOpen(false)}
             onEquip={(character) => setCharacter(character)}
+          />
+        )}
+        {modifiersItem && (
+          <CharacterItemModifiersDialog
+            open={!!modifiersItem}
+            item={modifiersItem}
+            onClose={() => setModifiersItem(undefined)}
+            onChange={(e) => onItemModified(e)}
           />
         )}
       </Box>
@@ -218,6 +238,7 @@ function SlotCard({
           }}
         />
       </Box>
+      {item && <ItemConditionChip condition={item.condition} />}
     </Stack>
   );
 }
@@ -341,12 +362,14 @@ function ItemList({
   items,
   setCharacter,
   onItemDeleted,
+  onItemModifiers,
 }: {
   character: Character;
   carried: boolean;
   items: StrategicItem[];
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   onItemDeleted: (itemId: string) => void;
+  onItemModifiers: (item: StrategicItem) => void;
 }) {
   const auth = useAuth();
   const { t } = useTranslation();
@@ -437,7 +460,10 @@ function ItemList({
               />
 
               <Box>
-                <Typography variant="body2">{item.name}</Typography>
+                <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+                  <Typography variant="body2">{item.name}</Typography>
+                  <ItemConditionChip condition={item.condition} />
+                </Stack>
                 <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
                   {item.name}
                 </Typography>
@@ -463,6 +489,17 @@ function ItemList({
                     <DeleteIcon fontSize="small" />
                   </ListItemIcon>
                   <ListItemText>{t('delete')}</ListItemText>
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    handleCloseMenu();
+                    onItemModifiers(item);
+                  }}
+                >
+                  <ListItemIcon>
+                    <TuneIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>{t('item-modifiers')}</ListItemText>
                 </MenuItem>
                 <MenuItem onClick={() => handleToggleCarried(item.id)}>
                   <ListItemIcon>{carried ? <ArrowDownwardIcon /> : <ArrowUpwardIcon />}</ListItemIcon>
