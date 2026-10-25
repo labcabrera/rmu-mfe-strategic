@@ -26,6 +26,9 @@ const RARITY_COLORS: Record<string, 'default' | 'info' | 'secondary' | 'warning'
   'very-rare': 'warning',
 };
 
+/** Categories without a `category-<key>.png` image. */
+const NO_IMAGE = ['other'];
+
 /** Subcategory of a catalog item: the weapon skill or the armor slot. */
 const subcategoryOf = (item: Item): string | undefined =>
   item.category === 'weapon' ? item.weapon?.skillId : item.category === 'armor' ? item.armor?.slot : undefined;
@@ -40,13 +43,15 @@ const CategoryChip: FC<{ value: string; selected: boolean; onClick: () => void }
       color={selected ? 'primary' : 'default'}
       variant={selected ? 'filled' : 'outlined'}
       avatar={
-        <Box
-          component="img"
-          src={`${imageBaseUrl}images/items/category-${value}.png`}
-          alt=""
-          onError={(event) => ((event.target as HTMLImageElement).style.visibility = 'hidden')}
-          sx={{ filter: itemFilter, objectFit: 'cover', borderRadius: '50%' }}
-        />
+        NO_IMAGE.includes(value) ? undefined : (
+          <Box
+            component="img"
+            src={`${imageBaseUrl}images/items/category-${value}.png`}
+            alt=""
+            onError={(event) => ((event.target as HTMLImageElement).style.visibility = 'hidden')}
+            sx={{ filter: itemFilter, objectFit: 'cover', borderRadius: '50%' }}
+          />
+        )
       }
     />
   );
@@ -211,8 +216,16 @@ const CatalogBrowser: FC<{
                     <Chip size="small" label={t(item.info.rarity)} color={RARITY_COLORS[item.info.rarity]} />
                     {item.armor && <Chip size="small" variant="outlined" label={`${t('at')} ${item.armor.at}`} />}
                   </Stack>
-                  {extra ? extra(item) : <MoneyDisplay gold={item.info.cost?.average ?? 0} />}
-                  {item.info.weight !== null && (
+                  {extra ? (
+                    extra(item)
+                  ) : item.info.cost?.average ? (
+                    <MoneyDisplay gold={item.info.cost.average} />
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      {t('price-unknown')}
+                    </Typography>
+                  )}
+                  {item.info.weight !== null && item.info.weight !== undefined && (
                     <Typography variant="caption" color="text.secondary">
                       {`${item.info.weight} ${t('lbs')}`}
                     </Typography>

@@ -17,6 +17,7 @@ import {
   fetchStrategicGame,
   ImageSelectorDialog,
   LoadingState,
+  MoneyDisplay,
   Panel,
   StatPill,
   StrategicGame,
@@ -110,7 +111,7 @@ export default function FactionViewPage() {
             ]
           : undefined,
         pills: [
-          <StatPill key="gold" label={t('gold')} value={numberFormat.format(entity.management.availableGold)} />,
+          <StatPill key="gold" label={t('gold')} value={<MoneyDisplay gold={entity.management.availableGold} />} />,
           <StatPill
             key="xp"
             label={t('xp')}
