@@ -5,17 +5,23 @@ import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Box, Chip, Stack, Typography } from '@mui/material';
 import {
-  AddButton,
   Character,
   CollectionMode,
   CollectionModeSwitch,
   deleteFaction,
   DetailPage,
+  DownloadButton,
+  downloadBlob,
+  exportFaction,
   Faction,
   fetchCharacters,
   fetchFaction,
   fetchStrategicGame,
   ImageSelectorDialog,
+  importCharacter,
+  ImportDialog,
+  ImportRequest,
+  ImportResult,
   LoadingState,
   MoneyDisplay,
   Panel,
@@ -27,6 +33,8 @@ import {
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { DEFAULT_FACTION_IMAGE_PATH } from '../../services/image-service';
+import CreateOrImportButton from '../../shared/CreateOrImportButton';
+import { isGameMaster } from '../../shared/permissions';
 import { Bento, span } from '../../shared/layout/Bento';
 import FactionViewArmory from './FactionViewArmory';
 import FactionViewCharactersTable from './FactionViewCharacterTable';
@@ -53,6 +61,7 @@ export default function FactionViewPage() {
   const [game, setGame] = useState<StrategicGame>();
   const [characters, setCharacters] = useState<Character[]>();
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [characterViewMode, setCharacterViewMode] = useCollectionMode(
     'strategic.faction-characters',
     CHARACTER_VIEW_MODES
@@ -79,6 +88,27 @@ export default function FactionViewPage() {
       .then(() => state.setEntity({ ...entity, imageUrl }))
       .catch(notify.error);
 
+  const onExport = (entity: Faction) =>
+    exportFaction(entity.id, auth)
+      .then(({ blob, fileName }) => downloadBlob(blob, fileName))
+      .catch(notify.error);
+
+  const previewImport = (entity: Faction, request: ImportRequest) =>
+    importCharacter(entity.id, request.file, { ...request, dryRun: true }, auth);
+
+  const runImport = (entity: Faction, request: ImportRequest) =>
+    importCharacter(entity.id, request.file, { ...request, dryRun: false }, auth);
+
+  const onImported = (result: ImportResult) => {
+    setImportOpen(false);
+    notify.success(t('import-completed'));
+    navigate(`/strategic/characters/view/${result.characterIds[0]}`);
+  };
+
+  // Exporting the faction is for the game master. Importing a character is offered like creating one: the API
+  // checks the permission.
+  const gameMaster = isGameMaster(auth, game);
+
   const totalLevels = characters?.reduce((sum, c) => sum + (c.experience?.availableLevel ?? 0), 0);
 
   return (
@@ -90,6 +120,9 @@ export default function FactionViewPage() {
         { name: faction?.name ?? t('view') },
       ]}
       entity={state}
+      actions={(entity) =>
+        gameMaster ? [<DownloadButton key="export" tooltip="export" onClick={() => onExport(entity)} />] : []
+      }
       onEdit={(entity) =>
         navigate(`/strategic/factions/edit/${entity.id}`, { state: { faction: entity, strategicGame: game } })
       }
@@ -139,12 +172,13 @@ export default function FactionViewPage() {
               title={t('characters')}
               extra={
                 <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-                  <AddButton
-                    onClick={() =>
+                  <CreateOrImportButton
+                    onCreate={() =>
                       navigate(`/strategic/characters/create?gameId=${entity.gameId}&factionId=${entity.id}`, {
                         state: { faction: entity },
                       })
                     }
+                    onImport={() => setImportOpen(true)}
                   />
                   <CollectionModeSwitch
                     modes={CHARACTER_VIEW_MODES}
@@ -164,6 +198,15 @@ export default function FactionViewPage() {
             </Panel>
           </Box>
           <FactionViewArmory faction={entity} onGoldChanged={state.refresh} />
+          <ImportDialog
+            open={importOpen}
+            title={t('import-character')}
+            subtitle={entity.name}
+            onPreview={(request) => previewImport(entity, request)}
+            onImport={(request) => runImport(entity, request)}
+            onImported={onImported}
+            onClose={() => setImportOpen(false)}
+          />
           <ImageSelectorDialog
             value={entity.imageUrl || DEFAULT_FACTION_IMAGE_PATH}
             open={imageDialogOpen}

@@ -38,6 +38,7 @@ import {
   setUpProfessionalSkill,
   StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import MissingReferenceChip from '../../../shared/chips/MissingReferenceChip';
 import { maxRanksPerLevel, resolvePowerLevel, spendableDevPoints } from '../../../services/game-rules';
 import { useStrategicNotify } from '../../../services/notify-service';
 
@@ -281,6 +282,7 @@ function SkillRow({
         </TableCell>
         <TableCell component="th" scope="row">
           {t(skill.skillId)}
+          {skill.missingReference && <MissingReferenceChip />}
         </TableCell>
         <TableCell component="th" scope="row">
           {skill.specialization ? t(skill.specialization) : '-'}

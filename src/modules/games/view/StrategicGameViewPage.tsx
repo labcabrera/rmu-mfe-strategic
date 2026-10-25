@@ -14,6 +14,10 @@ import {
   fetchTacticalGames,
   ImageSelectorDialog,
   imageBaseUrl,
+  ImportDialog,
+  importFaction,
+  ImportRequest,
+  ImportResult,
   Panel,
   StatPill,
   StrategicGame,
@@ -22,7 +26,9 @@ import {
   useEntity,
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import CreateOrImportButton from '../../shared/CreateOrImportButton';
 import { Bento, span } from '../../shared/layout/Bento';
+import { isGameMaster } from '../../shared/permissions';
 import StrategicGameCardChips from '../list/StrategicGameCardChips';
 import StrategicGameViewAttributes from './StrategicGameViewAttributes';
 import StrategicGameViewFactions from './StrategicGameViewFactions';
@@ -51,6 +57,7 @@ export default function StrategicGameViewPage() {
   const [factions, setFactions] = useState<Faction[]>();
   const [tacticalGames, setTacticalGames] = useState<TacticalGame[]>();
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
 
   useEffect(() => {
     if (!strategicGame) return;
@@ -71,6 +78,18 @@ export default function StrategicGameViewPage() {
     updateStrategicGame(game.id, { imageUrl }, auth)
       .then(() => state.setEntity({ ...game, imageUrl }))
       .catch(notify.error);
+
+  const previewImport = (game: StrategicGame, request: ImportRequest) =>
+    importFaction(game.id, request.file, { ...request, dryRun: true }, auth);
+
+  const runImport = (game: StrategicGame, request: ImportRequest) =>
+    importFaction(game.id, request.file, { ...request, dryRun: false }, auth);
+
+  const onImported = (result: ImportResult) => {
+    setImportOpen(false);
+    notify.success(t('import-completed'));
+    navigate(`/strategic/factions/view/${result.factionId}`);
+  };
 
   return (
     <DetailPage
@@ -129,10 +148,11 @@ export default function StrategicGameViewPage() {
             <Panel
               title={t('factions')}
               extra={
-                <AddButton
-                  onClick={() =>
+                <CreateOrImportButton
+                  onCreate={() =>
                     navigate(`/strategic/factions/create?gameId=${game.id}`, { state: { strategicGame: game } })
                   }
+                  onImport={isGameMaster(auth, game) ? () => setImportOpen(true) : undefined}
                 />
               }
             >
@@ -149,6 +169,15 @@ export default function StrategicGameViewPage() {
             <StrategicGameViewAttributes strategicGame={game} />
             <StrategicGameViewPowerLevel strategicGame={game} />
           </Stack>
+          <ImportDialog
+            open={importOpen}
+            title={t('import-faction')}
+            subtitle={game.name}
+            onPreview={(request) => previewImport(game, request)}
+            onImport={(request) => runImport(game, request)}
+            onImported={onImported}
+            onClose={() => setImportOpen(false)}
+          />
           <ImageSelectorDialog
             value={game.imageUrl || defaultGameImage}
             open={imageDialogOpen}

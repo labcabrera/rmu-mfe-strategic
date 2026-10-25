@@ -18,7 +18,9 @@ import {
   deleteCharacter,
   DetailPage,
   DownloadButton,
+  downloadBlob,
   enterSx,
+  exportCharacter,
   fetchCharacter,
   fetchCulture,
   fetchProfession,
@@ -38,6 +40,7 @@ import {
   useSectionParam,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { healthChips } from '../../shared/chips/CharacterHealthChips';
+import { canChangeCharacter } from '../../shared/permissions';
 import CharacterHealthSection from './health/CharacterHealthSection';
 import { armorLabel } from './sections/CharacterPanels';
 import {
@@ -61,21 +64,6 @@ const sectionIcons: Record<CharacterSectionId, ReactElement> = {
   health: <HealingIcon />,
   equipment: <BackpackIcon />,
   progression: <TrendingUpIcon />,
-};
-
-/** Downloads the character as a JSON file. */
-const downloadCharacter = (character: Character) => {
-  const json = JSON.stringify(character, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const sanitize = (name: string) => name.replace(/[^a-z0-9._-]/gi, '_');
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `${character.name ? sanitize(character.name) : `character-${character.id}`}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
 };
 
 export default function CharacterViewPage() {
@@ -130,13 +118,10 @@ export default function CharacterViewPage() {
       });
   };
 
-  const onDownload = (entity: Character) => {
-    try {
-      downloadCharacter(entity);
-    } catch (err) {
-      notify.error(err);
-    }
-  };
+  const onExport = (entity: Character) =>
+    exportCharacter(entity.id, auth)
+      .then(({ blob, fileName }) => downloadBlob(blob, fileName))
+      .catch(notify.error);
 
   const onDelete = (entity: Character) =>
     deleteCharacter(entity.id, auth)
@@ -182,7 +167,9 @@ export default function CharacterViewPage() {
         ...(entity.experience.availableLevel > entity.experience.level
           ? [<LevelUpButton key="level-up" onClick={() => onLevelUp(entity, false)} color="success" />]
           : []),
-        <DownloadButton key="download" onClick={() => onDownload(entity)} />,
+        ...(canChangeCharacter(auth, entity, strategicGame)
+          ? [<DownloadButton key="export" tooltip="export" onClick={() => onExport(entity)} />]
+          : []),
       ]}
       onEdit={(entity) => navigate(`/strategic/characters/edit/${entity.id}`, { state: { character: entity } })}
       onDelete={onDelete}

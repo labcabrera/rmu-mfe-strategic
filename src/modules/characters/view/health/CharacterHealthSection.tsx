@@ -19,6 +19,7 @@ import {
   StatPill,
   StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { isGameMaster as isGameMasterOf } from '../../../shared/permissions';
 import { useStrategicNotify } from '../../../services/notify-service';
 import { Bento, span } from '../sections/CharacterPanels';
 import HealingLogList from './HealingLogList';
@@ -36,7 +37,6 @@ import {
 
 /** Bonus of a skill the healer has not developed, as rmu-api-strategic applies it. */
 const UNRANKED_SKILL_BONUS = -20;
-const ADMIN_GROUP = 'rmu-admin';
 
 const toHealer = (character: Character): HealerCandidate => ({
   id: character.id,
@@ -63,10 +63,8 @@ const CharacterHealthSection: FC<{
   const [editing, setEditing] = useState<{ injury?: Injury }>();
   const [restOpen, setRestOpen] = useState(false);
 
-  const profile = auth.user?.profile;
-  const isAdmin = ((profile?.groups as string[] | undefined) || []).includes(ADMIN_GROUP);
   // Adding and editing injuries and resolving conditions are for the game master (the owner of the game).
-  const isGameMaster = isAdmin || (!!strategicGame && strategicGame.owner === profile?.sub);
+  const isGameMaster = isGameMasterOf(auth, strategicGame);
 
   useEffect(() => {
     fetchCharacters(`gameId==${character.gameId}`, 0, 100, auth)
