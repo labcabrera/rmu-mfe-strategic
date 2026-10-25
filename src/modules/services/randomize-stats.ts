@@ -1,4 +1,4 @@
-import { CreateCharacterDto, StatKey, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CreateCharacterDto, rollDice, StatKey, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { getStatGainRoll, STAT_BONUS_BANDS, StatBonusBand } from './stat-service';
 
 export type CreationStats = CreateCharacterDto['statistics'];
@@ -80,7 +80,7 @@ export const applyStatGainRoll = (
 ): { statistics: CreationStats; roll: number } => {
   const stat = statistics[key];
   const die = getStatGainRoll(stat.temporary);
-  const roll = rollBetween(die.min, die.max);
+  const roll = rollDice(die.spec).total;
   return {
     statistics: { ...statistics, [key]: { ...stat, temporary: Math.min(stat.potential, stat.temporary + roll) } },
     roll,
