@@ -10,6 +10,7 @@ import {
   StrategicGame,
   TraitTypeChip,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import MissingReferenceChip from '../../../shared/chips/MissingReferenceChip';
 import { toRoman } from '../../../services/roman-number-service';
 import AddTraitDialog from './AddTraitDialog';
 import CharacterViewTraitDialog from './CharacterViewTraitDialog';
@@ -62,6 +63,7 @@ const CharacterViewTraits: FC<{
                   {trait.source === 'race' && (
                     <Chip label={t('trait-source-race')} size="small" color="primary" variant="outlined" />
                   )}
+                  {trait.missingReference && <MissingReferenceChip />}
                   <TraitTypeChip isTalent={trait.isTalent} />
                   {trait.source !== 'race' && <TraitPaidChip trait={trait} />}
                 </Stack>
