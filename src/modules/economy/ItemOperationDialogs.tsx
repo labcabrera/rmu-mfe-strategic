@@ -1,0 +1,321 @@
+import React, { FC, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
+import { Alert, Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import {
+  ConfirmDialog,
+  discardItem,
+  ItemConditionChip,
+  ItemHolder,
+  ItemOperationResult,
+  itemUnits,
+  MoneyDisplay,
+  NumericInput,
+  PriceBreakdownView,
+  repairItem,
+  RmuDialog,
+  sellItem,
+  StrategicItem,
+  TradingRequest,
+  transferItem,
+  useNotify,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
+import ItemLedgerOutcome from './ItemLedgerOutcome';
+import ManeuverFields, { defaultSkillKey, emptyManeuver, isManeuverReady, toManeuverDto } from './ManeuverFields';
+import { TradingFields, usePriceQuote } from './TradingFields';
+import { HolderView } from './use-holder';
+
+/** Crafting skills offered first to craft or repair (spec 023, decisions 10 and 11). */
+export const CRAFT_SKILLS = ['crafting', 'metalcraft', 'woodcraft', 'leathercraft', 'stonecraft', 'fabric-craft'];
+
+/** Penalty of a repair roll: the damage of the item, or −100 when it is broken. */
+export const repairPenalty = (item: StrategicItem) =>
+  item.condition?.broken ? -100 : (item.condition?.breakagePenalty ?? 0);
+
+const AmountField: FC<{ item: StrategicItem; value: number | null; onChange: (value: number | null) => void }> = ({
+  item,
+  value,
+  onChange,
+}) => {
+  const { t } = useTranslation();
+  if (!item.info?.stackable) return null;
+  return (
+    <NumericInput
+      label={`${t('amount')} (${t('max')} ${itemUnits(item)})`}
+      value={value}
+      onChange={onChange}
+      min={0}
+      max={itemUnits(item)}
+      maxFractionDigits={3}
+    />
+  );
+};
+
+/** The amount to send: none for a whole item or a whole stack. */
+const partialAmount = (item: StrategicItem, amount: number | null) =>
+  item.info?.stackable && amount !== null && amount < itemUnits(item) ? amount : undefined;
+
+type DialogProps = {
+  item: StrategicItem;
+  view: HolderView;
+  onClose: () => void;
+  onDone: (result: ItemOperationResult) => void;
+};
+
+/** Sells an item at the market (spec 023, decision 12): its value by its condition and the sale percent. */
+export const SellItemDialog: FC<DialogProps> = ({ item, view, onClose, onDone }) => {
+  const auth = useAuth();
+  const { t } = useTranslation();
+  const notify = useNotify();
+  const [amount, setAmount] = useState<number | null>(itemUnits(item));
+  const [salePercent, setSalePercent] = useState<number | null>(null);
+  const [trading, setTrading] = useState<TradingRequest>();
+  const [busy, setBusy] = useState(false);
+  const dto = {
+    amount: partialAmount(item, amount),
+    ...(salePercent !== null ? { salePercent } : {}),
+    ...(trading ? { trading } : {}),
+  };
+  const { quote, error } = usePriceQuote(
+    amount && amount > 0 ? { kind: 'sale', itemId: item.id, holder: view.holder, ...dto } : undefined
+  );
+
+  const onSell = () => {
+    setBusy(true);
+    sellItem(item.id, dto, auth)
+      .then(onDone)
+      .catch(notify.error)
+      .finally(() => setBusy(false));
+  };
+
+  return (
+    <RmuDialog
+      open
+      title={t('sell-item', { name: item.name })}
+      onCancel={onClose}
+      buttons={
+        <Button variant="contained" disabled={!quote || busy} onClick={onSell}>
+          {t('sell')}
+        </Button>
+      }
+    >
+      <Stack spacing={2} sx={{ pt: 1 }}>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+          <Typography variant="body2" color="text.secondary">
+            {t('condition')}
+          </Typography>
+          <ItemConditionChip condition={item.condition} />
+        </Stack>
+        <AmountField item={item} value={amount} onChange={setAmount} />
+        <NumericInput
+          label={t('price-sale-percent-override')}
+          placeholder={quote ? `${quote.rules.salePercent}` : undefined}
+          value={salePercent}
+          onChange={setSalePercent}
+          min={0}
+          max={200}
+          integer
+        />
+        <TradingFields character={view.character} onChange={setTrading} />
+        {quote && <PriceBreakdownView price={quote.price} funds={{ label: t('price-funds-after'), gold: view.gold }} />}
+        {!!error && <Alert severity="warning">{t('price-quote-unavailable')}</Alert>}
+      </Stack>
+    </RmuDialog>
+  );
+};
+
+/** Gives an item to another character of the faction, or between a character and the armory (decision 9). */
+export const TransferItemDialog: FC<DialogProps> = ({ item, view, onClose, onDone }) => {
+  const auth = useAuth();
+  const { t } = useTranslation();
+  const notify = useNotify();
+  const [amount, setAmount] = useState<number | null>(itemUnits(item));
+  const [busy, setBusy] = useState(false);
+  const targets = useMemo<{ key: string; holder: ItemHolder; label: string }[]>(() => {
+    const faction = view.faction
+      ? [
+          {
+            key: `faction:${view.faction.id}`,
+            holder: { kind: 'faction' as const, id: view.faction.id },
+            label: t('armory-of', { name: view.faction.name }),
+          },
+        ]
+      : [];
+    const characters = view.members.map((member) => ({
+      key: `character:${member.id}`,
+      holder: { kind: 'character' as const, id: member.id },
+      label: member.name,
+    }));
+    return [...faction, ...characters].filter(
+      (target) => target.holder.kind !== view.holder.kind || target.holder.id !== view.holder.id
+    );
+  }, [view]);
+  const [target, setTarget] = useState(targets[0]?.key ?? '');
+
+  const onTransfer = () => {
+    const to = targets.find((option) => option.key === target)?.holder;
+    if (!to) return;
+    setBusy(true);
+    transferItem(item.id, { to, amount: partialAmount(item, amount) }, auth)
+      .then(onDone)
+      .catch(notify.error)
+      .finally(() => setBusy(false));
+  };
+
+  return (
+    <RmuDialog
+      open
+      title={t('transfer-item', { name: item.name })}
+      onCancel={onClose}
+      buttons={
+        <Button variant="contained" disabled={!target || !amount || busy} onClick={onTransfer}>
+          {t('transfer')}
+        </Button>
+      }
+    >
+      <Stack spacing={2} sx={{ pt: 1 }}>
+        <TextField select fullWidth label={t('transfer-to')} value={target} onChange={(e) => setTarget(e.target.value)}>
+          {targets.map((option) => (
+            <MenuItem key={option.key} value={option.key}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
+        <AmountField item={item} value={amount} onChange={setAmount} />
+      </Stack>
+    </RmuDialog>
+  );
+};
+
+/** Throws an item away, after a confirmation: it leaves an entry in the ledger. */
+export const DiscardItemDialog: FC<DialogProps> = ({ item, onClose, onDone }) => {
+  const auth = useAuth();
+  const { t } = useTranslation();
+  const notify = useNotify();
+  const [amount, setAmount] = useState<number | null>(itemUnits(item));
+  const [confirm, setConfirm] = useState(false);
+
+  const onDiscard = () =>
+    discardItem(item.id, { amount: partialAmount(item, amount) }, auth)
+      .then(onDone)
+      .catch(notify.error);
+
+  if (confirm || !item.info?.stackable) {
+    return (
+      <ConfirmDialog
+        open
+        destructive
+        title={t('discard-item')}
+        message={t('discard-item-confirm', { name: item.name, amount: amount ?? itemUnits(item) })}
+        confirmLabel={t('discard')}
+        onConfirm={onDiscard}
+        onClose={onClose}
+      />
+    );
+  }
+  return (
+    <RmuDialog
+      open
+      title={t('discard-item')}
+      onCancel={onClose}
+      buttons={
+        <Button color="error" variant="contained" disabled={!amount} onClick={() => setConfirm(true)}>
+          {t('discard')}
+        </Button>
+      }
+    >
+      <Stack sx={{ pt: 1 }}>
+        <AmountField item={item} value={amount} onChange={setAmount} />
+      </Stack>
+    </RmuDialog>
+  );
+};
+
+/**
+ * Repairs a damaged or broken item (decision 11): a craftsman of the faction rolls with the damage of the item as a
+ * penalty, and the outcome of the repair table changes its breakage. The cost is optional.
+ */
+export const RepairItemDialog: FC<DialogProps> = ({ item, view, onClose, onDone }) => {
+  const auth = useAuth();
+  const { t } = useTranslation();
+  const notify = useNotify();
+  const craftsmen = view.members;
+  const [actorId, setActorId] = useState(view.character?.id ?? craftsmen[0]?.id ?? '');
+  const actor = craftsmen.find((member) => member.id === actorId) ?? view.character;
+  const [maneuver, setManeuver] = useState(emptyManeuver(defaultSkillKey(actor, CRAFT_SKILLS), 'm'));
+  const [cost, setCost] = useState<number | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<ItemOperationResult>();
+
+  const onRepair = () => {
+    setBusy(true);
+    repairItem(
+      item.id,
+      { maneuver: { ...toManeuverDto(maneuver), ...(actorId ? { actorId } : {}) }, ...(cost ? { cost } : {}) },
+      auth
+    )
+      .then(setResult)
+      .catch(notify.error)
+      .finally(() => setBusy(false));
+  };
+
+  if (result) {
+    return (
+      <RmuDialog open title={t('repair-item', { name: item.name })} onClose={() => onDone(result)}>
+        <ItemLedgerOutcome entry={result.entry} item={result.item} />
+      </RmuDialog>
+    );
+  }
+
+  return (
+    <RmuDialog
+      open
+      maxWidth="md"
+      title={t('repair-item', { name: item.name })}
+      onCancel={onClose}
+      buttons={
+        <Button variant="contained" disabled={!isManeuverReady(actor, maneuver) || busy} onClick={onRepair}>
+          {t('repair')}
+        </Button>
+      }
+    >
+      <Stack spacing={2} sx={{ pt: 1 }}>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+          <Typography variant="body2" color="text.secondary">
+            {t('condition')}
+          </Typography>
+          <ItemConditionChip condition={item.condition} />
+        </Stack>
+        <TextField
+          select
+          fullWidth
+          label={t('craftsman')}
+          value={actorId}
+          onChange={(event) => {
+            setActorId(event.target.value);
+            const next = craftsmen.find((member) => member.id === event.target.value);
+            setManeuver({ ...maneuver, skillKey: defaultSkillKey(next, CRAFT_SKILLS) });
+          }}
+        >
+          {craftsmen.map((member) => (
+            <MenuItem key={member.id} value={member.id}>
+              {member.name}
+            </MenuItem>
+          ))}
+        </TextField>
+        <ManeuverFields
+          character={actor}
+          value={maneuver}
+          onChange={setManeuver}
+          preferred={CRAFT_SKILLS}
+          showDifficulty
+          extra={{ label: t('repair-damage-penalty'), value: repairPenalty(item) }}
+        />
+        <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
+          <NumericInput label={t('repair-cost')} value={cost} onChange={setCost} min={0} maxFractionDigits={3} />
+          {!!cost && <MoneyDisplay gold={cost} />}
+        </Stack>
+      </Stack>
+    </RmuDialog>
+  );
+};

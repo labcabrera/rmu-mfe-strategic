@@ -27,6 +27,7 @@ import {
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { DEFAULT_FACTION_IMAGE_PATH } from '../../services/image-service';
 import { Bento, span } from '../../shared/layout/Bento';
+import FactionViewArmory from './FactionViewArmory';
 import FactionViewCharactersTable from './FactionViewCharacterTable';
 import FactionViewCharacters from './FactionViewCharacters';
 
@@ -161,6 +162,7 @@ export default function FactionViewPage() {
               )}
             </Panel>
           </Box>
+          <FactionViewArmory faction={entity} onGoldChanged={state.refresh} />
           <ImageSelectorDialog
             value={entity.imageUrl || DEFAULT_FACTION_IMAGE_PATH}
             open={imageDialogOpen}

@@ -1,67 +1,25 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
+import BuildIcon from '@mui/icons-material/Build';
+import StorefrontIcon from '@mui/icons-material/Storefront';
 import { Button, Stack } from '@mui/material';
-import {
-  Character,
-  createStrategicItem,
-  fetchCharacter,
-  LoadingState,
-  StrategicItem,
-  useNotify,
-} from '@labcabrera-rmu/rmu-react-shared-lib';
-import CharacterViewAddItemDialog from './CharacterAddItemDialog';
+import { Character } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { holderPath } from '../../../economy/use-holder';
 
-export default function CharacterEquipmentButtons({
-  character,
-  setCharacter,
-}: {
-  character: Character;
-  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
-}) {
-  const auth = useAuth();
+/** Links of the equipment of a character to its market (buy and sell) and its workshop (craft and repair). */
+export default function CharacterEquipmentButtons({ character }: { character: Character }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const notify = useNotify();
-  const [openAddItemDialog, setOpenAddItemDialog] = useState(false);
-
-  const onItemAdded = (formData: Partial<StrategicItem>) => {
-    formData.gameId = character.gameId;
-    formData.characterId = character.id;
-    createStrategicItem(formData, auth)
-      .then(() => {
-        bindCharacter();
-      })
-      .catch((err) => notify.error(err));
-  };
-
-  const bindCharacter = () => {
-    fetchCharacter(character.id, auth)
-      .then((response) => setCharacter(response))
-      .catch((err) => notify.error(err));
-  };
-
-  if (!setCharacter) return <LoadingState />;
-
+  const holder = { kind: 'character' as const, id: character.id };
   return (
-    <>
-      <Stack direction="row" spacing={1}>
-        <Button variant="outlined" onClick={() => setOpenAddItemDialog(true)}>
-          {t('buy')}
-        </Button>
-        <Button variant="outlined" onClick={() => navigate(`/strategic/characters/trade/${character.id}`)}>
-          {t('trading')}
-        </Button>
-        <Button variant="outlined" onClick={() => navigate(`/strategic/characters/craft/${character.id}`)}>
-          {t('craft')}
-        </Button>
-      </Stack>
-      <CharacterViewAddItemDialog
-        open={openAddItemDialog}
-        onClose={() => setOpenAddItemDialog(false)}
-        onItemAdded={(addItemDto) => onItemAdded(addItemDto)}
-      />
-    </>
+    <Stack direction="row" spacing={1}>
+      <Button variant="outlined" startIcon={<StorefrontIcon />} onClick={() => navigate(holderPath('market', holder))}>
+        {t('market')}
+      </Button>
+      <Button variant="outlined" startIcon={<BuildIcon />} onClick={() => navigate(holderPath('workshop', holder))}>
+        {t('workshop')}
+      </Button>
+    </Stack>
   );
 }
