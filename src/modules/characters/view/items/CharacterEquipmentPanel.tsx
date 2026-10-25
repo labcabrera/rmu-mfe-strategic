@@ -1,43 +1,24 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import DeleteIcon from '@mui/icons-material/Delete';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import TuneIcon from '@mui/icons-material/Tune';
-import {
-  Box,
-  Card,
-  CardContent,
-  Chip,
-  Divider,
-  IconButton,
-  LinearProgress,
-  ListItemIcon,
-  ListItemText,
-  Menu,
-  MenuItem,
-  Stack,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Box, Card, CardContent, LinearProgress, Stack, Tooltip, Typography } from '@mui/material';
 import {
   Character,
-  deleteStrategicItem,
   EquipmentSlot,
   fetchCharacter,
-  fetchStrategicItems,
-  imageBaseUrl,
   ItemConditionChip,
-  itemFilter,
   ItemModifierChips,
+  imageBaseUrl,
+  itemImageUrl,
+  itemFilter,
+  LoadingState,
   StrategicItem,
-  updateCarriedStatus,
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import HolderInventory, { holderNames } from '../../../economy/HolderInventory';
+import ItemLedgerList from '../../../economy/ItemLedgerList';
+import { useHolder } from '../../../economy/use-holder';
 import CharacterEquipmentDialog from './CharacterEquipmentDialog';
-import CharacterItemModifiersDialog from './CharacterItemModifiersDialog';
 import CharacterViewTransferGold from './CharacterViewTransferGold';
 
 const borderRadius = 1;
@@ -51,47 +32,20 @@ export default function CharacterEquipmentPanel({
 }) {
   const auth = useAuth();
   const notify = useNotify();
-  const [items, setItems] = useState<StrategicItem[]>([]);
+  const { t } = useTranslation();
+  const { view, refresh } = useHolder('character', character.id);
+  const items = view?.items ?? [];
   const [dialogEquipSlot, setDialogEquipSlot] = useState<EquipmentSlot>();
-  const [dialogEquipOpen, setDialogEquipOpen] = useState<boolean>(false);
-  const [modifiersItem, setModifiersItem] = useState<StrategicItem>();
+  const equippedIds = Object.values(character.equipment.slots).filter((id): id is string => !!id);
 
-  const openDialog = (slot: EquipmentSlot) => {
-    setDialogEquipSlot(slot);
-    setDialogEquipOpen(true);
-  };
-
-  const bindItems = (characterId: string) => {
-    fetchStrategicItems(`characterId==${characterId}`, 0, 100, auth)
-      .then((response) => setItems(response.content))
-      .catch((err) => notify.error(err));
-  };
-
-  const bindCharacter = () => {
+  /** An operation changes the weight, the gold or the equipment of the character: the API reprocesses it. */
+  const onChanged = (updated?: Character) => {
+    refresh();
+    if (updated) return setCharacter(updated);
     fetchCharacter(character.id, auth)
-      .then((response) => {
-        setCharacter(response);
-        bindItems(response.id);
-      })
+      .then((response) => setCharacter(response))
       .catch((err) => notify.error(err));
   };
-
-  const onItemDeleted = (itemId: string) => {
-    deleteStrategicItem(itemId, auth)
-      .then(() => bindCharacter())
-      .catch((err) => notify.error(err));
-  };
-
-  /** A modifier changes the attacks, defense or penalties of the character: the API reprocesses it. */
-  const onItemModified = (item: StrategicItem) => {
-    setModifiersItem(item);
-    bindCharacter();
-  };
-
-  useEffect(() => {
-    if (!character) return;
-    bindItems(character.id);
-  }, [character]);
 
   return (
     <>
@@ -106,47 +60,48 @@ export default function CharacterEquipmentPanel({
             gap: 1,
           }}
         >
-          <EquipmentSlots character={character} items={items} onClick={(e) => openDialog(e)} />
+          <EquipmentSlots character={character} items={items} onClick={(slot) => setDialogEquipSlot(slot)} />
           <StatsPanel character={character} />
-          <Stack spacing={2}>
-            <ItemList
-              character={character}
-              carried={true}
-              items={items.filter((e) => e.carried)}
-              setCharacter={setCharacter}
-              onItemDeleted={(e) => onItemDeleted(e)}
-              onItemModifiers={(e) => setModifiersItem(e)}
-            />
-            <ItemList
-              character={character}
-              carried={false}
-              items={items.filter((e) => !e.carried)}
-              setCharacter={setCharacter}
-              onItemDeleted={(e) => onItemDeleted(e)}
-              onItemModifiers={(e) => setModifiersItem(e)}
-            />
-          </Stack>
+          <Card variant="outlined" sx={{ borderRadius: borderRadius }}>
+            <CardContent>
+              <Typography variant="overline" color="text.secondary">
+                {t('inventory')}
+              </Typography>
+              {view ? (
+                <HolderInventory view={view} onChanged={onChanged} equippedIds={equippedIds} />
+              ) : (
+                <LoadingState />
+              )}
+            </CardContent>
+          </Card>
         </Box>
         {dialogEquipSlot && (
           <CharacterEquipmentDialog
-            open={dialogEquipOpen}
+            open
             character={character}
             items={items}
             slot={dialogEquipSlot}
-            onClose={() => setDialogEquipOpen(false)}
-            onEquip={(character) => setCharacter(character)}
-          />
-        )}
-        {modifiersItem && (
-          <CharacterItemModifiersDialog
-            open={!!modifiersItem}
-            item={modifiersItem}
-            onClose={() => setModifiersItem(undefined)}
-            onChange={(e) => onItemModified(e)}
+            onClose={() => setDialogEquipSlot(undefined)}
+            onEquip={(updated) => onChanged(updated)}
           />
         )}
       </Box>
-      <CharacterViewTransferGold character={character} items={items} setCharacter={setCharacter} />
+      {view && <CharacterViewTransferGold character={character} view={view} onChanged={onChanged} />}
+      {view && (
+        <Card variant="outlined" sx={{ borderRadius: borderRadius, mt: 2 }}>
+          <CardContent>
+            <Typography variant="overline" color="text.secondary">
+              {t('history')}
+            </Typography>
+            <ItemLedgerList
+              rsql={`holderIds==${character.id}`}
+              perspective={view.holder}
+              names={holderNames(view)}
+              refreshKey={view}
+            />
+          </CardContent>
+        </Card>
+      )}
     </>
   );
 }
@@ -210,7 +165,7 @@ function SlotCard({
 }) {
   const { t } = useTranslation();
   const item = items.find((e) => e.id === itemId) || undefined;
-  const image = item ? `${imageBaseUrl}images/items/${item.itemTypeId}.png` : `${imageBaseUrl}images/items/no-item.png`;
+  const image = item ? itemImageUrl(item) : `${imageBaseUrl}images/items/no-item.png`;
   const modifiers = item?.modifiers || [];
   const tooltip = item ? (
     <Stack spacing={0.5}>
@@ -299,8 +254,12 @@ function StatsPanel({ character }: { character: Character }) {
           </Typography>
 
           <Stack spacing={1.25} sx={{ mt: 2 }}>
-            <StatRow label={t('carried-weight')} value={`${eq.weight} lbs`} danger={eq.weight > eq.weightAllowance} />
-            <StatRow label={t('weight-allowance')} value={`${eq.weightAllowance} lbs`} />
+            <StatRow
+              label={t('carried-weight')}
+              value={`${eq.weight} ${t('lbs')}`}
+              danger={eq.weight > eq.weightAllowance}
+            />
+            <StatRow label={t('weight-allowance')} value={`${eq.weightAllowance} ${t('lbs')}`} />
             <StatRow
               label={t('encumbrance-penalty')}
               value={eq.encumbrancePenalty}
@@ -332,7 +291,7 @@ function StatsPanel({ character }: { character: Character }) {
               <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
                 <Typography variant="body2">{t('encumbrance')}</Typography>
                 <Typography variant="body2" color="error.main">
-                  {`${eq.weight} / ${eq.weightAllowance} lbs`}
+                  {`${eq.weight} / ${eq.weightAllowance} ${t('lbs')}`}
                 </Typography>
               </Stack>
 
@@ -343,7 +302,7 @@ function StatsPanel({ character }: { character: Character }) {
                 sx={{ mt: 1, height: 8, borderRadius: 99 }}
               />
             </Box>
-            {overload > 0 && <StatRow label={t('overload')} value={`${overload.toFixed(2)} lbs`} danger />}
+            {overload > 0 && <StatRow label={t('overload')} value={`${overload.toFixed(2)} ${t('lbs')}`} danger />}
           </Stack>
         </CardContent>
       </Card>
@@ -387,162 +346,5 @@ function StatRow({
         {value}
       </Typography>
     </Stack>
-  );
-}
-
-function ItemList({
-  character,
-  carried,
-  items,
-  setCharacter,
-  onItemDeleted,
-  onItemModifiers,
-}: {
-  character: Character;
-  carried: boolean;
-  items: StrategicItem[];
-  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
-  onItemDeleted: (itemId: string) => void;
-  onItemModifiers: (item: StrategicItem) => void;
-}) {
-  const auth = useAuth();
-  const { t } = useTranslation();
-  const notify = useNotify();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [menuItemId, setMenuItemId] = useState<string | null>(null);
-
-  const handleOpenMenu = (e: React.MouseEvent<HTMLElement>, itemId: string) => {
-    setAnchorEl(e.currentTarget);
-    setMenuItemId(itemId);
-  };
-
-  const handleCloseMenu = () => {
-    setAnchorEl(null);
-    setMenuItemId(null);
-  };
-
-  const handleToggleCarried = (itemId: string) => {
-    updateCarriedStatus(character.id, itemId, !carried, auth)
-      .then((response) => {
-        setCharacter(response);
-        handleCloseMenu();
-      })
-      .catch((err) => notify.error(err));
-  };
-
-  if (items.length < 1) return;
-
-  return (
-    <Card variant="outlined" sx={{ borderRadius: borderRadius }}>
-      <CardContent sx={{ p: 0 }}>
-        <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', px: 2, py: 1.5 }}>
-          <Typography variant="subtitle2" sx={{ textTransform: 'uppercase' }}>
-            {t(carried ? 'carried' : 'stored')}
-          </Typography>
-          {carried && <Chip size="small" label={`${character.equipment.weight} lbs`} />}
-        </Stack>
-
-        <Divider />
-
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: '56px 1fr 90px 100px 40px',
-            px: 2,
-            py: 1,
-            color: 'text.secondary',
-          }}
-        >
-          <Box />
-          <Typography variant="caption">{t('name')}</Typography>
-          <Typography variant="caption">{t('quantity')}</Typography>
-          <Typography variant="caption" sx={{ textAlign: 'right' }}>
-            {t('weight')}
-          </Typography>
-          <Box />
-        </Box>
-
-        <Divider />
-
-        <Stack>
-          {items.map((item) => (
-            <Box
-              key={item.id}
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: '56px 1fr 90px 100px 40px',
-                alignItems: 'center',
-                px: 2,
-                py: 1,
-                borderBottom: 1,
-                borderColor: 'divider',
-                '&:hover': {
-                  bgcolor: 'action.hover',
-                },
-              }}
-            >
-              <Box
-                component="img"
-                src={`${imageBaseUrl}images/items/${item.itemTypeId}.png`}
-                alt={item.id}
-                sx={{
-                  width: 50,
-                  height: 50,
-                  objectFit: 'cover',
-                  filter: itemFilter,
-                }}
-              />
-
-              <Box>
-                <Typography variant="body2">{item.name}</Typography>
-                {item.modifiers && item.modifiers.length > 0 && (
-                  <Box sx={{ mt: 0.5 }}>
-                    <ItemModifierChips modifiers={item.modifiers} max={3} />
-                  </Box>
-                )}
-              </Box>
-              <Typography variant="body2">{item.amount ?? 1}</Typography>
-              <Typography variant="body2" sx={{ textAlign: 'right' }}>
-                {`${item.info.weight} lbs`}
-              </Typography>
-
-              <IconButton
-                size="small"
-                color="primary"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleOpenMenu(e, item.id);
-                }}
-              >
-                <MoreVertIcon fontSize="small" />
-              </IconButton>
-              <Menu anchorEl={anchorEl} open={Boolean(anchorEl) && menuItemId === item.id} onClose={handleCloseMenu}>
-                <MenuItem onClick={() => onItemDeleted(item.id)}>
-                  <ListItemIcon>
-                    <DeleteIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText>{t('delete')}</ListItemText>
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    handleCloseMenu();
-                    onItemModifiers(item);
-                  }}
-                >
-                  <ListItemIcon>
-                    <TuneIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText>{t('item-modifiers')}</ListItemText>
-                </MenuItem>
-                <MenuItem onClick={() => handleToggleCarried(item.id)}>
-                  <ListItemIcon>{carried ? <ArrowDownwardIcon /> : <ArrowUpwardIcon />}</ListItemIcon>
-                  <ListItemText>{t(carried ? 'Store' : 'Equip')}</ListItemText>
-                </MenuItem>
-              </Menu>
-            </Box>
-          ))}
-        </Stack>
-      </CardContent>
-    </Card>
   );
 }

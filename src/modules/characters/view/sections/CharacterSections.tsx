@@ -170,7 +170,7 @@ export const CharacterCombat = ({ character, strategicGame }: Omit<SectionProps,
 /** Equipment slots, carried and stored items, and gold. */
 export const CharacterEquipment = ({ character, setCharacter }: SectionProps) => (
   <Stack spacing={2}>
-    <CharacterEquipmentButtons character={character} setCharacter={setCharacter} />
+    <CharacterEquipmentButtons character={character} />
     <CharacterEquipmentPanel character={character} setCharacter={setCharacter} />
   </Stack>
 );

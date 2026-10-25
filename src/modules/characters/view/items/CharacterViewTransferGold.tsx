@@ -1,53 +1,45 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { Button, Card, CardContent, Stack, Typography } from '@mui/material';
+import { Box, Button, Card, CardContent, Stack, Typography } from '@mui/material';
 import {
   Character,
-  Faction,
-  fetchFaction,
-  StrategicItem,
+  MoneyDisplay,
+  NumericInput,
   transferFactionGold,
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { HolderView } from '../../../economy/use-holder';
 
-const goldCoin = 'gold-coin';
-
+/**
+ * Gold between a character and its faction (spec 023): any amount, in gold pieces with decimals for the smaller
+ * coins. Giving gold of the faction to a character needs the game master.
+ */
 export default function CharacterViewTransferGold({
   character,
-  items,
-  setCharacter,
+  view,
+  onChanged,
 }: {
   character: Character;
-  items: StrategicItem[];
-  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
+  view: HolderView;
+  onChanged: (character?: Character) => void;
 }) {
   const auth = useAuth();
   const { t } = useTranslation();
-  const [faction, setFaction] = useState<Faction | null>(null);
   const notify = useNotify();
+  const [amount, setAmount] = useState<number | null>(1);
+  const factionGold = view.faction?.management.availableGold ?? 0;
+  const characterGold = view.gold;
 
-  const characterAmount: number =
-    items
-      .filter((item) => item.itemTypeId === goldCoin)
-      .map((e) => e.amount)
-      .reduce((a, b) => a + b, 0) || 0;
-
-  const handleTransfer = (amount: number) => {
-    transferFactionGold(character.id, amount, auth)
-      .then((data) => setCharacter(data))
+  const handleTransfer = (gold: number) => {
+    transferFactionGold(character.id, gold, auth)
+      .then((data) => onChanged(data))
       .catch((err) => notify.error(err));
   };
 
-  useEffect(() => {
-    fetchFaction(character.faction.id, auth)
-      .then((factionData) => setFaction(factionData))
-      .catch((err) => notify.error(err));
-  }, [character, items]);
-
-  if (!character || !faction) return null;
+  if (!view.faction) return null;
 
   return (
     <Card variant="outlined" sx={{ borderRadius: 1, mt: 2 }}>
@@ -55,45 +47,46 @@ export default function CharacterViewTransferGold({
         <Typography variant="overline" color="text.secondary">
           {t('transfer-gold')}
         </Typography>
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mt: 2 }}>
-          <Typography>
-            {t('character')} ({characterAmount})
-          </Typography>
-          <Button
-            onClick={() => handleTransfer(1)}
-            variant="outlined"
-            startIcon={<ChevronLeftIcon />}
-            disabled={faction.management.availableGold < 1}
-          >
-            {`1G`}
-          </Button>
-          <Button
-            onClick={() => handleTransfer(10)}
-            variant="outlined"
-            startIcon={<ChevronLeftIcon />}
-            disabled={faction.management.availableGold < 10}
-          >
-            {`10G`}
-          </Button>
-          <Button
-            onClick={() => handleTransfer(-10)}
-            variant="outlined"
-            endIcon={<ChevronRightIcon />}
-            disabled={characterAmount < 10}
-          >
-            {`10G`}
-          </Button>
-          <Button
-            onClick={() => handleTransfer(-1)}
-            variant="outlined"
-            endIcon={<ChevronRightIcon />}
-            disabled={characterAmount < 1}
-          >
-            {`1G`}
-          </Button>
-          <Typography>
-            {t('faction')} ({faction.management.availableGold})
-          </Typography>
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={2}
+          sx={{ alignItems: { sm: 'center' }, justifyContent: 'space-between', mt: 2 }}
+        >
+          <Stack>
+            <Typography variant="caption" color="text.secondary">
+              {character.name}
+            </Typography>
+            <MoneyDisplay gold={characterGold} showIcon />
+          </Stack>
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+            <Button
+              onClick={() => handleTransfer(amount ?? 0)}
+              variant="outlined"
+              startIcon={<ChevronLeftIcon />}
+              disabled={!amount || factionGold < amount}
+              aria-label={t('transfer-gold-to-character')}
+            >
+              {t('receive')}
+            </Button>
+            <Box sx={{ width: 120 }}>
+              <NumericInput label={t('gold')} value={amount} onChange={setAmount} min={0} maxFractionDigits={3} />
+            </Box>
+            <Button
+              onClick={() => handleTransfer(-(amount ?? 0))}
+              variant="outlined"
+              endIcon={<ChevronRightIcon />}
+              disabled={!amount || characterGold < amount}
+              aria-label={t('transfer-gold-to-faction')}
+            >
+              {t('give')}
+            </Button>
+          </Stack>
+          <Stack sx={{ alignItems: { sm: 'flex-end' } }}>
+            <Typography variant="caption" color="text.secondary">
+              {view.faction.name}
+            </Typography>
+            <MoneyDisplay gold={factionGold} showIcon />
+          </Stack>
         </Stack>
       </CardContent>
     </Card>
