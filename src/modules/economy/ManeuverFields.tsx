@@ -7,7 +7,8 @@ import {
   ItemManeuverDto,
   MANEUVER_DIFFICULTIES,
   NumericInput,
-  OpenEndedRollInput,
+  OPEN_D100,
+  RollField,
   SelectDifficulty,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 
@@ -144,11 +145,10 @@ const ManeuverFields: FC<{
         </Grid>
       )}
       <Grid size={{ xs: 12, sm: 6 }}>
-        <OpenEndedRollInput
-          gridColumns={12}
-          inputGridSize={12}
+        <RollField
+          spec={OPEN_D100}
           value={value.roll}
-          onChange={(roll, details) => onChange({ ...value, roll, unmodifiedRoll: details?.unmodified })}
+          onChange={(roll) => onChange({ ...value, roll: roll.total, unmodifiedRoll: roll.unmodified })}
         />
       </Grid>
       <Grid size={12}>

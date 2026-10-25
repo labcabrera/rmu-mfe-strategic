@@ -27,13 +27,14 @@ import {
   HealerSelection,
   InjuryCard,
   KeyValue,
+  OPEN_D100,
   resolveHealer,
   RmuDialog,
   RollBreakdown,
-  RollInput,
-  RollModifier,
   rollCharacterInjuryPermanent,
   rollCharacterInjuryRecovery,
+  RollField,
+  RollModifier,
   SelectDifficulty,
   treatCharacterInjury,
   TreatInjuryDto,
@@ -381,7 +382,7 @@ const InjuryHealingDialog: FC<{
               )}
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <RollInput value={roll} onChange={setRoll} openEnded />
+              <RollField spec={OPEN_D100} value={roll} onChange={(value) => setRoll(value.total)} />
             </Grid>
             <Grid size={12}>
               <FormControlLabel
@@ -392,7 +393,12 @@ const InjuryHealingDialog: FC<{
               />
               {herbalismEnabled && (
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ alignItems: { sm: 'center' } }}>
-                  <RollInput label={t('herbalism')} value={herbalismRoll} onChange={setHerbalismRoll} openEnded />
+                  <RollField
+                    spec={OPEN_D100}
+                    label={t('herbalism')}
+                    value={herbalismRoll}
+                    onChange={(value) => setHerbalismRoll(value.total)}
+                  />
                   <Typography variant="body2" color="text.secondary">
                     {t('treatment-herbalism-help', {
                       bonus: formatBonus(resolvedHealer?.herbalism ?? 0),
@@ -468,11 +474,11 @@ const InjuryHealingDialog: FC<{
         {!recoveryRolled && (
           <Grid size={{ xs: 12, sm: 6 }}>
             <Stack spacing={1.5}>
-              <RollInput
+              <RollField
+                spec={OPEN_D100}
                 label={t('recovery-roll')}
                 value={recoveryRoll}
-                onChange={setRecoveryRoll}
-                openEnded
+                onChange={(value) => setRecoveryRoll(value.total)}
                 disabled={!canRollRecovery}
               />
               <Button
@@ -515,7 +521,12 @@ const InjuryHealingDialog: FC<{
             </Typography>
           )}
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ alignItems: { sm: 'center' } }}>
-            <RollInput label={t('permanent-roll')} value={permanentRoll} onChange={setPermanentRoll} openEnded />
+            <RollField
+              spec={OPEN_D100}
+              label={t('permanent-roll')}
+              value={permanentRoll}
+              onChange={(value) => setPermanentRoll(value.total)}
+            />
             <Button variant="outlined" disabled={busy || permanentRoll === null} onClick={submitPermanent}>
               {t('permanent-roll')}
             </Button>

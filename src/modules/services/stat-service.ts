@@ -1,3 +1,5 @@
+import type { RollSpec } from '@labcabrera-rmu/rmu-react-shared-lib';
+
 export const getStatBonus = (temporary: number) => {
   switch (temporary) {
     case 1:
@@ -145,17 +147,26 @@ export interface StatGainRoll {
   dice: string;
   min: number;
   max: number;
+  /** The die as a roll, for the roll field and the random gain. */
+  spec: RollSpec;
 }
+
+const gainDie = (sides: number, modifier = 0): StatGainRoll => ({
+  dice: modifier ? `d${sides} - ${-modifier}` : `d${sides}`,
+  min: 1 + modifier,
+  max: sides + modifier,
+  spec: { dice: 1, sides, openEnded: 'none', ...(modifier ? { modifier } : {}) },
+});
 
 /** Die of a stat gain roll by the current temporary value (the API validates the same bands). */
 export const getStatGainRoll = (temporary: number): StatGainRoll => {
-  if (temporary < 7) return { dice: 'd3 - 1', min: 0, max: 2 };
-  if (temporary < 9) return { dice: 'd3', min: 1, max: 3 };
-  if (temporary < 19) return { dice: 'd6', min: 1, max: 6 };
-  if (temporary < 82) return { dice: 'd10', min: 1, max: 10 };
-  if (temporary < 91) return { dice: 'd6', min: 1, max: 6 };
-  if (temporary < 93) return { dice: 'd3', min: 1, max: 3 };
-  return { dice: 'd3 - 1', min: 0, max: 2 };
+  if (temporary < 7) return gainDie(3, -1);
+  if (temporary < 9) return gainDie(3);
+  if (temporary < 19) return gainDie(6);
+  if (temporary < 82) return gainDie(10);
+  if (temporary < 91) return gainDie(6);
+  if (temporary < 93) return gainDie(3);
+  return gainDie(3, -1);
 };
 
 export interface StatBonusBand {

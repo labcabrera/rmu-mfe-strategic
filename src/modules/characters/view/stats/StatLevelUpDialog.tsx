@@ -5,14 +5,14 @@ import { Grid, Stack, Typography } from '@mui/material';
 import {
   Character,
   gridSizeCard,
-  NumericInput,
   RmuDialog,
+  RollField,
   StatKey,
   updateCharacterTemporaryStat,
   UpdateTemporaryStatDto,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useStrategicNotify } from '../../../services/notify-service';
-import { getStatGainRoll } from '../../../services/stat-service';
+import { getStatGainRoll, StatGainRoll } from '../../../services/stat-service';
 
 const StatLevelUpDialog: FC<{
   character: Character;
@@ -25,9 +25,7 @@ const StatLevelUpDialog: FC<{
   const { t } = useTranslation();
   const notify = useStrategicNotify();
   const [roll, setRoll] = useState<number>();
-  const [minRoll, setMinRoll] = useState<number>();
-  const [maxRoll, setMaxRoll] = useState<number>();
-  const [diceRoll, setDiceRoll] = useState<string>();
+  const [gainRoll, setGainRoll] = useState<StatGainRoll>();
   const selectedStat = stat ? character.statistics[stat] : undefined;
   const potential = selectedStat?.potential;
   const temporary = selectedStat?.temporary;
@@ -47,21 +45,14 @@ const StatLevelUpDialog: FC<{
   const calculateDiceRoll = () => {
     if (temporary === undefined) return;
 
-    const die = getStatGainRoll(temporary);
-    updateDiceRoll(die.dice, die.min, die.max);
-  };
-
-  const updateDiceRoll = (diceRoll?: string, min?: number, max?: number) => {
-    setDiceRoll(diceRoll);
-    setMinRoll(min);
-    setMaxRoll(max);
+    setGainRoll(getStatGainRoll(temporary));
   };
 
   useEffect(() => {
     if (stat && selectedStat) {
       calculateDiceRoll();
     } else {
-      updateDiceRoll(undefined, undefined, undefined);
+      setGainRoll(undefined);
     }
   }, [stat, selectedStat]);
 
@@ -96,7 +87,7 @@ const StatLevelUpDialog: FC<{
         </Grid>
         <Grid size={gridSizeCard}>
           <Stack>
-            <Typography>{diceRoll}</Typography>
+            <Typography>{gainRoll?.dice}</Typography>
             <Typography color="secondary">{t('roll-type')}</Typography>
           </Stack>
         </Grid>
@@ -106,13 +97,14 @@ const StatLevelUpDialog: FC<{
           </Typography>
         </Grid>
         <Grid size={gridSizeCard}>
-          <NumericInput
-            label={`${t('roll')} ${diceRoll}`}
-            value={roll}
-            onChange={(v) => setRoll(v || undefined)}
-            min={minRoll}
-            max={maxRoll}
-          />
+          {gainRoll && (
+            <RollField
+              spec={gainRoll.spec}
+              label={`${t('roll')} ${gainRoll.dice}`}
+              value={roll}
+              onChange={(value) => setRoll(value.total)}
+            />
+          )}
         </Grid>
       </Grid>
     </RmuDialog>
