@@ -107,7 +107,13 @@ function StyleCard({
       .then(setCharacter)
       .catch((error) => notify.error(error));
 
-  // The server checks the skills and traits required; here only what the sheet already knows
+  // As the server: a required skill (any specialization, or `skill@specialization`) with at least one rank
+  const hasSkill = (requirement: string) => {
+    const [skillId, specialization] = requirement.split('@');
+    return character.skills.some(
+      (s) => s.skillId === skillId && (!specialization || s.specialization === specialization) && s.ranks > 0
+    );
+  };
   const blockedBy = (ability: StyleAbility | undefined, cost: number, times: number): string | null => {
     if (!ability) return t('loading');
     if (times > 0 && (!ability.repeatable || (ability.maxTimes !== null && times >= ability.maxTimes))) {
@@ -116,6 +122,12 @@ function StyleCard({
     if (freeRanks < cost) return t('style-ability-no-ranks');
     const missing = ability.requiresAbilities.find((id) => !selections.some((s) => s.abilityId === id));
     if (missing) return t('style-ability-requires', { ability: t(`style-ability-${missing}`) });
+    const missingSkill = [...(style?.requiresSkills ?? []), ...ability.requiresSkills].find((id) => !hasSkill(id));
+    if (missingSkill) return t('style-ability-requires', { ability: t(missingSkill.split('@')[0]) });
+    const missingTrait = [...(style?.requiresTraits ?? []), ...ability.requiresTraits].find(
+      (id) => !character.traits?.some((trait) => trait.traitId === id)
+    );
+    if (missingTrait) return t('style-ability-requires', { ability: t(missingTrait) });
     return null;
   };
 
