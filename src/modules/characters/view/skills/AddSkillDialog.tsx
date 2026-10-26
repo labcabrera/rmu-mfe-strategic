@@ -58,7 +58,7 @@ export default function AddSkillDialog({
   const isValid = (): boolean => {
     if (!selectedSkill) return false;
     if (!formData.skillId) return false;
-    if (!formData.specialization && selectedSkill.specialization) return false;
+    if (!formData.specialization && selectedSkill.specialization && !selectedSkill.specializationOptional) return false;
     return true;
   };
 
