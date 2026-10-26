@@ -26,6 +26,7 @@ import {
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { resolvePowerLevel } from '../../../services/game-rules';
 import AddSkillDialog from './AddSkillDialog';
+import CharacterFightingStyles from './CharacterFightingStyles';
 import CharacterSkillBreakdown from './CharacterSkillBreakdown';
 import CharacterSkillTable from './CharacterSkillTable';
 
@@ -166,6 +167,7 @@ const CharacterViewSkills: FC<{
       ) : (
         <SkillGroupList skills={filteredSkills} onSelect={setSelectedSkill} searchable={false} />
       )}
+      <CharacterFightingStyles character={character} setCharacter={setCharacter} strategicGame={strategicGame} />
       <CharacterSkillBreakdown skill={selectedSkill} onClose={() => setSelectedSkill(null)} />
       <AddSkillDialog
         open={openAddSkillDialog}
