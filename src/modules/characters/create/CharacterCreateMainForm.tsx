@@ -55,25 +55,27 @@ const CharacterCreateMainForm: FC<{
   };
 
   const onProfessionChange = (professionId: string, profession: Profession) => {
-    let realmType = formData.info.realmType;
-    if (profession && profession.fixedRealmTypes && profession.fixedRealmTypes.length === 1) {
-      realmType = profession.fixedRealmTypes[0];
-    }
+    // The fixed realms of a spellcaster (two for a hybrid), or the realm chosen if the new profession allows it
+    const current = formData.info.realmTypes ?? [];
+    const fixed: string[] = profession?.fixedRealmTypes ?? [];
+    const available: string[] = profession?.availableRealmTypes ?? [];
+    const realmTypes =
+      fixed.length > 0 ? fixed : current.length === 1 && (available.length === 0 || available.includes(current[0])) ? current : [];
     setFormData((prevState) => ({
       ...prevState,
       info: {
         ...prevState.info,
         professionId: professionId,
-        realmType: realmType,
+        realmTypes,
       },
     }));
     setProfession(profession);
   };
 
-  const handleRealmTypeChange = (realmType: string) => {
+  const handleRealmTypeChange = (realmTypes: string[]) => {
     setFormData((prevState) => ({
       ...prevState,
-      info: { ...prevState.info, realmType: realmType },
+      info: { ...prevState.info, realmTypes },
     }));
   };
 
@@ -98,7 +100,7 @@ const CharacterCreateMainForm: FC<{
         <SelectProfession value={formData.info.professionId} onChange={(e, p) => onProfessionChange(e, p!)} />
       </Grid>
       <Grid size={gridFormSize}>
-        <SelectRealmType profession={profession} value={formData.info.realmType} onChange={handleRealmTypeChange} />
+        <SelectRealmType profession={profession} value={formData.info.realmTypes ?? []} onChange={handleRealmTypeChange} />
       </Grid>
       <Grid size={gridFormSize}>
         <NumericInput

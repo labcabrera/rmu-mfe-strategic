@@ -25,6 +25,7 @@ export const characterSectionIds = [
   'combat',
   'health',
   'equipment',
+  'magic',
   'progression',
 ] as const;
 export type CharacterSectionId = (typeof characterSectionIds)[number];
