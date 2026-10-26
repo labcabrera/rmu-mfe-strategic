@@ -133,7 +133,7 @@ function StyleCard({
           <Chip
             size="small"
             color={freeRanks > 0 ? 'success' : 'default'}
-            label={t('style-free-ranks', { ranks: freeRanks, bonus: skill.styleFreeRanksBonus ?? 0 })}
+            label={t('style-free-ranks-chip', { ranks: freeRanks, bonus: skill.styleFreeRanksBonus ?? 0 })}
           />
         </Tooltip>
       </Stack>
