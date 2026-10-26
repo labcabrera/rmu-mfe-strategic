@@ -66,7 +66,7 @@ const CHARACTER_EMPTY_TEMPLATE = {
   info: {
     raceId: '',
     professionId: '',
-    realmType: '',
+    realmTypes: [] as string[],
     height: 7,
     weight: 120,
   },
@@ -263,7 +263,7 @@ export default function CharacterCreatePage() {
     !!formData.name &&
     !!formData.info?.raceId &&
     !!formData.info?.professionId &&
-    !!formData.info?.realmType &&
+    (formData.info?.realmTypes?.length ?? 0) > 0 &&
     !!formData.info?.weight &&
     !!formData.level &&
     statsValid &&

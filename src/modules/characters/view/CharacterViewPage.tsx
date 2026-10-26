@@ -3,6 +3,7 @@ import React, { Dispatch, ReactElement, ReactNode, SetStateAction, useEffect, us
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import BackpackIcon from '@mui/icons-material/Backpack';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -42,6 +43,7 @@ import {
 import { healthChips } from '../../shared/chips/CharacterHealthChips';
 import { canChangeCharacter } from '../../shared/permissions';
 import CharacterHealthSection from './health/CharacterHealthSection';
+import CharacterMagicSection, { hasMagic } from './magic/CharacterMagicSection';
 import { armorLabel } from './sections/CharacterPanels';
 import {
   CharacterAttributes,
@@ -63,6 +65,7 @@ const sectionIcons: Record<CharacterSectionId, ReactElement> = {
   combat: <SportsMmaIcon />,
   health: <HealingIcon />,
   equipment: <BackpackIcon />,
+  magic: <AutoFixHighIcon />,
   progression: <TrendingUpIcon />,
 };
 
@@ -150,6 +153,7 @@ export default function CharacterViewPage() {
     combat: <CharacterCombat character={entity} strategicGame={strategicGame} />,
     health: <CharacterHealthSection character={entity} setCharacter={setCharacter} strategicGame={strategicGame} />,
     equipment: <CharacterEquipment character={entity} setCharacter={setCharacter} />,
+    magic: <CharacterMagicSection character={entity} setCharacter={setCharacter} strategicGame={strategicGame} />,
     progression: <CharacterProgression character={entity} setCharacter={setCharacter} strategicGame={strategicGame} />,
   });
 
@@ -288,7 +292,10 @@ export default function CharacterViewPage() {
             label={t('character-sections')}
             value={section}
             onChange={setSection}
-            sections={sectionIds.map((id) => ({ id, label: t(id), icon: sectionIcons[id] }))}
+            sections={sectionIds
+              // The Magic tab only for characters with spell lists or power points (spec 029)
+              .filter((id) => id !== 'magic' || hasMagic(entity))
+              .map((id) => ({ id, label: t(id), icon: sectionIcons[id] }))}
           />
           <Box key={section} sx={enterSx()}>
             {renderSection(entity)[section as CharacterSectionId]}

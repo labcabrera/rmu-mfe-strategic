@@ -85,6 +85,7 @@ export default function AddSkillDialog({
       <Grid container spacing={1}>
         <Grid size={12}>
           <SkillSelector
+            realms={character.info.realmTypes ?? [character.info.realmType]}
             onSkillChange={(v) => onSelectedSkill(v || '')}
             onSpecializationChange={(v) => setFormData({ ...formData, specialization: v })}
             onError={(err) => notify.error(err)}
