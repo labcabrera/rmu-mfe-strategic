@@ -10,6 +10,7 @@ import {
   Item,
   ITEM_RARITIES,
   itemFilter,
+  ItemFeatureChips,
   ItemThumb,
   LoadingState,
   MoneyDisplay,
@@ -34,11 +35,16 @@ const subcategoryOf = (item: Item): string | undefined =>
   item.category === 'weapon' ? item.weapon?.skillId : item.category === 'armor' ? item.armor?.slot : undefined;
 
 /** Image of a category or subcategory filter (`images/items/category-<key>.png`). */
-const CategoryChip: FC<{ value: string; selected: boolean; onClick: () => void }> = ({ value, selected, onClick }) => {
+const CategoryChip: FC<{ value: string; label?: string; selected: boolean; onClick: () => void }> = ({
+  value,
+  label,
+  selected,
+  onClick,
+}) => {
   const { t } = useTranslation();
   return (
     <Chip
-      label={t(value)}
+      label={label ?? t(value)}
       onClick={onClick}
       color={selected ? 'primary' : 'default'}
       variant={selected ? 'filled' : 'outlined'}
@@ -169,6 +175,7 @@ const CatalogBrowser: FC<{
           <CategoryChip
             key={value}
             value={value}
+            label={t(`item-category-${value}`, t(value))}
             selected={category === value}
             onClick={() => {
               setCategory(category === value ? undefined : value);
@@ -230,6 +237,10 @@ const CatalogBrowser: FC<{
                       {`${item.info.weight} ${t('lbs')}`}
                     </Typography>
                   )}
+                  <ItemFeatureChips
+                    variant="text"
+                    item={{ features: item.features, lotSize: item.info.lotSize, armor: item.armor, weapon: item.weapon }}
+                  />
                 </Stack>
               </CardActionArea>
             </Card>
