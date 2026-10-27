@@ -6,6 +6,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import HealingIcon from '@mui/icons-material/Healing';
 import HotelIcon from '@mui/icons-material/Hotel';
+import ScienceIcon from '@mui/icons-material/Science';
 import { Alert, Box, Button, Chip, FormControlLabel, Link, Stack, Switch, Typography } from '@mui/material';
 import {
   Character,
@@ -19,17 +20,20 @@ import {
   StatPill,
   StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { isGameMaster as isGameMasterOf } from '../../../shared/permissions';
 import { useStrategicNotify } from '../../../services/notify-service';
+import { isGameMaster as isGameMasterOf } from '../../../shared/permissions';
 import { Bento, span } from '../sections/CharacterPanels';
+import AntidoteDialog from './AntidoteDialog';
 import HealingLogList from './HealingLogList';
 import InjuryFormDialog from './InjuryFormDialog';
 import InjuryHealingDialog, { HealingStepId } from './InjuryHealingDialog';
+import PoisonCharacterDialog from './PoisonCharacterDialog';
 import RestDialog from './RestDialog';
 import {
   activeConditions,
   HERBALISM_SKILL,
   INJURY_GROUPS,
+  isPoisoning,
   isTreatable,
   MEDICINE_SKILL,
   skillBonus,
@@ -65,6 +69,8 @@ const CharacterHealthSection: FC<{
   const [healing, setHealing] = useState<{ injuryId: string; step: HealingStepId }>();
   const [editing, setEditing] = useState<{ injury?: Injury }>();
   const [restOpen, setRestOpen] = useState(false);
+  const [poisonOpen, setPoisonOpen] = useState(false);
+  const [antidoteFor, setAntidoteFor] = useState<Injury>();
 
   // Adding and editing injuries and resolving conditions are for the game master (the owner of the game).
   const isGameMaster = isGameMasterOf(auth, strategicGame);
@@ -104,7 +110,11 @@ const CharacterHealthSection: FC<{
   );
 
   const renderActions = (injury: Injury) =>
-    !dead && isTreatable(injury) ? (
+    !dead && isPoisoning(injury) ? (
+      <Button size="small" startIcon={<ScienceIcon />} onClick={() => setAntidoteFor(injury)}>
+        {t('antidote')}
+      </Button>
+    ) : !dead && isTreatable(injury) ? (
       <Button
         size="small"
         startIcon={<HealingIcon />}
@@ -124,6 +134,11 @@ const CharacterHealthSection: FC<{
               <Button size="small" startIcon={<HotelIcon />} disabled={dead} onClick={() => setRestOpen(true)}>
                 {t('pass-time')}
               </Button>
+              {isGameMaster && (
+                <Button size="small" startIcon={<ScienceIcon />} disabled={dead} onClick={() => setPoisonOpen(true)}>
+                  {t('poison-character')}
+                </Button>
+              )}
               {isGameMaster && (
                 <Button size="small" startIcon={<AddIcon />} onClick={() => setEditing({})}>
                   {t('add-injury')}
@@ -224,6 +239,19 @@ const CharacterHealthSection: FC<{
         open={!!editing}
         onClose={() => setEditing(undefined)}
         onSaved={setCharacter}
+      />
+      <PoisonCharacterDialog
+        character={character}
+        open={poisonOpen}
+        onClose={() => setPoisonOpen(false)}
+        onUpdated={setCharacter}
+      />
+      <AntidoteDialog
+        character={character}
+        injury={antidoteFor}
+        open={!!antidoteFor}
+        onClose={() => setAntidoteFor(undefined)}
+        onUpdated={setCharacter}
       />
       <RestDialog character={character} open={restOpen} onClose={() => setRestOpen(false)} onRested={setCharacter} />
     </Bento>

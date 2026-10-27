@@ -125,7 +125,11 @@ export const latestTreatment = (injury: Injury) =>
 export const INJURY_GROUPS: InjuryStatus[] = ['active', 'recovering', 'permanent', 'healed'];
 
 /** The injury can still be treated (or rolled for recovery). */
-export const isTreatable = (injury: Injury): boolean => injury.status === 'active' || injury.status === 'recovering';
+/** A poisoning still running (spec 042): it takes antidotes, not treatments, until it ends. */
+export const isPoisoning = (injury: Injury): boolean => !!injury.poison && !injury.poison.finished;
+
+export const isTreatable = (injury: Injury): boolean =>
+  !isPoisoning(injury) && (injury.status === 'active' || injury.status === 'recovering');
 
 /** Active conditions (not resolved). */
 export const activeConditions = (character: Character) =>

@@ -2,9 +2,11 @@ import React, { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
-import { Alert, Button, Stack, Typography } from '@mui/material';
+import { Alert, Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import {
   CharacterPicker,
+  coatItem,
+  COATING_FORMS,
   characterOption,
   ConfirmDialog,
   discardItem,
@@ -15,6 +17,7 @@ import {
   MoneyDisplay,
   NumericInput,
   PriceBreakdownView,
+  removeItemCoating,
   repairItem,
   RmuDialog,
   sellItem,
@@ -62,7 +65,8 @@ type DialogProps = {
   item: StrategicItem;
   view: HolderView;
   onClose: () => void;
-  onDone: (result: ItemOperationResult) => void;
+  /** The operation is done; no result for the ones without a ledger entry (removing a coating). */
+  onDone: (result?: ItemOperationResult) => void;
 };
 
 /** Sells an item at the market (spec 023, decision 12): its value by its condition and the sale percent. */
@@ -323,6 +327,77 @@ export const RepairItemDialog: FC<DialogProps> = ({ item, view, onClose, onDone 
           <NumericInput label={t('repair-cost')} value={cost} onChange={setCost} min={0} maxFractionDigits={3} />
           {!!cost && <MoneyDisplay gold={cost} />}
         </Stack>
+      </Stack>
+    </RmuDialog>
+  );
+};
+
+/** Poisons of the holder that coat a weapon: liquids and pastes (spec 042). */
+export const coatingPoisons = (items: StrategicItem[]): StrategicItem[] =>
+  items.filter((item) => {
+    const poison = item.catalog?.features?.poison;
+    return !!poison && COATING_FORMS.includes(poison.form) && itemUnits(item) > 0;
+  });
+
+/**
+ * Coats a weapon with a dose of a liquid or paste poison of its holder (spec 042), or wipes the poison it has. The
+ * next hit in a tactical game spends it.
+ */
+export const CoatItemDialog: FC<DialogProps> = ({ item, view, onClose, onDone }) => {
+  const auth = useAuth();
+  const { t } = useTranslation();
+  const notify = useNotify();
+  const [poisonItemId, setPoisonItemId] = useState('');
+  const poisons = coatingPoisons(view.items);
+
+  if (item.coating) {
+    return (
+      <ConfirmDialog
+        open
+        title={t('remove-coating')}
+        message={t('remove-coating-confirm', { name: item.name, poison: t(item.coating.name, item.coating.name) })}
+        confirmLabel={t('remove-coating')}
+        onConfirm={() =>
+          removeItemCoating(item.id, auth)
+            .then(() => onDone())
+            .catch(notify.error)
+        }
+        onClose={onClose}
+      />
+    );
+  }
+
+  const onCoat = () => coatItem(item.id, poisonItemId, auth).then(onDone).catch(notify.error);
+
+  return (
+    <RmuDialog
+      open
+      title={t('coat-item', { name: item.name })}
+      onCancel={onClose}
+      onConfirm={onCoat}
+      onConfirmDisabled={!poisonItemId}
+    >
+      <Stack spacing={2} sx={{ pt: 1 }}>
+        {poisons.length === 0 ? (
+          <Alert severity="info">{t('coat-item-no-poisons')}</Alert>
+        ) : (
+          <TextField
+            select
+            size="small"
+            label={t('poison')}
+            value={poisonItemId}
+            onChange={(e) => setPoisonItemId(e.target.value)}
+          >
+            {poisons.map((poison) => (
+              <MenuItem key={poison.id} value={poison.id}>
+                {`${t(poison.name, poison.name)} · ${t(`poison-form-${poison.catalog!.features!.poison!.form}`)} (${itemUnits(poison)})`}
+              </MenuItem>
+            ))}
+          </TextField>
+        )}
+        <Typography variant="caption" color="text.secondary">
+          {t('coat-item-help')}
+        </Typography>
       </Stack>
     </RmuDialog>
   );
