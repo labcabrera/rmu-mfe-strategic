@@ -6,6 +6,7 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import BuildIcon from '@mui/icons-material/Build';
 import DeleteIcon from '@mui/icons-material/Delete';
 import HistoryIcon from '@mui/icons-material/History';
+import ScienceIcon from '@mui/icons-material/Science';
 import SellIcon from '@mui/icons-material/Sell';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import TuneIcon from '@mui/icons-material/Tune';
@@ -20,10 +21,16 @@ import {
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import CharacterItemModifiersDialog from '../characters/view/items/CharacterItemModifiersDialog';
 import ItemLedgerList from './ItemLedgerList';
-import { DiscardItemDialog, RepairItemDialog, SellItemDialog, TransferItemDialog } from './ItemOperationDialogs';
+import {
+  CoatItemDialog,
+  DiscardItemDialog,
+  RepairItemDialog,
+  SellItemDialog,
+  TransferItemDialog,
+} from './ItemOperationDialogs';
 import { GOLD_COIN, HolderView } from './use-holder';
 
-type Operation = 'sell' | 'transfer' | 'repair' | 'discard' | 'modifiers' | 'history';
+type Operation = 'sell' | 'transfer' | 'repair' | 'coat' | 'discard' | 'modifiers' | 'history';
 
 export const isRepairable = (item: StrategicItem) =>
   !item.condition?.unrepairable && (!!item.condition?.broken || (item.condition?.breakagePenalty ?? 0) < 0);
@@ -37,7 +44,7 @@ export const holderNames = (view: HolderView): Record<string, string> => ({
 
 /**
  * The items of a character or of a faction armory (spec 023, decision 13) with the operations on each one: carry or
- * store (a character), give, sell, repair, modifiers, history and discard. The gold coins are shown apart.
+ * store (a character), give, sell, repair, poison a weapon (spec 042), modifiers, history and discard. The gold coins are shown apart.
  */
 const HolderInventory: FC<{
   view: HolderView;
@@ -85,6 +92,16 @@ const HolderInventory: FC<{
         onClick: open('repair'),
         disabled: !isRepairable(item),
       },
+      ...(item.weapon
+        ? [
+            {
+              key: 'coat',
+              label: t(item.coating ? 'remove-coating' : 'apply-poison'),
+              icon: <ScienceIcon fontSize="small" />,
+              onClick: open('coat'),
+            },
+          ]
+        : []),
       { key: 'modifiers', label: t('item-modifiers'), icon: <TuneIcon fontSize="small" />, onClick: open('modifiers') },
       { key: 'history', label: t('history'), icon: <HistoryIcon fontSize="small" />, onClick: open('history') },
       {
@@ -114,6 +131,7 @@ const HolderInventory: FC<{
       {props && operation?.kind === 'sell' && <SellItemDialog {...props} />}
       {props && operation?.kind === 'transfer' && <TransferItemDialog {...props} />}
       {props && operation?.kind === 'repair' && <RepairItemDialog {...props} />}
+      {props && operation?.kind === 'coat' && <CoatItemDialog {...props} />}
       {props && operation?.kind === 'discard' && <DiscardItemDialog {...props} />}
       {operation?.kind === 'modifiers' && (
         <CharacterItemModifiersDialog
