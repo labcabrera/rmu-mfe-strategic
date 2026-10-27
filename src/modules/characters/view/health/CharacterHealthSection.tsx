@@ -43,6 +43,9 @@ const toHealer = (character: Character): HealerCandidate => ({
   name: character.name,
   medicine: skillBonus(character, MEDICINE_SKILL) ?? UNRANKED_SKILL_BONUS,
   herbalism: skillBonus(character, HERBALISM_SKILL) ?? UNRANKED_SKILL_BONUS,
+  imageUrl: character.imageUrl,
+  factionId: character.faction?.id,
+  factionName: character.faction?.name,
 });
 
 /**

@@ -1,8 +1,11 @@
 import React, { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { Alert, Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import WarehouseIcon from '@mui/icons-material/Warehouse';
+import { Alert, Button, Stack, Typography } from '@mui/material';
 import {
+  CharacterPicker,
+  characterOption,
   ConfirmDialog,
   discardItem,
   ItemConditionChip,
@@ -174,13 +177,22 @@ export const TransferItemDialog: FC<DialogProps> = ({ item, view, onClose, onDon
       }
     >
       <Stack spacing={2} sx={{ pt: 1 }}>
-        <TextField select fullWidth label={t('transfer-to')} value={target} onChange={(e) => setTarget(e.target.value)}>
-          {targets.map((option) => (
-            <MenuItem key={option.key} value={option.key}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </TextField>
+        <CharacterPicker
+          label={t('transfer-to')}
+          options={targets
+            .filter((option) => option.holder.kind === 'character')
+            .map((option) => {
+              const member = view.members.find((each) => each.id === option.holder.id)!;
+              return characterOption(member, { id: option.key });
+            })}
+          extraOptions={targets
+            .filter((option) => option.holder.kind === 'faction')
+            .map((option) => ({ id: option.key, name: option.label, icon: <WarehouseIcon /> }))}
+          relation="friends"
+          factionId={view.faction?.id}
+          value={target}
+          onChange={(key) => key && setTarget(key)}
+        />
         <AmountField item={item} value={amount} onChange={setAmount} />
       </Stack>
     </RmuDialog>
@@ -286,23 +298,19 @@ export const RepairItemDialog: FC<DialogProps> = ({ item, view, onClose, onDone 
           </Typography>
           <ItemConditionChip condition={item.condition} />
         </Stack>
-        <TextField
-          select
-          fullWidth
+        <CharacterPicker
           label={t('craftsman')}
+          options={craftsmen.map((member) => characterOption(member))}
+          relation="friends"
+          factionId={view.faction?.id}
           value={actorId}
-          onChange={(event) => {
-            setActorId(event.target.value);
-            const next = craftsmen.find((member) => member.id === event.target.value);
+          onChange={(id) => {
+            if (!id) return;
+            setActorId(id);
+            const next = craftsmen.find((member) => member.id === id);
             setManeuver({ ...maneuver, skillKey: defaultSkillKey(next, CRAFT_SKILLS) });
           }}
-        >
-          {craftsmen.map((member) => (
-            <MenuItem key={member.id} value={member.id}>
-              {member.name}
-            </MenuItem>
-          ))}
-        </TextField>
+        />
         <ManeuverFields
           character={actor}
           value={maneuver}
