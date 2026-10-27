@@ -49,6 +49,8 @@ const TABS: MarketTab[] = ['buy', 'sell', 'history'];
 
 type CartLine = { item: Item; amount: number };
 const PAYER_MODES: PayerMode[] = ['holder', 'faction', 'split'];
+/** Items of a type that does not stack one purchase creates (strategic, spec 041). */
+const MAX_ITEMS_PER_PURCHASE = 100;
 
 /**
  * The market of a character or a faction (spec 023, decision 14): buy from the catalog with a cart and a price
@@ -102,12 +104,15 @@ const MarketBuy: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDone 
   const catalog = useCatalog();
   const [cart, setCart] = useState<CartLine[]>([]);
 
-  const add = (item: Item) =>
+  // Spec 041: what the book sells in lots (20 arrows) goes in by lots
+  const add = (item: Item) => {
+    const lot = item.info.lotSize && item.info.lotSize > 1 ? item.info.lotSize : 1;
     setCart((lines) =>
       lines.some((line) => line.item.id === item.id)
-        ? lines.map((line) => (line.item.id === item.id ? { ...line, amount: line.amount + 1 } : line))
-        : [...lines, { item, amount: 1 }]
+        ? lines.map((line) => (line.item.id === item.id ? { ...line, amount: line.amount + lot } : line))
+        : [...lines, { item, amount: lot }]
     );
+  };
 
   return (
     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 360px' }, gap: 2, alignItems: 'start' }}>
@@ -214,12 +219,18 @@ const MarketCart: FC<{
               ) : (
                 <Typography variant="caption">…</Typography>
               )}
+              {!line.item.info.stackable && line.amount > 1 && (
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                  {t('cart-separate-units', { count: line.amount })}
+                </Typography>
+              )}
             </Box>
             <Box sx={{ width: 72 }}>
               <NumericInput
                 label={t('amount')}
                 value={line.amount}
                 min={1}
+                max={line.item.info.stackable ? undefined : MAX_ITEMS_PER_PURCHASE}
                 integer
                 onChange={(amount) =>
                   setCart((lines) =>

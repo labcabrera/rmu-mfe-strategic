@@ -125,7 +125,7 @@ const HolderInventory: FC<{
       )}
       {operation?.kind === 'history' && (
         <RmuDialog open maxWidth="md" title={t('item-history', { name: operation.item.name })} onClose={close}>
-          <ItemLedgerList rsql={`itemId==${operation.item.id}`} names={holderNames(view)} />
+          <ItemLedgerList rsql={`itemIds==${operation.item.id}`} names={holderNames(view)} />
         </RmuDialog>
       )}
     </>
