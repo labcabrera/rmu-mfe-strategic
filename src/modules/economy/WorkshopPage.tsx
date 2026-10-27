@@ -23,6 +23,8 @@ import {
   Typography,
 } from '@mui/material';
 import {
+  CharacterPicker,
+  characterOption,
   craftItem,
   CraftingEnhancement,
   EconomyRules,
@@ -229,23 +231,19 @@ const CraftWizard: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDon
         <Paper variant="outlined" sx={{ p: 2 }}>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                select
-                fullWidth
+              <CharacterPicker
                 label={t('craftsman')}
+                options={craftsmen.map((member) => characterOption(member))}
+                relation="friends"
+                factionId={view.faction?.id}
                 value={actorId}
-                onChange={(event) => {
-                  setActorId(event.target.value);
-                  const next = craftsmen.find((member) => member.id === event.target.value);
+                onChange={(id) => {
+                  if (!id) return;
+                  setActorId(id);
+                  const next = craftsmen.find((member) => member.id === id);
                   setManeuver({ ...maneuver, skillKey: defaultSkillKey(next, CRAFT_SKILLS) });
                 }}
-              >
-                {craftsmen.map((member) => (
-                  <MenuItem key={member.id} value={member.id}>
-                    {member.name}
-                  </MenuItem>
-                ))}
-              </TextField>
+              />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
