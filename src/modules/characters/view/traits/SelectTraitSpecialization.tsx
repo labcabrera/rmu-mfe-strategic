@@ -1,8 +1,11 @@
 import React, { useState, useEffect, FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
+import { TextField } from '@mui/material';
 import {
   fetchEnumerations,
+  fetchRaces,
+  fetchSkillCategories,
   fetchSkills,
   LoadingState,
   REALM_TYPES,
@@ -24,14 +27,25 @@ const filterCombatSkills = (skills: Skill[], specialization: string): Skill[] =>
   return skills;
 };
 
+/** Free text specialization (life goal, phobia, vow...) of the Character Companion traits (spec 039). */
+const TEXT_SPECIALIZATION = 'text';
+
 /**
  * Values a trait specialization can take: the stat keys for `stat`, the realms for `realm`, the skills of the core
- * catalog for the skill kinds (only the combat-training ones for the combat kinds), and the enumerations of the
- * category for the rest (weapon types, senses, languages...).
+ * catalog for the skill kinds (only the combat-training ones for the combat kinds), the skill categories, the race
+ * names, and the enumerations of the category for the rest (weapon types, senses, languages...).
  */
 const loadSpecializations = async (specialization: string, auth: ReturnType<typeof useAuth>): Promise<string[]> => {
   if (specialization === 'stat') return [...STATS];
   if (specialization === 'realm') return [...REALM_TYPES];
+  if (specialization === 'skill-category') {
+    const response = await fetchSkillCategories('', 0, 100, auth);
+    return response.content.map((category) => category.id);
+  }
+  if (specialization === 'race') {
+    const response = await fetchRaces('', 0, 100, auth);
+    return response.content.map((race) => race.name);
+  }
   if (SKILL_SPECIALIZATIONS.includes(specialization)) {
     const rsql = specialization === 'skill' ? '' : `categoryId==${COMBAT_SKILL_CATEGORY}`;
     const response = await fetchSkills(rsql, 0, 500, auth);
@@ -52,7 +66,7 @@ const SelectTraitSpecialization: FC<{
   const [availableSpecializations, setAvailableSpecializations] = useState<string[]>();
 
   useEffect(() => {
-    if (!trait?.specialization) return;
+    if (!trait?.specialization || trait.specialization === TEXT_SPECIALIZATION) return;
     setAvailableSpecializations(undefined);
     loadSpecializations(trait.specialization, auth)
       .then((options) => setAvailableSpecializations(options))
@@ -60,6 +74,12 @@ const SelectTraitSpecialization: FC<{
   }, [trait?.specialization]);
 
   if (!trait) return null;
+
+  if (trait.specialization === TEXT_SPECIALIZATION) {
+    return (
+      <TextField label={t('specialization')} value={value || ''} onChange={(e) => onChange(e.target.value)} fullWidth />
+    );
+  }
 
   if (!availableSpecializations) return <LoadingState />;
 
