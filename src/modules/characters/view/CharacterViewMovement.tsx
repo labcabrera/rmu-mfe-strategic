@@ -5,15 +5,11 @@ import {
   CategorySeparator,
   Character,
   gridSizeCard,
-  imageBaseUrl,
   LoadingState,
   Pace,
-  RmuTextCard,
+  EntityCard,
   StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-
-/** Grayscale applied to the pace cards that are not available. */
-const greyScale = 0.7;
 
 interface TableItem {
   pace: Pace;
@@ -100,27 +96,16 @@ const CharacterViewMovement: FC<{
       <CategorySeparator text={t('movement')} />
       <Grid container spacing={1}>
         <Grid size={gridSizeCard}>
-          <RmuTextCard
-            value={bmr}
-            subtitle={t('base-movement-rate')}
-            image={`${imageBaseUrl}images/generic/stride-bonus.png`}
-            grayscale={greyScale}
-          />
+          <EntityCard title={`${bmr}`} subtitle={t('base-movement-rate')} imageRatio="none" />
         </Grid>
         <Grid size={gridSizeCard}>
-          <RmuTextCard
-            value={t(character.movement.maxPace)}
-            subtitle={t('max-pace')}
-            image={`${imageBaseUrl}images/generic/stride-bonus.png`}
-            grayscale={greyScale}
-          />
+          <EntityCard title={`${t(character.movement.maxPace)}`} subtitle={t('max-pace')} imageRatio="none" />
         </Grid>
         <Grid size={gridSizeCard}>
-          <RmuTextCard
-            value={t(`difficulty-${character.equipment.movementBaseDifficulty || '-'}`)}
+          <EntityCard
+            title={`${t(`difficulty-${character.equipment.movementBaseDifficulty || '-'}`)}`}
             subtitle={t('base-difficulty')}
-            image={`${imageBaseUrl}images/generic/stride-bonus.png`}
-            grayscale={greyScale}
+            imageRatio="none"
           />
         </Grid>
       </Grid>
@@ -129,24 +114,14 @@ const CharacterViewMovement: FC<{
         {character.movement?.modifiers &&
           Object.entries(character.movement.modifiers).map(([key, value]) => (
             <Grid key={key} size={gridSizeCard}>
-              <RmuTextCard
-                value={value}
-                subtitle={t(key)}
-                image={`${imageBaseUrl}images/generic/stride-bonus.png`}
-                grayscale={greyScale}
-              />
+              <EntityCard title={`${value}`} subtitle={t(key)} imageRatio="none" />
             </Grid>
           ))}
       </Grid>
       <CategorySeparator text={t('board-scale')} />
       <Grid container spacing={1}>
         <Grid size={gridSizeCard}>
-          <RmuTextCard
-            value={scale}
-            subtitle={t('board-scale')}
-            image={`${imageBaseUrl}images/generic/stride-bonus.png`}
-            grayscale={greyScale}
-          />
+          <EntityCard title={`${scale}`} subtitle={t('board-scale')} imageRatio="none" />
         </Grid>
       </Grid>
       <CategorySeparator text={t('speed-table')} />

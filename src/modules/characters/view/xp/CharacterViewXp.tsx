@@ -6,18 +6,16 @@ import {
   AddButton,
   addCharacterXP,
   Character,
-  imageBaseUrl,
   LoadingState,
   NumericInput,
   RmuDialog,
-  RmuTextCard,
+  EntityCard,
   Section,
   StrategicGame,
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { resolvePowerLevel } from '../../../services/game-rules';
 
-const grayscale = 0.7;
 const gridSizeCard = { xs: 10, sm: 5, md: 5, lg: 3, xl: 2 } as const;
 const numberFormat = new Intl.NumberFormat('en-US');
 
@@ -90,12 +88,7 @@ const CharacterViewExperience: FC<{
       <Section title={t('experience')} actions={<AddButton onClick={() => setOpenAddXpDialog(true)} />}>
         <Grid container spacing={1} columns={10}>
           <Grid size={gridSizeCard}>
-            <RmuTextCard
-              value={character.experience.availableLevel}
-              subtitle={t('level')}
-              image={`${imageBaseUrl}images/generic/experience.png`}
-              grayscale={grayscale}
-            />
+            <EntityCard title={`${character.experience.availableLevel}`} subtitle={t('level')} imageRatio="none" />
           </Grid>
           <Grid size={gridSizeCard}>
             <Badge
@@ -104,20 +97,14 @@ const CharacterViewExperience: FC<{
               invisible={character.experience.availableLevel <= character.experience.level}
               sx={{ display: 'block' }}
             >
-              <RmuTextCard
-                value={character.experience.level}
-                subtitle={t('current-level')}
-                image={`${imageBaseUrl}images/generic/experience.png`}
-                grayscale={grayscale}
-              />
+              <EntityCard title={`${character.experience.level}`} subtitle={t('current-level')} imageRatio="none" />
             </Badge>
           </Grid>
           <Grid size={gridSizeCard}>
-            <RmuTextCard
-              value={numberFormat.format(character.experience.xp)}
+            <EntityCard
+              title={`${numberFormat.format(character.experience.xp)}`}
               subtitle={t('xp')}
-              image={`${imageBaseUrl}images/generic/experience.png`}
-              grayscale={grayscale}
+              imageRatio="none"
             />
           </Grid>
           <Grid size={gridSizeCard}>
@@ -127,37 +114,33 @@ const CharacterViewExperience: FC<{
               invisible={character.experience.availableDevPoints < 1}
               sx={{ display: 'block' }}
             >
-              <RmuTextCard
-                value={`${character.experience.availableDevPoints} / ${character.experience.devPoints}`}
+              <EntityCard
+                title={`${`${character.experience.availableDevPoints} / ${character.experience.devPoints}`}`}
                 subtitle={t('dev-points')}
-                image={`${imageBaseUrl}images/generic/trait-combat.png`}
-                grayscale={grayscale}
+                imageRatio="none"
               />
             </Badge>
           </Grid>
           <Grid size={gridSizeCard}>
-            <RmuTextCard
-              value={character.experience.availableBonusDevPoints ?? 0}
+            <EntityCard
+              title={`${character.experience.availableBonusDevPoints ?? 0}`}
               subtitle={t('bonus-dev-points')}
-              image={`${imageBaseUrl}images/generic/dev-points.png`}
-              grayscale={grayscale}
+              imageRatio="none"
             />
           </Grid>
           <Grid size={gridSizeCard}>
-            <RmuTextCard
-              value={`${character.experience.bonusDevPointsSpentThisLevel ?? 0} / ${bonusDevPointsPerLevel}`}
+            <EntityCard
+              title={`${`${character.experience.bonusDevPointsSpentThisLevel ?? 0} / ${bonusDevPointsPerLevel}`}`}
               subtitle={t('bonus-dev-points-spent-this-level')}
-              image={`${imageBaseUrl}images/generic/dev-points.png`}
-              grayscale={grayscale}
+              imageRatio="none"
             />
           </Grid>
           {(character.experience.flawDevPoints ?? 0) > 0 && (
             <Grid size={gridSizeCard}>
-              <RmuTextCard
-                value={character.experience.flawDevPoints}
+              <EntityCard
+                title={`${character.experience.flawDevPoints}`}
                 subtitle={t('flaw-dev-points')}
-                image={`${imageBaseUrl}images/generic/trait.png`}
-                grayscale={grayscale}
+                imageRatio="none"
               />
             </Grid>
           )}

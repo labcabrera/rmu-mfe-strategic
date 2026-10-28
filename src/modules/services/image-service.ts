@@ -6,4 +6,3 @@ export const defaultImage = `${imageBaseUrl}images/generic/configuration.png`;
 // Relative to RMU_MFE_ASSETS_URI (EntityCard resolves them).
 export const DEFAULT_GAME_IMAGE_PATH = 'images/generic/strategic.png';
 export const DEFAULT_FACTION_IMAGE_PATH = 'images/generic/faction.png';
-export const DEFAULT_CHARACTER_IMAGE_PATH = 'images/generic/races.png';

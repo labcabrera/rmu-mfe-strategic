@@ -7,9 +7,9 @@ import {
   fetchRaces,
   fetchSkillCategories,
   fetchSkills,
+  EnumPicker,
   LoadingState,
   REALM_TYPES,
-  RmuSelect,
   Skill,
   STATS,
   Trait,
@@ -55,7 +55,7 @@ const loadSpecializations = async (specialization: string, auth: ReturnType<type
   return response.content.map((e) => e.key);
 };
 
-const SelectTraitSpecialization: FC<{
+const TraitSpecializationPicker: FC<{
   value: any;
   trait: Trait;
   onChange: (value: string) => void;
@@ -84,13 +84,13 @@ const SelectTraitSpecialization: FC<{
   if (!availableSpecializations) return <LoadingState />;
 
   return (
-    <RmuSelect
+    <EnumPicker
       label={t('specialization')}
-      value={value}
-      options={availableSpecializations}
-      onChange={(e) => onChange(e)}
+      value={value || null}
+      values={availableSpecializations}
+      onChange={(specialization) => specialization && onChange(specialization)}
     />
   );
 };
 
-export default SelectTraitSpecialization;
+export default TraitSpecializationPicker;

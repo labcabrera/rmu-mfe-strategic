@@ -48,7 +48,7 @@ import { resolvePowerLevel } from '../../../services/game-rules';
 import { useStrategicNotify } from '../../../services/notify-service';
 import { toRoman } from '../../../services/roman-number-service';
 import TalentPolicyChip from '../../../shared/chips/TalentPolicyChip';
-import SelectTraitSpecialization from './SelectTraitSpecialization';
+import TraitSpecializationPicker from './TraitSpecializationPicker';
 import {
   evaluateTraitPurchase,
   evaluateTraitRow,
@@ -501,7 +501,7 @@ const TraitDetail: FC<{
         {trait.description || t('no-description')}
       </Typography>
       {trait.specialization && (
-        <SelectTraitSpecialization value={specialization ?? ''} trait={trait} onChange={setSpecialization} />
+        <TraitSpecializationPicker value={specialization ?? ''} trait={trait} onChange={setSpecialization} />
       )}
       {trait.isTierBased && (
         <Box>

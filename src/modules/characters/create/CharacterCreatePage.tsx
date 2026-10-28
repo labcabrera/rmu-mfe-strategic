@@ -42,7 +42,7 @@ import { resolveOptions, resolvePowerLevel } from '../../services/game-rules';
 import { useStrategicNotify } from '../../services/notify-service';
 import { CreationStats, randomizePointBuyStats, randomizeStats } from '../../services/randomize-stats';
 import { safeStatBonus } from '../../services/stat-service';
-import StrategicGamePicker from '../../shared/StrategicGamePicker';
+import StrategicGameRequired from '../../shared/StrategicGameRequired';
 import CharacterViewStatsChart from '../view/stats/CharacterViewStatsChart';
 import CharacterCreateBoostOptionsDialog, {
   initialStatCreationBudget,
@@ -327,7 +327,7 @@ export default function CharacterCreatePage() {
 
   if (!gameId)
     return (
-      <StrategicGamePicker
+      <StrategicGameRequired
         breadcrumbs={breadcrumbs}
         message={t('select-campaign-to-continue')}
         onCancel={() => navigate('/strategic/characters')}

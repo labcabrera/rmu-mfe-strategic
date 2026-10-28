@@ -1,12 +1,13 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { Grid, MenuItem, TextField } from '@mui/material';
+import { Grid, TextField } from '@mui/material';
 import {
   addCharacterInjury,
   BodyLocation,
   BodySide,
   Character,
+  EnumPicker,
   Injury,
   InjurySeverity,
   InjuryStatus,
@@ -45,22 +46,6 @@ const initialState = (injury?: Injury): FormState => ({
   description: injury?.description ?? '',
   status: injury?.status ?? 'active',
 });
-
-const SelectField: FC<{
-  label: string;
-  value: string;
-  options: string[];
-  render: (option: string) => string;
-  onChange: (value: string) => void;
-}> = ({ label, value, options, render, onChange }) => (
-  <TextField select fullWidth label={label} value={value} onChange={(event) => onChange(event.target.value)}>
-    {options.map((option) => (
-      <MenuItem key={option || 'none'} value={option}>
-        {render(option)}
-      </MenuItem>
-    ))}
-  </TextField>
-);
 
 /** Adds a manual injury (game master) or edits one: type, severity, location, side, penalty, description, status. */
 const InjuryFormDialog: FC<{
@@ -124,9 +109,10 @@ const InjuryFormDialog: FC<{
       .finally(() => setSaving(false));
   };
 
+  // An empty value ('', "automatic" or "none") is the "all" option of the picker, which reports null.
   const field = <K extends keyof FormState>(key: K) => ({
-    value: form[key] as string,
-    onChange: (value: string) => set(key, value as FormState[K]),
+    value: (form[key] as string) || null,
+    onChange: (value: string | null) => set(key, (value ?? '') as FormState[K]),
   });
 
   const fields = {
@@ -149,29 +135,28 @@ const InjuryFormDialog: FC<{
     >
       <Grid container spacing={2} sx={{ pt: 1 }}>
         <Grid size={{ xs: 12, sm: 6 }}>
-          <SelectField label={t('type')} options={TYPES} render={(o) => t(`injury-type-${o}`)} {...fields.type} />
+          <EnumPicker label={t('type')} values={TYPES} labelPrefix="injury-type-" required {...fields.type} />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
-          <SelectField
+          <EnumPicker
             label={t('injury-severity')}
-            options={['', ...SEVERITIES]}
-            render={(o) => (o ? t(`injury-severity-${o}`) : t('injury-severity-auto'))}
+            values={SEVERITIES}
+            labelPrefix="injury-severity-"
+            allowAll
+            allLabel={t('injury-severity-auto')}
             {...fields.severity}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
-          <SelectField
-            label={t('location')}
-            options={['', ...LOCATIONS]}
-            render={(o) => (o ? t(o) : t('none'))}
-            {...fields.location}
-          />
+          <EnumPicker label={t('location')} values={LOCATIONS} allowAll allLabel={t('none')} {...fields.location} />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
-          <SelectField
+          <EnumPicker
             label={t('body-side')}
-            options={['', ...SIDES]}
-            render={(o) => (o ? t(`side-${o}`) : t('none'))}
+            values={SIDES}
+            labelPrefix="side-"
+            allowAll
+            allLabel={t('none')}
             {...fields.side}
           />
         </Grid>
@@ -186,10 +171,11 @@ const InjuryFormDialog: FC<{
         </Grid>
         {injury ? (
           <Grid size={{ xs: 12, sm: 6 }}>
-            <SelectField
+            <EnumPicker
               label={t('status')}
-              options={STATUSES}
-              render={(o) => t(`injury-status-${o}`)}
+              values={STATUSES}
+              labelPrefix="injury-status-"
+              required
               {...fields.status}
             />
           </Grid>
