@@ -18,6 +18,10 @@ const ItemLedgerOutcome: FC<{ entry: ItemLedgerEntry; item: StrategicItem | null
   const { t } = useTranslation();
   const bad = !!entry.outcome && BAD_OUTCOMES.includes(entry.outcome);
   const paid = entry.payments.reduce((sum, payment) => sum + payment.gold, 0);
+  // Spec 043: how the item was made
+  const crafting = entry.details?.crafting as
+    | { materialId?: string | null; masterwork?: string | null; masterworkAchieved?: boolean; workshop?: string }
+    | undefined;
   return (
     <Stack spacing={2} sx={{ pt: 1 }}>
       {entry.outcome && <Alert severity={bad ? 'error' : 'success'}>{t(`ledger-outcome-${entry.outcome}`)}</Alert>}
@@ -29,6 +33,23 @@ const ItemLedgerOutcome: FC<{ entry: ItemLedgerEntry; item: StrategicItem | null
           <Chip size="small" label={`${t('total')}: ${entry.maneuver.total}`} />
           {entry.maneuver.result && <Chip size="small" label={t(entry.maneuver.result)} />}
           {entry.maneuver.unusualEvent && <Chip size="small" color="warning" label={t('unusual-event')} />}
+        </Stack>
+      )}
+      {crafting && (
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
+          {crafting.materialId && (
+            <Chip size="small" variant="outlined" label={t(`material-${crafting.materialId}`, crafting.materialId)} />
+          )}
+          {crafting.masterwork && (
+            <Chip
+              size="small"
+              color={crafting.masterworkAchieved ? 'success' : 'default'}
+              label={t(crafting.masterworkAchieved ? 'masterwork-achieved' : 'masterwork-missed')}
+            />
+          )}
+          {crafting.workshop && crafting.workshop !== 'basic' && (
+            <Chip size="small" variant="outlined" label={t(`workshop-quality-${crafting.workshop}`)} />
+          )}
         </Stack>
       )}
       {entry.note && (
