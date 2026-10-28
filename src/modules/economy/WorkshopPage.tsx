@@ -37,6 +37,8 @@ import {
   EconomyRules,
   fetchEconomyRules,
   Item,
+  ItemCatalogBrowser,
+  itemCatalogFilters,
   ItemInventory,
   ItemOperationResult,
   ItemThumb,
@@ -46,9 +48,10 @@ import {
   roundGold,
   STRATEGIC_ITEM_MODIFIER_TARGETS,
   StrategicItem,
+  useItemCatalog,
+  useListFilters,
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import CatalogBrowser, { useCatalog } from './CatalogBrowser';
 import CraftQualityStep from './CraftQualityStep';
 import EconomyLayout from './EconomyLayout';
 import { isRepairable } from './HolderInventory';
@@ -61,7 +64,7 @@ import ManeuverFields, {
   ManeuverValue,
   toManeuverDto,
 } from './ManeuverFields';
-import { HolderView, useHolder } from './use-holder';
+import { GOLD_COIN, HolderView, useHolder } from './use-holder';
 
 type WorkshopTab = 'craft' | 'repair';
 const TABS: WorkshopTab[] = ['craft', 'repair'];
@@ -113,7 +116,8 @@ const CraftWizard: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDon
   const auth = useAuth();
   const { t } = useTranslation();
   const notify = useNotify();
-  const catalog = useCatalog();
+  const filters = useListFilters<Item>(itemCatalogFilters(t));
+  const catalog = useItemCatalog({ exclude: [GOLD_COIN] });
   const [rules, setRules] = useState<EconomyRules>();
   const [step, setStep] = useState(0);
   const [itemType, setItemType] = useState<Item>();
@@ -276,8 +280,14 @@ const CraftWizard: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDon
       )}
 
       {step === 0 && (
-        <CatalogBrowser
-          catalog={catalog}
+        <ItemCatalogBrowser
+          items={catalog.items}
+          filters={filters}
+          layout="drawer"
+          truncated={catalog.truncated}
+          error={catalog.error}
+          refresh={catalog.refresh}
+          storageKey="strategic.workshop"
           selectedId={itemType?.id}
           onSelect={(item) => {
             setItemType(item);
@@ -285,13 +295,14 @@ const CraftWizard: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDon
             setPlan(undefined);
             setStep(1);
           }}
-          extra={(item) => (
-            <Stack sx={{ alignItems: 'center' }}>
+          price={(item) => (
+            <Stack component="span">
               <MoneyDisplay
                 gold={roundGold(((item.info.cost?.average ?? 0) * (rules?.materialsPercent ?? 50)) / 100)}
+                variant="subtitle2"
               />
               {item.info.productionHours !== null && (
-                <Typography variant="caption" color="text.secondary">
+                <Typography component="span" variant="caption" color="text.secondary">
                   {t('production-hours-value', { hours: item.info.productionHours })}
                 </Typography>
               )}

@@ -5,23 +5,13 @@ import { useAuth } from 'react-oidc-context';
 import { useParams, useSearchParams } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import {
-  Alert,
-  Box,
-  Button,
-  Divider,
-  IconButton,
-  MenuItem,
-  Paper,
-  Stack,
-  Tab,
-  Tabs,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Alert, Box, Button, Divider, IconButton, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import {
   EmptyState,
+  EnumPicker,
   Item,
+  ItemCatalogBrowser,
+  itemCatalogFilters,
   ItemInventory,
   ItemThumb,
   MoneyDisplay,
@@ -34,9 +24,10 @@ import {
   roundGold,
   StrategicItem,
   TradingRequest,
+  useItemCatalog,
+  useListFilters,
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import CatalogBrowser, { useCatalog } from './CatalogBrowser';
 import EconomyLayout from './EconomyLayout';
 import { holderNames } from './HolderInventory';
 import ItemLedgerList from './ItemLedgerList';
@@ -100,8 +91,13 @@ export default function MarketPage() {
   );
 }
 
+/** Cards of the catalog next to the cart: two per row up to `lg`. */
+const MARKET_CARD_SIZE = { xs: 6, sm: 4, md: 6, lg: 4, xl: 3 };
+
 const MarketBuy: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDone }) => {
-  const catalog = useCatalog();
+  const { t } = useTranslation();
+  const filters = useListFilters<Item>(itemCatalogFilters(t));
+  const { items, error, truncated, refresh } = useItemCatalog({ exclude: [GOLD_COIN] });
   const [cart, setCart] = useState<CartLine[]>([]);
 
   // Spec 041: what the book sells in lots (20 arrows) goes in by lots
@@ -116,7 +112,17 @@ const MarketBuy: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDone 
 
   return (
     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 360px' }, gap: 2, alignItems: 'start' }}>
-      <CatalogBrowser catalog={catalog} onSelect={add} />
+      <ItemCatalogBrowser
+        items={items}
+        filters={filters}
+        layout="drawer"
+        onSelect={add}
+        cardSize={MARKET_CARD_SIZE}
+        truncated={truncated}
+        error={error}
+        refresh={refresh}
+        storageKey="strategic.market"
+      />
       <Box sx={{ position: { md: 'sticky' }, top: { md: 16 } }}>
         <MarketCart view={view} cart={cart} setCart={setCart} onDone={onDone} />
       </Box>
@@ -252,19 +258,14 @@ const MarketCart: FC<{
           <>
             <Divider />
             {isCharacter && (
-              <TextField
-                select
-                size="small"
+              <EnumPicker
                 label={t('payer')}
+                values={PAYER_MODES}
+                labelPrefix="payer-"
                 value={payer}
-                onChange={(e) => setPayer(e.target.value as PayerMode)}
-              >
-                {PAYER_MODES.map((mode) => (
-                  <MenuItem key={mode} value={mode}>
-                    {t(`payer-${mode}`)}
-                  </MenuItem>
-                ))}
-              </TextField>
+                onChange={(mode) => mode && setPayer(mode as PayerMode)}
+                required
+              />
             )}
             {isCharacter && payer !== 'holder' && (
               <Typography variant="caption" color="text.secondary">
