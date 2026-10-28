@@ -27,6 +27,13 @@ import {
   characterOption,
   craftItem,
   CraftingEnhancement,
+  CraftingPlan,
+  CraftingQualityDto,
+  craftKind,
+  fetchMaterials,
+  isBluntWeapon,
+  Material,
+  quoteCraft,
   EconomyRules,
   fetchEconomyRules,
   Item,
@@ -42,6 +49,7 @@ import {
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import CatalogBrowser, { useCatalog } from './CatalogBrowser';
+import CraftQualityStep from './CraftQualityStep';
 import EconomyLayout from './EconomyLayout';
 import { isRepairable } from './HolderInventory';
 import ItemLedgerOutcome from './ItemLedgerOutcome';
@@ -90,7 +98,16 @@ export default function WorkshopPage() {
 }
 
 type PayerOption = 'recipient' | 'faction' | 'free';
-const STEPS = ['craft-step-type', 'craft-step-craftsman', 'craft-step-enhancements', 'craft-step-roll'];
+const STEPS = [
+  'craft-step-type',
+  'craft-step-craftsman',
+  'craft-step-quality',
+  'craft-step-enhancements',
+  'craft-step-roll',
+];
+
+/** Quote the plan once the inputs stop changing. */
+const QUOTE_DELAY_MS = 300;
 
 const CraftWizard: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDone }) => {
   const auth = useAuth();
@@ -112,10 +129,53 @@ const CraftWizard: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDon
   const [enhancements, setEnhancements] = useState<CraftingEnhancement[]>([]);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<ItemOperationResult>();
+  // Spec 043: quality of the craft and the plan the API quotes for it
+  const [quality, setQuality] = useState<CraftingQualityDto>({});
+  const [materialList, setMaterialList] = useState<Material[] | null>(null);
+  const [materialsError, setMaterialsError] = useState(false);
+  const [plan, setPlan] = useState<CraftingPlan>();
+  const [planError, setPlanError] = useState<string>();
+  const kind = itemType ? craftKind(itemType) : 'other';
+  const blunt = itemType ? isBluntWeapon(itemType) : false;
 
   useEffect(() => {
     fetchEconomyRules(auth).then(setRules).catch(notify.error);
+    // Materials are rulebook content: without access the craft goes on without them
+    fetchMaterials(auth)
+      .then(setMaterialList)
+      .catch(() => setMaterialsError(true));
   }, []);
+
+  /** The quality as the API takes it: the blunt switch defaults to the attack table of the weapon. */
+  const qualityDto = useMemo((): CraftingQualityDto | undefined => {
+    const dto: CraftingQualityDto = { ...quality };
+    if (dto.materialId && dto.blunt === undefined && blunt) dto.blunt = true;
+    return Object.keys(dto).length > 0 ? dto : undefined;
+  }, [quality, blunt]);
+
+  useEffect(() => {
+    if (!itemType) return;
+    const timer = setTimeout(() => {
+      quoteCraft(
+        {
+          itemTypeId: itemType.id,
+          ...(itemType.info.stackable && amount ? { amount } : {}),
+          ...(qualityDto ? { quality: qualityDto } : {}),
+          ...(materialsCost !== null ? { materialsCost } : {}),
+          ...(enhancementsCost ? { enhancementsCost } : {}),
+        },
+        auth
+      )
+        .then((quoted) => {
+          setPlan(quoted);
+          setPlanError(undefined);
+        })
+        .catch((e: { code?: string; errorCode?: string; message?: string }) =>
+          setPlanError(e.code ?? e.errorCode ?? e.message ?? 'error')
+        );
+    }, QUOTE_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [itemType, amount, qualityDto, materialsCost, enhancementsCost]);
 
   const materials = useMemo(
     () =>
@@ -123,7 +183,7 @@ const CraftWizard: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDon
       roundGold(((itemType?.info.cost?.average ?? 0) * (amount ?? 1) * (rules?.materialsPercent ?? 50)) / 100),
     [itemType, amount, rules, materialsCost]
   );
-  const cost = roundGold(materials + (enhancementsCost ?? 0));
+  const cost = plan && !planError ? plan.cost.total : roundGold(materials + (enhancementsCost ?? 0));
 
   const reset = () => {
     setResult(undefined);
@@ -133,6 +193,8 @@ const CraftWizard: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDon
     setName('');
     setMaterialsCost(null);
     setEnhancementsCost(null);
+    setQuality({});
+    setPlan(undefined);
     setManeuver({ ...maneuver, roll: null, unmodifiedRoll: undefined });
   };
 
@@ -151,6 +213,7 @@ const CraftWizard: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDon
         ...(enhancements.length > 0 ? { enhancements: enhancements.filter((e) => e.value !== 0) } : {}),
         ...(enhancementsCost ? { enhancementsCost } : {}),
         ...(name.trim() ? { name: name.trim() } : {}),
+        ...(qualityDto ? { quality: qualityDto } : {}),
       },
       auth
     )
@@ -173,7 +236,15 @@ const CraftWizard: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDon
     );
   }
 
-  const canNext = [!!itemType, !!actorId, true, isManeuverReady(actor, maneuver) && !busy][step];
+  const qualityReady = !planError && (quality.masterwork !== 'circumstantial' || !!quality.circumstance?.trim());
+  const canNext = [
+    !!itemType,
+    !!actorId,
+    qualityReady,
+    true,
+    isManeuverReady(actor, maneuver) && !busy && qualityReady,
+  ][step];
+  const automatic = (plan?.modifiers ?? []).reduce((sum, modifier) => sum + modifier.value, 0);
 
   return (
     <Stack spacing={2}>
@@ -194,9 +265,9 @@ const CraftWizard: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDon
                 {t('craft-cost')}
               </Typography>
               <MoneyDisplay gold={payer === 'free' ? 0 : cost} variant="caption" />
-              {itemType.info.productionHours !== null && (
+              {(plan?.productionHours ?? itemType.info.productionHours) !== null && (
                 <Typography variant="caption" color="text.secondary">
-                  {t('production-hours-value', { hours: itemType.info.productionHours })}
+                  {t('production-hours-value', { hours: plan?.productionHours ?? itemType.info.productionHours })}
                 </Typography>
               )}
             </Stack>
@@ -210,6 +281,8 @@ const CraftWizard: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDon
           selectedId={itemType?.id}
           onSelect={(item) => {
             setItemType(item);
+            setQuality({});
+            setPlan(undefined);
             setStep(1);
           }}
           extra={(item) => (
@@ -269,7 +342,21 @@ const CraftWizard: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDon
         </Paper>
       )}
 
-      {step === 2 && (
+      {step === 2 && itemType && (
+        <CraftQualityStep
+          kind={kind}
+          blunt={blunt}
+          materials={materialList}
+          materialsError={materialsError}
+          value={quality}
+          onChange={setQuality}
+          plan={plan}
+          planError={planError}
+          free={payer === 'free'}
+        />
+      )}
+
+      {step === 3 && (
         <Paper variant="outlined" sx={{ p: 2 }}>
           <Stack spacing={2}>
             <Grid container spacing={2}>
@@ -290,7 +377,7 @@ const CraftWizard: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDon
               <Grid size={{ xs: 6, sm: 3 }}>
                 <NumericInput
                   label={t('craft-materials-cost')}
-                  placeholder={`${materials}`}
+                  placeholder={`${plan && !planError && !plan.cost.asked ? plan.cost.materials : materials}`}
                   value={materialsCost}
                   onChange={setMaterialsCost}
                   min={0}
@@ -381,7 +468,7 @@ const CraftWizard: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDon
         </Paper>
       )}
 
-      {step === 3 && (
+      {step === 4 && (
         <Paper variant="outlined" sx={{ p: 2 }}>
           <Stack spacing={2}>
             <Typography variant="body2" color="text.secondary">
@@ -393,6 +480,7 @@ const CraftWizard: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDon
               onChange={setManeuver}
               preferred={CRAFT_SKILLS}
               showDifficulty
+              extra={{ label: t('craft-quality-modifiers'), value: automatic }}
             />
           </Stack>
         </Paper>
