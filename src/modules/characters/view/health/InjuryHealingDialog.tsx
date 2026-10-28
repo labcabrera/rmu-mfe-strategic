@@ -20,6 +20,7 @@ import {
 } from '@mui/material';
 import {
   Character,
+  DifficultyPicker,
   fetchCharacterTreatmentDifficulty,
   formatBonus,
   HealerCandidate,
@@ -27,6 +28,7 @@ import {
   HealerSelection,
   InjuryCard,
   KeyValue,
+  MANEUVER_DIFFICULTIES,
   OPEN_D100,
   resolveHealer,
   RmuDialog,
@@ -35,7 +37,6 @@ import {
   rollCharacterInjuryRecovery,
   RollField,
   RollModifier,
-  SelectDifficulty,
   treatCharacterInjury,
   TreatInjuryDto,
   TreatmentDifficulty,
@@ -357,10 +358,9 @@ const InjuryHealingDialog: FC<{
         {!isMagic && (
           <>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <SelectDifficulty
-                label={t('difficulty')}
+              <DifficultyPicker
                 value={selectedGrade}
-                onChange={(value) => setOverride(value)}
+                onChange={(key) => setOverride(MANEUVER_DIFFICULTIES.find((option) => option.key === key))}
               />
               <Typography variant="caption" color="text.secondary" component="div">
                 {difficultyCaption}

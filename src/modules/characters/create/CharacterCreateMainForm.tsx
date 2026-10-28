@@ -6,14 +6,15 @@ import {
   LoadingState,
   NumericInput,
   Profession,
+  ProfessionPicker,
   Race,
+  RacePicker,
+  RealmTypePicker,
+  REALM_TYPES,
   STATS,
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import NameTextField from '../../shared/inputs/NameTextField';
-import SelectProfession from '../../shared/selects/SelectProfession';
-import SelectRace from '../../shared/selects/SelectRace';
-import SelectRealmType from '../../shared/selects/SelectRealmType';
 
 const gridFormSize = { xs: 12, sm: 12, md: 6, lg: 6, xl: 4 };
 
@@ -54,13 +55,17 @@ const CharacterCreateMainForm: FC<{
     }));
   };
 
-  const onProfessionChange = (professionId: string, profession: Profession) => {
+  const onProfessionChange = (professionId: string, profession: Profession | undefined) => {
     // The fixed realms of a spellcaster (two for a hybrid), or the realm chosen if the new profession allows it
     const current = formData.info.realmTypes ?? [];
     const fixed: string[] = profession?.fixedRealmTypes ?? [];
     const available: string[] = profession?.availableRealmTypes ?? [];
     const realmTypes =
-      fixed.length > 0 ? fixed : current.length === 1 && (available.length === 0 || available.includes(current[0])) ? current : [];
+      fixed.length > 0
+        ? fixed
+        : current.length === 1 && (available.length === 0 || available.includes(current[0]))
+          ? current
+          : [];
     setFormData((prevState) => ({
       ...prevState,
       info: {
@@ -81,6 +86,13 @@ const CharacterCreateMainForm: FC<{
 
   if (!races) return <LoadingState />;
 
+  // Spec 029: the fixed realms of a spellcaster profession (two for a hybrid), read only, or one of the available
+  // realms of an arms profession.
+  const fixedRealms = profession?.fixedRealmTypes ?? [];
+  const availableRealms =
+    profession && profession.availableRealmTypes.length > 0 ? profession.availableRealmTypes : REALM_TYPES;
+  const realmTypes = formData.info.realmTypes ?? [];
+
   return (
     <Grid container spacing={2}>
       <Grid size={12}>
@@ -94,13 +106,39 @@ const CharacterCreateMainForm: FC<{
         />
       </Grid>
       <Grid size={gridFormSize}>
-        <SelectRace label={t('race')} value={formData.info.raceId} onChange={onRaceChange} races={races} />
+        <RacePicker
+          races={races}
+          value={formData.info.raceId}
+          onChange={(_, race) => race && onRaceChange(race)}
+          required
+        />
       </Grid>
       <Grid size={gridFormSize}>
-        <SelectProfession value={formData.info.professionId} onChange={(e, p) => onProfessionChange(e, p!)} />
+        <ProfessionPicker
+          value={formData.info.professionId}
+          onChange={(id, selected) => onProfessionChange(id ?? '', selected)}
+          required
+        />
       </Grid>
       <Grid size={gridFormSize}>
-        <SelectRealmType profession={profession} value={formData.info.realmTypes ?? []} onChange={handleRealmTypeChange} />
+        {fixedRealms.length > 0 ? (
+          <RealmTypePicker
+            mode="multiple"
+            realmTypes={fixedRealms}
+            value={fixedRealms}
+            onChange={() => undefined}
+            disabled
+            required
+          />
+        ) : (
+          <RealmTypePicker
+            realmTypes={availableRealms}
+            value={realmTypes[0] ?? null}
+            onChange={(id) => handleRealmTypeChange(id ? [id] : [])}
+            disabled={availableRealms.length === 1}
+            required
+          />
+        )}
       </Grid>
       <Grid size={gridFormSize}>
         <NumericInput

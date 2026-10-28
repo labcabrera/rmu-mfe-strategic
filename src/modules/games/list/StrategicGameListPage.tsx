@@ -6,31 +6,55 @@ import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import { Button } from '@mui/material';
 import {
+  ClearableTextField,
   EmptyState,
   EntityCard,
+  EnumPicker,
   fetchRealms,
   fetchStrategicGames,
+  FilterBar,
+  FilterSchema,
   gridSizeShowcase,
   ListPage,
   Realm,
+  RealmPicker,
   StrategicGame,
+  useListFilters,
   useNotify,
   usePagedQuery,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { DEFAULT_GAME_IMAGE_PATH } from '../../services/image-service';
 import StrategicGameCardChips from './StrategicGameCardChips';
-import StrategicGameListFilters from './StrategicGameListFilters';
+
+/** Statuses of a campaign (rmu-api-strategic GameStatus). */
+const GAME_STATUSES = ['open', 'closed'];
 
 export default function StrategicGameListPage() {
   const auth = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const notify = useNotify();
-  const [rsql, setRsql] = useState('');
   const [realms, setRealms] = useState<Realm[]>([]);
+  const schema: FilterSchema<StrategicGame> = {
+    q: { kind: 'text', label: t('name'), toRsql: (value) => `name=re=${value}` },
+    realm: {
+      kind: 'single',
+      label: t('realm'),
+      format: (id) => t(realms.find((realm) => realm.id === id)?.name ?? id),
+      toRsql: (value) => `realmId==${value}`,
+    },
+    status: {
+      kind: 'single',
+      label: t('status'),
+      options: GAME_STATUSES,
+      format: (value) => t(value),
+      toRsql: (value) => `status==${value}`,
+    },
+  };
+  const filters = useListFilters(schema);
   const query = usePagedQuery<StrategicGame>({
     fetcher: (q, page, size) => fetchStrategicGames(q, page, size, auth),
-    rsql,
+    rsql: filters.rsql,
     onError: notify.error,
   });
 
@@ -53,7 +77,32 @@ export default function StrategicGameListPage() {
       ]}
       query={query}
       onAdd={onCreate}
-      filters={<StrategicGameListFilters realms={realms} onChange={setRsql} />}
+      filterState={filters}
+      filters={
+        <FilterBar>
+          <ClearableTextField
+            label={t('name')}
+            name="q"
+            value={filters.get('q')}
+            onChange={(value) => filters.set('q', value ?? '')}
+          />
+          <RealmPicker
+            realms={realms}
+            variant="select"
+            value={filters.get('realm') || null}
+            onChange={(id) => filters.set('realm', id)}
+            allowAll
+          />
+          <EnumPicker
+            label={t('status')}
+            values={GAME_STATUSES}
+            variant="select"
+            value={filters.get('status') || null}
+            onChange={(id) => filters.set('status', id)}
+            allowAll
+          />
+        </FilterBar>
+      }
       collection={{ modes: ['cards'], storageKey: 'strategic.games', cardSize: gridSizeShowcase }}
       emptyState={
         <EmptyState

@@ -22,7 +22,7 @@ import {
   useEntity,
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import StrategicGamePicker from '../../shared/StrategicGamePicker';
+import StrategicGameRequired from '../../shared/StrategicGameRequired';
 import FactionForm from './FactionForm';
 
 const EMPTY_FACTION = {
@@ -121,7 +121,7 @@ export default function FactionFormPage({ mode }: { mode: 'create' | 'edit' }) {
 
   if (mode === 'create' && !gameId) {
     return (
-      <StrategicGamePicker
+      <StrategicGameRequired
         breadcrumbs={breadcrumbs}
         onCancel={() => navigate('/strategic/factions')}
         onSelect={(id) =>

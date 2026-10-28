@@ -1,7 +1,9 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Grid, TextField } from '@mui/material';
-import { CreateCharacterDto, NumericInput, RmuSelect } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CreateCharacterDto, EnumPicker, NumericInput } from '@labcabrera-rmu/rmu-react-shared-lib';
+
+const GENDERS = ['male', 'female', 'other'];
 
 const CharacterCreateLore: FC<{
   formData: CreateCharacterDto;
@@ -12,12 +14,12 @@ const CharacterCreateLore: FC<{
   return (
     <Grid container spacing={1}>
       <Grid size={4}>
-        <RmuSelect
+        <EnumPicker
           value={formData.roleplay.gender}
           label={t('gender')}
-          options={['male', 'female', 'other']}
-          onChange={(value: string) =>
-            setFormData((prev) => ({ ...prev, roleplay: { ...prev.roleplay, gender: value } }))
+          values={GENDERS}
+          onChange={(value) =>
+            value && setFormData((prev) => ({ ...prev, roleplay: { ...prev.roleplay, gender: value } }))
           }
         />
       </Grid>

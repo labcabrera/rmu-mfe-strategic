@@ -4,12 +4,12 @@ import { Grid, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import {
   Character,
   CharacterSkill,
+  DifficultyPicker,
   ItemManeuverDto,
   MANEUVER_DIFFICULTIES,
   NumericInput,
   OPEN_D100,
   RollField,
-  SelectDifficulty,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 /** What the game master fills for a maneuver of the market or the workshop. */
@@ -137,11 +137,7 @@ const ManeuverFields: FC<{
       </Grid>
       {showDifficulty && (
         <Grid size={{ xs: 12, sm: 6 }}>
-          <SelectDifficulty
-            label={t('difficulty')}
-            value={value.difficulty ?? ''}
-            onChange={(difficulty) => onChange({ ...value, difficulty: difficulty.key })}
-          />
+          <DifficultyPicker value={value.difficulty} onChange={(difficulty) => onChange({ ...value, difficulty })} />
         </Grid>
       )}
       <Grid size={{ xs: 12, sm: 6 }}>

@@ -1,7 +1,9 @@
 import React, { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Grid, TextField } from '@mui/material';
-import { NumericInput, RmuSelect, UpdateCharacterDto } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { EnumPicker, NumericInput, UpdateCharacterDto } from '@labcabrera-rmu/rmu-react-shared-lib';
+
+const GENDERS = ['male', 'female', 'other'];
 
 export default function CharacterEditAttributes({
   formData,
@@ -56,11 +58,12 @@ export default function CharacterEditAttributes({
         />
       </Grid>
       <Grid size={{ xs: 12, md: 2 }}>
-        <RmuSelect
-          value={formData.roleplay?.gender || ''}
+        <EnumPicker
+          value={formData.roleplay?.gender || null}
           label={t('gender')}
-          options={['male', 'female', 'other']}
-          onChange={(e) => setFormData({ ...formData, roleplay: { ...formData.roleplay!, gender: e } })}
+          values={GENDERS}
+          variant="select"
+          onChange={(gender) => gender && setFormData({ ...formData, roleplay: { ...formData.roleplay!, gender } })}
         />
       </Grid>
       <Grid size={12}>

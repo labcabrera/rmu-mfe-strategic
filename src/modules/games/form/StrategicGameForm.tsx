@@ -1,10 +1,11 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FormControlLabel, Grid, MenuItem, Switch, TextField } from '@mui/material';
+import { FormControlLabel, Grid, Switch, TextField } from '@mui/material';
 import {
+  EnumPicker,
   NumericInput,
   Realm,
-  SelectRealm,
+  RealmPicker,
   Section,
   STAT_GENERATIONS,
   StrategicGame,
@@ -59,7 +60,7 @@ const StrategicGameForm: FC<{
             </Grid>
             {realms && (
               <Grid size={12}>
-                <SelectRealm
+                <RealmPicker
                   realms={realms}
                   value={formData.realmId}
                   onChange={(realmId) => setFormData({ ...formData, realmId: realmId || '' })}
@@ -115,36 +116,28 @@ const StrategicGameForm: FC<{
               />
             </Grid>
             <Grid size={gridSize}>
-              <TextField
-                select
+              <EnumPicker
                 label={t('talent-policy')}
                 name="talentPolicy"
+                variant="select"
+                values={TALENT_POLICIES}
+                labelPrefix="talent-policy-"
                 value={formData.options.talentPolicy ?? 'free'}
-                onChange={(e) => handleOptionsChange('talentPolicy', e.target.value)}
-                fullWidth
-              >
-                {TALENT_POLICIES.map((policy) => (
-                  <MenuItem key={policy} value={policy}>
-                    {t(`talent-policy-${policy}`)}
-                  </MenuItem>
-                ))}
-              </TextField>
+                onChange={(policy) => policy && handleOptionsChange('talentPolicy', policy)}
+                required
+              />
             </Grid>
             <Grid size={gridSize}>
-              <TextField
-                select
+              <EnumPicker
                 label={t('stat-generation')}
                 name="statGeneration"
+                variant="select"
+                values={STAT_GENERATIONS}
+                labelPrefix="stat-generation-"
                 value={formData.options.statGeneration ?? 'roll'}
-                onChange={(e) => handleOptionsChange('statGeneration', e.target.value)}
-                fullWidth
-              >
-                {STAT_GENERATIONS.map((method) => (
-                  <MenuItem key={method} value={method}>
-                    {t(`stat-generation-${method}`)}
-                  </MenuItem>
-                ))}
-              </TextField>
+                onChange={(method) => method && handleOptionsChange('statGeneration', method)}
+                required
+              />
             </Grid>
             <Grid size={gridSize}>
               <FormControlLabel

@@ -4,30 +4,51 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
 import {
+  ClearableTextField,
   Faction,
   fetchFactions,
   fetchStrategicGames,
+  FilterBar,
+  FilterSchema,
   gridSizeShowcase,
   ListPage,
+  StrategicGame,
+  StrategicGamePicker,
+  useListFilters,
   useNotify,
   usePagedQuery,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import FactionCard from '../FactionCard';
-import FactionListFilters from './FactionListFilters';
 
 export default function FactionListPage() {
   const auth = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const notify = useNotify();
-  const [rsql, setRsql] = useState('');
+  const [games, setGames] = useState<StrategicGame[]>([]);
+  const schema: FilterSchema<Faction> = {
+    q: { kind: 'text', label: t('name'), toRsql: (value) => `name=re=${value}` },
+    game: {
+      kind: 'single',
+      label: t('strategic-game'),
+      format: (id) => games.find((game) => game.id === id)?.name ?? id,
+      toRsql: (value) => `gameId==${value}`,
+    },
+  };
+  const filters = useListFilters(schema);
   // Names of the games of the factions shown, by id: one request per page, only for the games not known yet.
   const [gameNames, setGameNames] = useState<Record<string, string>>({});
   const query = usePagedQuery<Faction>({
     fetcher: (q, page, size) => fetchFactions(q, page, size, auth),
-    rsql,
+    rsql: filters.rsql,
     onError: notify.error,
   });
+
+  useEffect(() => {
+    fetchStrategicGames('', 0, 100, auth)
+      .then((response) => setGames(response.content))
+      .catch(notify.error);
+  }, []);
 
   useEffect(() => {
     const missing = [...new Set((query.items ?? []).map((faction) => faction.gameId))].filter(
@@ -53,7 +74,24 @@ export default function FactionListPage() {
       ]}
       query={query}
       onAdd={() => navigate('/strategic/factions/create')}
-      filters={<FactionListFilters onChange={setRsql} />}
+      filterState={filters}
+      filters={
+        <FilterBar>
+          <ClearableTextField
+            label={t('name')}
+            name="q"
+            value={filters.get('q')}
+            onChange={(value) => filters.set('q', value ?? '')}
+          />
+          <StrategicGamePicker
+            games={games}
+            variant="select"
+            value={filters.get('game') || null}
+            onChange={(id) => filters.set('game', id)}
+            allowAll
+          />
+        </FilterBar>
+      }
       collection={{ modes: ['cards'], storageKey: 'strategic.factions', cardSize: gridSizeShowcase }}
       renderItem={(faction) => (
         <FactionCard

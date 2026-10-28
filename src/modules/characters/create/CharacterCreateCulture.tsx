@@ -6,12 +6,13 @@ import { Autocomplete, Box, Chip, Grid, Paper, Stack, TextField, Typography } fr
 import {
   AddButton,
   Culture,
+  CulturePicker,
   CultureSkillRank,
   DeleteButton,
-  EntitySelect,
   fetchEnumerations,
   NumericInput,
   Skill,
+  SkillPicker,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import {
   CultureAssignmentRow,
@@ -84,13 +85,13 @@ const CharacterCreateCulture: FC<{
     <Stack spacing={2}>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 6 }}>
-          <EntitySelect<Culture>
-            options={cultures}
+          <CulturePicker
+            cultures={cultures}
+            variant="select"
             value={culture?.id ?? null}
-            onChange={(_, selected) => onCultureChange(selected ?? undefined)}
-            label={t('culture')}
-            getLabel={(option) => t(option.name)}
+            onChange={(_, selected) => onCultureChange(selected)}
             placeholder={t('no-culture')}
+            clearable
           />
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
@@ -231,12 +232,11 @@ const CultureEntryBlock: FC<{
             <Box key={row.key}>
               <Grid container spacing={1.5} sx={{ alignItems: 'center' }}>
                 <Grid size={{ xs: 12, md: 4 }}>
-                  <EntitySelect<Skill>
-                    options={options}
+                  <SkillPicker
+                    skills={options}
+                    variant="select"
                     value={row.skillId || null}
                     onChange={(id) => onUpdate(row.key, { skillId: id || '', specialization: '' })}
-                    label={t('skill')}
-                    getLabel={(option) => t(option.id)}
                     disabled={entry.type === 'region' || options.length === 1}
                     required
                   />
