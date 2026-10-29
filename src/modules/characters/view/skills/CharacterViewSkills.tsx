@@ -26,6 +26,7 @@ import {
   SkillGroupList,
   sortSkillsByName,
   StrategicGame,
+  useSpecializationLabel,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { MAX_PROFESSIONAL_SKILLS, resolvePowerLevel } from '../../../services/game-rules';
 import AddSkillDialog from './AddSkillDialog';
@@ -42,6 +43,8 @@ const CharacterViewSkills: FC<{
   strategicGame?: StrategicGame;
 }> = ({ character, setCharacter, profession, strategicGame }) => {
   const { t, i18n } = useTranslation();
+  // Spec 050: specializations are catalog keys shown by their name
+  const specializationLabel = useSpecializationLabel();
   const [openAddSkillDialog, setOpenAddSkillDialog] = useState(false);
   const [skillNameFilter, setSkillNameFilter] = useState('');
   const [selectedSkill, setSelectedSkill] = useState<CharacterSkill | null>(null);
@@ -71,11 +74,11 @@ const CharacterViewSkills: FC<{
       ? character.skills
       : character.skills.filter((skill) => {
           const skillName = t(skill.skillId).toLowerCase();
-          const specialization = skill.specialization ? t(skill.specialization).toLowerCase() : '';
+          const specialization = specializationLabel(skill.specialization).toLowerCase();
           return skillName.includes(normalizedFilter) || specialization.includes(normalizedFilter);
         });
     return sortSkillsByName(skills, t, i18n.language);
-  }, [character.skills, normalizedFilter, t, i18n.language]);
+  }, [character.skills, normalizedFilter, t, i18n.language, specializationLabel]);
 
   return (
     <>

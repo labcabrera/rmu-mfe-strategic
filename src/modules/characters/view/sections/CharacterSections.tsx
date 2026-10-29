@@ -9,6 +9,7 @@ import {
   ResistanceList,
   StatBlock,
   StrategicGame,
+  useSpecializationLabel,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import CharacterViewMovement from '../CharacterViewMovement';
 import CharacterEquipmentButtons from '../items/CharacterEquipmentButtons';
@@ -45,6 +46,8 @@ export const CharacterOverview = ({
   go,
 }: Omit<SectionProps, 'setCharacter'> & { go: (id: CharacterSectionId) => void }) => {
   const { t } = useTranslation();
+  // Spec 050: specializations are catalog keys shown by their name
+  const specializationLabel = useSpecializationLabel();
   const seeAll = (id: CharacterSectionId) => ({ label: t('see-all'), onClick: () => go(id) });
   const topSkills = [...character.skills].sort((a, b) => b.totalBonus - a.totalBonus).slice(0, TOP_SKILLS);
   return (
@@ -84,7 +87,11 @@ export const CharacterOverview = ({
           {topSkills.map((skill) => (
             <Row
               key={skill.id}
-              label={skill.specialization ? `${t(skill.skillId)} (${t(skill.specialization)})` : t(skill.skillId)}
+              label={
+                skill.specialization
+                  ? `${t(skill.skillId)} (${specializationLabel(skill.specialization)})`
+                  : t(skill.skillId)
+              }
               value={formatBonus(skill.totalBonus)}
             />
           ))}

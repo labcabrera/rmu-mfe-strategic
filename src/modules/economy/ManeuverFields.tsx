@@ -10,6 +10,7 @@ import {
   NumericInput,
   OPEN_D100,
   RollField,
+  useSpecializationLabel,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 /** What the game master fills for a maneuver of the market or the workshop. */
@@ -88,6 +89,8 @@ const ManeuverFields: FC<{
   extra?: { label: string; value: number };
 }> = ({ character, value, onChange, preferred = [], showDifficulty = false, extra }) => {
   const { t } = useTranslation();
+  // Spec 050: specializations are catalog keys shown by their name
+  const specializationLabel = useSpecializationLabel();
   const skills = useMemo(() => {
     const rank = (skill: CharacterSkill) => {
       const index = preferred.findIndex((id) => skill.skillId === id || skill.specialization === id);
@@ -111,7 +114,7 @@ const ManeuverFields: FC<{
           <MenuItem value="">{t('none')}</MenuItem>
           {skills.map((s) => (
             <MenuItem key={s.id ?? skillKeyOf(s)} value={skillKeyOf(s)}>
-              {`${t(s.skillId)}${s.specialization ? `: ${t(s.specialization)}` : ''} (${s.totalBonus})`}
+              {`${t(s.skillId)}${s.specialization ? `: ${specializationLabel(s.specialization)}` : ''} (${s.totalBonus})`}
             </MenuItem>
           ))}
         </TextField>
