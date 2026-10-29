@@ -41,17 +41,6 @@ const FactionForm: FC<{
                 maxFractionDigits={2}
               />
             </Grid>
-            <Grid size={{ xs: 12, md: 4 }}>
-              <NumericInput
-                label={t('xp')}
-                name="availableXP"
-                value={formData.management.availableXP}
-                onChange={(e) =>
-                  setFormData({ ...formData, management: { ...formData.management, availableXP: e || 0 } })
-                }
-                integer
-              />
-            </Grid>
           </Grid>
         </Section>
       </Grid>

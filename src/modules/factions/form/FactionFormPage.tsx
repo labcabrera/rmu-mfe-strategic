@@ -5,7 +5,6 @@ import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
   addFactionGold,
-  addFactionXP,
   createFaction,
   EditableAvatar,
   ErrorState,
@@ -30,7 +29,6 @@ const EMPTY_FACTION = {
   name: '',
   management: {
     availableGold: 100,
-    availableXP: 200000,
   },
   shortDescription: '',
   description: '',
@@ -42,7 +40,6 @@ const toFormData = (faction: Faction) =>
     name: faction.name || '',
     management: {
       availableGold: faction.management?.availableGold || 0,
-      availableXP: faction.management?.availableXP || 0,
     },
     shortDescription: faction.shortDescription || '',
     description: faction.description || '',
@@ -85,17 +82,15 @@ export default function FactionFormPage({ mode }: { mode: 'create' | 'edit' }) {
   }, [game.entity, existing.entity]);
 
   /**
-   * rmu-api-strategic ignores `management` in the PATCH (spec 021, F-strategic-16): the gold and XP edited here are sent
-   * as the difference through add-gold and add-xp, which only the game owner or an admin may call.
+   * rmu-api-strategic ignores `management` in the PATCH (spec 021, F-strategic-16): the gold edited here is sent as the
+   * difference through add-gold, which only the game owner or an admin may call.
    */
   const saveEdit = async (data: Faction): Promise<Faction> => {
     const { management, ...rest } = data;
     const before = existing.entity?.management;
     let saved = await updateFaction(factionId!, rest, auth);
     const gold = management.availableGold - (before?.availableGold ?? 0);
-    const xp = management.availableXP - (before?.availableXP ?? 0);
     if (gold !== 0) saved = await addFactionGold(factionId!, gold, auth);
-    if (xp !== 0) saved = await addFactionXP(factionId!, xp, auth);
     return saved;
   };
 

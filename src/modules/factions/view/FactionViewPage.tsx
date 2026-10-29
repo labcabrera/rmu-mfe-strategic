@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -44,12 +44,12 @@ const CHARACTER_VIEW_MODES: CollectionMode[] = ['cards', 'table'];
 
 /**
  * Faction view, with the layout of the character view (spec 017): a header with the image, the campaign and the
- * key numbers (gold, experience, levels and characters), the description, and the characters as cards or a table.
+ * key numbers (gold, characters and levels), the description, and the characters as cards or a table.
  */
 export default function FactionViewPage() {
   const navigate = useNavigate();
   const auth = useAuth();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const location = useLocation();
   const notify = useNotify();
   const { factionId } = useParams<{ factionId: string }>();
@@ -66,7 +66,6 @@ export default function FactionViewPage() {
     'strategic.faction-characters',
     CHARACTER_VIEW_MODES
   );
-  const numberFormat = useMemo(() => new Intl.NumberFormat(i18n.language), [i18n.language]);
 
   useEffect(() => {
     if (!faction) return;
@@ -145,12 +144,6 @@ export default function FactionViewPage() {
           : undefined,
         pills: [
           <StatPill key="gold" label={t('gold')} value={<MoneyDisplay gold={entity.management.availableGold} />} />,
-          <StatPill
-            key="xp"
-            label={t('xp')}
-            hint={t('experience')}
-            value={numberFormat.format(entity.management.availableXP)}
-          />,
           <StatPill key="characters" label={t('characters')} value={characters?.length ?? '—'} />,
           <StatPill key="levels" label={t('total-levels')} value={totalLevels ?? '—'} />,
         ],
