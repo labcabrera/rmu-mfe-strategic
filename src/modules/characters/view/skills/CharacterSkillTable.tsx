@@ -1,11 +1,13 @@
-import React, { Dispatch, Fragment, SetStateAction, useState } from 'react';
+import React, { Dispatch, FC, Fragment, SetStateAction, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
-import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
+import AddIcon from '@mui/icons-material/Add';
 import CropSquareIcon from '@mui/icons-material/CropSquare';
+import DeleteIcon from '@mui/icons-material/Delete';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import RemoveIcon from '@mui/icons-material/Remove';
 import SquareIcon from '@mui/icons-material/Square';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
@@ -13,9 +15,12 @@ import TurnedInIcon from '@mui/icons-material/TurnedIn';
 import TurnedInNotIcon from '@mui/icons-material/TurnedInNot';
 import {
   Box,
-  ButtonGroup,
   Collapse,
   IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
   Paper,
   Stack,
   Table,
@@ -30,15 +35,15 @@ import {
 import {
   Character,
   CharacterSkill,
-  DeleteButton,
   deleteCharacterSkill,
+  formatBonus,
   levelDownSkill,
   levelUpSkill,
   Profession,
   setUpProfessionalSkill,
+  skillCategoryOf,
   StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import MissingReferenceChip from '../../../shared/chips/MissingReferenceChip';
 import {
   MAX_PROFESSIONAL_SKILLS,
   maxRanksPerLevel,
@@ -46,7 +51,36 @@ import {
   spendableDevPoints,
 } from '../../../services/game-rules';
 import { useStrategicNotify } from '../../../services/notify-service';
+import MissingReferenceChip from '../../../shared/chips/MissingReferenceChip';
 
+/** Columns hidden on phones: they go to the details of the row. */
+const WIDE = { display: { xs: 'none', md: 'table-cell' } };
+/** The expand column, also hidden on phones. */
+const EXPAND = { display: { xs: 'none', sm: 'table-cell' } };
+const COLUMNS = 8;
+const OTHER_CATEGORY = 'other';
+
+type ProfessionalType = 'professional' | 'knack';
+const PROFESSIONAL: ProfessionalType = 'professional';
+const KNACK: ProfessionalType = 'knack';
+
+/** What the rows need to know about the whole character. */
+type TableContext = {
+  character: Character;
+  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
+  profession?: Profession;
+  strategicGame?: StrategicGame;
+  /** Marked skills of each type, and how many the character may have. */
+  marked: Record<ProfessionalType, number>;
+  limits: Record<ProfessionalType, number>;
+};
+
+/**
+ * The skills of a character as a compact table: grouped by category, each row with the rank stepper of the level, the
+ * professional and knack marks next to the name and the delete action in a menu. The details of a row show the
+ * breakdown of the total in one line and, on phones, the columns that do not fit. `skills` comes already filtered and
+ * sorted by name; the groups keep that order.
+ */
 export default function CharacterSkillTable({
   character,
   skills,
@@ -60,76 +94,80 @@ export default function CharacterSkillTable({
   profession?: Profession;
   strategicGame?: StrategicGame;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const displayedSkills = skills ?? character.skills;
-  const currentKnackSkills = character.skills.filter((s) => s.professional?.includes('knack')).length;
-  const currentProfessionalSkills = character.skills.filter((s) => s.professional?.includes('professional')).length;
+  const count = (type: ProfessionalType) => character.skills.filter((s) => s.professional?.includes(type)).length;
+  const context: TableContext = {
+    character,
+    setCharacter,
+    profession,
+    strategicGame,
+    marked: { professional: count('professional'), knack: count('knack') },
+    limits: { professional: MAX_PROFESSIONAL_SKILLS, knack: resolvePowerLevel(strategicGame?.powerLevel).knackCount },
+  };
+
+  const groups = useMemo(() => {
+    const byCategory = new Map<string, CharacterSkill[]>();
+    displayedSkills.forEach((skill) => {
+      const category = skillCategoryOf(skill) ?? OTHER_CATEGORY;
+      byCategory.set(category, [...(byCategory.get(category) ?? []), skill]);
+    });
+    return [...byCategory.entries()].sort(([a], [b]) => t(a).localeCompare(t(b), i18n.language));
+  }, [displayedSkills, t, i18n.language]);
 
   return (
-    <TableContainer component={Paper} sx={{ maxWidth: '100%', overflowX: 'auto' }}>
-      <Table size="small">
+    <TableContainer component={Paper} variant="outlined">
+      <Table
+        size="small"
+        sx={{
+          '& td, & th': { px: { xs: 0.5, sm: 1 } },
+          // Phones: tighter icon buttons, so that the total and the menu fit
+          '& .MuiIconButton-sizeSmall': { p: { xs: 0.25, sm: 0.625 } },
+          // The expand and menu buttons need no padding around them
+          '& tr > td:first-of-type:not([colspan]), & tr > td:last-of-type:not([colspan]), & th:first-of-type, & th:last-of-type':
+            { px: 0.25, width: 40 },
+        }}
+      >
         <TableHead>
           <TableRow>
-            <TableCell align="left" sx={{ width: 44 }} />
-            <TableCell align="left" sx={{ minWidth: 180 }}>
-              {t('skill')}
-            </TableCell>
-            <TableCell align="left" sx={{ minWidth: 120 }}>
-              <Tooltip title={t('specialization')}>
-                <Typography variant="body2">
-                  <b>{t('spec')}</b>
-                </Typography>
-              </Tooltip>
-            </TableCell>
-            <TableCell align="left" sx={{ minWidth: 90 }}>
-              {t('stats')}
-            </TableCell>
-
-            <TableCell align="right" sx={{ width: 64 }}>
+            <TableCell sx={EXPAND} />
+            <TableCell>{t('skill')}</TableCell>
+            <TableCell sx={WIDE}>{t('stats')}</TableCell>
+            <TableCell align="center">
               <Tooltip title={t('developed-ranks')}>
-                <Typography variant="body2">
-                  <b>{t('ranks')}</b>
-                </Typography>
+                <span>{t('dev-ranks')}</span>
               </Tooltip>
             </TableCell>
-            <TableCell align="right" sx={{ width: 72 }}>
-              {t('total')}
+            <TableCell align="right" sx={WIDE}>
+              {t('ranks')}
             </TableCell>
-            <TableCell align="left" sx={{ minWidth: 88 }}>
-              <Tooltip title={t('developed-ranks')}>
-                <Typography variant="body2">
-                  <b>{t('dev-ranks')}</b>
-                </Typography>
-              </Tooltip>
-            </TableCell>
-            <TableCell align="right" sx={{ minWidth: 72 }}>
+            <TableCell align="right">{t('total')}</TableCell>
+            <TableCell align="right" sx={WIDE}>
               <Tooltip title={t('development-cost')}>
-                <Typography variant="body2">
-                  <b>{t('development-cost-short')}</b>
-                </Typography>
+                <span>{t('cost')}</span>
               </Tooltip>
             </TableCell>
-            <TableCell align="left" sx={{ minWidth: 220 }}>
-              {t('actions')}
-            </TableCell>
+            <TableCell sx={{ width: 40, px: 0.5 }} />
           </TableRow>
         </TableHead>
         <TableBody>
-          {displayedSkills.map((item, index) => (
-            <SkillRow
-              key={index}
-              skill={item}
-              character={character}
-              setCharacter={setCharacter}
-              profession={profession}
-              strategicGame={strategicGame}
-              currentKnackSkills={currentKnackSkills}
-              currentProfessionalSkills={currentProfessionalSkills}
-            />
+          {groups.map(([category, list]) => (
+            <Fragment key={category}>
+              <TableRow>
+                <TableCell colSpan={COLUMNS} sx={{ bgcolor: 'action.hover', py: 0.25 }}>
+                  <Typography variant="overline" color="text.secondary">
+                    {`${t(category)} · ${list.length}`}
+                  </Typography>
+                </TableCell>
+              </TableRow>
+              {list.map((skill) => (
+                <SkillRow key={`${skill.skillId}::${skill.specialization ?? ''}`} skill={skill} context={context} />
+              ))}
+            </Fragment>
           ))}
           {displayedSkills.length === 0 && (
             <TableRow>
-              <TableCell colSpan={9}>
+              <TableCell colSpan={COLUMNS}>
                 <Typography variant="body2" color="text.secondary">
                   {t('not-found-skills')}
                 </Typography>
@@ -142,244 +180,226 @@ export default function CharacterSkillTable({
   );
 }
 
-function SkillRow({
-  character,
-  setCharacter,
-  skill,
-  profession,
-  strategicGame,
-  currentKnackSkills,
-  currentProfessionalSkills,
-}: {
-  character: Character;
-  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
-  skill: CharacterSkill;
-  profession?: Profession;
-  strategicGame?: StrategicGame;
-  currentKnackSkills: number;
-  currentProfessionalSkills: number;
-}) {
+const bonusColor = (value: number) => (value < 0 ? 'error.main' : value > 0 ? 'success.main' : 'text.secondary');
+
+function SkillRow({ skill, context }: { skill: CharacterSkill; context: TableContext }) {
   const auth = useAuth();
   const { t } = useTranslation();
   const notify = useStrategicNotify();
+  const { character, setCharacter, profession, strategicGame } = context;
   const [open, setOpen] = useState(false);
+  const [menu, setMenu] = useState<HTMLElement | null>(null);
   const maxRanks = maxRanksPerLevel(strategicGame);
-  const maxKnackSkills = resolvePowerLevel(strategicGame?.powerLevel).knackCount;
   const cultureRanks = skill.cultureRanks ?? 0;
-  const isProfessional = skill.professional?.includes('professional');
-  const isKnack = skill.professional?.includes('knack');
+  const professionSkill = !!profession && (profession.professionalSkills as string[]).includes(skill.skillId);
 
-  const handleLevelUp = () => {
-    levelUpSkill(character.id, skill.skillId, skill.specialization, auth)
-      .then((updated) => setCharacter(updated))
-      .catch((error: any) => notify.error(error));
-  };
-
-  const handleLevelDown = () => {
-    levelDownSkill(character.id, skill.skillId, skill.specialization, auth)
-      .then((updated) => setCharacter(updated))
-      .catch((error: any) => notify.error(error));
-  };
-
-  const handleSetUpProfessionalSkill = (skillObj: CharacterSkill) => {
-    const array = skillObj.professional || [];
-    if (array.includes('professional')) {
-      //remove
-      const index = array.indexOf('professional');
-      if (index > -1) {
-        array.splice(index, 1);
-      }
-    } else {
-      //add
-      array.push('professional');
-    }
-    setUpProfessionalSkill(character.id, skillObj.skillId, skillObj.specialization, array, auth)
-      .then((updated) => setCharacter(updated))
-      .catch((error: any) => notify.error(error));
-  };
-
-  const handleSetUpKnackSkill = (skillObj: CharacterSkill) => {
-    const array = skillObj.professional || [];
-    if (array.includes('knack')) {
-      //remove
-      const index = array.indexOf('knack');
-      if (index > -1) {
-        array.splice(index, 1);
-      }
-    } else {
-      //add
-      array.push('knack');
-    }
-    setUpProfessionalSkill(character.id, skillObj.skillId, skillObj.specialization, array, auth)
-      .then((updated) => setCharacter(updated))
-      .catch((error: any) => notify.error(error));
-  };
-
-  const handleDeleteSkill = (skill: CharacterSkill) => {
-    deleteCharacterSkill(character.id, skill.skillId, skill.specialization, auth)
-      .then((updated) => setCharacter(updated))
-      .catch((error) => notify.error(error));
-  };
+  const update = (request: Promise<Character>) => request.then(setCharacter).catch(notify.error);
 
   // Up to 2 ranks per level (3 with the game's allowThirdRank option); the third rank costs the same as the second
-  const isLevelUpDisabled = () => {
-    if (skill.ranksDeveloped >= maxRanks) return true;
-    const cost = skill.development[Math.min(skill.ranksDeveloped, skill.development.length - 1, 1)];
-    return cost === undefined || spendableDevPoints(character, strategicGame) < cost;
-  };
-
+  const nextCost = skill.development[Math.min(skill.ranksDeveloped, skill.development.length - 1, 1)];
+  const canLevelUp =
+    skill.ranksDeveloped < maxRanks &&
+    nextCost !== undefined &&
+    spendableDevPoints(character, strategicGame) >= nextCost;
   // Culture ranks cannot be removed
-  const isLevelDownDisabled = () => {
-    return skill.ranksDeveloped < 1 || skill.ranks - 1 < cultureRanks;
+  const canLevelDown = skill.ranksDeveloped >= 1 && skill.ranks - 1 >= cultureRanks;
+  const canDelete = skill.skillId !== 'body-development' && skill.ranks <= skill.ranksDeveloped;
+
+  const toggle = (type: ProfessionalType) => {
+    const types = (skill.professional ?? []).includes(type)
+      ? (skill.professional ?? []).filter((value) => value !== type)
+      : [...(skill.professional ?? []), type];
+    update(setUpProfessionalSkill(character.id, skill.skillId, skill.specialization, types, auth));
   };
 
-  const isDeletedDisabled = () => {
-    if (skill.skillId === 'body-development') return true;
-    return skill.ranks > skill.ranksDeveloped;
+  const mark = (type: ProfessionalType) => {
+    const on = !!skill.professional?.includes(type);
+    // A skill of another profession may still carry a mark: shown, not editable
+    const editable = professionSkill && (on || context.marked[type] < context.limits[type]);
+    return { on, editable, shown: on || professionSkill };
   };
 
-  const getColor = (value: number) => {
-    if (value < 0) return 'error.main';
-    if (value > 0) return 'success.main';
-    return 'inherit';
-  };
+  const professionalMark = mark(PROFESSIONAL);
+  const knackMark = mark(KNACK);
 
-  const isAvailableProfessionSkill = (skillObj: CharacterSkill) => {
-    return !!profession && (profession.professionalSkills as string[]).includes(skillObj.skillId);
-  };
-
-  const getStatistics = (skill: CharacterSkill) => {
-    return skill.statistics && skill.statistics.length > 0 ? skill.statistics.join('/').toLowerCase() : '-';
-  };
-
-  const detailItems = [
-    ...(cultureRanks > 0 ? [{ label: t('culture-ranks'), value: cultureRanks, color: 'text.primary' }] : []),
-    { label: t('rank'), value: skill.developmentBonus, color: getColor(skill.developmentBonus) },
-    { label: t('stat'), value: skill.statBonus, color: getColor(skill.statBonus) },
-    { label: t('racial'), value: skill.racialBonus, color: getColor(skill.racialBonus) },
-    { label: t('profession'), value: skill.professionalBonus, color: getColor(skill.professionalBonus) },
-    { label: t('trait-bonus'), value: skill.traitBonus ?? 0, color: getColor(skill.traitBonus ?? 0) },
-    {
-      label: t('custom'),
-      value: skill.customBonus,
-      color: skill.customBonus === 0 ? 'text.primary' : skill.customBonus > 0 ? 'success.main' : 'error.main',
-    },
-    {
-      label: t('dev-ranks'),
-      value: '',
-      color: 'text.primary',
-    },
-  ];
+  const breakdown = [
+    { key: 'rank', value: skill.developmentBonus },
+    { key: 'stat', value: skill.statBonus },
+    { key: 'racial', value: skill.racialBonus },
+    { key: 'profession', value: skill.professionalBonus },
+    { key: 'trait-bonus', value: skill.traitBonus ?? 0 },
+    { key: 'custom', value: skill.customBonus },
+  ].filter((item) => item.key === 'rank' || item.value !== 0);
 
   return (
     <Fragment>
-      <TableRow>
-        <TableCell align="left" sx={{ width: 44, px: 0.5 }}>
-          <IconButton
-            aria-label={t('toggle-skill-details')}
-            onClick={() => setOpen((current) => !current)}
-            size="small"
-          >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+      <TableRow hover sx={{ '& > td': { borderBottom: open ? 0 : undefined } }}>
+        <TableCell sx={EXPAND}>
+          <IconButton size="small" aria-label={t('toggle-skill-details')} onClick={() => setOpen((value) => !value)}>
+            {open ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
           </IconButton>
         </TableCell>
-        <TableCell component="th" scope="row">
-          {t(skill.skillId)}
-          {skill.missingReference && <MissingReferenceChip />}
-        </TableCell>
-        <TableCell component="th" scope="row">
-          {skill.specialization ? t(skill.specialization) : '-'}
-        </TableCell>
-        <TableCell align="left">{getStatistics(skill)}</TableCell>
-        <TableCell align="right">
-          {cultureRanks > 0 ? (
-            <Tooltip title={t('culture-ranks-breakdown', { culture: cultureRanks, total: skill.ranks })}>
-              <Typography variant="body2">
-                <b>{skill.ranks}</b>
-                <Typography component="span" variant="caption" color="text.secondary">
-                  {` (${cultureRanks})`}
-                </Typography>
-              </Typography>
-            </Tooltip>
-          ) : (
-            <Typography variant="body2">
-              <b>{skill.ranks}</b>
-            </Typography>
-          )}
-        </TableCell>
+        {/* On phones there is no expand column: the name opens the details */}
         <TableCell
-          align="right"
-          sx={{
-            color: getColor(skill.totalBonus),
-            fontWeight: 'bold',
+          onClick={() => setOpen((value) => !value)}
+          onKeyDown={(event) => {
+            if (event.target !== event.currentTarget || (event.key !== 'Enter' && event.key !== ' ')) return;
+            event.preventDefault();
+            setOpen((value) => !value);
           }}
+          tabIndex={0}
+          aria-expanded={open}
+          sx={{ cursor: 'pointer' }}
         >
-          {skill.totalBonus}
-        </TableCell>
-        <TableCell align="left">
-          <Stack direction="row" spacing={0}>
-            {Array.from({ length: maxRanks }, (_, idx) => idx + 1).map((rank) => (
-              <Box key={rank} component="span" sx={{ display: 'inline-flex', mx: 0, p: 0 }}>
-                {rank <= skill.ranksDeveloped ? (
-                  <SquareIcon sx={{ mx: 0, p: 0 }} fontSize="small" />
-                ) : (
-                  <CropSquareIcon sx={{ mx: 0, p: 0 }} fontSize="small" />
-                )}
-              </Box>
-            ))}
+          <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', minWidth: 0 }}>
+            <Typography variant="body2" sx={{ fontWeight: 500 }}>
+              {t(skill.skillId)}
+              {skill.specialization && (
+                <Typography
+                  component="span"
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ display: { xs: 'block', sm: 'inline' } }}
+                >
+                  <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                    {' · '}
+                  </Box>
+                  {t(skill.specialization)}
+                </Typography>
+              )}
+            </Typography>
+            {skill.missingReference && <MissingReferenceChip />}
+            {/* On phones the marks are in the menu of the row */}
+            <Stack direction="row" sx={{ display: { xs: 'none', sm: 'flex' } }}>
+              <MarkToggle
+                type={PROFESSIONAL}
+                {...professionalMark}
+                onToggle={() => toggle(PROFESSIONAL)}
+                limit={context.limits.professional}
+              />
+              <MarkToggle type={KNACK} {...knackMark} onToggle={() => toggle(KNACK)} limit={context.limits.knack} />
+            </Stack>
           </Stack>
         </TableCell>
-        <TableCell align="right">{skill.development?.join(' / ') || '-'}</TableCell>
-        <TableCell align="left">
-          <ButtonGroup>
-            <IconButton onClick={handleLevelUp} disabled={isLevelUpDisabled()} color="primary">
-              <ArrowCircleUpIcon />
-            </IconButton>
-            <IconButton onClick={handleLevelDown} disabled={isLevelDownDisabled()} color="primary">
-              <ArrowCircleDownIcon />
-            </IconButton>
-            <DeleteButton onClick={() => handleDeleteSkill(skill)} disabled={isDeletedDisabled()} />
-            {isAvailableProfessionSkill(skill) && (
-              <>
-                <Tooltip title={t('professional-skill')}>
-                  <IconButton
-                    aria-label={t('professional-skill')}
-                    onClick={() => handleSetUpProfessionalSkill(skill)}
-                    disabled={!isProfessional && currentProfessionalSkills >= MAX_PROFESSIONAL_SKILLS}
-                    color="primary"
-                  >
-                    {isProfessional ? <TurnedInIcon /> : <TurnedInNotIcon />}
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title={t('knack-skill')}>
-                  <IconButton
-                    aria-label={t('knack-skill')}
-                    onClick={() => handleSetUpKnackSkill(skill)}
-                    color="primary"
-                    disabled={!isKnack && currentKnackSkills >= maxKnackSkills}
-                  >
-                    {isKnack ? <StarIcon /> : <StarBorderIcon />}
-                  </IconButton>
-                </Tooltip>
-              </>
-            )}
-          </ButtonGroup>
+        <TableCell sx={WIDE}>
+          <Typography variant="caption" color="text.secondary">
+            {skill.statistics.length ? skill.statistics.join('/').toUpperCase() : '—'}
+          </Typography>
+        </TableCell>
+        <TableCell align="center" sx={{ whiteSpace: 'nowrap', px: 0.5 }}>
+          <RankStepper
+            developed={skill.ranksDeveloped}
+            max={maxRanks}
+            canUp={canLevelUp}
+            canDown={canLevelDown}
+            onUp={() => update(levelUpSkill(character.id, skill.skillId, skill.specialization, auth))}
+            onDown={() => update(levelDownSkill(character.id, skill.skillId, skill.specialization, auth))}
+          />
+        </TableCell>
+        <TableCell align="right" sx={WIDE}>
+          {cultureRanks > 0 ? (
+            <Tooltip title={t('culture-ranks-breakdown', { culture: cultureRanks, total: skill.ranks })}>
+              <span>
+                {skill.ranks}
+                <Typography
+                  component="span"
+                  variant="caption"
+                  color="text.secondary"
+                >{` (${cultureRanks})`}</Typography>
+              </span>
+            </Tooltip>
+          ) : (
+            skill.ranks
+          )}
+        </TableCell>
+        <TableCell align="right" sx={{ fontWeight: 700, color: skill.totalBonus < 0 ? 'error.main' : 'text.primary' }}>
+          {formatBonus(skill.totalBonus)}
+        </TableCell>
+        <TableCell align="right" sx={{ ...WIDE, whiteSpace: 'nowrap' }}>
+          <Typography variant="caption" color="text.secondary">
+            {skill.development?.join(' / ') || '—'}
+          </Typography>
+        </TableCell>
+        <TableCell sx={{ px: 0.5 }}>
+          <IconButton size="small" aria-label={t('more-actions')} onClick={(event) => setMenu(event.currentTarget)}>
+            <MoreVertIcon fontSize="small" />
+          </IconButton>
+          <Menu anchorEl={menu} open={!!menu} onClose={() => setMenu(null)}>
+            {[
+              { type: PROFESSIONAL, state: professionalMark, on: TurnedInIcon, off: TurnedInNotIcon },
+              { type: KNACK, state: knackMark, on: StarIcon, off: StarBorderIcon },
+            ]
+              .filter((item) => item.state.shown)
+              .map(({ type, state, on: OnIcon, off: OffIcon }) => (
+                <MenuItem
+                  key={type}
+                  disabled={!state.editable}
+                  onClick={() => {
+                    setMenu(null);
+                    toggle(type);
+                  }}
+                >
+                  <ListItemIcon>
+                    {state.on ? <OnIcon fontSize="small" color="primary" /> : <OffIcon fontSize="small" />}
+                  </ListItemIcon>
+                  <ListItemText>{t(type === PROFESSIONAL ? 'professional-skill' : 'knack-skill')}</ListItemText>
+                </MenuItem>
+              ))}
+            <MenuItem
+              disabled={!canDelete}
+              onClick={() => {
+                setMenu(null);
+                update(deleteCharacterSkill(character.id, skill.skillId, skill.specialization, auth));
+              }}
+            >
+              <ListItemIcon>
+                <DeleteIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('delete')}</ListItemText>
+            </MenuItem>
+          </Menu>
         </TableCell>
       </TableRow>
-      <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-        <TableCell colSpan={9} sx={{ py: 0, borderBottom: 0 }}>
+      <TableRow>
+        <TableCell colSpan={COLUMNS} sx={{ py: 0, ...(open ? {} : { borderBottom: 0 }) }}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <Stack spacing={1} sx={{ py: 1.5 }}>
-              {detailItems
-                .filter((item) => item.label !== t('dev-ranks'))
-                .map((item) => (
-                  <Stack key={item.label} direction="row" spacing={2} sx={{ justifyContent: 'space-between' }}>
-                    <Typography variant="body2" color="text.secondary">
-                      {item.label}
-                    </Typography>
-                    <Box sx={{ color: item.color, fontWeight: 500 }}>{item.value}</Box>
-                  </Stack>
+            <Stack spacing={0.75} sx={{ py: 1, pl: { md: 5 } }}>
+              <Stack
+                direction="row"
+                useFlexGap
+                sx={{ flexWrap: 'wrap', columnGap: 2, rowGap: 0.5, alignItems: 'baseline' }}
+              >
+                {breakdown.map((item) => (
+                  <Typography key={item.key} variant="body2" color="text.secondary">
+                    {`${t(item.key)} `}
+                    <Box component="span" sx={{ color: bonusColor(item.value), fontWeight: 600 }}>
+                      {formatBonus(item.value)}
+                    </Box>
+                  </Typography>
                 ))}
+                <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                  {`= ${formatBonus(skill.totalBonus)}`}
+                </Typography>
+              </Stack>
+              {/* On phones, the columns that do not fit */}
+              <Stack
+                direction="row"
+                useFlexGap
+                sx={{ display: { xs: 'flex', md: 'none' }, flexWrap: 'wrap', columnGap: 2, rowGap: 0.5 }}
+              >
+                <Detail label={t('stats')} value={skill.statistics.join('/').toUpperCase() || '—'} />
+                <Detail
+                  label={t('ranks')}
+                  value={cultureRanks > 0 ? `${skill.ranks} (${cultureRanks})` : `${skill.ranks}`}
+                />
+                <Detail label={t('development-cost')} value={skill.development?.join(' / ') || '—'} />
+                <Detail label={t('dev-ranks')} value={`${skill.ranksDeveloped} / ${maxRanks}`} />
+              </Stack>
+              {cultureRanks > 0 && (
+                <Typography variant="caption" color="text.secondary">
+                  {t('culture-ranks-breakdown', { culture: cultureRanks, total: skill.ranks })}
+                </Typography>
+              )}
             </Stack>
           </Collapse>
         </TableCell>
@@ -387,3 +407,89 @@ function SkillRow({
     </Fragment>
   );
 }
+
+const Detail: FC<{ label: string; value: string }> = ({ label, value }) => (
+  <Typography variant="body2" color="text.secondary">
+    {`${label} `}
+    <Box component="span" sx={{ color: 'text.primary', fontWeight: 600 }}>
+      {value}
+    </Box>
+  </Typography>
+);
+
+/** Ranks developed in the level between the buttons that remove and add one. */
+const RankStepper: FC<{
+  developed: number;
+  max: number;
+  canUp: boolean;
+  canDown: boolean;
+  onUp: () => void;
+  onDown: () => void;
+}> = ({ developed, max, canUp, canDown, onUp, onDown }) => {
+  const { t } = useTranslation();
+  return (
+    <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'center' }}>
+      <IconButton size="small" color="primary" aria-label={t('skill-rank-remove')} disabled={!canDown} onClick={onDown}>
+        <RemoveIcon fontSize="small" />
+      </IconButton>
+      {/* On phones the squares do not fit: the details of the row show the ranks */}
+      <Stack
+        direction="row"
+        role="img"
+        aria-label={t('dev-ranks-value', { developed, max })}
+        sx={{ display: { xs: 'none', sm: 'flex' } }}
+      >
+        {Array.from({ length: max }, (_, index) =>
+          index < developed ? (
+            <SquareIcon key={index} sx={{ fontSize: 14 }} />
+          ) : (
+            <CropSquareIcon key={index} sx={{ fontSize: 14, color: 'text.disabled' }} />
+          )
+        )}
+      </Stack>
+      <IconButton size="small" color="primary" aria-label={t('skill-rank-add')} disabled={!canUp} onClick={onUp}>
+        <AddIcon fontSize="small" />
+      </IconButton>
+    </Stack>
+  );
+};
+
+/**
+ * Professional or knack mark next to the name: a small toggle on the skills of the profession, disabled when the
+ * character already has all of its kind; only the mark on any other marked skill.
+ */
+const MarkToggle: FC<{
+  type: ProfessionalType;
+  on: boolean;
+  editable: boolean;
+  shown: boolean;
+  limit: number;
+  onToggle: () => void;
+}> = ({ type, on, editable, shown, limit, onToggle }) => {
+  const { t } = useTranslation();
+  if (!shown) return null;
+  const label = t(type === 'professional' ? 'professional-skill' : 'knack-skill');
+  const Icon = type === 'professional' ? (on ? TurnedInIcon : TurnedInNotIcon) : on ? StarIcon : StarBorderIcon;
+  const hint = !editable && !on ? t('professional-mark-limit', { limit }) : label;
+  return (
+    <Tooltip title={hint}>
+      <span>
+        <IconButton
+          size="small"
+          color="primary"
+          aria-label={label}
+          aria-pressed={on}
+          disabled={!editable}
+          onClick={(event) => {
+            // The name cell opens the details: a mark only toggles itself
+            event.stopPropagation();
+            onToggle();
+          }}
+          sx={{ p: 0.25, ...(on ? {} : { opacity: 0.6 }) }}
+        >
+          <Icon sx={{ fontSize: 18 }} />
+        </IconButton>
+      </span>
+    </Tooltip>
+  );
+};
