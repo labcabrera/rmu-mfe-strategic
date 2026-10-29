@@ -226,7 +226,11 @@ const CultureEntryBlock: FC<{
         {rows.map((row) => {
           const skill = options.find((s) => s.id === row.skillId);
           const needsSpecialization = requiresSpecialization(entry, skill);
-          const freeSolo = !(entry.type === 'languages' && culture.languages?.length);
+          // Closed lists: the culture's languages and the regions of the realm (free text if the realm has none)
+          const freeSolo =
+            entry.type === 'region'
+              ? specializationOptions(row).length === 0
+              : !(entry.type === 'languages' && culture.languages?.length);
           const error = validation?.rowErrors[row.key];
           return (
             <Box key={row.key}>
@@ -242,17 +246,7 @@ const CultureEntryBlock: FC<{
                   />
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
-                  {needsSpecialization && entry.type === 'region' && (
-                    <TextField
-                      label={t('region')}
-                      value={row.specialization}
-                      onChange={(e) => onUpdate(row.key, { specialization: e.target.value })}
-                      error={!row.specialization.trim()}
-                      required
-                      fullWidth
-                    />
-                  )}
-                  {needsSpecialization && entry.type !== 'region' && (
+                  {needsSpecialization && (
                     <Autocomplete
                       freeSolo={freeSolo}
                       options={specializationOptions(row)}
@@ -267,7 +261,13 @@ const CultureEntryBlock: FC<{
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          label={entry.type === 'languages' ? t('language') : t('specialization')}
+                          label={
+                            entry.type === 'languages'
+                              ? t('language')
+                              : entry.type === 'region'
+                                ? t('region')
+                                : t('specialization')
+                          }
                           error={!!row.skillId && !row.specialization.trim()}
                           required
                         />
