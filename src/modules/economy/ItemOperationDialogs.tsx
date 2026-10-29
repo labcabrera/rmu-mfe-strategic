@@ -22,13 +22,24 @@ import {
   RmuDialog,
   sellItem,
   StrategicItem,
-  TradingRequest,
+  ModifierSelectionValues,
   transferItem,
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import ItemLedgerOutcome from './ItemLedgerOutcome';
 import ManeuverFields, { defaultSkillKey, emptyManeuver, isManeuverReady, toManeuverDto } from './ManeuverFields';
-import { TradingFields, usePriceQuote } from './TradingFields';
+import {
+  emptyTrading,
+  MarketConditions,
+  marketFactors,
+  negotiatorOf,
+  TradingFields,
+  tradingRequest,
+  TradingValue,
+  usePriceQuote,
+  useTradingModifiers,
+  useTradingTables,
+} from './TradingFields';
 import { HolderView } from './use-holder';
 
 /** Crafting skills offered first to craft or repair (spec 023, decisions 10 and 11). */
@@ -69,23 +80,34 @@ type DialogProps = {
   onDone: (result?: ItemOperationResult) => void;
 };
 
-/** Sells an item at the market (spec 023, decision 12): its value by its condition and the sale percent. */
+/**
+ * Sells an item at the market (spec 023, decision 12): its value by its condition and the sale percent, with the market
+ * conditions and the Trading roll of spec 048.
+ */
 export const SellItemDialog: FC<DialogProps> = ({ item, view, onClose, onDone }) => {
   const auth = useAuth();
   const { t } = useTranslation();
   const notify = useNotify();
   const [amount, setAmount] = useState<number | null>(itemUnits(item));
   const [salePercent, setSalePercent] = useState<number | null>(null);
-  const [trading, setTrading] = useState<TradingRequest>();
+  const { tables } = useTradingTables();
+  const modifiers = useTradingModifiers();
+  const [conditions, setConditions] = useState<ModifierSelectionValues>({});
+  const [tradingValue, setTradingValue] = useState<TradingValue>(() => emptyTrading(view.character));
   const [busy, setBusy] = useState(false);
+  const trading = tradingRequest(tradingValue, negotiatorOf(tradingValue, view.character, view.members), modifiers, 'sale');
+  const factors = marketFactors(tables, 'sale', conditions);
   const dto = {
     amount: partialAmount(item, amount),
     ...(salePercent !== null ? { salePercent } : {}),
+    ...(factors.length ? { factors } : {}),
     ...(trading ? { trading } : {}),
   };
+
   const { quote, error } = usePriceQuote(
     amount && amount > 0 ? { kind: 'sale', itemId: item.id, holder: view.holder, ...dto } : undefined
   );
+  const noDeal = quote?.price.trading?.pricePercent === null;
 
   const onSell = () => {
     setBusy(true);
@@ -101,7 +123,7 @@ export const SellItemDialog: FC<DialogProps> = ({ item, view, onClose, onDone })
       title={t('sell-item', { name: item.name })}
       onCancel={onClose}
       buttons={
-        <Button variant="contained" disabled={!quote || busy} onClick={onSell}>
+        <Button variant="contained" disabled={!quote || busy || noDeal} onClick={onSell}>
           {t('sell')}
         </Button>
       }
@@ -123,8 +145,18 @@ export const SellItemDialog: FC<DialogProps> = ({ item, view, onClose, onDone })
           max={200}
           integer
         />
-        <TradingFields character={view.character} onChange={setTrading} />
+        <MarketConditions context="sale" value={conditions} onChange={setConditions} />
+        <TradingFields
+          character={view.character}
+          members={view.members}
+          factionId={view.faction?.id}
+          context="sale"
+          modifiers={modifiers}
+          value={tradingValue}
+          onChange={setTradingValue}
+        />
         {quote && <PriceBreakdownView price={quote.price} funds={{ label: t('price-funds-after'), gold: view.gold }} />}
+        {noDeal && <Alert severity="error">{t(`trading-outcome-${quote?.price.trading?.outcome ?? 'no-agreement'}`)}</Alert>}
         {!!error && <Alert severity="warning">{t('price-quote-unavailable')}</Alert>}
       </Stack>
     </RmuDialog>
