@@ -22,6 +22,7 @@ import {
   CharacterSkill,
   Profession,
   SkillGroupList,
+  sortSkillsByName,
   StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { resolvePowerLevel } from '../../../services/game-rules';
@@ -38,7 +39,7 @@ const CharacterViewSkills: FC<{
   profession?: Profession;
   strategicGame?: StrategicGame;
 }> = ({ character, setCharacter, profession, strategicGame }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [openAddSkillDialog, setOpenAddSkillDialog] = useState(false);
   const [skillNameFilter, setSkillNameFilter] = useState('');
   const [selectedSkill, setSelectedSkill] = useState<CharacterSkill | null>(null);
@@ -62,15 +63,17 @@ const CharacterViewSkills: FC<{
   };
 
   const normalizedFilter = skillNameFilter.trim().toLowerCase();
+  // Sorted by the translated name, again when the translations load or the language changes
   const filteredSkills = useMemo(() => {
-    if (!normalizedFilter) return character.skills;
-
-    return character.skills.filter((skill) => {
-      const skillName = t(skill.skillId).toLowerCase();
-      const specialization = skill.specialization ? t(skill.specialization).toLowerCase() : '';
-      return skillName.includes(normalizedFilter) || specialization.includes(normalizedFilter);
-    });
-  }, [character.skills, normalizedFilter, t]);
+    const skills = !normalizedFilter
+      ? character.skills
+      : character.skills.filter((skill) => {
+          const skillName = t(skill.skillId).toLowerCase();
+          const specialization = skill.specialization ? t(skill.specialization).toLowerCase() : '';
+          return skillName.includes(normalizedFilter) || specialization.includes(normalizedFilter);
+        });
+    return sortSkillsByName(skills, t, i18n.language);
+  }, [character.skills, normalizedFilter, t, i18n.language]);
 
   return (
     <>
