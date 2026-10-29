@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
-import { Alert, Box, Button, Divider, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Alert, Box, Button, Divider, Paper, Stack, Tab, Tabs, Theme, Typography, useMediaQuery } from '@mui/material';
 import {
   EmptyState,
   Item,
@@ -25,7 +25,6 @@ import { GOLD_COIN, HolderView, useHolder } from './use-holder';
 
 type MarketTab = 'buy' | 'sell' | 'history';
 const TABS: MarketTab[] = ['buy', 'sell', 'history'];
-
 
 /**
  * The market of a character or a faction (spec 023, decision 14): buy from the catalog with a cart checked out in
@@ -75,8 +74,8 @@ export default function MarketPage() {
   );
 }
 
-/** Cards of the catalog next to the cart: two per row up to `lg`. */
-const MARKET_CARD_SIZE = { xs: 6, sm: 4, md: 6, lg: 4, xl: 3 };
+/** Cards of the catalog: as many per row as fit at this width, whatever the side column leaves. */
+const MARKET_CARD_MIN_WIDTH = 200;
 
 const MarketBuy: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDone }) => {
   const { t } = useTranslation();
@@ -84,6 +83,7 @@ const MarketBuy: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDone 
   const { items, error, truncated, refresh } = useItemCatalog({ exclude: [GOLD_COIN] });
   const [cart, setCart] = useState<CartLine[]>([]);
   const [checkout, setCheckout] = useState(false);
+  const wide = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
 
   // Spec 041: what the book sells in lots (20 arrows) goes in by lots
   const add = (item: Item) => {
@@ -109,22 +109,28 @@ const MarketBuy: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDone 
       />
     );
 
+  const marketCart = <MarketCart view={view} cart={cart} setCart={setCart} onCheckout={() => setCheckout(true)} />;
+  const browser = (
+    <ItemCatalogBrowser
+      items={items}
+      filters={filters}
+      layout={wide ? 'side' : 'drawer'}
+      onSelect={add}
+      cardMinWidth={MARKET_CARD_MIN_WIDTH}
+      panelHeader={wide ? marketCart : undefined}
+      panelWidth={300}
+      truncated={truncated}
+      error={error}
+      refresh={refresh}
+      storageKey="strategic.market"
+    />
+  );
+  // From lg the cart heads the side column of the filters, like the item list; below, the filters go in a drawer
+  if (wide) return browser;
   return (
-    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 360px' }, gap: 2, alignItems: 'start' }}>
-      <ItemCatalogBrowser
-        items={items}
-        filters={filters}
-        layout="drawer"
-        onSelect={add}
-        cardSize={MARKET_CARD_SIZE}
-        truncated={truncated}
-        error={error}
-        refresh={refresh}
-        storageKey="strategic.market"
-      />
-      <Box sx={{ position: { md: 'sticky' }, top: { md: 16 } }}>
-        <MarketCart view={view} cart={cart} setCart={setCart} onCheckout={() => setCheckout(true)} />
-      </Box>
+    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 320px' }, gap: 2, alignItems: 'start' }}>
+      {browser}
+      <Box sx={{ position: { md: 'sticky' }, top: { md: 16 } }}>{marketCart}</Box>
     </Box>
   );
 };
