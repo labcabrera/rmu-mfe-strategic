@@ -1,7 +1,13 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Divider, Stack } from '@mui/material';
-import { CharacterSkill, formatBonus, PreviewDrawer, skillCategoryOf } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  CharacterSkill,
+  formatBonus,
+  PreviewDrawer,
+  skillCategoryOf,
+  useSpecializationLabel,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { Row } from '../sections/CharacterPanels';
 
 /** Side panel with how a skill's total bonus adds up. */
@@ -13,6 +19,8 @@ export default function CharacterSkillBreakdown({
   onClose: () => void;
 }) {
   const { t } = useTranslation();
+  // Spec 050: specializations are catalog keys shown by their name
+  const specializationLabel = useSpecializationLabel();
   return (
     <PreviewDrawer
       open={Boolean(skill)}
@@ -20,7 +28,9 @@ export default function CharacterSkillBreakdown({
       title={skill ? t(skill.skillId) : undefined}
       subtitle={
         skill
-          ? [t(skillCategoryOf(skill) ?? 'skill'), skill.specialization && t(skill.specialization)].filter(Boolean).join(' · ')
+          ? [t(skillCategoryOf(skill) ?? 'skill'), skill.specialization && specializationLabel(skill.specialization)]
+              .filter(Boolean)
+              .join(' · ')
           : undefined
       }
     >

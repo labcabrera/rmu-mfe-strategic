@@ -43,6 +43,7 @@ import {
   setUpProfessionalSkill,
   skillCategoryOf,
   StrategicGame,
+  useSpecializationLabel,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import {
   MAX_PROFESSIONAL_SKILLS,
@@ -183,6 +184,8 @@ export default function CharacterSkillTable({
 const bonusColor = (value: number) => (value < 0 ? 'error.main' : value > 0 ? 'success.main' : 'text.secondary');
 
 function SkillRow({ skill, context }: { skill: CharacterSkill; context: TableContext }) {
+  // Spec 050: specializations are catalog keys shown by their name
+  const specializationLabel = useSpecializationLabel();
   const auth = useAuth();
   const { t } = useTranslation();
   const notify = useStrategicNotify();
@@ -264,7 +267,7 @@ function SkillRow({ skill, context }: { skill: CharacterSkill; context: TableCon
                   <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
                     {' · '}
                   </Box>
-                  {t(skill.specialization)}
+                  {specializationLabel(skill.specialization)}
                 </Typography>
               )}
             </Typography>

@@ -13,6 +13,7 @@ import {
   NumericInput,
   Skill,
   SkillPicker,
+  useSpecializationLabel,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import {
   CultureAssignmentRow,
@@ -50,6 +51,8 @@ const CharacterCreateCulture: FC<{
 }> = ({ realmId, cultures, culture, onCultureChange, rows, setRows, skills, validation, onError }) => {
   const auth = useAuth();
   const { t } = useTranslation();
+  // Spec 050: specializations are catalog keys shown by their name
+  const specializationLabel = useSpecializationLabel();
   const [specializations, setSpecializations] = useState<Record<string, string[]>>({});
 
   // Loads the specializations (enumeration keys) of the skills used in the rows
@@ -126,7 +129,7 @@ const CharacterCreateCulture: FC<{
                   <Chip
                     key={index}
                     variant="outlined"
-                    label={`${t(entry.skillId || '')}${entry.specialization ? ` (${t(entry.specialization)})` : ''} +${entry.ranks}`}
+                    label={`${t(entry.skillId || '')}${entry.specialization ? ` (${specializationLabel(entry.specialization)})` : ''} +${entry.ranks}`}
                   />
                 ))}
               </Stack>
@@ -166,6 +169,8 @@ const CultureEntryBlock: FC<{
   onRemove: (key: number) => void;
 }> = ({ culture, entry, rows, skills, specializations, validation, onAdd, onUpdate, onRemove }) => {
   const { t } = useTranslation();
+  // Spec 050: specializations are catalog keys shown by their name
+  const specializationLabel = useSpecializationLabel();
   const options = entrySkillOptions(entry, skills);
   const max = maxRanksPerSkill(entry);
   const pending = validation?.pending ?? entry.ranks;
@@ -180,7 +185,7 @@ const CultureEntryBlock: FC<{
         return `${t(entry.skillId || '')} · ${t(`culture-region-${entry.region || 'own'}`)}`;
       case 'languages':
         return culture.languages?.length
-          ? culture.languages.map((language) => t(language)).join(', ')
+          ? culture.languages.map((language) => specializationLabel(language)).join(', ')
           : t('culture-languages-all');
       default:
         return '';
@@ -226,11 +231,8 @@ const CultureEntryBlock: FC<{
         {rows.map((row) => {
           const skill = options.find((s) => s.id === row.skillId);
           const needsSpecialization = requiresSpecialization(entry, skill);
-          // Closed lists: the culture's languages and the regions of the realm (free text if the realm has none)
-          const freeSolo =
-            entry.type === 'region'
-              ? specializationOptions(row).length === 0
-              : !(entry.type === 'languages' && culture.languages?.length);
+          // Closed lists of catalog keys (spec 050): the culture's languages or the enumerations of the realm
+          const specializationChoices = specializationOptions(row);
           const error = validation?.rowErrors[row.key];
           return (
             <Box key={row.key}>
@@ -248,15 +250,10 @@ const CultureEntryBlock: FC<{
                 <Grid size={{ xs: 12, md: 4 }}>
                   {needsSpecialization && (
                     <Autocomplete
-                      freeSolo={freeSolo}
-                      options={specializationOptions(row)}
-                      getOptionLabel={(option) => t(option)}
+                      options={specializationChoices}
+                      getOptionLabel={(option) => specializationLabel(option)}
                       value={row.specialization || null}
                       onChange={(_, value) => onUpdate(row.key, { specialization: value || '' })}
-                      onInputChange={(_, value, reason) => {
-                        // Typed values are only kept when the options are not a closed list
-                        if (freeSolo && reason === 'input') onUpdate(row.key, { specialization: value });
-                      }}
                       disabled={!row.skillId}
                       renderInput={(params) => (
                         <TextField
@@ -269,6 +266,11 @@ const CultureEntryBlock: FC<{
                                 : t('specialization')
                           }
                           error={!!row.skillId && !row.specialization.trim()}
+                          helperText={
+                            row.skillId && specializationChoices.length === 0
+                              ? t('specialization-catalog-empty')
+                              : undefined
+                          }
                           required
                         />
                       )}
