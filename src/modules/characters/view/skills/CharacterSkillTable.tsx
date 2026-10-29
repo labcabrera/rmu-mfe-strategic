@@ -39,10 +39,13 @@ import {
   StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import MissingReferenceChip from '../../../shared/chips/MissingReferenceChip';
-import { maxRanksPerLevel, resolvePowerLevel, spendableDevPoints } from '../../../services/game-rules';
+import {
+  MAX_PROFESSIONAL_SKILLS,
+  maxRanksPerLevel,
+  resolvePowerLevel,
+  spendableDevPoints,
+} from '../../../services/game-rules';
 import { useStrategicNotify } from '../../../services/notify-service';
-
-const maxProfessionalSkills = 10;
 
 export default function CharacterSkillTable({
   character,
@@ -342,7 +345,7 @@ function SkillRow({
                   <IconButton
                     aria-label={t('professional-skill')}
                     onClick={() => handleSetUpProfessionalSkill(skill)}
-                    disabled={!isProfessional && currentProfessionalSkills >= maxProfessionalSkills}
+                    disabled={!isProfessional && currentProfessionalSkills >= MAX_PROFESSIONAL_SKILLS}
                     color="primary"
                   >
                     {isProfessional ? <TurnedInIcon /> : <TurnedInNotIcon />}

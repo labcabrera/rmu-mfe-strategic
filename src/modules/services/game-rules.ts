@@ -5,6 +5,9 @@ import {
   StrategicGamePowerLevel,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 
+/** Skills of the profession that get the professional bonus (Core Law 2.4: 10 of the 15 of the profession). */
+export const MAX_PROFESSIONAL_SKILLS = 10;
+
 /** Power level values the API applies when a game does not set them (Superior power level). */
 export const DEFAULT_POWER_LEVEL: Required<StrategicGamePowerLevel> = {
   baseDevPoints: 60,

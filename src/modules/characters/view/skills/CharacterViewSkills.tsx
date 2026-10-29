@@ -5,8 +5,10 @@ import SearchIcon from '@mui/icons-material/Search';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import ViewAgendaIcon from '@mui/icons-material/ViewAgenda';
 import {
+  Alert,
   alpha,
   Box,
+  Button,
   InputAdornment,
   IconButton,
   Stack,
@@ -25,7 +27,7 @@ import {
   sortSkillsByName,
   StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { resolvePowerLevel } from '../../../services/game-rules';
+import { MAX_PROFESSIONAL_SKILLS, resolvePowerLevel } from '../../../services/game-rules';
 import AddSkillDialog from './AddSkillDialog';
 import CharacterFightingStyles from './CharacterFightingStyles';
 import CharacterSkillBreakdown from './CharacterSkillBreakdown';
@@ -157,6 +159,12 @@ const CharacterViewSkills: FC<{
           strategicGame={strategicGame}
           limit={resolvePowerLevel(strategicGame?.powerLevel).raceDevPointsPerLevel}
         />
+        <ProfessionalBonusesAlert
+          character={character}
+          profession={profession}
+          strategicGame={strategicGame}
+          onShowTable={displaySkillTable ? undefined : () => handleViewModeChange(null, 'table')}
+        />
       </Stack>
 
       {displaySkillTable ? (
@@ -182,6 +190,53 @@ const CharacterViewSkills: FC<{
     </>
   );
 };
+
+/**
+ * Professional bonuses still to assign (Core Law 2.4): 10 skills of the profession get the professional bonus and the
+ * power level sets the knacks. They are marked with the buttons of the skill table, so the alert offers to open it.
+ */
+function ProfessionalBonusesAlert({
+  character,
+  profession,
+  strategicGame,
+  onShowTable,
+}: {
+  character: Character;
+  profession?: Profession;
+  strategicGame?: StrategicGame;
+  onShowTable?: () => void;
+}) {
+  const { t, i18n } = useTranslation();
+  if (!profession) return null;
+  const count = (type: string) => character.skills.filter((skill) => skill.professional?.includes(type)).length;
+  const professional = Math.max(0, MAX_PROFESSIONAL_SKILLS - count('professional'));
+  const knacks = Math.max(0, resolvePowerLevel(strategicGame?.powerLevel).knackCount - count('knack'));
+  if (professional === 0 && knacks === 0) return null;
+  // Only the skills of the profession that the character has can be marked
+  const candidates = character.skills.filter((skill) =>
+    (profession.professionalSkills as string[]).includes(skill.skillId)
+  ).length;
+  return (
+    <Alert
+      severity="info"
+      action={
+        onShowTable && (
+          <Button color="inherit" size="small" onClick={onShowTable}>
+            {t('professional-bonuses-assign')}
+          </Button>
+        )
+      }
+    >
+      {t('professional-bonuses-pending', {
+        items: new Intl.ListFormat(i18n.language, { type: 'conjunction' }).format([
+          ...(professional > 0 ? [t('professional-bonuses-professional', { count: professional })] : []),
+          ...(knacks > 0 ? [t('professional-bonuses-knacks', { count: knacks })] : []),
+        ]),
+      })}
+      {professional > 0 && candidates < MAX_PROFESSIONAL_SKILLS && ` ${t('professional-bonuses-add-skills')}`}
+    </Alert>
+  );
+}
 
 function DevelopmentPointsProgress({ available, total }: { available: number; total: number }) {
   const { t } = useTranslation();
