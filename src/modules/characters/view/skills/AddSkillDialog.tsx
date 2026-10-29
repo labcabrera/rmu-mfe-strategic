@@ -10,17 +10,21 @@ import {
   RmuDialog,
   Skill,
   SkillSelector,
+  StrategicGame,
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 export default function AddSkillDialog({
   open,
   character,
+  strategicGame,
   setCharacter,
   onClose,
 }: {
   open: boolean;
   character: Character;
+  /** Its realm gives the specializations of the realm (the regions of Survival and Region Lore). */
+  strategicGame?: StrategicGame;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   onClose: () => void;
 }) {
@@ -85,6 +89,8 @@ export default function AddSkillDialog({
       <Grid container spacing={1}>
         <Grid size={12}>
           <SkillSelector
+            realmId={strategicGame?.realmId}
+            owned={character.skills}
             realms={character.info.realmTypes ?? [character.info.realmType]}
             onSkillChange={(v) => onSelectedSkill(v || '')}
             onSpecializationChange={(v) => setFormData({ ...formData, specialization: v })}

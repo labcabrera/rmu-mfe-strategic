@@ -171,6 +171,7 @@ const CharacterViewSkills: FC<{
       <CharacterSkillBreakdown skill={selectedSkill} onClose={() => setSelectedSkill(null)} />
       <AddSkillDialog
         open={openAddSkillDialog}
+        strategicGame={strategicGame}
         character={character}
         setCharacter={setCharacter}
         onClose={() => setOpenAddSkillDialog(false)}
