@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { EntityCard, Faction } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { DEFAULT_FACTION_IMAGE_PATH } from '../services/image-service';
 
-/** Faction showcase card: image, short description and the available gold and XP, formatted in the user language. */
+/** Faction showcase card: image, short description and the available gold, formatted in the user language. */
 const FactionCard: FC<{ faction: Faction; subtitle?: string; onClick: () => void }> = ({
   faction,
   subtitle,
@@ -20,7 +20,6 @@ const FactionCard: FC<{ faction: Faction; subtitle?: string; onClick: () => void
       descriptionLines={3}
       metrics={[
         { label: t('gold'), value: numberFormat.format(faction.management?.availableGold ?? 0) },
-        { label: t('xp'), value: numberFormat.format(faction.management?.availableXP ?? 0) },
       ]}
       onClick={onClick}
     />
