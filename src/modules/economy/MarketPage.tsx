@@ -1,51 +1,35 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from 'react-oidc-context';
 import { useParams, useSearchParams } from 'react-router-dom';
-import DeleteIcon from '@mui/icons-material/Delete';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { Alert, Box, Button, Divider, IconButton, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
+import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
+import { Alert, Box, Button, Divider, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import {
   EmptyState,
-  EnumPicker,
   Item,
   ItemCatalogBrowser,
   itemCatalogFilters,
   ItemInventory,
-  ItemThumb,
   MoneyDisplay,
   NotFound,
-  NumericInput,
-  PayerMode,
-  PriceQuote,
-  purchaseItem,
-  quoteItemPrice,
-  roundGold,
   StrategicItem,
-  TradingRequest,
   useItemCatalog,
   useListFilters,
-  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import EconomyLayout from './EconomyLayout';
 import { holderNames } from './HolderInventory';
 import ItemLedgerList from './ItemLedgerList';
 import { SellItemDialog } from './ItemOperationDialogs';
-import { TradingFields } from './TradingFields';
+import MarketCheckout, { CartLine, CartLines, usePurchaseOrderQuote } from './MarketCheckout';
 import { GOLD_COIN, HolderView, useHolder } from './use-holder';
 
 type MarketTab = 'buy' | 'sell' | 'history';
 const TABS: MarketTab[] = ['buy', 'sell', 'history'];
 
-type CartLine = { item: Item; amount: number };
-const PAYER_MODES: PayerMode[] = ['holder', 'faction', 'split'];
-/** Items of a type that does not stack one purchase creates (strategic, spec 041). */
-const MAX_ITEMS_PER_PURCHASE = 100;
 
 /**
- * The market of a character or a faction (spec 023, decision 14): buy from the catalog with a cart and a price
- * breakdown, sell the items of the holder, and the ledger of its operations.
+ * The market of a character or a faction (spec 023, decision 14): buy from the catalog with a cart checked out in
+ * steps (spec 048), sell the items of the holder, and the ledger of its operations.
  */
 export default function MarketPage() {
   const { t } = useTranslation();
@@ -99,6 +83,7 @@ const MarketBuy: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDone 
   const filters = useListFilters<Item>(itemCatalogFilters(t));
   const { items, error, truncated, refresh } = useItemCatalog({ exclude: [GOLD_COIN] });
   const [cart, setCart] = useState<CartLine[]>([]);
+  const [checkout, setCheckout] = useState(false);
 
   // Spec 041: what the book sells in lots (20 arrows) goes in by lots
   const add = (item: Item) => {
@@ -109,6 +94,20 @@ const MarketBuy: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDone 
         : [...lines, { item, amount: lot }]
     );
   };
+
+  if (checkout)
+    return (
+      <MarketCheckout
+        view={view}
+        cart={cart}
+        setCart={setCart}
+        onCancel={() => setCheckout(false)}
+        onDone={() => {
+          setCheckout(false);
+          onDone();
+        }}
+      />
+    );
 
   return (
     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 360px' }, gap: 2, alignItems: 'start' }}>
@@ -124,84 +123,25 @@ const MarketBuy: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDone 
         storageKey="strategic.market"
       />
       <Box sx={{ position: { md: 'sticky' }, top: { md: 16 } }}>
-        <MarketCart view={view} cart={cart} setCart={setCart} onDone={onDone} />
+        <MarketCart view={view} cart={cart} setCart={setCart} onCheckout={() => setCheckout(true)} />
       </Box>
     </Box>
   );
 };
 
+/** The cart next to the catalog: its lines, the price of a direct purchase and the button to check out. */
 const MarketCart: FC<{
   view: HolderView;
   cart: CartLine[];
   setCart: React.Dispatch<React.SetStateAction<CartLine[]>>;
-  onDone: () => void;
-}> = ({ view, cart, setCart, onDone }) => {
-  const auth = useAuth();
+  onCheckout: () => void;
+}> = ({ view, cart, setCart, onCheckout }) => {
   const { t } = useTranslation();
-  const notify = useNotify();
-  const isCharacter = view.holder.kind === 'character';
-  const [payer, setPayer] = useState<PayerMode>('holder');
-  const [trading, setTrading] = useState<TradingRequest>();
-  const [quotes, setQuotes] = useState<Record<string, PriceQuote>>({});
-  const [busy, setBusy] = useState(false);
-  const key = JSON.stringify({ cart: cart.map((line) => [line.item.id, line.amount]), trading });
-
-  useEffect(() => {
-    if (cart.length === 0) return setQuotes({});
-    let active = true;
-    const timer = setTimeout(() => {
-      Promise.all(
-        cart.map((line) =>
-          quoteItemPrice(
-            { kind: 'purchase', itemTypeId: line.item.id, holder: view.holder, amount: line.amount, trading },
-            auth
-          ).then((quote) => [line.item.id, quote] as const)
-        )
-      )
-        .then((entries) => active && setQuotes(Object.fromEntries(entries)))
-        .catch(notify.error);
-    }, 250);
-    return () => {
-      active = false;
-      clearTimeout(timer);
-    };
-  }, [key]);
-
-  const total = roundGold(cart.reduce((sum, line) => sum + (quotes[line.item.id]?.price.total ?? 0), 0));
-  const factionGold = view.faction?.management.availableGold ?? 0;
-  const funds = !isCharacter
-    ? view.gold
-    : payer === 'holder'
-      ? view.gold
-      : payer === 'faction'
-        ? factionGold
-        : roundGold(view.gold + factionGold);
-  const after = roundGold(funds - total);
-
-  const onBuy = async () => {
-    setBusy(true);
-    try {
-      for (const line of cart) {
-        await purchaseItem(
-          {
-            buyer: view.holder,
-            itemTypeId: line.item.id,
-            amount: line.amount,
-            ...(isCharacter ? { payer } : {}),
-            ...(trading ? { trading } : {}),
-          },
-          auth
-        );
-        setCart((lines) => lines.filter((other) => other.item.id !== line.item.id));
-      }
-      notify.success(t('purchase-done'));
-    } catch (e) {
-      notify.error(e);
-    } finally {
-      setBusy(false);
-      onDone();
-    }
-  };
+  const { quote, error } = usePurchaseOrderQuote(
+    cart.length
+      ? { buyer: view.holder, lines: cart.map((line) => ({ itemTypeId: line.item.id, amount: line.amount })) }
+      : undefined
+  );
 
   return (
     <Paper variant="outlined" sx={{ p: 2 }}>
@@ -213,84 +153,20 @@ const MarketCart: FC<{
           </Typography>
         </Stack>
         {cart.length === 0 && <EmptyState title={t('cart-empty')} description={t('cart-empty-hint')} />}
-        {cart.map((line) => (
-          <Stack key={line.item.id} direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-            <ItemThumb item={line.item} size={40} />
-            <Box sx={{ flex: 1, minWidth: 0 }}>
-              <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
-                {t(line.item.name, line.item.name)}
-              </Typography>
-              {quotes[line.item.id] ? (
-                <MoneyDisplay gold={quotes[line.item.id].price.total} variant="caption" />
-              ) : (
-                <Typography variant="caption">…</Typography>
-              )}
-              {!line.item.info.stackable && line.amount > 1 && (
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                  {t('cart-separate-units', { count: line.amount })}
-                </Typography>
-              )}
-            </Box>
-            <Box sx={{ width: 72 }}>
-              <NumericInput
-                label={t('amount')}
-                value={line.amount}
-                min={1}
-                max={line.item.info.stackable ? undefined : MAX_ITEMS_PER_PURCHASE}
-                integer
-                onChange={(amount) =>
-                  setCart((lines) =>
-                    lines.map((other) => (other.item.id === line.item.id ? { ...other, amount: amount || 1 } : other))
-                  )
-                }
-              />
-            </Box>
-            <IconButton
-              size="small"
-              aria-label={t('remove')}
-              onClick={() => setCart((lines) => lines.filter((other) => other.item.id !== line.item.id))}
-            >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          </Stack>
-        ))}
+        <CartLines cart={cart} setCart={setCart} quote={quote} />
         {cart.length > 0 && (
           <>
             <Divider />
-            {isCharacter && (
-              <EnumPicker
-                label={t('payer')}
-                values={PAYER_MODES}
-                labelPrefix="payer-"
-                value={payer}
-                onChange={(mode) => mode && setPayer(mode as PayerMode)}
-                required
-              />
-            )}
-            {isCharacter && payer !== 'holder' && (
-              <Typography variant="caption" color="text.secondary">
-                {t('payer-faction-hint')}
-              </Typography>
-            )}
-            <TradingFields character={view.character} onChange={setTrading} />
-            <Divider />
             <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
-              <Typography sx={{ fontWeight: 700 }}>{t('price-total')}</Typography>
-              <MoneyDisplay gold={total} />
+              <Typography sx={{ fontWeight: 700 }}>{t('cart-direct-total')}</Typography>
+              {quote ? <MoneyDisplay gold={quote.total} /> : <Typography>…</Typography>}
             </Stack>
-            <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
-              <Typography variant="body2" color="text.secondary">
-                {t('price-funds-after')}
-              </Typography>
-              <MoneyDisplay gold={after} color={after < 0 ? 'error.main' : undefined} />
-            </Stack>
-            {after < 0 && <Alert severity="warning">{t('err-insufficient-gold')}</Alert>}
-            <Button
-              variant="contained"
-              disabled={busy || after < 0 || Object.keys(quotes).length < cart.length}
-              onClick={onBuy}
-            >
-              {t('buy')}
+            <Typography variant="caption" color="text.secondary">
+              {t('cart-direct-total-hint')}
+            </Typography>
+            {!!error && <Alert severity="warning">{t('price-quote-unavailable')}</Alert>}
+            <Button variant="contained" startIcon={<ShoppingCartCheckoutIcon />} onClick={onCheckout}>
+              {t('checkout')}
             </Button>
           </>
         )}
