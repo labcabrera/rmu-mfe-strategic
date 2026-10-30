@@ -2,7 +2,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { Stack, Typography } from '@mui/material';
+import { Alert, Stack, Typography } from '@mui/material';
 import {
   Character,
   fetchItems,
@@ -13,14 +13,17 @@ import {
   PoisonData,
   PoisonDataFields,
   poisonCharacter,
+  PoisonRrResult,
   RmuDialog,
+  RollBreakdown,
   RollField,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useStrategicNotify } from '../../../services/notify-service';
 
 /**
  * A poison reaches the character (spec 042): the game master picks it, the roll (empty, the server rolls it) and a
- * modifier of the RR (dose, size...). The server resolves the RR with the poison resistance of the sheet.
+ * modifier of the RR (dose, size...). The server resolves the RR with the poison resistance of the sheet, and the
+ * dialog then shows the RR entry by entry with its rules (workspace spec 052).
  */
 const PoisonCharacterDialog: FC<{
   character: Character;
@@ -36,12 +39,14 @@ const PoisonCharacterDialog: FC<{
   const [roll, setRoll] = useState<number | null>(null);
   const [modifier, setModifier] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
+  const [rr, setRr] = useState<PoisonRrResult>();
 
   useEffect(() => {
     if (!open) return;
     setPoison(undefined);
     setRoll(null);
     setModifier(null);
+    setRr(undefined);
     if (catalog.length === 0)
       fetchItems('category==poison', 0, 1000, auth)
         .then((page) => setCatalog(page.content))
@@ -62,17 +67,33 @@ const PoisonCharacterDialog: FC<{
     )
       .then((result) => {
         onUpdated(result.character);
-        const values = { total: result.rr.total, required: result.rr.required };
-        if (result.rr.resisted) notify.success(t('poison-rr-resisted', values));
-        else
-          notify.warning(
-            t('poison-rr-failed', { ...values, severity: t(`poison-severity-${result.rr.severity ?? 'mild'}`) })
-          );
-        onClose();
+        setRr(result.rr);
       })
       .catch(notify.error)
       .finally(() => setSaving(false));
   };
+
+  if (rr) {
+    const values = { total: rr.total, required: rr.required };
+    return (
+      <RmuDialog open={open} title={t('poison-character')} subtitle={character.name} maxWidth="sm" onClose={onClose}>
+        <Stack spacing={2} sx={{ pt: 1 }}>
+          <Alert severity={rr.resisted ? 'success' : 'warning'}>
+            {rr.resisted
+              ? t('poison-rr-resisted', values)
+              : t('poison-rr-failed', { ...values, severity: t(`poison-severity-${rr.severity ?? 'mild'}`) })}
+          </Alert>
+          <RollBreakdown
+            context="poison-rr"
+            modifiers={rr.breakdown.filter((modifier) => modifier.key !== 'roll')}
+            roll={rr.roll}
+            total={rr.total}
+            totalLabel={t('poison-rr-total', { required: rr.required })}
+          />
+        </Stack>
+      </RmuDialog>
+    );
+  }
 
   return (
     <RmuDialog
