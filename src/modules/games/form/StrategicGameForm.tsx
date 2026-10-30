@@ -15,6 +15,8 @@ import { DEFAULT_OPTIONS, DEFAULT_POWER_LEVEL } from '../../services/game-rules'
 import { GameOptionField } from '../GameOptionHint';
 
 const gridSize = { xs: 12, md: 3 };
+/** Pickers with a description and switches with a long label. */
+const wideSize = { xs: 12, md: 6 };
 
 const StrategicGameForm: FC<{
   formData: StrategicGame;
@@ -141,7 +143,7 @@ const StrategicGameForm: FC<{
                 />
               </GameOptionField>
             </Grid>
-            <Grid size={gridSize}>
+            <Grid size={wideSize}>
               <GameOptionField
                 option="talent-policy"
                 label={t('talent-policy')}
@@ -160,7 +162,7 @@ const StrategicGameForm: FC<{
                 />
               </GameOptionField>
             </Grid>
-            <Grid size={gridSize}>
+            <Grid size={wideSize}>
               <GameOptionField
                 option="stat-generation"
                 label={t('stat-generation')}
@@ -179,7 +181,7 @@ const StrategicGameForm: FC<{
                 />
               </GameOptionField>
             </Grid>
-            <Grid size={gridSize}>
+            <Grid size={wideSize}>
               <GameOptionField
                 option="allow-third-rank"
                 label={t('allow-third-rank')}
@@ -197,7 +199,7 @@ const StrategicGameForm: FC<{
                 />
               </GameOptionField>
             </Grid>
-            <Grid size={gridSize}>
+            <Grid size={wideSize}>
               <GameOptionField
                 option="bonus-dev-points-cap-at-creation"
                 label={t('bonus-dev-points-cap-at-creation')}
@@ -215,7 +217,7 @@ const StrategicGameForm: FC<{
                 />
               </GameOptionField>
             </Grid>
-            <Grid size={gridSize}>
+            <Grid size={wideSize}>
               <GameOptionField option="open-rounds" label={t('open-rounds')} defaultValue={DEFAULT_OPTIONS.openRounds}>
                 <FormControlLabel
                   control={

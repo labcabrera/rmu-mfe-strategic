@@ -30,9 +30,12 @@ export const GameOptionField: FC<{
   defaultValue?: number | string | boolean;
   children: ReactNode;
 }> = ({ children, ...hint }) => (
-  <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
+  // At the field's top, not the middle of the field plus its helper text (8px centres it on a 56px input)
+  <Stack direction="row" spacing={0.5} sx={{ alignItems: 'flex-start' }}>
     <Box sx={{ flex: 1, minWidth: 0 }}>{children}</Box>
-    <GameOptionHint {...hint} />
+    <Box sx={{ mt: 1 }}>
+      <GameOptionHint {...hint} />
+    </Box>
   </Stack>
 );
 
