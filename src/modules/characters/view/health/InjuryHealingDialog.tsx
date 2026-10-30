@@ -283,7 +283,10 @@ const InjuryHealingDialog: FC<{
             group: 'situation' as const,
             source: 'healing-type',
             rule: 'Table 13-1a',
-            params: latest ? { healingType, procedure: latest.procedure } : { healingType },
+            params: {
+              healingType: `healing-type-${healingType}`,
+              ...(latest ? { procedure: `procedure-${latest.procedure}` } : {}),
+            },
           },
         ]
       : []),
