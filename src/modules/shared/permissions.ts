@@ -1,10 +1,7 @@
 import type { AuthContextProps } from 'react-oidc-context';
-import type { Character, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { isAdmin, type Character, type StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 
-const ADMIN_GROUP = 'rmu-admin';
-
-export const isAdmin = (auth: AuthContextProps): boolean =>
-  ((auth.user?.profile?.groups as string[] | undefined) || []).includes(ADMIN_GROUP);
+export { isAdmin };
 
 /** The game master: the owner of the game, or an admin. */
 export const isGameMaster = (auth: AuthContextProps, game: StrategicGame | undefined): boolean =>
