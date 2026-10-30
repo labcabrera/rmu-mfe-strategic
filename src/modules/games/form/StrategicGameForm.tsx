@@ -1,6 +1,6 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FormControlLabel, Grid, Switch, TextField } from '@mui/material';
+import { FormControlLabel, Grid, Switch, TextField, Typography } from '@mui/material';
 import {
   EnumPicker,
   NumericInput,
@@ -11,9 +11,12 @@ import {
   StrategicGame,
   TALENT_POLICIES,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { DEFAULT_POWER_LEVEL } from '../../services/game-rules';
+import { DEFAULT_OPTIONS, DEFAULT_POWER_LEVEL } from '../../services/game-rules';
+import { GameOptionField } from '../GameOptionHint';
 
 const gridSize = { xs: 12, md: 3 };
+/** Pickers with a description and switches with a long label. */
+const wideSize = { xs: 12, md: 6 };
 
 const StrategicGameForm: FC<{
   formData: StrategicGame;
@@ -74,106 +77,159 @@ const StrategicGameForm: FC<{
       <Grid size={12}>
         <Section title={t('settings')}>
           <Grid container spacing={2}>
+            <Grid size={12}>
+              <Typography variant="body2" color="text.secondary">
+                {t('game-settings-intro')}
+              </Typography>
+            </Grid>
             <Grid size={gridSize}>
-              <NumericInput
+              <GameOptionField
+                option="experience-multiplier"
                 label={t('experience-multiplier')}
-                name="experienceMultiplier"
-                value={formData.options.experienceMultiplier}
-                onChange={(e) =>
-                  setFormData({ ...formData, options: { ...formData.options, experienceMultiplier: e || 1 } })
-                }
-                maxFractionDigits={2}
-                allowNegatives={false}
-              />
+                defaultValue={DEFAULT_OPTIONS.experienceMultiplier}
+              >
+                <NumericInput
+                  label={t('experience-multiplier')}
+                  name="experienceMultiplier"
+                  value={formData.options.experienceMultiplier}
+                  onChange={(e) =>
+                    setFormData({ ...formData, options: { ...formData.options, experienceMultiplier: e || 1 } })
+                  }
+                  maxFractionDigits={2}
+                  allowNegatives={false}
+                />
+              </GameOptionField>
             </Grid>
             <Grid size={gridSize}>
-              <NumericInput
+              <GameOptionField
+                option="fatigue-multiplier"
                 label={t('fatigue-multiplier')}
-                name="fatigueMultiplier"
-                value={formData.options.fatigueMultiplier}
-                onChange={(e) => handleOptionsChange('fatigueMultiplier', e || 0)}
-                maxFractionDigits={2}
-                allowNegatives={false}
-              />
+                defaultValue={DEFAULT_OPTIONS.fatigueMultiplier}
+              >
+                <NumericInput
+                  label={t('fatigue-multiplier')}
+                  name="fatigueMultiplier"
+                  value={formData.options.fatigueMultiplier}
+                  onChange={(e) => handleOptionsChange('fatigueMultiplier', e || 0)}
+                  maxFractionDigits={2}
+                  allowNegatives={false}
+                />
+              </GameOptionField>
             </Grid>
             <Grid size={gridSize}>
-              <NumericInput
+              <GameOptionField
+                option="board-scale"
                 label={t('board-scale')}
-                name="boardScaleMultiplier"
-                value={formData.options.boardScaleMultiplier}
-                onChange={(e) => handleOptionsChange('boardScaleMultiplier', e || 1)}
-                maxFractionDigits={2}
-                allowNegatives={false}
-              />
+                defaultValue={DEFAULT_OPTIONS.boardScaleMultiplier}
+              >
+                <NumericInput
+                  label={t('board-scale')}
+                  name="boardScaleMultiplier"
+                  value={formData.options.boardScaleMultiplier}
+                  onChange={(e) => handleOptionsChange('boardScaleMultiplier', e || 1)}
+                  maxFractionDigits={2}
+                  allowNegatives={false}
+                />
+              </GameOptionField>
             </Grid>
             <Grid size={gridSize}>
-              <NumericInput
-                label={t('letality')}
-                name="letality"
-                value={formData.options.letality}
-                onChange={(e) => handleOptionsChange('letality', e || 0)}
-                integer
-              />
+              <GameOptionField option="letality" label={t('letality')} defaultValue={DEFAULT_OPTIONS.letality}>
+                <NumericInput
+                  label={t('letality')}
+                  name="letality"
+                  value={formData.options.letality}
+                  onChange={(e) => handleOptionsChange('letality', e || 0)}
+                  integer
+                />
+              </GameOptionField>
             </Grid>
-            <Grid size={gridSize}>
-              <EnumPicker
+            <Grid size={wideSize}>
+              <GameOptionField
+                option="talent-policy"
                 label={t('talent-policy')}
-                name="talentPolicy"
-                variant="select"
-                values={TALENT_POLICIES}
-                labelPrefix="talent-policy-"
-                value={formData.options.talentPolicy ?? 'free'}
-                onChange={(policy) => policy && handleOptionsChange('talentPolicy', policy)}
-                required
-              />
+                defaultValue={DEFAULT_OPTIONS.talentPolicy}
+              >
+                <EnumPicker
+                  label={t('talent-policy')}
+                  name="talentPolicy"
+                  variant="select"
+                  values={TALENT_POLICIES}
+                  labelPrefix="talent-policy-"
+                  descriptionPrefix="talent-policy-help-"
+                  value={formData.options.talentPolicy ?? 'free'}
+                  onChange={(policy) => policy && handleOptionsChange('talentPolicy', policy)}
+                  required
+                />
+              </GameOptionField>
             </Grid>
-            <Grid size={gridSize}>
-              <EnumPicker
+            <Grid size={wideSize}>
+              <GameOptionField
+                option="stat-generation"
                 label={t('stat-generation')}
-                name="statGeneration"
-                variant="select"
-                values={STAT_GENERATIONS}
-                labelPrefix="stat-generation-"
-                value={formData.options.statGeneration ?? 'roll'}
-                onChange={(method) => method && handleOptionsChange('statGeneration', method)}
-                required
-              />
+                defaultValue={DEFAULT_OPTIONS.statGeneration}
+              >
+                <EnumPicker
+                  label={t('stat-generation')}
+                  name="statGeneration"
+                  variant="select"
+                  values={STAT_GENERATIONS}
+                  labelPrefix="stat-generation-"
+                  descriptionPrefix="stat-generation-help-"
+                  value={formData.options.statGeneration ?? 'roll'}
+                  onChange={(method) => method && handleOptionsChange('statGeneration', method)}
+                  required
+                />
+              </GameOptionField>
             </Grid>
-            <Grid size={gridSize}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    name="allowThirdRank"
-                    checked={!!formData.options.allowThirdRank}
-                    onChange={(e) => handleOptionsChange('allowThirdRank', e.target.checked)}
-                  />
-                }
+            <Grid size={wideSize}>
+              <GameOptionField
+                option="allow-third-rank"
                 label={t('allow-third-rank')}
-              />
+                defaultValue={DEFAULT_OPTIONS.allowThirdRank}
+              >
+                <FormControlLabel
+                  control={
+                    <Switch
+                      name="allowThirdRank"
+                      checked={!!formData.options.allowThirdRank}
+                      onChange={(e) => handleOptionsChange('allowThirdRank', e.target.checked)}
+                    />
+                  }
+                  label={t('allow-third-rank')}
+                />
+              </GameOptionField>
             </Grid>
-            <Grid size={gridSize}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    name="bonusDevPointsCapAtCreation"
-                    checked={!!formData.options.bonusDevPointsCapAtCreation}
-                    onChange={(e) => handleOptionsChange('bonusDevPointsCapAtCreation', e.target.checked)}
-                  />
-                }
+            <Grid size={wideSize}>
+              <GameOptionField
+                option="bonus-dev-points-cap-at-creation"
                 label={t('bonus-dev-points-cap-at-creation')}
-              />
+                defaultValue={DEFAULT_OPTIONS.bonusDevPointsCapAtCreation}
+              >
+                <FormControlLabel
+                  control={
+                    <Switch
+                      name="bonusDevPointsCapAtCreation"
+                      checked={!!formData.options.bonusDevPointsCapAtCreation}
+                      onChange={(e) => handleOptionsChange('bonusDevPointsCapAtCreation', e.target.checked)}
+                    />
+                  }
+                  label={t('bonus-dev-points-cap-at-creation')}
+                />
+              </GameOptionField>
             </Grid>
-            <Grid size={gridSize}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    name="openRounds"
-                    checked={formData.options.openRounds ?? true}
-                    onChange={(e) => handleOptionsChange('openRounds', e.target.checked)}
-                  />
-                }
-                label={t('open-rounds')}
-              />
+            <Grid size={wideSize}>
+              <GameOptionField option="open-rounds" label={t('open-rounds')} defaultValue={DEFAULT_OPTIONS.openRounds}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      name="openRounds"
+                      checked={formData.options.openRounds ?? true}
+                      onChange={(e) => handleOptionsChange('openRounds', e.target.checked)}
+                    />
+                  }
+                  label={t('open-rounds')}
+                />
+              </GameOptionField>
             </Grid>
           </Grid>
         </Section>
@@ -181,125 +237,202 @@ const StrategicGameForm: FC<{
       <Grid size={12}>
         <Section title={t('power-level')}>
           <Grid container spacing={2}>
+            <Grid size={12}>
+              <Typography variant="body2" color="text.secondary">
+                {t('game-power-level-intro')}
+              </Typography>
+            </Grid>
             <Grid size={gridSize}>
-              <NumericInput
+              <GameOptionField
+                option="base-dev-points"
                 label={t('base-dev-points')}
-                name="baseDevPoints"
-                value={formData.powerLevel.baseDevPoints}
-                onChange={(e) => handlePowerLevelChange('baseDevPoints', e || 0)}
-                integer
-                allowNegatives={false}
-              />
+                defaultValue={DEFAULT_POWER_LEVEL.baseDevPoints}
+              >
+                <NumericInput
+                  label={t('base-dev-points')}
+                  name="baseDevPoints"
+                  value={formData.powerLevel.baseDevPoints}
+                  onChange={(e) => handlePowerLevelChange('baseDevPoints', e || 0)}
+                  integer
+                  allowNegatives={false}
+                />
+              </GameOptionField>
             </Grid>
             <Grid size={gridSize}>
-              <NumericInput
+              <GameOptionField
+                option="stat-random-min"
                 label={t('stat-random-min')}
-                name="statRandomMin"
-                value={formData.powerLevel.statRandomMin}
-                onChange={(e) => handlePowerLevelChange('statRandomMin', e || 0)}
-                integer
-                allowNegatives={false}
-              />
+                defaultValue={DEFAULT_POWER_LEVEL.statRandomMin}
+              >
+                <NumericInput
+                  label={t('stat-random-min')}
+                  name="statRandomMin"
+                  value={formData.powerLevel.statRandomMin}
+                  onChange={(e) => handlePowerLevelChange('statRandomMin', e || 0)}
+                  integer
+                  allowNegatives={false}
+                />
+              </GameOptionField>
             </Grid>
             <Grid size={gridSize}>
-              <NumericInput
+              <GameOptionField
+                option="stat-boost-potential"
                 label={t('stat-boost-potential')}
-                name="statBoostPotential"
-                value={formData.powerLevel.statBoostPotential}
-                onChange={(e) => handlePowerLevelChange('statBoostPotential', e || 0)}
-                integer
-                allowNegatives={false}
-              />
+                defaultValue={DEFAULT_POWER_LEVEL.statBoostPotential}
+              >
+                <NumericInput
+                  label={t('stat-boost-potential')}
+                  name="statBoostPotential"
+                  value={formData.powerLevel.statBoostPotential}
+                  onChange={(e) => handlePowerLevelChange('statBoostPotential', e || 0)}
+                  integer
+                  allowNegatives={false}
+                />
+              </GameOptionField>
             </Grid>
             <Grid size={gridSize}>
-              <NumericInput
+              <GameOptionField
+                option="stat-boost-temporary"
                 label={t('stat-boost-temporary')}
-                name="statBoostTemporary"
-                value={formData.powerLevel.statBoostTemporary}
-                onChange={(e) => handlePowerLevelChange('statBoostTemporary', e || 0)}
-                integer
-                allowNegatives={false}
-              />
+                defaultValue={DEFAULT_POWER_LEVEL.statBoostTemporary}
+              >
+                <NumericInput
+                  label={t('stat-boost-temporary')}
+                  name="statBoostTemporary"
+                  value={formData.powerLevel.statBoostTemporary}
+                  onChange={(e) => handlePowerLevelChange('statBoostTemporary', e || 0)}
+                  integer
+                  allowNegatives={false}
+                />
+              </GameOptionField>
             </Grid>
             <Grid size={gridSize}>
-              <NumericInput
+              <GameOptionField
+                option="stat-creation-boosts"
                 label={t('stat-creation-boosts')}
-                name="statCreationBoost"
-                value={formData.powerLevel.statCreationBoost}
-                onChange={(e) => handlePowerLevelChange('statCreationBoost', e || 0)}
-                integer
-                allowNegatives={false}
-              />
+                defaultValue={DEFAULT_POWER_LEVEL.statCreationBoost}
+              >
+                <NumericInput
+                  label={t('stat-creation-boosts')}
+                  name="statCreationBoost"
+                  value={formData.powerLevel.statCreationBoost}
+                  onChange={(e) => handlePowerLevelChange('statCreationBoost', e || 0)}
+                  integer
+                  allowNegatives={false}
+                />
+              </GameOptionField>
             </Grid>
             <Grid size={gridSize}>
-              <NumericInput
+              <GameOptionField
+                option="stat-creation-swaps"
                 label={t('stat-creation-swaps')}
-                name="statCreationSwap"
-                value={formData.powerLevel.statCreationSwap}
-                onChange={(e) => handlePowerLevelChange('statCreationSwap', e || 0)}
-                integer
-                allowNegatives={false}
-              />
+                defaultValue={DEFAULT_POWER_LEVEL.statCreationSwap}
+              >
+                <NumericInput
+                  label={t('stat-creation-swaps')}
+                  name="statCreationSwap"
+                  value={formData.powerLevel.statCreationSwap}
+                  onChange={(e) => handlePowerLevelChange('statCreationSwap', e || 0)}
+                  integer
+                  allowNegatives={false}
+                />
+              </GameOptionField>
             </Grid>
             <Grid size={gridSize}>
-              <NumericInput
+              <GameOptionField
+                option="max-trait-cost"
                 label={t('max-trait-cost')}
-                name="maxTraitCost"
-                value={formData.powerLevel.maxTraitCost ?? DEFAULT_POWER_LEVEL.maxTraitCost}
-                onChange={(e) => handlePowerLevelChange('maxTraitCost', e || 0)}
-                integer
-                allowNegatives={false}
-              />
+                defaultValue={DEFAULT_POWER_LEVEL.maxTraitCost}
+              >
+                <NumericInput
+                  label={t('max-trait-cost')}
+                  name="maxTraitCost"
+                  value={formData.powerLevel.maxTraitCost ?? DEFAULT_POWER_LEVEL.maxTraitCost}
+                  onChange={(e) => handlePowerLevelChange('maxTraitCost', e || 0)}
+                  integer
+                  allowNegatives={false}
+                />
+              </GameOptionField>
             </Grid>
             <Grid size={gridSize}>
-              <NumericInput
+              <GameOptionField
+                option="race-dev-points-per-level"
                 label={t('race-dev-points-per-level')}
-                name="raceDevPointsPerLevel"
-                value={formData.powerLevel.raceDevPointsPerLevel ?? DEFAULT_POWER_LEVEL.raceDevPointsPerLevel}
-                onChange={(e) => handlePowerLevelChange('raceDevPointsPerLevel', e || 0)}
-                integer
-                allowNegatives={false}
-              />
+                defaultValue={DEFAULT_POWER_LEVEL.raceDevPointsPerLevel}
+              >
+                <NumericInput
+                  label={t('race-dev-points-per-level')}
+                  name="raceDevPointsPerLevel"
+                  value={formData.powerLevel.raceDevPointsPerLevel ?? DEFAULT_POWER_LEVEL.raceDevPointsPerLevel}
+                  onChange={(e) => handlePowerLevelChange('raceDevPointsPerLevel', e || 0)}
+                  integer
+                  allowNegatives={false}
+                />
+              </GameOptionField>
             </Grid>
             <Grid size={gridSize}>
-              <NumericInput
+              <GameOptionField
+                option="creation-bonus-dev-points"
                 label={t('creation-bonus-dev-points')}
-                name="creationBonusDevPoints"
-                value={formData.powerLevel.creationBonusDevPoints ?? DEFAULT_POWER_LEVEL.creationBonusDevPoints}
-                onChange={(e) => handlePowerLevelChange('creationBonusDevPoints', e || 0)}
-                integer
-                allowNegatives={false}
-              />
+                defaultValue={DEFAULT_POWER_LEVEL.creationBonusDevPoints}
+              >
+                <NumericInput
+                  label={t('creation-bonus-dev-points')}
+                  name="creationBonusDevPoints"
+                  value={formData.powerLevel.creationBonusDevPoints ?? DEFAULT_POWER_LEVEL.creationBonusDevPoints}
+                  onChange={(e) => handlePowerLevelChange('creationBonusDevPoints', e || 0)}
+                  integer
+                  allowNegatives={false}
+                />
+              </GameOptionField>
             </Grid>
             <Grid size={gridSize}>
-              <NumericInput
+              <GameOptionField
+                option="stat-points"
                 label={t('stat-points')}
-                name="statPoints"
-                value={formData.powerLevel.statPoints ?? DEFAULT_POWER_LEVEL.statPoints}
-                onChange={(e) => handlePowerLevelChange('statPoints', e || 0)}
-                integer
-                allowNegatives={false}
-              />
+                defaultValue={DEFAULT_POWER_LEVEL.statPoints}
+              >
+                <NumericInput
+                  label={t('stat-points')}
+                  name="statPoints"
+                  value={formData.powerLevel.statPoints ?? DEFAULT_POWER_LEVEL.statPoints}
+                  onChange={(e) => handlePowerLevelChange('statPoints', e || 0)}
+                  integer
+                  allowNegatives={false}
+                />
+              </GameOptionField>
             </Grid>
             <Grid size={gridSize}>
-              <NumericInput
+              <GameOptionField
+                option="knack-count"
                 label={t('knack-count')}
-                name="knackCount"
-                value={formData.powerLevel.knackCount ?? DEFAULT_POWER_LEVEL.knackCount}
-                onChange={(e) => handlePowerLevelChange('knackCount', e || 0)}
-                integer
-                allowNegatives={false}
-              />
+                defaultValue={DEFAULT_POWER_LEVEL.knackCount}
+              >
+                <NumericInput
+                  label={t('knack-count')}
+                  name="knackCount"
+                  value={formData.powerLevel.knackCount ?? DEFAULT_POWER_LEVEL.knackCount}
+                  onChange={(e) => handlePowerLevelChange('knackCount', e || 0)}
+                  integer
+                  allowNegatives={false}
+                />
+              </GameOptionField>
             </Grid>
             <Grid size={gridSize}>
-              <NumericInput
+              <GameOptionField
+                option="knack-bonus"
                 label={t('knack-bonus')}
-                name="knackBonus"
-                value={formData.powerLevel.knackBonus ?? DEFAULT_POWER_LEVEL.knackBonus}
-                onChange={(e) => handlePowerLevelChange('knackBonus', e || 0)}
-                integer
-                allowNegatives={false}
-              />
+                defaultValue={DEFAULT_POWER_LEVEL.knackBonus}
+              >
+                <NumericInput
+                  label={t('knack-bonus')}
+                  name="knackBonus"
+                  value={formData.powerLevel.knackBonus ?? DEFAULT_POWER_LEVEL.knackBonus}
+                  onChange={(e) => handlePowerLevelChange('knackBonus', e || 0)}
+                  integer
+                  allowNegatives={false}
+                />
+              </GameOptionField>
             </Grid>
           </Grid>
         </Section>

@@ -37,6 +37,7 @@ import {
   rollCharacterInjuryRecovery,
   RollField,
   RollModifier,
+  RuleHint,
   treatCharacterInjury,
   TreatInjuryDto,
   TreatmentDifficulty,
@@ -268,15 +269,31 @@ const InjuryHealingDialog: FC<{
   // Recovery preview: Body Development ranks + Co bonus + type of healing - |penalty|.
   const latest = latestTreatment(injury);
   const healingType = latest?.healingType ?? 'none';
-  const healingTypeModifier = tables
-    ? (tables.healingTypeModifiers[healingType] ?? 0) +
-      (latest?.result === 'partial-success' ? latest.recoveryModifier || 0 : 0)
-    : undefined;
+  const partialModifier = latest?.result === 'partial-success' ? latest.recoveryModifier || 0 : 0;
+  const healingTypeModifier = tables ? (tables.healingTypeModifiers[healingType] ?? 0) + partialModifier : undefined;
+  // Spec 052: the same entries, groups and rules as the API keeps with the recovery
   const recoveryModifiers: RollModifier[] = [
-    { key: 'body-development-ranks', value: bodyDevelopmentRanks(character) },
-    { key: 'constitution-bonus', value: character.statistics.co?.totalBonus ?? 0 },
-    ...(healingTypeModifier !== undefined ? [{ key: healingTypeKey(healingType), value: healingTypeModifier }] : []),
-    { key: 'injury-penalty', value: -Math.abs(injury.penalty || 0) },
+    { key: 'body-development-ranks', value: bodyDevelopmentRanks(character), group: 'skill', rule: '§13.1' },
+    { key: 'constitution-bonus', value: character.statistics.co?.totalBonus ?? 0, group: 'skill', rule: '§13.1' },
+    ...(healingTypeModifier !== undefined
+      ? [
+          {
+            key: healingTypeKey(healingType),
+            value: healingTypeModifier - partialModifier,
+            group: 'situation' as const,
+            source: 'healing-type',
+            rule: 'Table 13-1a',
+            params: {
+              healingType: `healing-type-${healingType}`,
+              ...(latest ? { procedure: `procedure-${latest.procedure}` } : {}),
+            },
+          },
+        ]
+      : []),
+    ...(healingTypeModifier !== undefined && partialModifier
+      ? [{ key: 'partial-success', value: partialModifier, group: 'situation' as const, rule: '§13.1' }]
+      : []),
+    { key: 'injury-penalty', value: -Math.abs(injury.penalty || 0), group: 'penalty', rule: '§13.1' },
   ];
   const raceMultiplier = recoveryMultiplierOf(character);
   const recovery = injury.recovery;
@@ -499,10 +516,34 @@ const InjuryHealingDialog: FC<{
               {t('recovery-total-days', { count: recovery.totalDays })}
             </Alert>
           )}
-          <Line label={t('roll')} value={recovery.roll} />
-          <Line label={t('modifier')} value={formatBonus(recovery.modifiers)} />
-          <Line label={t('total')} value={recovery.total} />
-          <Line label={t('recovery-base-days')} value={recovery.baseDays} />
+          {recovery.breakdown ? (
+            <RollBreakdown
+              context="recovery"
+              modifiers={recovery.breakdown}
+              roll={recovery.roll}
+              total={recovery.total}
+              totalLabel={t('recovery-total')}
+            />
+          ) : (
+            <>
+              <Line label={t('roll')} value={recovery.roll} />
+              <Line label={t('modifier')} value={formatBonus(recovery.modifiers)} />
+              <Line label={t('total')} value={recovery.total} />
+            </>
+          )}
+          {/* Spec 052: which column and multipliers give the days */}
+          {recovery.days ? (
+            <RuleHint
+              title={t('recovery-base-days')}
+              description={t('recovery-days-explanation')}
+              params={recovery.days}
+              reference="Table 13-1a"
+            >
+              <Line label={t('recovery-base-days')} value={recovery.baseDays} />
+            </RuleHint>
+          ) : (
+            <Line label={t('recovery-base-days')} value={recovery.baseDays} />
+          )}
           <Line label={t('recovery-multiplier')} value={`×${recovery.multiplier}`} />
           <Line label={t('recovery-total-days-label')} value={recovery.totalDays} />
           <Line label={t('recovery-remaining-days')} value={recovery.remainingDays} />
@@ -568,7 +609,7 @@ const InjuryHealingDialog: FC<{
 
 const RecoveryBreakdown: FC<{ modifiers: RollModifier[]; roll: number | null }> = ({ modifiers, roll }) => {
   const { t } = useTranslation();
-  return <RollBreakdown modifiers={modifiers} roll={roll} totalLabel={t('recovery-total')} />;
+  return <RollBreakdown context="recovery" modifiers={modifiers} roll={roll} totalLabel={t('recovery-total')} />;
 };
 
 export type { StepId as HealingStepId };
