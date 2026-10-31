@@ -22,6 +22,8 @@ import {
   Character,
   DifficultyPicker,
   fetchCharacterTreatmentDifficulty,
+  fetchStrategicItems,
+  herbTreats,
   formatBonus,
   HealerCandidate,
   HealerPicker,
@@ -38,6 +40,7 @@ import {
   RollField,
   RollModifier,
   RuleHint,
+  StrategicItem,
   treatCharacterInjury,
   TreatInjuryDto,
   TreatmentDifficulty,
@@ -110,6 +113,9 @@ const InjuryHealingDialog: FC<{
   const [healingOption, setHealingOption] = useState<HealingOption>('medicine');
   const [herbalismEnabled, setHerbalismEnabled] = useState(false);
   const [herbalismRoll, setHerbalismRoll] = useState<number | null>(null);
+  // Spec 062: the herbs the character carries that treat this injury, and the one used
+  const [herbs, setHerbs] = useState<StrategicItem[]>([]);
+  const [herbItemId, setHerbItemId] = useState('');
   const [treated, setTreated] = useState(false);
   const [recoveryRoll, setRecoveryRoll] = useState<number | null>(null);
   const [recoveryDone, setRecoveryDone] = useState(false);
@@ -165,6 +171,16 @@ const InjuryHealingDialog: FC<{
     setHealingOption('medicine');
     setHerbalismEnabled(false);
     setHerbalismRoll(null);
+    setHerbItemId('');
+    fetchStrategicItems(`characterId==${character.id}`, 0, 1000, auth)
+      .then((page) =>
+        setHerbs(
+          page.content.filter(
+            (item) => item.category === 'herb' && herbTreats(item.catalog?.features?.herb, injury.type)
+          )
+        )
+      )
+      .catch(() => setHerbs([]));
     setTreated(false);
     setRecoveryRoll(null);
     setRecoveryDone(false);
@@ -183,6 +199,18 @@ const InjuryHealingDialog: FC<{
   const difficultyValue = override ? override.value + extraDifficulty : computed?.difficulty;
   const selectedGrade = override?.key ?? computed?.grade ?? '';
   const overridden = !!override && override.value !== computed?.base;
+
+  const usesHerbs = procedure === 'herbs' || healingOption === 'herbs' || healingOption === 'magic-and-herbs';
+  const herbItem = herbs.find((item) => item.id === herbItemId);
+  const herbMagical = herbItem?.catalog?.features?.herb?.magical !== false;
+  const herbBonusText = herbItem
+    ? herbMagical
+      ? t('treatment-herb-bonus-magical', {
+          medicine: formatBonus(25),
+          recovery: formatBonus(healingOption === 'magic-and-herbs' ? 75 : 50),
+        })
+      : t('treatment-herb-bonus-mundane', { medicine: formatBonus(25) })
+    : t('treatment-herb-generic');
 
   const changeProcedure = (next: TreatmentProcedure) => {
     setProcedure(next);
@@ -220,6 +248,7 @@ const InjuryHealingDialog: FC<{
               herbalismBonus: resolvedHealer.herbalism,
             },
           }),
+      ...(usesHerbs && herbItemId ? { herbItemId } : {}),
       ...(herbalismEnabled && herbalismRoll !== null
         ? {
             herbalism: resolvedHealer.characterId
@@ -372,6 +401,25 @@ const InjuryHealingDialog: FC<{
             ))}
           </TextField>
         </Grid>
+        {usesHerbs && (
+          <Grid size={12}>
+            <TextField
+              select
+              fullWidth
+              label={t('treatment-herb')}
+              value={herbItemId}
+              onChange={(event) => setHerbItemId(event.target.value)}
+              helperText={herbs.length === 0 ? t('treatment-herb-none-carried') : herbBonusText}
+            >
+              <MenuItem value="">{t('treatment-herb-generic-option')}</MenuItem>
+              {herbs.map((item) => (
+                <MenuItem key={item.id} value={item.id}>
+                  {`${t(item.name, item.name)} (${item.amount})`}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+        )}
         {!isMagic && (
           <>
             <Grid size={{ xs: 12, sm: 6 }}>
@@ -457,6 +505,15 @@ const InjuryHealingDialog: FC<{
               {t('treatment-healer-penalty', { value: formatBonus(latest.healer.penalty) })}
             </Box>
           )}
+        </Alert>
+      )}
+      {treated && latest?.herb && (
+        <Alert severity="info">
+          {t('treatment-herb-applied', {
+            name: latest.herb.name ? t(latest.herb.name, latest.herb.name) : '',
+            medicine: formatBonus(latest.herb.medicineBonus),
+            recovery: formatBonus(latest.herb.recoveryBonus),
+          })}
         </Alert>
       )}
       {latest?.heatCritical && (

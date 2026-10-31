@@ -2,7 +2,7 @@ import React, { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
-import { Alert, Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Button, FormControlLabel, MenuItem, Stack, Switch, TextField, Typography } from '@mui/material';
 import {
   CharacterPicker,
   coatItem,
@@ -80,9 +80,16 @@ type DialogProps = {
   onDone: (result?: ItemOperationResult) => void;
 };
 
+/** Default commission of a jeweler when the economy rules do not give one (spec 062). */
+const DEFAULT_JEWELER_PERCENT = 3;
+
+/** Gems and jewelry can go to a jeweler (spec 062). */
+export const isJewelerItem = (item: StrategicItem) => item.category === 'gem' || item.category === 'jewelry';
+
 /**
  * Sells an item at the market (spec 023, decision 12): its value by its condition and the sale percent, with the market
- * conditions and the Trading roll of spec 048.
+ * conditions and the Trading roll of spec 048. A gem or a jewel may go to a jeweler instead (spec 062), for its value
+ * less the commission and without haggling.
  */
 export const SellItemDialog: FC<DialogProps> = ({ item, view, onClose, onDone }) => {
   const auth = useAuth();
@@ -95,14 +102,23 @@ export const SellItemDialog: FC<DialogProps> = ({ item, view, onClose, onDone })
   const [conditions, setConditions] = useState<ModifierSelectionValues>({});
   const [tradingValue, setTradingValue] = useState<TradingValue>(() => emptyTrading(view.character));
   const [busy, setBusy] = useState(false);
+  const canJeweler = isJewelerItem(item);
+  const [jeweler, setJeweler] = useState(canJeweler);
+  const [jewelerPercent, setJewelerPercent] = useState<number | null>(null);
   const trading = tradingRequest(tradingValue, negotiatorOf(tradingValue, view.character, view.members), modifiers, 'sale');
   const factors = marketFactors(tables, 'sale', conditions);
-  const dto = {
-    amount: partialAmount(item, amount),
-    ...(salePercent !== null ? { salePercent } : {}),
-    ...(factors.length ? { factors } : {}),
-    ...(trading ? { trading } : {}),
-  };
+  const dto = jeweler
+    ? {
+        amount: partialAmount(item, amount),
+        jeweler: true,
+        ...(jewelerPercent !== null ? { jewelerPercent } : {}),
+      }
+    : {
+        amount: partialAmount(item, amount),
+        ...(salePercent !== null ? { salePercent } : {}),
+        ...(factors.length ? { factors } : {}),
+        ...(trading ? { trading } : {}),
+      };
 
   const { quote, error } = usePriceQuote(
     amount && amount > 0 ? { kind: 'sale', itemId: item.id, holder: view.holder, ...dto } : undefined
@@ -136,25 +152,50 @@ export const SellItemDialog: FC<DialogProps> = ({ item, view, onClose, onDone })
           <ItemConditionChip condition={item.condition} />
         </Stack>
         <AmountField item={item} value={amount} onChange={setAmount} />
-        <NumericInput
-          label={t('price-sale-percent-override')}
-          placeholder={quote ? `${quote.rules.salePercent}` : undefined}
-          value={salePercent}
-          onChange={setSalePercent}
-          min={0}
-          max={200}
-          integer
-        />
-        <MarketConditions context="sale" value={conditions} onChange={setConditions} />
-        <TradingFields
-          character={view.character}
-          members={view.members}
-          factionId={view.faction?.id}
-          context="sale"
-          modifiers={modifiers}
-          value={tradingValue}
-          onChange={setTradingValue}
-        />
+        {canJeweler && (
+          <FormControlLabel
+            control={<Switch checked={jeweler} onChange={(_, checked) => setJeweler(checked)} />}
+            label={t('sell-to-jeweler')}
+          />
+        )}
+        {jeweler ? (
+          <>
+            <NumericInput
+              label={t('jeweler-percent')}
+              placeholder={`${quote?.rules.jewelerPercent ?? DEFAULT_JEWELER_PERCENT}`}
+              value={jewelerPercent}
+              onChange={setJewelerPercent}
+              min={0}
+              max={100}
+              maxFractionDigits={1}
+            />
+            <Typography variant="caption" color="text.secondary">
+              {t('sell-to-jeweler-hint')}
+            </Typography>
+          </>
+        ) : (
+          <>
+            <NumericInput
+              label={t('price-sale-percent-override')}
+              placeholder={quote ? `${quote.rules.salePercent}` : undefined}
+              value={salePercent}
+              onChange={setSalePercent}
+              min={0}
+              max={200}
+              integer
+            />
+            <MarketConditions context="sale" value={conditions} onChange={setConditions} />
+            <TradingFields
+              character={view.character}
+              members={view.members}
+              factionId={view.faction?.id}
+              context="sale"
+              modifiers={modifiers}
+              value={tradingValue}
+              onChange={setTradingValue}
+            />
+          </>
+        )}
         {quote && <PriceBreakdownView price={quote.price} funds={{ label: t('price-funds-after'), gold: view.gold }} />}
         {noDeal && <Alert severity="error">{t(`trading-outcome-${quote?.price.trading?.outcome ?? 'no-agreement'}`)}</Alert>}
         {!!error && <Alert severity="warning">{t('price-quote-unavailable')}</Alert>}

@@ -4,9 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Link as RouterLink } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
+import GrassIcon from '@mui/icons-material/Grass';
 import HealingIcon from '@mui/icons-material/Healing';
 import HotelIcon from '@mui/icons-material/Hotel';
 import ScienceIcon from '@mui/icons-material/Science';
+import SpaIcon from '@mui/icons-material/Spa';
 import { Alert, Box, Button, Chip, FormControlLabel, Link, Stack, Switch, Typography } from '@mui/material';
 import {
   Character,
@@ -25,10 +27,12 @@ import { isGameMaster as isGameMasterOf } from '../../../shared/permissions';
 import { Bento, span } from '../sections/CharacterPanels';
 import AntidoteDialog from './AntidoteDialog';
 import HealingLogList from './HealingLogList';
+import HerbSearchDialog from './HerbSearchDialog';
 import InjuryFormDialog from './InjuryFormDialog';
 import InjuryHealingDialog, { HealingStepId } from './InjuryHealingDialog';
 import PoisonCharacterDialog from './PoisonCharacterDialog';
 import RestDialog from './RestDialog';
+import UseHerbDialog from './UseHerbDialog';
 import {
   activeConditions,
   HERBALISM_SKILL,
@@ -71,6 +75,8 @@ const CharacterHealthSection: FC<{
   const [restOpen, setRestOpen] = useState(false);
   const [poisonOpen, setPoisonOpen] = useState(false);
   const [antidoteFor, setAntidoteFor] = useState<Injury>();
+  const [herbUseOpen, setHerbUseOpen] = useState(false);
+  const [herbSearchOpen, setHerbSearchOpen] = useState(false);
 
   // Adding and editing injuries and resolving conditions are for the game master (the owner of the game).
   const isGameMaster = isGameMasterOf(auth, strategicGame);
@@ -130,9 +136,15 @@ const CharacterHealthSection: FC<{
         <Panel
           title={t('health')}
           extra={
-            <Stack direction="row" spacing={1}>
+            <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
               <Button size="small" startIcon={<HotelIcon />} disabled={dead} onClick={() => setRestOpen(true)}>
                 {t('pass-time')}
+              </Button>
+              <Button size="small" startIcon={<SpaIcon />} disabled={dead} onClick={() => setHerbUseOpen(true)}>
+                {t('herb-use')}
+              </Button>
+              <Button size="small" startIcon={<GrassIcon />} disabled={dead} onClick={() => setHerbSearchOpen(true)}>
+                {t('herb-search')}
               </Button>
               {isGameMaster && (
                 <Button size="small" startIcon={<ScienceIcon />} disabled={dead} onClick={() => setPoisonOpen(true)}>
@@ -253,6 +265,16 @@ const CharacterHealthSection: FC<{
         onClose={() => setAntidoteFor(undefined)}
         onUpdated={setCharacter}
       />
+      <UseHerbDialog
+        characterId={character.id}
+        open={herbUseOpen}
+        onClose={() => setHerbUseOpen(false)}
+        onDone={(result) => {
+          setHerbUseOpen(false);
+          setCharacter((current) => current && { ...current, hp: { ...current.hp, current: result.hp.current } });
+        }}
+      />
+      <HerbSearchDialog character={character} open={herbSearchOpen} onClose={() => setHerbSearchOpen(false)} />
       <RestDialog character={character} open={restOpen} onClose={() => setRestOpen(false)} onRested={setCharacter} />
     </Bento>
   );
