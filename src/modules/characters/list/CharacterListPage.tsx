@@ -95,7 +95,13 @@ export default function CharacterListPage() {
             />
           </FilterSection>
           <FilterSection title={t('strategic-game')}>
-            <StrategicGamePicker games={games} value={gameId || null} onChange={onGameChange} allowAll />
+            <StrategicGamePicker
+              games={games}
+              value={gameId || null}
+              onChange={onGameChange}
+              allowAll
+              variant="select"
+            />
           </FilterSection>
           <FilterSection title={t('faction')}>
             <FactionPicker
@@ -103,6 +109,7 @@ export default function CharacterListPage() {
               value={filters.get('faction') || null}
               onChange={(id) => filters.set('faction', id)}
               allowAll
+              variant="select"
             />
           </FilterSection>
         </>

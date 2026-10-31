@@ -96,9 +96,6 @@ export default function MarketPage() {
   );
 }
 
-/** Cards of the catalog: as many per row as fit at this width, whatever the side column leaves. */
-const MARKET_CARD_MIN_WIDTH = 200;
-
 const MarketBuy: FC<{
   view: HolderView;
   cart: CartLine[];
@@ -143,7 +140,6 @@ const MarketBuy: FC<{
       filters={filters}
       layout={wide ? 'side' : 'drawer'}
       onSelect={add}
-      cardMinWidth={MARKET_CARD_MIN_WIDTH}
       panelHeader={wide ? marketCart : undefined}
       panelWidth={300}
       truncated={truncated}
