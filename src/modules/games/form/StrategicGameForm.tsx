@@ -65,6 +65,7 @@ const StrategicGameForm: FC<{
               <Grid size={12}>
                 <RealmPicker
                   realms={realms}
+                  variant="select"
                   value={formData.realmId}
                   onChange={(realmId) => setFormData({ ...formData, realmId: realmId || '' })}
                   required
