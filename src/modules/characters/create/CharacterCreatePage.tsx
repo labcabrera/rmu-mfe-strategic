@@ -10,7 +10,7 @@ import {
   createCharacter,
   CreateCharacterDto,
   Culture,
-  EditableAvatar,
+  EntityImage,
   ErrorState,
   Faction,
   fetchCultures,
@@ -360,8 +360,8 @@ export default function CharacterCreatePage() {
       dirty={!!formData.name}
       leftPanel={
         <>
-          <EditableAvatar
-            imageUrl={formData.imageUrl || defaultImage}
+          <EntityImage
+            image={formData.imageUrl || defaultImage}
             onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl })}
           />
           <Typography>{faction?.name}</Typography>

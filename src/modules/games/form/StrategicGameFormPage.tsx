@@ -5,7 +5,7 @@ import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   createStrategicGame,
-  EditableAvatar,
+  EntityImage,
   ErrorState,
   fetchRealms,
   fetchStrategicGame,
@@ -100,8 +100,8 @@ export default function StrategicGameFormPage({ mode }: { mode: 'create' | 'edit
       dirty={!!formData && JSON.stringify(formData) !== initialData}
       leftPanel={
         formData && (
-          <EditableAvatar
-            imageUrl={formData.imageUrl || DEFAULT_REALM_IMAGE}
+          <EntityImage
+            image={formData.imageUrl || DEFAULT_REALM_IMAGE}
             onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl })}
           />
         )

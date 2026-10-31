@@ -14,7 +14,6 @@ import {
   fetchStrategicGames,
   FilterBar,
   FilterSchema,
-  gridSizeShowcase,
   ListPage,
   Realm,
   RealmPicker,
@@ -103,7 +102,7 @@ export default function StrategicGameListPage() {
           />
         </FilterBar>
       }
-      collection={{ modes: ['cards'], storageKey: 'strategic.games', cardSize: gridSizeShowcase }}
+      collection={{ modes: ['cards'], storageKey: 'strategic.games' }}
       emptyState={
         <EmptyState
           title={t('no-strategic-games')}

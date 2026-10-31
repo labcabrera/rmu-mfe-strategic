@@ -13,7 +13,6 @@ import {
   fetchStrategicGames,
   FilterSchema,
   FilterSection,
-  gridSizeShowcase,
   ListPage,
   StrategicGame,
   StrategicGamePicker,
@@ -108,7 +107,7 @@ export default function CharacterListPage() {
           </FilterSection>
         </>
       }
-      collection={{ modes: ['cards'], storageKey: 'strategic.characters', cardSize: gridSizeShowcase }}
+      collection={{ modes: ['cards'], storageKey: 'strategic.characters' }}
       renderItem={(character) => (
         <CharacterCard
           character={character}

@@ -38,6 +38,20 @@ export default [
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       eqeqeq: ['error', 'always'],
 
+      // Entity images are squares (spec 058): no circular MUI Avatar, which is the default without `variant`.
+      // Use EntityAvatar or EntityImage; only the account avatar of the user is a circle (disable the rule there).
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "JSXOpeningElement[name.name='Avatar']:not(:has(JSXAttribute[name.name='variant']))",
+          message: 'Avatar is circular without `variant`: entity images are square (spec 058). Use EntityAvatar.',
+        },
+        {
+          selector: "JSXOpeningElement[name.name='Avatar'] > JSXAttribute[name.name='variant'][value.value='circular']",
+          message: 'Entity images are square (spec 058): only the account avatar of the user is circular.',
+        },
+      ],
+
       // Every visible string goes through i18n: JSX text and the attributes users see or hear.
       'i18next/no-literal-string': [
         'error',

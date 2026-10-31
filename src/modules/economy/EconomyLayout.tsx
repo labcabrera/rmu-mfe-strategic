@@ -3,8 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import BuildIcon from '@mui/icons-material/Build';
 import StorefrontIcon from '@mui/icons-material/Storefront';
-import { Avatar, Button, Paper, Stack, Typography } from '@mui/material';
+import { Button, Paper, Stack, Typography } from '@mui/material';
 import {
+  EntityAvatar,
   ErrorState,
   LayoutBase,
   LoadingState,
@@ -70,7 +71,7 @@ const EconomyLayout: FC<{
               sx={{ alignItems: { sm: 'center' }, justifyContent: 'space-between' }}
             >
               <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
-                <Avatar src={image} alt={view.name} sx={{ width: 56, height: 56 }} />
+                <EntityAvatar name={view.name} imageUrl={image} size={56} />
                 <Stack>
                   <Typography variant="overline" color="text.secondary">
                     {t(view.holder.kind === 'faction' ? 'armory' : 'character')}
