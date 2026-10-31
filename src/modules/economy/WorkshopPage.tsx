@@ -85,7 +85,17 @@ export default function WorkshopPage() {
         <>
           <Tabs
             value={tab}
-            onChange={(_, value: WorkshopTab) => setParams({ tab: value }, { replace: true })}
+            onChange={(_, value: WorkshopTab) =>
+              // Merge into the query, which also holds the filters of the catalog (spec 056, B-04)
+              setParams(
+                (current) => {
+                  const next = new URLSearchParams(current);
+                  next.set('tab', value);
+                  return next;
+                },
+                { replace: true }
+              )
+            }
             sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
           >
             {TABS.map((value) => (

@@ -37,6 +37,9 @@ export default function MarketPage() {
   const tab = (TABS.find((value) => value === params.get('tab')) ?? 'buy') as MarketTab;
   const { view, refresh, invalid, error } = useHolder(holderKind, holderId);
   const [refreshKey, setRefreshKey] = useState(0);
+  // The cart and the checkout step live here, so they survive the switch between tabs (spec 056, decision 9)
+  const [cart, setCart] = useState<CartLine[]>([]);
+  const [checkout, setCheckout] = useState(false);
   const reload = () => {
     refresh();
     setRefreshKey((key) => key + 1);
@@ -50,7 +53,17 @@ export default function MarketPage() {
         <>
           <Tabs
             value={tab}
-            onChange={(_, value: MarketTab) => setParams({ tab: value }, { replace: true })}
+            onChange={(_, value: MarketTab) =>
+              // Merge into the query, which also holds the filters of the catalog (spec 056, B-04)
+              setParams(
+                (current) => {
+                  const next = new URLSearchParams(current);
+                  next.set('tab', value);
+                  return next;
+                },
+                { replace: true }
+              )
+            }
             variant="scrollable"
             sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
           >
@@ -58,7 +71,16 @@ export default function MarketPage() {
               <Tab key={value} value={value} label={t(`market-tab-${value}`)} />
             ))}
           </Tabs>
-          {tab === 'buy' && <MarketBuy view={view} onDone={reload} />}
+          {tab === 'buy' && (
+            <MarketBuy
+              view={view}
+              cart={cart}
+              setCart={setCart}
+              checkout={checkout}
+              setCheckout={setCheckout}
+              onDone={reload}
+            />
+          )}
           {tab === 'sell' && <MarketSell view={view} onDone={reload} />}
           {tab === 'history' && (
             <ItemLedgerList
@@ -77,12 +99,17 @@ export default function MarketPage() {
 /** Cards of the catalog: as many per row as fit at this width, whatever the side column leaves. */
 const MARKET_CARD_MIN_WIDTH = 200;
 
-const MarketBuy: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDone }) => {
+const MarketBuy: FC<{
+  view: HolderView;
+  cart: CartLine[];
+  setCart: React.Dispatch<React.SetStateAction<CartLine[]>>;
+  checkout: boolean;
+  setCheckout: React.Dispatch<React.SetStateAction<boolean>>;
+  onDone: () => void;
+}> = ({ view, cart, setCart, checkout, setCheckout, onDone }) => {
   const { t } = useTranslation();
   const filters = useListFilters<Item>(itemCatalogFilters(t));
   const { items, error, truncated, refresh } = useItemCatalog({ exclude: [GOLD_COIN] });
-  const [cart, setCart] = useState<CartLine[]>([]);
-  const [checkout, setCheckout] = useState(false);
   const wide = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
 
   // Spec 041: what the book sells in lots (20 arrows) goes in by lots
