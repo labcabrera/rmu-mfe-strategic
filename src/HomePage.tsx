@@ -8,7 +8,7 @@ const OPTIONS = [
   {
     value: 'strategic-games',
     subtitle: 'manage-strategic-games',
-    image: 'images/generic/realm.png',
+    image: 'images/generic/strategic.png',
     to: '/strategic/games',
   },
   {
