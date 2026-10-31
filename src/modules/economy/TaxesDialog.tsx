@@ -44,7 +44,7 @@ const TaxesDialog: FC<{ open: boolean; onClose: () => void }> = ({ open, onClose
                     <TableCell align="right">
                       {row.cost === null ? '-' : <MoneyDisplay gold={row.cost} variant="body2" />}
                     </TableCell>
-                    <TableCell>{row.unit ? t(`tax-unit-${row.unit}`, { defaultValue: row.unit }) : '-'}</TableCell>
+                    <TableCell>{row.unit ? t(`tax-unit-${row.unit.replace(/\s+/g, '-')}`, { defaultValue: row.unit }) : '-'}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
