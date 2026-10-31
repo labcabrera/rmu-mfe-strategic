@@ -12,7 +12,6 @@ const CharacterCard: FC<{ character: Character; onClick: () => void }> = ({ char
       subtitle={[character.info?.race?.name, t(character.info?.professionId || '')].filter(Boolean).join(' · ')}
       image={character.imageUrl || defaultImages.character}
       fallbackImages={[defaultImages.character]}
-      imageRatio="square"
       description={character.description}
       chips={
         healthChips(character, t).length > 0 ? (

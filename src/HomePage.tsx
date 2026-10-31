@@ -1,8 +1,7 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Grid } from '@mui/material';
-import { EntityCard, gridSizeShowcase, LayoutBase } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { EntityCard, CardGrid, LayoutBase } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const OPTIONS = [
   {
@@ -31,13 +30,13 @@ const HomePage: FC = () => {
 
   return (
     <LayoutBase breadcrumbs={[{ name: t('home'), link: '/' }, { name: t('strategic-module') }]}>
-      <Grid container spacing={2}>
-        {OPTIONS.map((c) => (
-          <Grid size={gridSizeShowcase} key={c.value}>
-            <EntityCard title={t(c.value)} description={t(c.subtitle)} image={c.image} onClick={() => navigate(c.to)} />
-          </Grid>
-        ))}
-      </Grid>
+      <CardGrid
+        items={OPTIONS}
+        getKey={(c) => c.value}
+        renderItem={(c) => (
+          <EntityCard title={t(c.value)} description={t(c.subtitle)} image={c.image} onClick={() => navigate(c.to)} />
+        )}
+      />
     </LayoutBase>
   );
 };

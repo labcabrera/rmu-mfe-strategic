@@ -10,7 +10,6 @@ import {
   fetchStrategicGames,
   FilterBar,
   FilterSchema,
-  gridSizeShowcase,
   ListPage,
   StrategicGame,
   StrategicGamePicker,
@@ -92,7 +91,7 @@ export default function FactionListPage() {
           />
         </FilterBar>
       }
-      collection={{ modes: ['cards'], storageKey: 'strategic.factions', cardSize: gridSizeShowcase }}
+      collection={{ modes: ['cards'], storageKey: 'strategic.factions' }}
       renderItem={(faction) => (
         <FactionCard
           faction={faction}

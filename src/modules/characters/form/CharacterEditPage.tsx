@@ -5,7 +5,7 @@ import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   Character,
-  EditableAvatar,
+  EntityImage,
   ErrorState,
   fetchCharacter,
   FormPage,
@@ -78,10 +78,9 @@ export default function CharacterEditPage() {
       dirty={!!formData && JSON.stringify(formData) !== initialData}
       leftPanel={
         formData && (
-          <EditableAvatar
-            imageUrl={formData.imageUrl || character?.imageUrl || ''}
+          <EntityImage
+            image={formData.imageUrl || character?.imageUrl || ''}
             onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl })}
-            variant="rounded"
           />
         )
       }

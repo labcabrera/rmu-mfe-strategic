@@ -88,7 +88,7 @@ const CharacterViewExperience: FC<{
       <Section title={t('experience')} actions={<AddButton onClick={() => setOpenAddXpDialog(true)} />}>
         <Grid container spacing={1} columns={10}>
           <Grid size={gridSizeCard}>
-            <EntityCard title={`${character.experience.availableLevel}`} subtitle={t('level')} imageRatio="none" />
+            <EntityCard title={`${character.experience.availableLevel}`} subtitle={t('level')} noImage />
           </Grid>
           <Grid size={gridSizeCard}>
             <Badge
@@ -97,15 +97,11 @@ const CharacterViewExperience: FC<{
               invisible={character.experience.availableLevel <= character.experience.level}
               sx={{ display: 'block' }}
             >
-              <EntityCard title={`${character.experience.level}`} subtitle={t('current-level')} imageRatio="none" />
+              <EntityCard title={`${character.experience.level}`} subtitle={t('current-level')} noImage />
             </Badge>
           </Grid>
           <Grid size={gridSizeCard}>
-            <EntityCard
-              title={`${numberFormat.format(character.experience.xp)}`}
-              subtitle={t('xp')}
-              imageRatio="none"
-            />
+            <EntityCard title={`${numberFormat.format(character.experience.xp)}`} subtitle={t('xp')} noImage />
           </Grid>
           <Grid size={gridSizeCard}>
             <Badge
@@ -117,7 +113,7 @@ const CharacterViewExperience: FC<{
               <EntityCard
                 title={`${`${character.experience.availableDevPoints} / ${character.experience.devPoints}`}`}
                 subtitle={t('dev-points')}
-                imageRatio="none"
+                noImage
               />
             </Badge>
           </Grid>
@@ -125,23 +121,19 @@ const CharacterViewExperience: FC<{
             <EntityCard
               title={`${character.experience.availableBonusDevPoints ?? 0}`}
               subtitle={t('bonus-dev-points')}
-              imageRatio="none"
+              noImage
             />
           </Grid>
           <Grid size={gridSizeCard}>
             <EntityCard
               title={`${`${character.experience.bonusDevPointsSpentThisLevel ?? 0} / ${bonusDevPointsPerLevel}`}`}
               subtitle={t('bonus-dev-points-spent-this-level')}
-              imageRatio="none"
+              noImage
             />
           </Grid>
           {(character.experience.flawDevPoints ?? 0) > 0 && (
             <Grid size={gridSizeCard}>
-              <EntityCard
-                title={`${character.experience.flawDevPoints}`}
-                subtitle={t('flaw-dev-points')}
-                imageRatio="none"
-              />
+              <EntityCard title={`${character.experience.flawDevPoints}`} subtitle={t('flaw-dev-points')} noImage />
             </Grid>
           )}
         </Grid>

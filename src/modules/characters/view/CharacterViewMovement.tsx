@@ -96,16 +96,16 @@ const CharacterViewMovement: FC<{
       <CategorySeparator text={t('movement')} />
       <Grid container spacing={1}>
         <Grid size={gridSizeCard}>
-          <EntityCard title={`${bmr}`} subtitle={t('base-movement-rate')} imageRatio="none" />
+          <EntityCard title={`${bmr}`} subtitle={t('base-movement-rate')} noImage />
         </Grid>
         <Grid size={gridSizeCard}>
-          <EntityCard title={`${t(character.movement.maxPace)}`} subtitle={t('max-pace')} imageRatio="none" />
+          <EntityCard title={`${t(character.movement.maxPace)}`} subtitle={t('max-pace')} noImage />
         </Grid>
         <Grid size={gridSizeCard}>
           <EntityCard
             title={`${t(`difficulty-${character.equipment.movementBaseDifficulty || '-'}`)}`}
             subtitle={t('base-difficulty')}
-            imageRatio="none"
+            noImage
           />
         </Grid>
       </Grid>
@@ -114,14 +114,14 @@ const CharacterViewMovement: FC<{
         {character.movement?.modifiers &&
           Object.entries(character.movement.modifiers).map(([key, value]) => (
             <Grid key={key} size={gridSizeCard}>
-              <EntityCard title={`${value}`} subtitle={t(key)} imageRatio="none" />
+              <EntityCard title={`${value}`} subtitle={t(key)} noImage />
             </Grid>
           ))}
       </Grid>
       <CategorySeparator text={t('board-scale')} />
       <Grid container spacing={1}>
         <Grid size={gridSizeCard}>
-          <EntityCard title={`${scale}`} subtitle={t('board-scale')} imageRatio="none" />
+          <EntityCard title={`${scale}`} subtitle={t('board-scale')} noImage />
         </Grid>
       </Grid>
       <CategorySeparator text={t('speed-table')} />

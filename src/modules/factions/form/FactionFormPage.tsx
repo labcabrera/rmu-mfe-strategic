@@ -6,7 +6,7 @@ import { useLocation, useNavigate, useParams, useSearchParams } from 'react-rout
 import {
   addFactionGold,
   createFaction,
-  EditableAvatar,
+  EntityImage,
   ErrorState,
   Faction,
   fetchFaction,
@@ -138,8 +138,8 @@ export default function FactionFormPage({ mode }: { mode: 'create' | 'edit' }) {
       dirty={!!formData && JSON.stringify(formData) !== initialData}
       leftPanel={
         formData && (
-          <EditableAvatar
-            imageUrl={formData.imageUrl || `${imageBaseUrl}images/generic/faction.png`}
+          <EntityImage
+            image={formData.imageUrl || `${imageBaseUrl}images/generic/faction.png`}
             onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl })}
           />
         )

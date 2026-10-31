@@ -10,6 +10,3 @@ export const Bento = ({ children }: { children: ReactNode }) => (
 export const span = (sm: number, lg: number, xl = lg) => ({
   gridColumn: { xs: 'span 12', sm: `span ${sm}`, lg: `span ${lg}`, xl: `span ${xl}` },
 });
-
-/** Grid size of showcase cards inside a panel of 8 columns: three per row on desktop, not four (too narrow). */
-export const PANEL_CARD_SIZE = { xs: 12, sm: 6, md: 4 } as const;
