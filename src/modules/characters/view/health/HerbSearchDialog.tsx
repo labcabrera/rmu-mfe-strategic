@@ -168,7 +168,7 @@ const HerbSearchDialog: FC<{
     const item = catalog.find((each) => each.id === id);
     return item ? t(item.name, item.name) : id;
   };
-  const found = result?.results.reduce((sum, entry) => sum + (entry.result === 'found' ? entry.doses : 0), 0) ?? 0;
+  const found = result?.herbs.reduce((sum, entry) => sum + (entry.result === 'found' ? entry.doses : 0), 0) ?? 0;
 
   return (
     <RmuDialog
@@ -313,6 +313,10 @@ const HerbSearchDialog: FC<{
             <Typography variant="subtitle2">
               {t('herb-search-result', { doses: found, hours: result.hours })}
             </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {t('herb-search-base', { roll: result.roll, bonus: formatBonus(result.bonus), base: result.base })}
+            </Typography>
+            {result.unusualEvent && <Alert severity="warning">{t('unusual-event')}</Alert>}
             <Box sx={{ overflowX: 'auto' }}>
               <Table size="small">
                 <TableHead>
@@ -325,11 +329,13 @@ const HerbSearchDialog: FC<{
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {result.results.map((entry) => (
+                  {result.herbs.map((entry) => (
                     <TableRow key={entry.itemTypeId}>
-                      <TableCell>{herbName(entry.itemTypeId)}</TableCell>
-                      <TableCell align="right">{formatBonus(entry.difficulty)}</TableCell>
-                      <TableCell align="right">{entry.total ?? '-'}</TableCell>
+                      <TableCell>{t(entry.name, herbName(entry.itemTypeId))}</TableCell>
+                      <TableCell align="right">
+                        {entry.difficulty ? t(difficultyCodeKey(entry.difficulty)) : '-'}
+                      </TableCell>
+                      <TableCell align="right">{entry.result === 'not-here' ? '-' : entry.total}</TableCell>
                       <TableCell>
                         <Chip
                           size="small"
@@ -338,9 +344,7 @@ const HerbSearchDialog: FC<{
                         />
                       </TableCell>
                       <TableCell align="right">
-                        {entry.result === 'found'
-                          ? `${entry.doses}${entry.doseRoll ? ` (d10 ${entry.doseRoll})` : ''}`
-                          : '-'}
+                        {entry.result === 'found' ? `${entry.doses}${entry.d10 ? ` (d10 ${entry.d10})` : ''}` : '-'}
                       </TableCell>
                     </TableRow>
                   ))}

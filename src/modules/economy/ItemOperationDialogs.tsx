@@ -24,7 +24,6 @@ import {
   StrategicItem,
   ModifierSelectionValues,
   transferItem,
-  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import ItemLedgerOutcome from './ItemLedgerOutcome';
 import ManeuverFields, { defaultSkillKey, emptyManeuver, isManeuverReady, toManeuverDto } from './ManeuverFields';
@@ -40,6 +39,7 @@ import {
   useTradingModifiers,
   useTradingTables,
 } from './TradingFields';
+import { useStrategicNotify } from '../services/notify-service';
 import { HolderView } from './use-holder';
 
 /** Crafting skills offered first to craft or repair (spec 023, decisions 10 and 11). */
@@ -94,7 +94,7 @@ export const isJewelerItem = (item: StrategicItem) => item.category === 'gem' ||
 export const SellItemDialog: FC<DialogProps> = ({ item, view, onClose, onDone }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useNotify();
+  const notify = useStrategicNotify();
   const [amount, setAmount] = useState<number | null>(itemUnits(item));
   const [salePercent, setSalePercent] = useState<number | null>(null);
   const { tables } = useTradingTables();
@@ -208,7 +208,7 @@ export const SellItemDialog: FC<DialogProps> = ({ item, view, onClose, onDone })
 export const TransferItemDialog: FC<DialogProps> = ({ item, view, onClose, onDone }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useNotify();
+  const notify = useStrategicNotify();
   const [amount, setAmount] = useState<number | null>(itemUnits(item));
   const [busy, setBusy] = useState(false);
   const targets = useMemo<{ key: string; holder: ItemHolder; label: string }[]>(() => {
@@ -280,7 +280,7 @@ export const TransferItemDialog: FC<DialogProps> = ({ item, view, onClose, onDon
 export const DiscardItemDialog: FC<DialogProps> = ({ item, onClose, onDone }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useNotify();
+  const notify = useStrategicNotify();
   const [amount, setAmount] = useState<number | null>(itemUnits(item));
   const [confirm, setConfirm] = useState(false);
 
@@ -327,7 +327,7 @@ export const DiscardItemDialog: FC<DialogProps> = ({ item, onClose, onDone }) =>
 export const RepairItemDialog: FC<DialogProps> = ({ item, view, onClose, onDone }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useNotify();
+  const notify = useStrategicNotify();
   const craftsmen = view.members;
   const [actorId, setActorId] = useState(view.character?.id ?? craftsmen[0]?.id ?? '');
   const actor = craftsmen.find((member) => member.id === actorId) ?? view.character;
@@ -419,7 +419,7 @@ export const coatingPoisons = (items: StrategicItem[]): StrategicItem[] =>
 export const CoatItemDialog: FC<DialogProps> = ({ item, view, onClose, onDone }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useNotify();
+  const notify = useStrategicNotify();
   const [poisonItemId, setPoisonItemId] = useState('');
   const poisons = coatingPoisons(view.items);
 

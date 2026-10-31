@@ -39,7 +39,6 @@ import {
   QuotePurchaseOrderDto,
   quotePurchaseOrder,
   roundGold,
-  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import {
   emptyTrading,
@@ -53,6 +52,7 @@ import {
   useTradingTables,
 } from './TradingFields';
 import PurchaseOptionsFields, { arePurchaseOptionsValid } from './PurchaseOptionsFields';
+import { useStrategicNotify } from '../services/notify-service';
 import { HolderView } from './use-holder';
 
 /** A line of the cart; `options` holds the size, carats or jewelry class of spec 062. */
@@ -220,7 +220,7 @@ const MarketCheckout: FC<{
 }> = ({ view, cart, setCart, onCancel, onDone }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useNotify();
+  const notify = useStrategicNotify();
   const { tables } = useTradingTables();
   const modifiers = useTradingModifiers();
   const isCharacter = view.holder.kind === 'character';
