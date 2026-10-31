@@ -23,6 +23,8 @@ const KIND_COLORS: Record<string, 'default' | 'primary' | 'secondary' | 'success
   repair: 'warning',
   discard: 'error',
   'gold-transfer': 'default',
+  // Spec 062: the doses of a herb search
+  found: 'success',
 };
 
 /**

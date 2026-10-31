@@ -1,6 +1,7 @@
 import React, { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import { Alert, Box, Button, Divider, Paper, Stack, Tab, Tabs, Theme, Typography, useMediaQuery } from '@mui/material';
@@ -20,7 +21,9 @@ import EconomyLayout from './EconomyLayout';
 import { holderNames } from './HolderInventory';
 import ItemLedgerList from './ItemLedgerList';
 import { SellItemDialog } from './ItemOperationDialogs';
-import MarketCheckout, { CartLine, CartLines, usePurchaseOrderQuote } from './MarketCheckout';
+import MarketCheckout, { CartLine, CartLines, cartLineDto, isCartValid, usePurchaseOrderQuote } from './MarketCheckout';
+import { defaultPurchaseOptions } from './PurchaseOptionsFields';
+import TaxesDialog from './TaxesDialog';
 import { GOLD_COIN, HolderView, useHolder } from './use-holder';
 
 type MarketTab = 'buy' | 'sell' | 'history';
@@ -40,6 +43,7 @@ export default function MarketPage() {
   // The cart and the checkout step live here, so they survive the switch between tabs (spec 056, decision 9)
   const [cart, setCart] = useState<CartLine[]>([]);
   const [checkout, setCheckout] = useState(false);
+  const [taxesOpen, setTaxesOpen] = useState(false);
   const reload = () => {
     refresh();
     setRefreshKey((key) => key + 1);
@@ -51,26 +55,47 @@ export default function MarketPage() {
     <EconomyLayout page="market" view={view} error={error} onRetry={refresh}>
       {view && (
         <>
-          <Tabs
-            value={tab}
-            onChange={(_, value: MarketTab) =>
-              // Merge into the query, which also holds the filters of the catalog (spec 056, B-04)
-              setParams(
-                (current) => {
-                  const next = new URLSearchParams(current);
-                  next.set('tab', value);
-                  return next;
-                },
-                { replace: true }
-              )
-            }
-            variant="scrollable"
-            sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{
+              mb: 2,
+              borderBottom: 1,
+              borderColor: 'divider',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
           >
-            {TABS.map((value) => (
-              <Tab key={value} value={value} label={t(`market-tab-${value}`)} />
-            ))}
-          </Tabs>
+            <Tabs
+              value={tab}
+              onChange={(_, value: MarketTab) =>
+                // Merge into the query, which also holds the filters of the catalog (spec 056, B-04)
+                setParams(
+                  (current) => {
+                    const next = new URLSearchParams(current);
+                    next.set('tab', value);
+                    return next;
+                  },
+                  { replace: true }
+                )
+              }
+              variant="scrollable"
+              sx={{ minWidth: 0 }}
+            >
+              {TABS.map((value) => (
+                <Tab key={value} value={value} label={t(`market-tab-${value}`)} />
+              ))}
+            </Tabs>
+            <Button
+              size="small"
+              startIcon={<ReceiptLongIcon />}
+              onClick={() => setTaxesOpen(true)}
+              sx={{ flexShrink: 0 }}
+            >
+              {t('taxes-and-tolls')}
+            </Button>
+          </Stack>
+          <TaxesDialog open={taxesOpen} onClose={() => setTaxesOpen(false)} />
           {tab === 'buy' && (
             <MarketBuy
               view={view}
@@ -115,7 +140,7 @@ const MarketBuy: FC<{
     setCart((lines) =>
       lines.some((line) => line.item.id === item.id)
         ? lines.map((line) => (line.item.id === item.id ? { ...line, amount: line.amount + lot } : line))
-        : [...lines, { item, amount: lot }]
+        : [...lines, { item, amount: lot, options: defaultPurchaseOptions(item) }]
     );
   };
 
@@ -167,9 +192,7 @@ const MarketCart: FC<{
 }> = ({ view, cart, setCart, onCheckout }) => {
   const { t } = useTranslation();
   const { quote, error } = usePurchaseOrderQuote(
-    cart.length
-      ? { buyer: view.holder, lines: cart.map((line) => ({ itemTypeId: line.item.id, amount: line.amount })) }
-      : undefined
+    cart.length && isCartValid(cart) ? { buyer: view.holder, lines: cart.map(cartLineDto) } : undefined
   );
 
   return (
@@ -194,7 +217,12 @@ const MarketCart: FC<{
               {t('cart-direct-total-hint')}
             </Typography>
             {!!error && <Alert severity="warning">{t('price-quote-unavailable')}</Alert>}
-            <Button variant="contained" startIcon={<ShoppingCartCheckoutIcon />} onClick={onCheckout}>
+            <Button
+              variant="contained"
+              startIcon={<ShoppingCartCheckoutIcon />}
+              disabled={!isCartValid(cart)}
+              onClick={onCheckout}
+            >
               {t('checkout')}
             </Button>
           </>

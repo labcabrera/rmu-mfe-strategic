@@ -33,11 +33,12 @@ import {
   PayerMode,
   placePurchaseOrder,
   PriceBreakdownView,
+  PurchaseItemOptions,
+  PurchaseOrderLine,
   PurchaseOrderQuote,
   QuotePurchaseOrderDto,
   quotePurchaseOrder,
   roundGold,
-  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import {
   emptyTrading,
@@ -50,9 +51,25 @@ import {
   useTradingModifiers,
   useTradingTables,
 } from './TradingFields';
+import PurchaseOptionsFields, { arePurchaseOptionsValid } from './PurchaseOptionsFields';
+import { useStrategicNotify } from '../services/notify-service';
 import { HolderView } from './use-holder';
 
-export type CartLine = { item: Item; amount: number };
+/** A line of the cart; `options` holds the size, carats or jewelry class of spec 062. */
+export type CartLine = { item: Item; amount: number; options?: PurchaseItemOptions };
+
+/** The purchase-order line of a cart line, without the empty instance data. */
+export const cartLineDto = (line: CartLine): PurchaseOrderLine => ({
+  itemTypeId: line.item.id,
+  amount: line.amount,
+  ...Object.fromEntries(
+    Object.entries(line.options ?? {}).filter(([, value]) => value !== null && value !== undefined)
+  ),
+});
+
+/** Every line of the cart has the instance data it needs (the carats of a gem). */
+export const isCartValid = (cart: CartLine[]): boolean =>
+  cart.every((line) => arePurchaseOptionsValid(line.item, line.options));
 
 /** Items of a type that does not stack one purchase creates (strategic, spec 041). */
 export const MAX_ITEMS_PER_PURCHASE = 100;
@@ -102,44 +119,55 @@ export const CartLines: FC<{
       {cart.map((line) => {
         const price = quote?.lines.find((other) => other.itemTypeId === line.item.id)?.price;
         return (
-          <Stack key={line.item.id} direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-            <ItemThumb item={line.item} size={40} />
-            <Box sx={{ flex: 1, minWidth: 0 }}>
-              <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
-                {t(line.item.name, line.item.name)}
-              </Typography>
-              {price ? (
-                <MoneyDisplay gold={price.total} variant="caption" />
-              ) : (
-                <Typography variant="caption">…</Typography>
-              )}
-              {!line.item.info.stackable && line.amount > 1 && (
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                  {t('cart-separate-units', { count: line.amount })}
+          <Stack key={line.item.id} spacing={1}>
+            <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+              <ItemThumb item={line.item} size={40} />
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
+                  {t(line.item.name, line.item.name)}
                 </Typography>
-              )}
-            </Box>
-            <Box sx={{ width: 72 }}>
-              <NumericInput
-                label={t('amount')}
-                value={line.amount}
-                min={1}
-                max={line.item.info.stackable ? undefined : MAX_ITEMS_PER_PURCHASE}
-                integer
-                onChange={(amount) =>
-                  setCart((lines) =>
-                    lines.map((other) => (other.item.id === line.item.id ? { ...other, amount: amount || 1 } : other))
-                  )
-                }
-              />
-            </Box>
-            <IconButton
-              size="small"
-              aria-label={t('remove')}
-              onClick={() => setCart((lines) => lines.filter((other) => other.item.id !== line.item.id))}
-            >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
+                {price ? (
+                  <MoneyDisplay gold={price.total} variant="caption" />
+                ) : (
+                  <Typography variant="caption">…</Typography>
+                )}
+                {!line.item.info.stackable && line.amount > 1 && (
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                    {t('cart-separate-units', { count: line.amount })}
+                  </Typography>
+                )}
+              </Box>
+              <Box sx={{ width: 72 }}>
+                <NumericInput
+                  label={t('amount')}
+                  value={line.amount}
+                  min={1}
+                  max={line.item.info.stackable ? undefined : MAX_ITEMS_PER_PURCHASE}
+                  integer
+                  onChange={(amount) =>
+                    setCart((lines) =>
+                      lines.map((other) => (other.item.id === line.item.id ? { ...other, amount: amount || 1 } : other))
+                    )
+                  }
+                />
+              </Box>
+              <IconButton
+                size="small"
+                aria-label={t('remove')}
+                onClick={() => setCart((lines) => lines.filter((other) => other.item.id !== line.item.id))}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Stack>
+            <PurchaseOptionsFields
+              item={line.item}
+              value={line.options}
+              onChange={(options) =>
+                setCart((lines) =>
+                  lines.map((other) => (other.item.id === line.item.id ? { ...other, options } : other))
+                )
+              }
+            />
           </Stack>
         );
       })}
@@ -158,7 +186,12 @@ const ChoiceCard: FC<{
 }> = ({ selected, disabled, onSelect, icon, title, children }) => (
   <Paper
     variant="outlined"
-    sx={{ flex: 1, borderColor: selected ? 'primary.main' : undefined, borderWidth: selected ? 2 : 1, opacity: disabled ? 0.6 : 1 }}
+    sx={{
+      flex: 1,
+      borderColor: selected ? 'primary.main' : undefined,
+      borderWidth: selected ? 2 : 1,
+      opacity: disabled ? 0.6 : 1,
+    }}
   >
     <CardActionArea disabled={disabled} onClick={onSelect} sx={{ p: 2, height: '100%' }}>
       <Stack direction="row" spacing={1.5} sx={{ alignItems: 'flex-start' }}>
@@ -187,7 +220,7 @@ const MarketCheckout: FC<{
 }> = ({ view, cart, setCart, onCancel, onDone }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useNotify();
+  const notify = useStrategicNotify();
   const { tables } = useTradingTables();
   const modifiers = useTradingModifiers();
   const isCharacter = view.holder.kind === 'character';
@@ -202,7 +235,7 @@ const MarketCheckout: FC<{
   const negotiator = negotiatorOf(trading, view.character, view.members);
   const tradingDto = negotiated ? tradingRequest(trading, negotiator, modifiers, 'purchase') : undefined;
   const factors = negotiated ? marketFactors(tables, 'purchase', conditions) : [];
-  const lines = cart.map((line) => ({ itemTypeId: line.item.id, amount: line.amount }));
+  const lines = cart.map(cartLineDto);
   const { quote, error } = usePurchaseOrderQuote(
     cart.length
       ? {
@@ -238,7 +271,7 @@ const MarketCheckout: FC<{
     if (cart.length === 0) onCancel();
   }, [cart.length]);
 
-  const canNext = [cart.length > 0 && !!quote, !negotiated || !!tradingDto, false][step];
+  const canNext = [cart.length > 0 && isCartValid(cart) && !!quote, !negotiated || !!tradingDto, false][step];
 
   const onPay = () => {
     if (!payer) return;
@@ -395,11 +428,7 @@ const MarketCheckout: FC<{
               {t('next')}
             </Button>
           ) : (
-            <Button
-              variant="contained"
-              disabled={busy || !quote || noDeal || !payer || !enough(payer)}
-              onClick={onPay}
-            >
+            <Button variant="contained" disabled={busy || !quote || noDeal || !payer || !enough(payer)} onClick={onPay}>
               {t('checkout-pay')}
             </Button>
           )}

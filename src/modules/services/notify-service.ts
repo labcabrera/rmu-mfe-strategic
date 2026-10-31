@@ -2,6 +2,9 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isApiError, Notify, useNotify } from '@labcabrera-rmu/rmu-react-shared-lib';
 
+/** Domain codes sent without the `err-` prefix; their i18n key is `err-<code>`. */
+const UNPREFIXED_CODES = ['herb-without-effect', 'herb-not-applicable'];
+
 /** Domain error code of an rmu-api-strategic error body (`{ code, message }`), when it is a translatable one.
  * Falls back to the deprecated `errorCode` alias that images released before workspace spec 021 still send. */
 export const apiErrorCode = (error: unknown): string | undefined => {
@@ -9,7 +12,10 @@ export const apiErrorCode = (error: unknown): string | undefined => {
   try {
     const body = JSON.parse(error.body);
     const code = body?.code ?? body?.errorCode;
-    return typeof code === 'string' && code.startsWith('err-') ? code : undefined;
+    if (typeof code !== 'string') return undefined;
+    if (code.startsWith('err-')) return code;
+    // Herb rules of workspace spec 062 send their codes without the prefix
+    return UNPREFIXED_CODES.includes(code) ? `err-${code}` : undefined;
   } catch {
     return undefined;
   }
