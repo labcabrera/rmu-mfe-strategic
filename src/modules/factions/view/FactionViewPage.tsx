@@ -34,11 +34,12 @@ import {
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { DEFAULT_FACTION_IMAGE_PATH } from '../../services/image-service';
 import CreateOrImportButton from '../../shared/CreateOrImportButton';
-import { isGameMaster } from '../../shared/permissions';
 import { Bento, span } from '../../shared/layout/Bento';
+import { isGameMaster } from '../../shared/permissions';
 import FactionViewArmory from './FactionViewArmory';
 import FactionViewCharactersTable from './FactionViewCharacterTable';
 import FactionViewCharacters from './FactionViewCharacters';
+import FactionViewNpcs from './FactionViewNpcs';
 
 const CHARACTER_VIEW_MODES: CollectionMode[] = ['cards', 'table'];
 
@@ -146,6 +147,11 @@ export default function FactionViewPage() {
           <StatPill key="gold" label={t('gold')} value={<MoneyDisplay gold={entity.management.availableGold} />} />,
           <StatPill key="characters" label={t('characters')} value={characters?.length ?? '—'} />,
           <StatPill key="levels" label={t('total-levels')} value={totalLevels ?? '—'} />,
+          <StatPill
+            key="npcs"
+            label={t('npcs')}
+            value={(entity.npcs ?? []).reduce((sum, npc) => sum + npc.count, 0)}
+          />,
         ],
       })}
     >
@@ -190,6 +196,7 @@ export default function FactionViewPage() {
               )}
             </Panel>
           </Box>
+          <FactionViewNpcs faction={entity} game={game} canEdit={gameMaster} onChanged={state.setEntity} />
           <FactionViewArmory faction={entity} onGoldChanged={state.refresh} />
           <ImportDialog
             open={importOpen}
