@@ -57,7 +57,7 @@ import CharacterCreateSkillCosts from './CharacterCreateSkillCosts';
 import CharacterCreateSortCombat from './CharacterCreateSortCombat';
 import CharacterCreateStats from './CharacterCreateStats';
 
-const defaultImage = `${imageBaseUrl}images/races/unknown-alt.png`;
+const defaultImage = `${imageBaseUrl}images/races/unknown.png`;
 
 const CHARACTER_EMPTY_TEMPLATE = {
   name: '',

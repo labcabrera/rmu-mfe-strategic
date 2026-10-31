@@ -5,6 +5,8 @@
 window.__RMU_CONFIG__ = {
   // Static assets (images, locales).
   RMU_MFE_ASSETS_URI: '${RMU_MFE_ASSETS_URI}',
+  // User uploads (`uploads/...`), read by rmu-react-shared-lib. Defaults to /media/.
+  RMU_MFE_MEDIA_URI: '${RMU_MFE_MEDIA_URI}',
   // APIs, read by strategic and by rmu-react-shared-lib.
   RMU_API_CORE_URI: '${RMU_API_CORE_URI}',
   RMU_API_STRATEGIC_URI: '${RMU_API_STRATEGIC_URI}',
