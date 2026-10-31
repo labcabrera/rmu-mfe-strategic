@@ -1,6 +1,6 @@
 import React, { FC, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import BuildIcon from '@mui/icons-material/Build';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import { Avatar, Button, Paper, Stack, Typography } from '@mui/material';
@@ -24,12 +24,20 @@ const EconomyLayout: FC<{
 }> = ({ page, view, error, onRetry, children }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
   const image = view?.imageUrl
     ? resolveAssetUrl(view.imageUrl)
     : view?.holder.kind === 'faction'
       ? resolveAssetUrl(DEFAULT_FACTION_IMAGE_PATH)
       : undefined;
   const other = page === 'market' ? 'workshop' : 'market';
+  // The other page opens on its first tab, with the same filters of the catalog (spec 056, B-04)
+  const otherPath = (holder: HolderView['holder']) => {
+    const query = new URLSearchParams(params);
+    query.delete('tab');
+    const search = query.toString();
+    return `${holderPath(other, holder)}${search ? `?${search}` : ''}`;
+  };
 
   return (
     <LayoutBase
@@ -88,7 +96,7 @@ const EconomyLayout: FC<{
                 <Button
                   variant="outlined"
                   startIcon={other === 'market' ? <StorefrontIcon /> : <BuildIcon />}
-                  onClick={() => navigate(holderPath(other, view.holder))}
+                  onClick={() => navigate(otherPath(view.holder))}
                 >
                   {t(other)}
                 </Button>
