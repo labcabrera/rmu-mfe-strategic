@@ -84,7 +84,8 @@ export default function CharacterItemModifiersDialog({
         round: modifier.source.round ?? '',
       });
     }
-    return t('item-modifier-source-manual');
+    // Spec 064 and before: modifiers made by an operation name it (crafting, repair, catalog, enchantment)
+    return t(`item-modifier-source-${modifier.source?.kind ?? 'manual'}`);
   };
 
   return (

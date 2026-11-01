@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import BuildIcon from '@mui/icons-material/Build';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import { Box, Button, Stack } from '@mui/material';
@@ -30,6 +31,9 @@ export default function FactionViewArmory({ faction, onGoldChanged }: { faction:
       </Button>
       <Button size="small" startIcon={<BuildIcon />} onClick={() => navigate(holderPath('workshop', holder))}>
         {t('workshop')}
+      </Button>
+      <Button size="small" startIcon={<AutoAwesomeIcon />} onClick={() => navigate(holderPath('enchantments', holder))}>
+        {t('enchantments')}
       </Button>
     </Stack>
   );

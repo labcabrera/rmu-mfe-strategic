@@ -1,6 +1,7 @@
 import React, { FC, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import BuildIcon from '@mui/icons-material/Build';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import { Button, Paper, Stack, Typography } from '@mui/material';
@@ -13,11 +14,20 @@ import {
   resolveAssetUrl,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { DEFAULT_FACTION_IMAGE_PATH } from '../services/image-service';
-import { HolderView, holderPath, holderViewPath } from './use-holder';
+import { ECONOMY_PAGES, EconomyPage, HolderView, holderPath, holderViewPath } from './use-holder';
 
-/** Layout of the market and the workshop: breadcrumbs, the holder with its gold, and the switch between pages. */
+const PAGE_ICONS: Record<EconomyPage, React.ReactElement> = {
+  market: <StorefrontIcon />,
+  workshop: <BuildIcon />,
+  enchantments: <AutoAwesomeIcon />,
+};
+
+/**
+ * Layout of the market, the workshop and the enchantments (spec 064): breadcrumbs, the holder with its gold, and the
+ * links to the other pages.
+ */
 const EconomyLayout: FC<{
-  page: 'market' | 'workshop';
+  page: EconomyPage;
   view: HolderView | undefined;
   error?: unknown;
   onRetry: () => void;
@@ -31,9 +41,9 @@ const EconomyLayout: FC<{
     : view?.holder.kind === 'faction'
       ? resolveAssetUrl(DEFAULT_FACTION_IMAGE_PATH)
       : undefined;
-  const other = page === 'market' ? 'workshop' : 'market';
+  const others = ECONOMY_PAGES.filter((value) => value !== page);
   // The other page opens on its first tab, with the same filters of the catalog (spec 056, B-04)
-  const otherPath = (holder: HolderView['holder']) => {
+  const otherPath = (other: EconomyPage, holder: HolderView['holder']) => {
     const query = new URLSearchParams(params);
     query.delete('tab');
     const search = query.toString();
@@ -94,13 +104,16 @@ const EconomyLayout: FC<{
                     <MoneyDisplay gold={view.faction.management.availableGold} variant="subtitle1" showIcon />
                   </Stack>
                 )}
-                <Button
-                  variant="outlined"
-                  startIcon={other === 'market' ? <StorefrontIcon /> : <BuildIcon />}
-                  onClick={() => navigate(otherPath(view.holder))}
-                >
-                  {t(other)}
-                </Button>
+                {others.map((other) => (
+                  <Button
+                    key={other}
+                    variant="outlined"
+                    startIcon={PAGE_ICONS[other]}
+                    onClick={() => navigate(otherPath(other, view.holder))}
+                  >
+                    {t(other)}
+                  </Button>
+                ))}
               </Stack>
             </Stack>
           </Paper>

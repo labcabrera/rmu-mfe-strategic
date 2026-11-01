@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import BuildIcon from '@mui/icons-material/Build';
 import DeleteIcon from '@mui/icons-material/Delete';
 import HistoryIcon from '@mui/icons-material/History';
@@ -14,6 +15,7 @@ import TuneIcon from '@mui/icons-material/Tune';
 import {
   Character,
   ItemAction,
+  ItemEnchantmentInfo,
   ItemInventory,
   isHealingHerb,
   RmuDialog,
@@ -33,7 +35,16 @@ import {
 } from './ItemOperationDialogs';
 import { GOLD_COIN, HolderView } from './use-holder';
 
-type Operation = 'sell' | 'transfer' | 'repair' | 'coat' | 'discard' | 'modifiers' | 'history' | 'use-herb';
+type Operation =
+  | 'sell'
+  | 'transfer'
+  | 'repair'
+  | 'coat'
+  | 'discard'
+  | 'modifiers'
+  | 'history'
+  | 'use-herb'
+  | 'enchantment';
 
 export const isRepairable = (item: StrategicItem) =>
   !item.condition?.unrepairable && (!!item.condition?.broken || (item.condition?.breakagePenalty ?? 0) < 0);
@@ -109,6 +120,17 @@ const HolderInventory: FC<{
             },
           ]
         : []),
+      // Spec 064: the level, spells and properties of an enchanted item
+      ...(item.enchantment
+        ? [
+            {
+              key: 'enchantment',
+              label: t('item-enchantment'),
+              icon: <AutoAwesomeIcon fontSize="small" />,
+              onClick: open('enchantment'),
+            },
+          ]
+        : []),
       { key: 'modifiers', label: t('item-modifiers'), icon: <TuneIcon fontSize="small" />, onClick: open('modifiers') },
       { key: 'history', label: t('history'), icon: <HistoryIcon fontSize="small" />, onClick: open('history') },
       {
@@ -150,6 +172,11 @@ const HolderInventory: FC<{
           onClose={() => done()}
           onChange={(item) => setOperation({ kind: 'modifiers', item })}
         />
+      )}
+      {operation?.kind === 'enchantment' && (
+        <RmuDialog open maxWidth="sm" title={t('item-enchantment')} subtitle={operation.item.name} onClose={close}>
+          <ItemEnchantmentInfo item={operation.item} bare />
+        </RmuDialog>
       )}
       {operation?.kind === 'history' && (
         <RmuDialog open maxWidth="md" title={t('item-history', { name: operation.item.name })} onClose={close}>
