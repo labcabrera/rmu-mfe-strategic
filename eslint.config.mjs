@@ -52,6 +52,22 @@ export default [
         },
       ],
 
+      // Spec 066: the MFEs use the wrappers of rmu-react-shared-lib (RmuDialog, FlowSteps, RmuPagination,
+      // LoadingState). The library itself builds those wrappers, so it shows these warnings by design.
+      'no-restricted-imports': [
+        'warn',
+        {
+          paths: [
+            {
+              name: '@mui/material',
+              importNames: ['Dialog', 'Stepper', 'Pagination', 'CircularProgress'],
+              message:
+                'Use the rmu-react-shared-lib wrapper: RmuDialog/ConfirmDialog, FlowSteps, RmuPagination or LoadingState (spec 066).',
+            },
+          ],
+        },
+      ],
+
       // Every visible string goes through i18n: JSX text and the attributes users see or hear.
       'i18next/no-literal-string': [
         'error',
