@@ -7,7 +7,6 @@ import {
   cancelEnchantment,
   completeEnchantment,
   ConfirmDialog,
-  D100,
   deleteEnchantment,
   EnchantmentProject,
   EnchantmentScr,
@@ -18,6 +17,7 @@ import {
   LoadingState,
   MoneyDisplay,
   NumericInput,
+  OPEN_D100,
   progressEnchantment,
   resumeEnchantment,
   RmuDialog,
@@ -307,7 +307,7 @@ const ScrResult: FC<{
       {scr.failed && scr.failureRoll === null && (
         <Stack direction="row" spacing={2} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
           <RollField
-            spec={D100}
+            spec={OPEN_D100}
             label={t('enchantment-failure-roll')}
             value={roll}
             onChange={(value) => onRoll(value.total)}
