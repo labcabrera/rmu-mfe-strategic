@@ -1,13 +1,14 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import BuildIcon from '@mui/icons-material/Build';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import { Button, Stack } from '@mui/material';
 import { Character } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { holderPath } from '../../../economy/use-holder';
 
-/** Links of the equipment of a character to its market (buy and sell) and its workshop (craft and repair). */
+/** Links of the equipment of a character to its market (buy and sell), workshop (craft and repair) and enchantments. */
 export default function CharacterEquipmentButtons({ character }: { character: Character }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -19,6 +20,13 @@ export default function CharacterEquipmentButtons({ character }: { character: Ch
       </Button>
       <Button variant="outlined" startIcon={<BuildIcon />} onClick={() => navigate(holderPath('workshop', holder))}>
         {t('workshop')}
+      </Button>
+      <Button
+        variant="outlined"
+        startIcon={<AutoAwesomeIcon />}
+        onClick={() => navigate(holderPath('enchantments', holder))}
+      >
+        {t('enchantments')}
       </Button>
     </Stack>
   );

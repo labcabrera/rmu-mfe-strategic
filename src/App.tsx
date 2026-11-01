@@ -8,6 +8,7 @@ import CharacterListPage from './modules/characters/list/CharacterListPage';
 import CharacterViewPage from './modules/characters/view/CharacterViewPage';
 import MarketPage from './modules/economy/MarketPage';
 import WorkshopPage from './modules/economy/WorkshopPage';
+import EnchantmentsPage from './modules/enchantments/EnchantmentsPage';
 import FactionFormPage from './modules/factions/form/FactionFormPage';
 import FactionListPage from './modules/factions/list/FactionListPage';
 import FactionViewPage from './modules/factions/view/FactionViewPage';
@@ -40,6 +41,7 @@ const App: FC = () => (
       <Route path="/characters/trade/:characterId" element={<TradeRedirect />} />
       <Route path="/market/:holderKind/:holderId" element={<MarketPage />} />
       <Route path="/workshop/:holderKind/:holderId" element={<WorkshopPage />} />
+      <Route path="/enchantments/:holderKind/:holderId" element={<EnchantmentsPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   </MfeRoot>

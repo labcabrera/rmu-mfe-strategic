@@ -107,8 +107,12 @@ export function useHolder(kind: string | undefined, id: string | undefined) {
   return { view, error, refresh: load, invalid: !isHolderKind(kind) };
 }
 
-/** Path of the market or the workshop of a holder. */
-export const holderPath = (page: 'market' | 'workshop', holder: ItemHolder, tab?: string) =>
+/** Pages of the items and gold of a holder: buy and sell, craft and repair, and enchant (spec 064). */
+export type EconomyPage = 'market' | 'workshop' | 'enchantments';
+export const ECONOMY_PAGES: EconomyPage[] = ['market', 'workshop', 'enchantments'];
+
+/** Path of the market, the workshop or the enchantments of a holder. */
+export const holderPath = (page: EconomyPage, holder: ItemHolder, tab?: string) =>
   `/strategic/${page}/${holder.kind}/${holder.id}${tab ? `?tab=${tab}` : ''}`;
 
 /** Path of the view of a holder. */
