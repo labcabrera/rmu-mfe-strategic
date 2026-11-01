@@ -13,13 +13,13 @@ const OPTIONS = [
   {
     value: 'factions',
     subtitle: 'manage-factions',
-    image: 'images/generic/faction.png',
+    image: 'images/generic/faction-01.png',
     to: '/strategic/factions',
   },
   {
     value: 'characters',
     subtitle: 'manage-characters',
-    image: 'images/generic/races.png',
+    image: 'images/generic/character.png',
     to: '/strategic/characters',
   },
 ];
