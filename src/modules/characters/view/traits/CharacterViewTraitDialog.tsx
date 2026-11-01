@@ -1,13 +1,14 @@
 import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography } from '@mui/material';
+import { Chip, Typography } from '@mui/material';
 import {
   Character,
   CharacterTrait,
   deleteCharacterTrait,
   DeleteTraitDto,
   fetchTrait,
+  RmuDialog,
   TechnicalInfo,
   Trait,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
@@ -49,31 +50,24 @@ const CharacterViewTraitDialog: FC<{
   if (!trait) return null;
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle color="primary">{t(trait.name)}</DialogTitle>
-      <DialogContent>
-        {characterTrait.source === 'race' && (
-          <Chip label={t('trait-source-race')} size="small" color="primary" variant="outlined" />
-        )}
-        <Grid container spacing={1} sx={{ mt: 1 }}>
-          <Typography variant="body2" color="textSecondary" gutterBottom>
-            {trait.description}
-          </Typography>
-        </Grid>
-        <TechnicalInfo>
-          <pre>{`CharacterTrait: ${JSON.stringify(characterTrait, null, 2)}`}</pre>
-          <pre>{`Trait: ${JSON.stringify(trait, null, 2)}`}</pre>
-        </TechnicalInfo>
-      </DialogContent>
-      <DialogActions>
-        {characterTrait.source !== 'race' && (
-          <Button onClick={onDeleteTrait} color="error">
-            {t('delete')}
-          </Button>
-        )}
-        <Button onClick={onClose}>{t('cancel')}</Button>
-      </DialogActions>
-    </Dialog>
+    <RmuDialog
+      open={open}
+      title={t(trait.name)}
+      maxWidth="sm"
+      onDelete={characterTrait.source !== 'race' ? onDeleteTrait : undefined}
+      onClose={onClose}
+    >
+      {characterTrait.source === 'race' && (
+        <Chip label={t('trait-source-race')} size="small" color="primary" variant="outlined" />
+      )}
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }} gutterBottom>
+        {trait.description}
+      </Typography>
+      <TechnicalInfo>
+        <pre>{`CharacterTrait: ${JSON.stringify(characterTrait, null, 2)}`}</pre>
+        <pre>{`Trait: ${JSON.stringify(trait, null, 2)}`}</pre>
+      </TechnicalInfo>
+    </RmuDialog>
   );
 };
 
