@@ -1,7 +1,8 @@
 import React, { FC, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Stack } from '@mui/material';
-import { FieldHint } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { FieldHint, OptionHelp } from '@labcabrera-rmu/rmu-react-shared-lib';
+import type { TFunction } from 'i18next';
 
 /**
  * The help of a campaign option (spec 052): what it does, what raising or lowering it implies and its default,
@@ -39,12 +40,28 @@ export const GameOptionField: FC<{
   </Stack>
 );
 
-/** The label of an option row of the campaign view, with its help button. */
-export const GameOptionLabel: FC<{ option: string; label: string; defaultValue?: number | string | boolean }> = (
-  props
-) => (
-  <Stack direction="row" spacing={0.25} component="span" sx={{ alignItems: 'center' }}>
-    <span>{props.label}</span>
-    <GameOptionHint {...props} />
-  </Stack>
-);
+/** A row of an options block of the campaign view: its key, label, value in use and default. */
+export interface GameOptionRow {
+  option: string;
+  label: string;
+  value: ReactNode;
+  defaultValue: number | string | boolean;
+}
+
+/**
+ * The entries of the help dialog of an options block (spec 066, decision 17): the same help text and default as
+ * GameOptionHint (translated strings, yes or no for booleans).
+ */
+export const gameOptionsHelp = (rows: GameOptionRow[], t: TFunction): OptionHelp[] =>
+  rows.map(({ option, label, value, defaultValue }) => ({
+    key: option,
+    label,
+    value,
+    defaultValue:
+      typeof defaultValue === 'string'
+        ? t(`${option}-${defaultValue}`)
+        : typeof defaultValue === 'boolean'
+          ? t(defaultValue ? 'yes' : 'no')
+          : String(defaultValue),
+    description: t(`game-option-${option}-help`),
+  }));
