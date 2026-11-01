@@ -3,6 +3,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import HandshakeIcon from '@mui/icons-material/Handshake';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import {
@@ -12,24 +13,20 @@ import {
   Alert,
   Box,
   Button,
-  CardActionArea,
   Divider,
   IconButton,
-  Paper,
   Radio,
   Stack,
-  Step,
-  StepLabel,
-  Stepper,
   Typography,
 } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
+  FlowSteps,
   Item,
   ItemThumb,
   ModifierSelectionValues,
   MoneyDisplay,
   NumericInput,
+  Panel,
   PayerMode,
   placePurchaseOrder,
   PriceBreakdownView,
@@ -39,7 +36,11 @@ import {
   QuotePurchaseOrderDto,
   quotePurchaseOrder,
   roundGold,
+  SectionLabel,
+  SelectableCard,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { useStrategicNotify } from '../services/notify-service';
+import PurchaseOptionsFields, { arePurchaseOptionsValid } from './PurchaseOptionsFields';
 import {
   emptyTrading,
   MarketConditions,
@@ -51,8 +52,6 @@ import {
   useTradingModifiers,
   useTradingTables,
 } from './TradingFields';
-import PurchaseOptionsFields, { arePurchaseOptionsValid } from './PurchaseOptionsFields';
-import { useStrategicNotify } from '../services/notify-service';
 import { HolderView } from './use-holder';
 
 /** A line of the cart; `options` holds the size, carats or jewelry class of spec 062. */
@@ -184,26 +183,16 @@ const ChoiceCard: FC<{
   title: string;
   children?: React.ReactNode;
 }> = ({ selected, disabled, onSelect, icon, title, children }) => (
-  <Paper
-    variant="outlined"
-    sx={{
-      flex: 1,
-      borderColor: selected ? 'primary.main' : undefined,
-      borderWidth: selected ? 2 : 1,
-      opacity: disabled ? 0.6 : 1,
-    }}
-  >
-    <CardActionArea disabled={disabled} onClick={onSelect} sx={{ p: 2, height: '100%' }}>
-      <Stack direction="row" spacing={1.5} sx={{ alignItems: 'flex-start' }}>
-        <Radio checked={selected} disabled={disabled} tabIndex={-1} sx={{ p: 0 }} />
-        {icon}
-        <Stack spacing={0.5} sx={{ minWidth: 0 }}>
-          <Typography sx={{ fontWeight: 600 }}>{title}</Typography>
-          {children}
-        </Stack>
+  <SelectableCard selected={selected} disabled={disabled} onClick={onSelect} sx={{ flex: 1, p: 2 }}>
+    <Stack direction="row" spacing={1.5} sx={{ alignItems: 'flex-start' }}>
+      <Radio checked={selected} disabled={disabled} tabIndex={-1} sx={{ p: 0 }} />
+      {icon}
+      <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+        <Typography sx={{ fontWeight: 600 }}>{title}</Typography>
+        {children}
       </Stack>
-    </CardActionArea>
-  </Paper>
+    </Stack>
+  </SelectableCard>
 );
 
 /**
@@ -295,146 +284,144 @@ const MarketCheckout: FC<{
       .finally(() => setBusy(false));
   };
 
-  return (
-    <Paper variant="outlined" sx={{ p: { xs: 2, md: 3 } }}>
-      <Stack spacing={3}>
-        <Stepper activeStep={step} alternativeLabel>
-          {STEPS.map((label) => (
-            <Step key={label}>
-              <StepLabel>{t(label)}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
+  const stepContent = [
+    <Stack key="cart" spacing={2}>
+      <CartLines cart={cart} setCart={setCart} quote={quote} />
+      <Typography variant="caption" color="text.secondary">
+        {t('checkout-cart-hint')}
+      </Typography>
+    </Stack>,
 
-        {step === 0 && (
-          <Stack spacing={2}>
-            <CartLines cart={cart} setCart={setCart} quote={quote} />
-            <Typography variant="caption" color="text.secondary">
-              {t('checkout-cart-hint')}
-            </Typography>
-          </Stack>
-        )}
+    <Stack key="method" spacing={2}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+        <ChoiceCard
+          selected={!negotiated}
+          onSelect={() => setMethod('direct')}
+          icon={<ShoppingBagIcon color="action" />}
+          title={t('checkout-method-direct')}
+        >
+          <Typography variant="body2" color="text.secondary">
+            {t('checkout-method-direct-hint')}
+          </Typography>
+        </ChoiceCard>
+        <ChoiceCard
+          selected={negotiated}
+          onSelect={() => setMethod('negotiated')}
+          icon={<HandshakeIcon color="action" />}
+          title={t('checkout-method-negotiated')}
+        >
+          <Typography variant="body2" color="text.secondary">
+            {t('checkout-method-negotiated-hint')}
+          </Typography>
+        </ChoiceCard>
+      </Stack>
+      {negotiated && (
+        <>
+          <Alert severity="info">{t('checkout-whole-cart-hint')}</Alert>
+          <MarketConditions context="purchase" value={conditions} onChange={setConditions} />
+          <Divider />
+          <TradingFields
+            character={view.character}
+            members={view.members}
+            factionId={view.faction?.id}
+            context="purchase"
+            modifiers={modifiers}
+            value={trading}
+            onChange={setTrading}
+            alwaysOn
+          />
+        </>
+      )}
+      <CheckoutTotal quote={quote} />
+    </Stack>,
 
-        {step === 1 && (
-          <Stack spacing={2}>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <ChoiceCard
-                selected={!negotiated}
-                onSelect={() => setMethod('direct')}
-                icon={<ShoppingBagIcon color="action" />}
-                title={t('checkout-method-direct')}
-              >
-                <Typography variant="body2" color="text.secondary">
-                  {t('checkout-method-direct-hint')}
-                </Typography>
-              </ChoiceCard>
-              <ChoiceCard
-                selected={negotiated}
-                onSelect={() => setMethod('negotiated')}
-                icon={<HandshakeIcon color="action" />}
-                title={t('checkout-method-negotiated')}
-              >
-                <Typography variant="body2" color="text.secondary">
-                  {t('checkout-method-negotiated-hint')}
-                </Typography>
-              </ChoiceCard>
-            </Stack>
-            {negotiated && (
-              <>
-                <Alert severity="info">{t('checkout-whole-cart-hint')}</Alert>
-                <MarketConditions context="purchase" value={conditions} onChange={setConditions} />
-                <Divider />
-                <TradingFields
-                  character={view.character}
-                  members={view.members}
-                  factionId={view.faction?.id}
-                  context="purchase"
-                  modifiers={modifiers}
-                  value={trading}
-                  onChange={setTrading}
-                  alwaysOn
-                />
-              </>
-            )}
-            <CheckoutTotal quote={quote} />
-          </Stack>
-        )}
-
-        {step === 2 && (
-          <Stack spacing={2}>
-            <Typography variant="subtitle2">{t('checkout-payer')}</Typography>
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
-              {payers.map((mode) => (
-                <ChoiceCard
-                  key={mode}
-                  selected={payer === mode}
-                  disabled={!enough(mode) || noDeal}
-                  onSelect={() => setPayer(mode)}
-                  title={isCharacter ? t(`payer-${mode}`) : t('payer-faction')}
-                >
-                  <MoneyDisplay gold={funds(mode)} variant="body2" />
-                  {quote && !enough(mode) && (
-                    <Typography variant="caption" color="error.main">
-                      {t('err-insufficient-gold')}
-                    </Typography>
-                  )}
-                </ChoiceCard>
-              ))}
-            </Stack>
-            {isCharacter && payer && payer !== 'holder' && (
-              <Typography variant="caption" color="text.secondary">
-                {t('payer-faction-hint')}
+    <Stack key="payment" spacing={2}>
+      <SectionLabel>{t('checkout-payer')}</SectionLabel>
+      <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
+        {payers.map((mode) => (
+          <ChoiceCard
+            key={mode}
+            selected={payer === mode}
+            disabled={!enough(mode) || noDeal}
+            onSelect={() => setPayer(mode)}
+            title={isCharacter ? t(`payer-${mode}`) : t('payer-faction')}
+          >
+            <MoneyDisplay gold={funds(mode)} variant="body2" />
+            {quote && !enough(mode) && (
+              <Typography variant="caption" color="error.main">
+                {t('err-insufficient-gold')}
               </Typography>
             )}
-            {noDeal && (
-              <Alert severity="error">
-                {t(`trading-outcome-${quote?.trading?.outcome ?? 'no-agreement'}`)}: {t('checkout-no-deal-hint')}
-              </Alert>
-            )}
-            <Typography variant="subtitle2">{t('checkout-summary')}</Typography>
-            <Box>
-              {quote?.lines.map((line) => {
-                const item = cart.find((other) => other.item.id === line.itemTypeId)?.item;
-                return (
-                  <Accordion key={line.itemTypeId} disableGutters variant="outlined">
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                      <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flex: 1, minWidth: 0, pr: 1 }}>
-                        {item && <ItemThumb item={item} size={32} />}
-                        <Typography variant="body2" sx={{ flex: 1, minWidth: 0 }} noWrap>
-                          {`${item ? t(item.name, item.name) : line.itemTypeId} × ${line.amount}`}
-                        </Typography>
-                        <MoneyDisplay gold={line.price.total} variant="body2" />
-                      </Stack>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <PriceBreakdownView price={line.price} />
-                    </AccordionDetails>
-                  </Accordion>
-                );
-              })}
-            </Box>
-            <CheckoutTotal quote={quote} funds={payer ? funds(payer) : undefined} />
-          </Stack>
-        )}
-
-        {!!error && <Alert severity="warning">{t('price-quote-unavailable')}</Alert>}
-
-        <Stack direction="row" spacing={1} sx={{ justifyContent: 'space-between' }}>
-          <Button onClick={step === 0 ? onCancel : () => setStep(step - 1)} disabled={busy}>
-            {step === 0 ? t('checkout-back-to-catalog') : t('back')}
-          </Button>
-          {step < 2 ? (
-            <Button variant="contained" disabled={!canNext} onClick={() => setStep(step + 1)}>
-              {t('next')}
-            </Button>
-          ) : (
-            <Button variant="contained" disabled={busy || !quote || noDeal || !payer || !enough(payer)} onClick={onPay}>
-              {t('checkout-pay')}
-            </Button>
-          )}
-        </Stack>
+          </ChoiceCard>
+        ))}
       </Stack>
-    </Paper>
+      {isCharacter && payer && payer !== 'holder' && (
+        <Typography variant="caption" color="text.secondary">
+          {t('payer-faction-hint')}
+        </Typography>
+      )}
+      {noDeal && (
+        <Alert severity="error">
+          {t(`trading-outcome-${quote?.trading?.outcome ?? 'no-agreement'}`)}: {t('checkout-no-deal-hint')}
+        </Alert>
+      )}
+      <SectionLabel>{t('checkout-summary')}</SectionLabel>
+      <Box>
+        {quote?.lines.map((line) => {
+          const item = cart.find((other) => other.item.id === line.itemTypeId)?.item;
+          return (
+            <Accordion key={line.itemTypeId} disableGutters variant="outlined">
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flex: 1, minWidth: 0, pr: 1 }}>
+                  {item && <ItemThumb item={item} size={32} />}
+                  <Typography variant="body2" sx={{ flex: 1, minWidth: 0 }} noWrap>
+                    {`${item ? t(item.name, item.name) : line.itemTypeId} × ${line.amount}`}
+                  </Typography>
+                  <MoneyDisplay gold={line.price.total} variant="body2" />
+                </Stack>
+              </AccordionSummary>
+              <AccordionDetails>
+                <PriceBreakdownView price={line.price} />
+              </AccordionDetails>
+            </Accordion>
+          );
+        })}
+      </Box>
+      <CheckoutTotal quote={quote} funds={payer ? funds(payer) : undefined} />
+    </Stack>,
+  ];
+
+  return (
+    <Panel variant="outlined">
+      <FlowSteps
+        activeIndex={step}
+        onReview={(id) => id && !busy && setStep(STEPS.indexOf(id))}
+        steps={STEPS.map((label, index) => ({ id: label, label: t(label), content: stepContent[index] }))}
+        footer={
+          <Stack spacing={1.5}>
+            {!!error && <Alert severity="warning">{t('price-quote-unavailable')}</Alert>}
+            <Stack direction="row" spacing={1} sx={{ justifyContent: 'space-between' }}>
+              <Button onClick={step === 0 ? onCancel : () => setStep(step - 1)} disabled={busy}>
+                {step === 0 ? t('checkout-back-to-catalog') : t('back')}
+              </Button>
+              {step < 2 ? (
+                <Button variant="contained" disabled={!canNext} onClick={() => setStep(step + 1)}>
+                  {t('next')}
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  disabled={busy || !quote || noDeal || !payer || !enough(payer)}
+                  onClick={onPay}
+                >
+                  {t('checkout-pay')}
+                </Button>
+              )}
+            </Stack>
+          </Stack>
+        }
+      />
+    </Panel>
   );
 };
 
@@ -446,7 +433,7 @@ const CheckoutTotal: FC<{ quote?: PurchaseOrderQuote; funds?: number }> = ({ quo
     <Stack spacing={0.5}>
       <Divider />
       <Stack direction="row" sx={{ justifyContent: 'space-between', pt: 1 }}>
-        <Typography sx={{ fontWeight: 700 }}>{t('price-total')}</Typography>
+        <Typography sx={{ fontWeight: 600 }}>{t('price-total')}</Typography>
         {quote ? <MoneyDisplay gold={quote.total} /> : <Typography>…</Typography>}
       </Stack>
       {quote?.trading && quote.trading.pricePercent !== null && (
