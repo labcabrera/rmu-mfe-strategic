@@ -30,6 +30,7 @@ const EMPTY_STRATEGIC_GAME = {
   powerLevel: { ...DEFAULT_POWER_LEVEL },
   description: '',
   imageUrl: 'images/generic/strategic.png',
+  calendar: { startDate: '', elapsedDays: 0, elapsedHours: 0, currentDay: 1 },
 } as StrategicGame;
 
 /** Create and edit page of a strategic game. The realm can only be chosen on creation. */
@@ -113,6 +114,7 @@ export default function StrategicGameFormPage({ mode }: { mode: 'create' | 'edit
             formData={formData}
             setFormData={setFormData as Dispatch<SetStateAction<StrategicGame>>}
             realms={mode === 'create' ? realms : undefined}
+            editing={mode === 'edit'}
           />
           <TechnicalInfo>
             <pre>{JSON.stringify(formData, null, 2)}</pre>

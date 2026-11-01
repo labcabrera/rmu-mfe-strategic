@@ -20,7 +20,9 @@ const RestDialog: FC<{
   open: boolean;
   onClose: () => void;
   onRested: (character: Character) => void;
-}> = ({ character, open, onClose, onRested }) => {
+  /** Starting values, like the rest still pending from a step of time of the campaign (spec 065) */
+  initial?: { hours: number; days: number; fullRest: boolean };
+}> = ({ character, open, onClose, onRested, initial }) => {
   const { t } = useTranslation();
   const auth = useAuth();
   const notify = useStrategicNotify();
@@ -32,9 +34,9 @@ const RestDialog: FC<{
 
   useEffect(() => {
     if (!open) return;
-    setHours(0);
-    setDays(0);
-    setFullRest(false);
+    setHours(initial?.hours ?? 0);
+    setDays(initial?.days ?? 0);
+    setFullRest(initial?.fullRest ?? false);
   }, [open]);
 
   const percent = tables?.restHpPercentPerPeriod ?? FALLBACK_HP_PERCENT;
@@ -50,7 +52,8 @@ const RestDialog: FC<{
   const counterDays = elapsedDays * (fullRest ? fullRestMultiplier : 1);
   // Power points (spec 029): 10% of the maximum per 2 complete hours, at most 8 hours a day, as rmu-api-strategic
   const powerPeriods =
-    elapsedDays * POWER_PERIODS_PER_DAY + Math.min(POWER_PERIODS_PER_DAY, Math.floor((hours % HOURS_PER_DAY) / POWER_PERIOD_HOURS));
+    elapsedDays * POWER_PERIODS_PER_DAY +
+    Math.min(POWER_PERIODS_PER_DAY, Math.floor((hours % HOURS_PER_DAY) / POWER_PERIOD_HOURS));
   const power = character.power;
   const powerAfter = power
     ? Math.min(power.max, Math.max(power.current, power.current + Math.ceil((power.max * powerPeriods) / 10)))
@@ -117,7 +120,12 @@ const RestDialog: FC<{
           </Typography>
           {power && powerAfter !== undefined && (
             <Typography variant="body2">
-              {t('rest-preview-power', { before: power.current, after: powerAfter, max: power.max, gain: powerAfter - power.current })}
+              {t('rest-preview-power', {
+                before: power.current,
+                after: powerAfter,
+                max: power.max,
+                gain: powerAfter - power.current,
+              })}
             </Typography>
           )}
           <Typography variant="body2">{t('rest-preview-days', { count: counterDays })}</Typography>

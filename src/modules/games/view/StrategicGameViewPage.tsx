@@ -12,6 +12,7 @@ import {
   fetchFactions,
   fetchStrategicGame,
   fetchTacticalGames,
+  formatCampaignDate,
   ImageSelectorDialog,
   imageBaseUrl,
   ImportDialog,
@@ -34,6 +35,8 @@ import StrategicGameViewAttributes from './StrategicGameViewAttributes';
 import StrategicGameViewFactions from './StrategicGameViewFactions';
 import StrategicGameViewPowerLevel from './StrategicGameViewPowerLevel';
 import StrategicGameViewTacticalGames from './StrategicGameViewTacticalGames';
+import PassTimeDialog from './time/PassTimeDialog';
+import StrategicGameViewCalendar from './time/StrategicGameViewCalendar';
 
 const defaultGameImage = `${imageBaseUrl}images/generic/strategic.png`;
 
@@ -58,6 +61,9 @@ export default function StrategicGameViewPage() {
   const [tacticalGames, setTacticalGames] = useState<TacticalGame[]>();
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  // Spec 065: the step of time and the reload of its log
+  const [passTimeOpen, setPassTimeOpen] = useState(false);
+  const [timeLogKey, setTimeLogKey] = useState(0);
 
   useEffect(() => {
     if (!strategicGame) return;
@@ -76,7 +82,8 @@ export default function StrategicGameViewPage() {
 
   const onImageSelected = (game: StrategicGame, imageUrl: string) =>
     updateStrategicGame(game.id, { imageUrl }, auth)
-      .then(() => state.setEntity({ ...game, imageUrl }))
+      // The stored game, with its new version: the step of time sends it back (spec 065)
+      .then((updated) => state.setEntity(updated))
       .catch(notify.error);
 
   const previewImport = (game: StrategicGame, request: ImportRequest) =>
@@ -131,6 +138,12 @@ export default function StrategicGameViewPage() {
             value={`×${game.options.experienceMultiplier}`}
           />,
           <StatPill key="letality" label={t('letality')} value={game.options.letality} />,
+          <StatPill
+            key="day"
+            label={t('calendar')}
+            hint={formatCampaignDate(game.calendar, t)}
+            value={game.calendar?.currentDay ?? 1}
+          />,
         ],
       })}
     >
@@ -145,6 +158,12 @@ export default function StrategicGameViewPage() {
                 </Typography>
               </Panel>
             )}
+            <StrategicGameViewCalendar
+              game={game}
+              canPassTime={isGameMaster(auth, game)}
+              onPassTime={() => setPassTimeOpen(true)}
+              refreshKey={timeLogKey}
+            />
             <Panel
               title={t('factions')}
               extra={
@@ -177,6 +196,16 @@ export default function StrategicGameViewPage() {
             onImport={(request) => runImport(game, request)}
             onImported={onImported}
             onClose={() => setImportOpen(false)}
+          />
+          <PassTimeDialog
+            game={game}
+            open={passTimeOpen}
+            onClose={() => setPassTimeOpen(false)}
+            onPassed={(updated) => {
+              state.setEntity(updated);
+              setTimeLogKey((key) => key + 1);
+            }}
+            onConflict={() => state.refresh()}
           />
           <ImageSelectorDialog
             value={game.imageUrl || defaultGameImage}
