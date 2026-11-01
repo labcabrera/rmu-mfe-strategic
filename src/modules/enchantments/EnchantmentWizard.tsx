@@ -296,7 +296,6 @@ const EnchantmentWizard: FC<{
             emptyTitle={t('enchantment-no-items')}
             onSelect={(next) => {
               setItem(next);
-              setWholeStack(false);
               setStep(2);
             }}
           />
