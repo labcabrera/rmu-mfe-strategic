@@ -26,77 +26,79 @@ const PassTimeResults: FC<{
         </TableRow>
       </TableHead>
       <TableBody>
-        {results.map((entry) => {
-          const result = entry.result;
-          const character = byId.get(entry.characterId);
-          return (
-            <TableRow key={entry.characterId}>
-              <TableCell>{entry.name}</TableCell>
-              <TableCell>{t(`activity-${entry.activity}`)}</TableCell>
-              {entry.error ? (
-                <TableCell colSpan={3}>
-                  <Typography variant="body2" color="error" component="span" sx={{ mr: 1 }}>
-                    {t('pass-time-failed', { error: t(entry.error.code) })}
-                  </Typography>
-                  {onRetry && character && (
-                    <Button size="small" onClick={() => onRetry(character, entry)}>
-                      {t('pass-time-apply-pending-rest')}
-                    </Button>
-                  )}
-                </TableCell>
-              ) : result ? (
-                <>
-                  <TableCell>
-                    {result.hpBefore === result.hpAfter ? result.hpAfter : `${result.hpBefore} → ${result.hpAfter}`}
+        {[...results]
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((entry) => {
+            const result = entry.result;
+            const character = byId.get(entry.characterId);
+            return (
+              <TableRow key={entry.characterId}>
+                <TableCell>{entry.name}</TableCell>
+                <TableCell>{t(`activity-${entry.activity}`)}</TableCell>
+                {entry.error ? (
+                  <TableCell colSpan={3}>
+                    <Typography variant="body2" color="error" component="span" sx={{ mr: 1 }}>
+                      {t('pass-time-failed', { error: t(entry.error.code) })}
+                    </Typography>
+                    {onRetry && character && (
+                      <Button size="small" onClick={() => onRetry(character, entry)}>
+                        {t('pass-time-apply-pending-rest')}
+                      </Button>
+                    )}
                   </TableCell>
-                  <TableCell>
-                    {result.powerBefore === null || result.powerAfter === null
-                      ? '—'
-                      : result.powerBefore === result.powerAfter
-                        ? result.powerAfter
-                        : `${result.powerBefore} → ${result.powerAfter}`}
+                ) : result ? (
+                  <>
+                    <TableCell>
+                      {result.hpBefore === result.hpAfter ? result.hpAfter : `${result.hpBefore} → ${result.hpAfter}`}
+                    </TableCell>
+                    <TableCell>
+                      {result.powerBefore === null || result.powerAfter === null
+                        ? '—'
+                        : result.powerBefore === result.powerAfter
+                          ? result.powerAfter
+                          : `${result.powerBefore} → ${result.powerAfter}`}
+                    </TableCell>
+                    <TableCell>
+                      {result.injuries.length === 0 && (result.poisonings ?? []).length === 0
+                        ? '—'
+                        : [
+                            ...result.injuries.map((injury) => (
+                              <Chip
+                                key={injury.injuryId}
+                                size="small"
+                                variant="outlined"
+                                color={injury.status === 'healed' ? 'success' : 'default'}
+                                label={
+                                  injury.status === 'healed'
+                                    ? t('pass-time-injury-healed')
+                                    : t('pass-time-injury-days', { count: injury.remainingDays })
+                                }
+                                sx={{ mr: 0.5, mb: 0.5 }}
+                              />
+                            )),
+                            ...(result.poisonings ?? []).map((poisoning) => (
+                              <Chip
+                                key={poisoning.injuryId}
+                                size="small"
+                                variant="outlined"
+                                color="warning"
+                                label={t('pass-time-poisoning', { status: t(`injury-status-${poisoning.status}`) })}
+                                sx={{ mr: 0.5, mb: 0.5 }}
+                              />
+                            )),
+                          ]}
+                    </TableCell>
+                  </>
+                ) : (
+                  <TableCell colSpan={3}>
+                    <Typography variant="body2" color="text.secondary">
+                      {t('pass-time-no-changes')}
+                    </Typography>
                   </TableCell>
-                  <TableCell>
-                    {result.injuries.length === 0 && (result.poisonings ?? []).length === 0
-                      ? '—'
-                      : [
-                          ...result.injuries.map((injury) => (
-                            <Chip
-                              key={injury.injuryId}
-                              size="small"
-                              variant="outlined"
-                              color={injury.status === 'healed' ? 'success' : 'default'}
-                              label={
-                                injury.status === 'healed'
-                                  ? t('pass-time-injury-healed')
-                                  : t('pass-time-injury-days', { count: injury.remainingDays })
-                              }
-                              sx={{ mr: 0.5, mb: 0.5 }}
-                            />
-                          )),
-                          ...(result.poisonings ?? []).map((poisoning) => (
-                            <Chip
-                              key={poisoning.injuryId}
-                              size="small"
-                              variant="outlined"
-                              color="warning"
-                              label={t('pass-time-poisoning', { status: t(`injury-status-${poisoning.status}`) })}
-                              sx={{ mr: 0.5, mb: 0.5 }}
-                            />
-                          )),
-                        ]}
-                  </TableCell>
-                </>
-              ) : (
-                <TableCell colSpan={3}>
-                  <Typography variant="body2" color="text.secondary">
-                    {t('pass-time-no-changes')}
-                  </Typography>
-                </TableCell>
-              )}
-            </TableRow>
-          );
-        })}
+                )}
+              </TableRow>
+            );
+          })}
       </TableBody>
     </Table>
   );
