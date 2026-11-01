@@ -8,7 +8,6 @@ import {
   Button,
   Checkbox,
   Chip,
-  FormControlLabel,
   Grid,
   MenuItem,
   Paper,
@@ -16,7 +15,6 @@ import {
   Step,
   StepLabel,
   Stepper,
-  Switch,
   Table,
   TableBody,
   TableCell,
@@ -117,7 +115,6 @@ const EnchantmentWizard: FC<{
   const [grimoire, setGrimoire] = useState<GrimoireSpell[]>();
   const [search, setSearch] = useState('');
   const [chosen, setChosen] = useState<Record<string, SpellChoice>>({});
-  const [wholeStack, setWholeStack] = useState(false);
   const [powerLevel, setPowerLevel] = useState<PowerLevel>(DEFAULT_POWER_LEVEL);
   const [plan, setPlan] = useState<EnchantmentPlan>();
   const [planError, setPlanError] = useState<string>();
@@ -145,7 +142,8 @@ const EnchantmentWizard: FC<{
     (other) => other.itemTypeId !== GOLD_COIN && !other.enchantment && !busyItemIds.has(other.id)
   );
   const stack = item && item.info?.stackable && (item.amount ?? 1) > 1 ? item.amount : null;
-  const batchSize = stack && wholeStack ? stack : 1;
+  // The API enchants the whole stack: the batch is always every unit of the item
+  const batchSize = stack ?? 1;
 
   const request = useMemo((): EnchantmentRequest | undefined => {
     const spells = Object.entries(chosen).map(([spellId, choice]) => ({
@@ -437,10 +435,7 @@ const EnchantmentWizard: FC<{
               </Grid>
               {stack && (
                 <Grid size={{ xs: 12, sm: 6 }}>
-                  <FormControlLabel
-                    control={<Switch checked={wholeStack} onChange={(e) => setWholeStack(e.target.checked)} />}
-                    label={t('enchantment-batch-whole-stack', { count: stack })}
-                  />
+                  <Typography variant="body2">{t('enchantment-batch-whole-stack', { count: stack })}</Typography>
                   <Typography variant="caption" color="text.secondary" component="div">
                     {t('enchantment-batch-hint')}
                   </Typography>
