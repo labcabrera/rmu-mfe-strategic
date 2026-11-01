@@ -2,20 +2,21 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Button, CircularProgress, Stack } from '@mui/material';
+import { Box, Button, Stack } from '@mui/material';
 import {
   Faction,
   FactionNpcInput,
+  LoadingState,
   NpcEntry,
   NpcEntryDialog,
   NpcEntryList,
   Panel,
+  span,
   StrategicGame,
   updateFactionNpcs,
   useCampaignNpcs,
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { span } from '../../shared/layout/Bento';
 
 /**
  * The NPCs of a faction (spec 055): guards, mercenaries, mounts… with their alias, specimens and notes. They can be
@@ -66,7 +67,7 @@ export default function FactionViewNpcs({
         extra={
           canEdit && (
             <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-              {saving && <CircularProgress size={18} />}
+              {saving && <LoadingState variant="inline" />}
               <Button size="small" startIcon={<AddIcon />} disabled={saving} onClick={() => setEditing('new')}>
                 {t('add-npc')}
               </Button>

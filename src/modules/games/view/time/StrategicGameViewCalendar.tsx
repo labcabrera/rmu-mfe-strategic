@@ -2,13 +2,16 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { Box, Button, Collapse, List, ListItem, ListItemText, Pagination, Stack, Typography } from '@mui/material';
+import { Box, Button, Collapse, List, ListItem, ListItemText, Stack, Typography } from '@mui/material';
 import {
+  EmptyState,
   fetchGameTimeLog,
   formatCampaignDate,
   formatElapsedTime,
   GameTimeLogEntry,
   Panel,
+  RmuPagination,
+  SectionLabel,
   StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useStrategicNotify } from '../../../services/notify-service';
@@ -67,14 +70,8 @@ const StrategicGameViewCalendar: FC<{
             {t('no-start-date')}
           </Typography>
         )}
-        <Typography variant="subtitle2" sx={{ pt: 1 }}>
-          {t('time-log')}
-        </Typography>
-        {log && log.content.length === 0 && (
-          <Typography variant="body2" color="text.secondary">
-            {t('time-log-empty')}
-          </Typography>
-        )}
+        <SectionLabel sx={{ pt: 1 }}>{t('time-log')}</SectionLabel>
+        {log && log.content.length === 0 && <EmptyState dense title={t('time-log-empty')} />}
         {log && log.content.length > 0 && (
           <List dense disablePadding>
             {log.content.map((entry) => {
@@ -111,13 +108,7 @@ const StrategicGameViewCalendar: FC<{
           </List>
         )}
         {log && log.totalPages > 1 && (
-          <Pagination
-            size="small"
-            count={log.totalPages}
-            page={page + 1}
-            onChange={(_, value) => setPage(value - 1)}
-            sx={{ alignSelf: 'center' }}
-          />
+          <RmuPagination dense page={page} pageSize={PAGE_SIZE} totalPages={log.totalPages} setPage={setPage} />
         )}
       </Stack>
     </Panel>

@@ -23,7 +23,7 @@ export const Row = ({ label, value }: { label: string; value: ReactNode }) => (
 );
 
 // The grid moved to the shared layout (campaign and faction views use it too); re-exported for the sections.
-export { Bento, span } from '../../../shared/layout/Bento';
+export { Bento, span } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 /** Armor type: the single AT, or the AT of head / body / arms / legs. */
 export const armorLabel = (character: Character) => {

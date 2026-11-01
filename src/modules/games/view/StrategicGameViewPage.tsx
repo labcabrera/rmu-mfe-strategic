@@ -6,6 +6,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Chip, Stack, Typography } from '@mui/material';
 import {
   AddButton,
+  Bento,
   deleteStrategicGame,
   DetailPage,
   Faction,
@@ -13,13 +14,14 @@ import {
   fetchStrategicGame,
   fetchTacticalGames,
   formatCampaignDate,
-  ImageSelectorDialog,
   imageBaseUrl,
+  ImageSelectorDialog,
   ImportDialog,
   importFaction,
   ImportRequest,
   ImportResult,
   Panel,
+  span,
   StatPill,
   StrategicGame,
   TacticalGame,
@@ -28,7 +30,6 @@ import {
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import CreateOrImportButton from '../../shared/CreateOrImportButton';
-import { Bento, span } from '../../shared/layout/Bento';
 import { isGameMaster } from '../../shared/permissions';
 import StrategicGameCardChips from '../list/StrategicGameCardChips';
 import StrategicGameViewAttributes from './StrategicGameViewAttributes';
