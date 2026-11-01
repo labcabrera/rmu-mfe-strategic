@@ -1,6 +1,7 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
+import AddIcon from '@mui/icons-material/Add';
 import { Box, Card, CardContent, LinearProgress, Stack, Tooltip, Typography } from '@mui/material';
 import {
   Character,
@@ -8,7 +9,6 @@ import {
   fetchCharacter,
   ItemConditionChip,
   ItemModifierChips,
-  imageBaseUrl,
   itemImageUrl,
   itemFilter,
   LoadingState,
@@ -23,6 +23,14 @@ import CharacterViewTransferGold from './CharacterViewTransferGold';
 
 const borderRadius = 1;
 
+/** The paper doll: three columns, one row per line; null leaves the cell empty. */
+const SLOT_LAYOUT: (EquipmentSlot | null)[][] = [
+  [null, 'head', null],
+  ['mainHand', 'body', 'offHand'],
+  [null, 'arms', null],
+  [null, 'legs', null],
+];
+
 export default function CharacterEquipmentPanel({
   character,
   setCharacter,
@@ -36,7 +44,15 @@ export default function CharacterEquipmentPanel({
   const { view, refresh } = useHolder('character', character.id);
   const items = view?.items ?? [];
   const [dialogEquipSlot, setDialogEquipSlot] = useState<EquipmentSlot>();
-  const equippedIds = Object.values(character.equipment.slots).filter((id): id is string => !!id);
+  // The item under the pointer, in a slot or in the inventory: both sides highlight it
+  const [hoveredId, setHoveredId] = useState<string>();
+  const slots = character.equipment.slots;
+  const equippedIds = Object.values(slots).filter((id): id is string => !!id);
+  const equippedSlots = Object.fromEntries(
+    Object.entries(slots)
+      .filter((entry): entry is [string, string] => !!entry[1])
+      .map(([slot, id]) => [id, slot])
+  );
 
   /** An operation changes the weight, the gold or the equipment of the character: the API reprocesses it. */
   const onChanged = (updated?: Character) => {
@@ -53,22 +69,35 @@ export default function CharacterEquipmentPanel({
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: {
-              xs: '1fr',
-              lg: '360px 1fr 520px',
-            },
-            gap: 1,
+            gridTemplateColumns: { xs: 'minmax(0, 1fr)', lg: '380px minmax(0, 1fr)' },
+            gap: 2,
+            alignItems: 'start',
           }}
         >
-          <EquipmentSlots character={character} items={items} onClick={(slot) => setDialogEquipSlot(slot)} />
-          <StatsPanel character={character} />
-          <Card variant="outlined" sx={{ borderRadius: borderRadius }}>
+          <Stack spacing={2} sx={{ minWidth: 0 }}>
+            <EquipmentSlots
+              character={character}
+              items={items}
+              hoveredId={hoveredId}
+              onHover={setHoveredId}
+              onClick={(slot) => setDialogEquipSlot(slot)}
+            />
+            <StatsPanel character={character} />
+          </Stack>
+          <Card variant="outlined" sx={{ borderRadius: borderRadius, minWidth: 0 }}>
             <CardContent>
               <Typography variant="overline" color="text.secondary">
                 {t('inventory')}
               </Typography>
               {view ? (
-                <HolderInventory view={view} onChanged={onChanged} equippedIds={equippedIds} />
+                <HolderInventory
+                  view={view}
+                  onChanged={onChanged}
+                  equippedIds={equippedIds}
+                  equippedSlots={equippedSlots}
+                  highlightedId={hoveredId}
+                  onHoverItem={setHoveredId}
+                />
               ) : (
                 <LoadingState />
               )}
@@ -109,10 +138,14 @@ export default function CharacterEquipmentPanel({
 function EquipmentSlots({
   character,
   items,
+  hoveredId,
+  onHover,
   onClick,
 }: {
   character: Character;
   items: StrategicItem[];
+  hoveredId?: string;
+  onHover: (itemId: string | undefined) => void;
   onClick: (slot: EquipmentSlot) => void;
 }) {
   const { t } = useTranslation();
@@ -122,30 +155,34 @@ function EquipmentSlots({
         <Typography variant="overline" color="text.secondary">
           {t('equipment')}
         </Typography>
-
+        {/* Fixed tracks that shrink on narrow screens, centered in the card */}
         <Box
           sx={{
             mt: 1,
             display: 'grid',
-            gridTemplateColumns: '1fr 120px 1fr',
-            gridTemplateRows: 'repeat(4, 110px)',
-            gap: 1,
-            alignItems: 'start',
-            justifyItems: 'center',
+            gridTemplateColumns: 'repeat(3, minmax(0, 104px))',
+            justifyContent: 'center',
+            columnGap: { xs: 1, sm: 2 },
+            rowGap: 1.5,
           }}
         >
-          <Box />
-          <SlotCard slot="head" itemId={character.equipment.slots['head']} items={items} onClick={onClick} />
-          <Box />
-          <SlotCard slot="mainHand" itemId={character.equipment.slots['mainHand']} items={items} onClick={onClick} />
-          <SlotCard slot="body" itemId={character.equipment.slots['body']} items={items} onClick={onClick} />
-          <SlotCard slot="offHand" itemId={character.equipment.slots['offHand']} items={items} onClick={onClick} />
-          <Box />
-          <SlotCard slot="arms" itemId={character.equipment.slots['arms']} items={items} onClick={onClick} />
-          <Box />
-          <Box />
-          <SlotCard slot="legs" itemId={character.equipment.slots['legs']} items={items} onClick={onClick} />
-          <Box />
+          {SLOT_LAYOUT.flatMap((row, index) =>
+            row.map((slot, column) =>
+              slot ? (
+                <SlotCard
+                  key={slot}
+                  slot={slot}
+                  itemId={character.equipment.slots[slot]}
+                  items={items}
+                  hoveredId={hoveredId}
+                  onHover={onHover}
+                  onClick={onClick}
+                />
+              ) : (
+                <Box key={`empty-${index}-${column}`} />
+              )
+            )
+          )}
         </Box>
       </CardContent>
     </Card>
@@ -156,20 +193,25 @@ function SlotCard({
   slot,
   itemId,
   items,
+  hoveredId,
+  onHover,
   onClick,
 }: {
   slot: EquipmentSlot;
   itemId: string | null;
   items: StrategicItem[];
+  hoveredId?: string;
+  onHover: (itemId: string | undefined) => void;
   onClick: (slot: EquipmentSlot) => void;
 }) {
   const { t } = useTranslation();
   const item = items.find((e) => e.id === itemId) || undefined;
-  const image = item ? itemImageUrl(item) : `${imageBaseUrl}images/items/no-item.png`;
+  const name = item ? t(item.name, { defaultValue: item.name }) : undefined;
   const modifiers = item?.modifiers || [];
+  const highlighted = !!item && hoveredId === item.id;
   const tooltip = item ? (
     <Stack spacing={0.5}>
-      <Typography variant="subtitle2">{item.name}</Typography>
+      <Typography variant="subtitle2">{name}</Typography>
       {modifiers.length > 0 ? (
         modifiers.map((modifier) => (
           <Typography key={modifier.id} variant="body2" component="span">
@@ -186,48 +228,69 @@ function SlotCard({
     t('empty-slot')
   );
   return (
-    // Fixed size: the image always sits at the same height of its row, with or without badges below.
-    <Stack spacing={0.5} sx={{ alignItems: 'center', width: 110, height: 110 }}>
+    <Stack spacing={0.25} sx={{ alignItems: 'center', minWidth: 0 }}>
+      <Typography variant="caption" color="text.secondary" noWrap sx={{ maxWidth: '100%' }}>
+        {t(slot)}
+      </Typography>
       <Tooltip title={tooltip}>
         <Box
+          component="button"
+          type="button"
+          aria-label={name ? `${t(slot)}: ${name}` : `${t(slot)}: ${t('empty-slot')}`}
           onClick={() => onClick(slot)}
+          onMouseEnter={() => onHover(item?.id)}
+          onMouseLeave={() => onHover(undefined)}
           sx={{
-            width: 82,
-            height: 82,
-            flexShrink: 0,
+            p: 0,
+            width: '100%',
+            maxWidth: 82,
+            aspectRatio: '1',
             cursor: 'pointer',
-            border: 0.5,
-            borderColor: item ? 'primary.main' : 'divider',
             borderRadius: 0.5,
             overflow: 'hidden',
-            bgcolor: 'action.hover',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            color: 'text.disabled',
+            bgcolor: item ? 'action.hover' : 'transparent',
+            border: item ? 1 : '1px dashed',
+            borderColor: highlighted ? 'primary.light' : item ? 'primary.main' : 'divider',
+            boxShadow: highlighted ? (theme) => `0 0 0 2px ${theme.palette.primary.main}` : 'none',
+            transition: 'box-shadow 120ms, border-color 120ms, color 120ms',
+            '&:hover, &:focus-visible': { borderColor: 'primary.main', color: 'primary.main', outline: 'none' },
           }}
         >
-          <Box
-            component="img"
-            src={image}
-            alt={item ? item.name : t('empty-slot')}
-            sx={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              filter: itemFilter,
-            }}
-          />
+          {item ? (
+            <Box
+              component="img"
+              src={itemImageUrl(item)}
+              alt=""
+              sx={{ width: '100%', height: '100%', objectFit: 'cover', filter: itemFilter }}
+            />
+          ) : (
+            <AddIcon />
+          )}
         </Box>
       </Tooltip>
-      <Stack
-        direction="row"
-        spacing={0.5}
-        sx={{ alignItems: 'center', justifyContent: 'center', height: 24, maxWidth: '100%', overflow: 'hidden' }}
+      <Typography
+        variant="caption"
+        noWrap
+        sx={{ maxWidth: '100%', fontWeight: 600, minHeight: '1.66em' }}
+        color={item ? 'text.primary' : 'text.disabled'}
       >
-        {item && <ItemConditionChip condition={item.condition} />}
-        {/* Breakage is already in the condition: the slot only adds the other kinds, folded. */}
-        {item && <ItemModifierChips modifiers={modifiers.filter((modifier) => modifier.type !== 'breakage')} max={0} />}
-      </Stack>
+        {name ?? t('empty-slot')}
+      </Typography>
+      {item && (
+        <Stack
+          direction="row"
+          spacing={0.5}
+          sx={{ alignItems: 'center', justifyContent: 'center', maxWidth: '100%', overflow: 'hidden' }}
+        >
+          <ItemConditionChip condition={item.condition} />
+          {/* Breakage is already in the condition: the slot only adds the other kinds, folded. */}
+          <ItemModifierChips modifiers={modifiers.filter((modifier) => modifier.type !== 'breakage')} max={0} />
+        </Stack>
+      )}
     </Stack>
   );
 }
@@ -235,7 +298,8 @@ function SlotCard({
 function StatsPanel({ character }: { character: Character }) {
   const { t } = useTranslation();
   const eq = character.equipment;
-  const loadPercent = Math.min((eq.weight / eq.weightAllowance) * 100, 100);
+  const over = eq.weight > eq.weightAllowance;
+  const loadPercent = eq.weightAllowance > 0 ? Math.min((eq.weight / eq.weightAllowance) * 100, 100) : 100;
   const overload = eq.weight - eq.weightAllowance;
 
   const getArmorType = (): string => {
@@ -246,101 +310,101 @@ function StatsPanel({ character }: { character: Character }) {
   };
 
   return (
-    <Stack spacing={2}>
-      <Card variant="outlined" sx={{ borderRadius: borderRadius }}>
-        <CardContent>
-          <Typography variant="overline" color="text.secondary">
-            {t('equipment-stats')}
-          </Typography>
+    <Card variant="outlined" sx={{ borderRadius: borderRadius }}>
+      <CardContent>
+        <Typography variant="overline" color="text.secondary">
+          {t('equipment-stats')}
+        </Typography>
 
-          <Stack spacing={1.25} sx={{ mt: 2 }}>
-            <StatRow
-              label={t('carried-weight')}
-              value={`${eq.weight} ${t('lbs')}`}
-              danger={eq.weight > eq.weightAllowance}
-            />
-            <StatRow label={t('weight-allowance')} value={`${eq.weightAllowance} ${t('lbs')}`} />
-            <StatRow
-              label={t('encumbrance-penalty')}
-              value={eq.encumbrancePenalty}
-              danger={eq.encumbrancePenalty < 0}
-            />
-            <StatRow label={t('armor-type')} value={getArmorType()} />
-            <StatRow label={t('maneuver-penalty')} value={eq.maneuverPenalty} danger={eq.maneuverPenalty < 0} />
-            <StatRow
-              label={t('armor-base-penalty')}
-              value={eq.baseManeuverPenalty}
-              danger={eq.baseManeuverPenalty < 0}
-            />
-            <StatRow label={t('ranged-penalty')} value={eq.rangedPenalty} danger={eq.rangedPenalty < 0} />
-            <StatRow label={t('perception-penalty')} value={eq.perceptionPenalty!} danger={eq.perceptionPenalty! < 0} />
-            <StatRow label={t('max-pace')} value={t(character.movement.maxPace)} />
-            <StatRow label={t('movement-base-difficulty')} value={t(`difficulty-${eq.movementBaseDifficulty!}`)} />
+        <Box sx={{ mt: 1 }}>
+          <Stack direction="row" spacing={2} sx={{ justifyContent: 'space-between' }}>
+            <Typography variant="body2">{t('encumbrance')}</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 600 }} color={over ? 'error.main' : 'text.primary'}>
+              {`${eq.weight} / ${eq.weightAllowance} ${t('lbs')}`}
+            </Typography>
           </Stack>
-        </CardContent>
-      </Card>
+          <LinearProgress
+            variant="determinate"
+            value={loadPercent}
+            color={over ? 'error' : 'primary'}
+            sx={{ mt: 1, height: 8, borderRadius: 99 }}
+          />
+        </Box>
 
-      <Card variant="outlined" sx={{ borderRadius: borderRadius }}>
-        <CardContent>
-          <Typography variant="overline" color="text.secondary">
-            {t('weight')}
-          </Typography>
+        <StatGroup title={t('weight')}>
+          {overload > 0 && <StatRow label={t('overload')} value={`${overload.toFixed(2)} ${t('lbs')}`} danger />}
+          <StatRow label={t('encumbrance-penalty')} value={eq.encumbrancePenalty} penalty />
+        </StatGroup>
 
-          <Stack spacing={2} sx={{ mt: 2 }}>
-            <Box>
-              <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
-                <Typography variant="body2">{t('encumbrance')}</Typography>
-                <Typography variant="body2" color="error.main">
-                  {`${eq.weight} / ${eq.weightAllowance} ${t('lbs')}`}
-                </Typography>
-              </Stack>
+        <StatGroup title={t('armor')}>
+          <StatRow label={t('armor-type')} value={getArmorType()} />
+          <StatRow label={t('armor-base-penalty')} value={eq.baseManeuverPenalty} penalty />
+          <StatRow label={t('maneuver-penalty')} value={eq.maneuverPenalty} penalty />
+        </StatGroup>
 
-              <LinearProgress
-                variant="determinate"
-                value={loadPercent}
-                color={eq.weight > eq.weightAllowance ? 'error' : 'primary'}
-                sx={{ mt: 1, height: 8, borderRadius: 99 }}
-              />
-            </Box>
-            {overload > 0 && <StatRow label={t('overload')} value={`${overload.toFixed(2)} ${t('lbs')}`} danger />}
-          </Stack>
-        </CardContent>
-      </Card>
-    </Stack>
+        <StatGroup title={t('penalties')}>
+          <StatRow label={t('ranged-penalty')} value={eq.rangedPenalty} penalty />
+          <StatRow label={t('perception-penalty')} value={eq.perceptionPenalty ?? 0} penalty />
+        </StatGroup>
+
+        <StatGroup title={t('movement')}>
+          <StatRow label={t('max-pace')} value={t(character.movement.maxPace)} />
+          {eq.movementBaseDifficulty && (
+            <StatRow label={t('movement-base-difficulty')} value={t(`difficulty-${eq.movementBaseDifficulty}`)} />
+          )}
+        </StatGroup>
+      </CardContent>
+    </Card>
   );
 }
 
+function StatGroup({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <Box sx={{ mt: 2 }}>
+      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase' }}>
+        {title}
+      </Typography>
+      <Stack>{children}</Stack>
+    </Box>
+  );
+}
+
+/** A label and its value; a penalty is red when negative and dimmed when zero. */
 function StatRow({
   label,
   value,
   danger,
-  success,
+  penalty,
 }: {
   label: string;
   value: string | number;
   danger?: boolean;
-  success?: boolean;
+  penalty?: boolean;
 }) {
+  const negative = penalty && typeof value === 'number' && value < 0;
+  const zero = penalty && value === 0;
   return (
     <Stack
       direction="row"
+      spacing={2}
       sx={{
         justifyContent: 'space-between',
-        alignItems: 'center',
+        alignItems: 'baseline',
         py: 0.75,
         borderBottom: 1,
         borderColor: 'divider',
+        '&:last-of-type': { borderBottom: 0 },
       }}
     >
       <Typography variant="body2" color="text.secondary">
         {label}
       </Typography>
-
       <Typography
         variant="body2"
         sx={{
           fontWeight: 600,
-          color: danger ? 'error.main' : success ? 'success.main' : 'text.primary',
+          whiteSpace: 'nowrap',
+          color: danger || negative ? 'error.main' : zero ? 'text.disabled' : 'text.primary',
         }}
       >
         {value}

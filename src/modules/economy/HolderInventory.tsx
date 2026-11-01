@@ -66,8 +66,13 @@ const HolderInventory: FC<{
   /** An item changed: reload the holder (a character also reloads its equipment). */
   onChanged: (character?: Character) => void;
   equippedIds?: string[];
+  /** Item id → equipment slot of a character, shown under the item name. */
+  equippedSlots?: Record<string, string>;
+  /** The item to highlight and the hover callback, to link the rows with the equipment slots. */
+  highlightedId?: string;
+  onHoverItem?: (itemId: string | undefined) => void;
   emptyAction?: React.ReactNode;
-}> = ({ view, onChanged, equippedIds, emptyAction }) => {
+}> = ({ view, onChanged, equippedIds, equippedSlots, highlightedId, onHoverItem, emptyAction }) => {
   const auth = useAuth();
   const { t } = useTranslation();
   const notify = useNotify();
@@ -152,6 +157,9 @@ const HolderInventory: FC<{
         items={view.items}
         actions={actions}
         equippedIds={equippedIds}
+        equippedSlots={equippedSlots}
+        highlightedId={highlightedId}
+        onHoverItem={onHoverItem}
         groupings={view.holder.kind === 'character' ? ['carried', 'category'] : ['category']}
         hideItemTypeIds={[GOLD_COIN]}
         emptyTitle={view.holder.kind === 'faction' ? t('armory-empty') : undefined}
