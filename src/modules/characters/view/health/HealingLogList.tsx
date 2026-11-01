@@ -147,6 +147,7 @@ const HealingLogList: FC<{ character: Character }> = ({ character }) => {
             <ListItemText
               primary={text(entry)}
               secondary={[
+                entry.gameDay !== undefined ? t('campaign-day', { day: entry.gameDay }) : undefined,
                 new Date(entry.at).toLocaleString(i18n.language),
                 t(`healing-log-kind-${entry.kind}`),
                 injuryLabel(entry.injuryId),
