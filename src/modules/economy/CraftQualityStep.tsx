@@ -16,14 +16,15 @@ import {
 } from '@mui/material';
 import {
   ARMOR_WEIGHT_PERCENTS,
+  ChipRow,
   CraftingPlan,
   CraftingQualityDto,
   CraftKind,
-  Material,
   MASTERWORK_KINDS,
   MasterworkKind,
-  materialsFor,
+  Material,
   MATERIAL_GROUPS,
+  materialsFor,
   MoneyDisplay,
   Panel,
   WORKSHOP_QUALITIES,
@@ -116,7 +117,7 @@ const CraftQualityStep: FC<{
           </Grid>
           {material && (
             <Grid size={12}>
-              <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', alignItems: 'center' }} useFlexGap>
+              <ChipRow>
                 {material.magical && <Chip size="small" color="secondary" label={t('material-magical')} />}
                 {material.alloyDifficulty && (
                   <Chip
@@ -147,7 +148,7 @@ const CraftQualityStep: FC<{
                     label={t('material-replaces-metal', { bonus: signed(material.metalBonus) })}
                   />
                 )}
-              </Stack>
+              </ChipRow>
             </Grid>
           )}
           {materialsError && (
@@ -275,7 +276,7 @@ export const CraftPlanSummary: FC<{ plan: CraftingPlan; free: boolean }> = ({ pl
           </Typography>
         )}
       </Stack>
-      <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', alignItems: 'center' }} useFlexGap>
+      <ChipRow>
         <Typography variant="body2" color="text.secondary">
           {t('craft-plan-modifiers')}
         </Typography>
@@ -289,8 +290,8 @@ export const CraftPlanSummary: FC<{ plan: CraftingPlan; free: boolean }> = ({ pl
             label={`${t(`maneuver-modifier-${modifier.key}`)} ${signed(modifier.value)}`}
           />
         ))}
-      </Stack>
-      <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', alignItems: 'center' }} useFlexGap>
+      </ChipRow>
+      <ChipRow>
         <Typography variant="body2" color="text.secondary">
           {t('craft-plan-bonuses')}
         </Typography>
@@ -298,7 +299,7 @@ export const CraftPlanSummary: FC<{ plan: CraftingPlan; free: boolean }> = ({ pl
         {bonuses.map((bonus) => (
           <Chip key={bonus} size="small" label={bonus} />
         ))}
-      </Stack>
+      </ChipRow>
     </Stack>
   );
 };

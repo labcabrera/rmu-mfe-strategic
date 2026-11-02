@@ -12,6 +12,7 @@ import SpaIcon from '@mui/icons-material/Spa';
 import { Alert, Box, Button, Chip, FormControlLabel, Link, Stack, Switch } from '@mui/material';
 import {
   Character,
+  ChipRow,
   EmptyState,
   fetchCharacters,
   HealerCandidate,
@@ -172,7 +173,7 @@ const CharacterHealthSection: FC<{
               )}
             </Stack>
             {conditions.length > 0 && (
-              <Stack direction="row" useFlexGap sx={{ flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
+              <ChipRow>
                 {conditions.map((condition) => (
                   <Chip
                     key={condition.id}
@@ -188,7 +189,7 @@ const CharacterHealthSection: FC<{
                     title={isGameMaster ? t('resolve-condition') : undefined}
                   />
                 ))}
-              </Stack>
+              </ChipRow>
             )}
           </Stack>
         </Panel>

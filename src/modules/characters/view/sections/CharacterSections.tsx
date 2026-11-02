@@ -4,6 +4,7 @@ import { Box, Chip, Stack } from '@mui/material';
 import {
   AttackCard,
   Character,
+  ChipRow,
   formatBonus,
   Panel,
   ResistanceList,
@@ -104,7 +105,7 @@ export const CharacterOverview = ({
       </Box>
       <Box sx={span(12, 3)}>
         <Panel title={t('traits')} action={seeAll('attributes')}>
-          <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 0.75 }}>
+          <ChipRow>
             {character.traits.map((trait) => (
               <Chip
                 key={`${trait.traitId}-${trait.specialization ?? ''}`}
@@ -113,7 +114,7 @@ export const CharacterOverview = ({
                 variant={trait.isTalent ? 'outlined' : 'filled'}
               />
             ))}
-          </Stack>
+          </ChipRow>
         </Panel>
       </Box>
     </Bento>

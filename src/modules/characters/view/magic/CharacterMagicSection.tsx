@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import {
   Character,
+  EmptyState,
   fetchCharacterSpells,
   formatBonus,
   KnownSpellList,
@@ -22,19 +23,26 @@ import {
   Panel,
   ResourceBar,
   restoreCharacterPower,
-  spendCharacterPower,
   SpellEffectList,
+  spendCharacterPower,
   StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useStrategicNotify } from '../../../services/notify-service';
 import { canChangeCharacter } from '../../../shared/permissions';
 
 /** Skills whose specialization is a spell list (spec 029). */
-const SPELL_LIST_SKILLS = ['base-spell-list', 'open-spell-list', 'closed-spell-list', 'arcane-spell-list', 'restricted-spell-list'];
+const SPELL_LIST_SKILLS = [
+  'base-spell-list',
+  'open-spell-list',
+  'closed-spell-list',
+  'arcane-spell-list',
+  'restricted-spell-list',
+];
 
 /** The character has magic: spell lists or power points (the Magic tab is shown only then). */
 export const hasMagic = (character: Character): boolean =>
-  !!character.power || character.skills.some((skill) => SPELL_LIST_SKILLS.includes(skill.skillId) && !!skill.specialization);
+  !!character.power ||
+  character.skills.some((skill) => SPELL_LIST_SKILLS.includes(skill.skillId) && !!skill.specialization);
 
 /** Magic of the character (spec 029): power points and the spells known in each list, up to its ranks. */
 const CharacterMagicSection: FC<{
@@ -86,7 +94,11 @@ const CharacterMagicSection: FC<{
                     onChange={(value) => setAmount(Math.max(1, value ?? 1))}
                   />
                 </Box>
-                <Button variant="outlined" onClick={() => changePower('spend')} disabled={character.power.current < amount}>
+                <Button
+                  variant="outlined"
+                  onClick={() => changePower('spend')}
+                  disabled={character.power.current < amount}
+                >
                   {t('spend-power')}
                 </Button>
                 <Button variant="outlined" onClick={() => changePower('restore')}>
@@ -96,26 +108,32 @@ const CharacterMagicSection: FC<{
             )}
           </Stack>
         ) : (
-          <Typography color="text.secondary">{t('no-power-points')}</Typography>
+          <EmptyState dense title={t('no-power-points')} />
         )}
       </Panel>
       <Panel title={t('spell-lists')}>
-        {lists && lists.length === 0 && <Typography color="text.secondary">{t('no-spell-lists')}</Typography>}
+        {lists && lists.length === 0 && <EmptyState dense title={t('no-spell-lists')} />}
         {lists?.map((list) => (
           <Accordion key={list.code} disableGutters variant="outlined">
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 1, minWidth: 0 }}>
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 1, minWidth: 0 }}
+              >
                 <Typography sx={{ fontWeight: 600 }}>{list.name ?? list.code}</Typography>
                 <Chip size="small" label={t(list.skillId)} />
                 <Chip size="small" variant="outlined" label={`${t('ranks')}: ${list.ranks}`} />
-                <Chip size="small" variant="outlined" label={`${t('list-type-modifier')}: ${formatBonus(list.listTypeModifier)}`} />
+                <Chip
+                  size="small"
+                  variant="outlined"
+                  label={`${t('list-type-modifier')}: ${formatBonus(list.listTypeModifier)}`}
+                />
               </Stack>
             </AccordionSummary>
             <AccordionDetails>
               {!list.spellListId && <Alert severity="warning">{t('spell-list-not-found', { code: list.code })}</Alert>}
-              {list.spellListId && list.spells.length === 0 && (
-                <Typography color="text.secondary">{t('no-known-spells')}</Typography>
-              )}
+              {list.spellListId && list.spells.length === 0 && <EmptyState dense title={t('no-known-spells')} />}
               <Stack spacing={1}>
                 {list.spells.map(({ spell, powerPoints }) => (
                   <Accordion key={spell.id} disableGutters variant="outlined">

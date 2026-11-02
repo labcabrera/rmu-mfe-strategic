@@ -10,6 +10,7 @@ import {
   CulturePicker,
   CultureSkillRank,
   DeleteButton,
+  EmptyState,
   fetchEnumerations,
   NumericInput,
   Panel,
@@ -296,11 +297,7 @@ const CultureEntryBlock: FC<{
             </Box>
           );
         })}
-        {rows.length === 0 && (
-          <Typography variant="body2" color="text.secondary">
-            {t('culture-no-assignments')}
-          </Typography>
-        )}
+        {rows.length === 0 && <EmptyState dense title={t('culture-no-assignments')} />}
         {validation?.errors.includes('err-culture-incomplete-entry') && rows.length > 0 && (
           <Typography variant="caption" color="error">
             {t('err-culture-incomplete-entry')}

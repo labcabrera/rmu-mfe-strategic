@@ -1,8 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Typography } from '@mui/material';
-import { CardGrid, Faction } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { CardGrid, EmptyState, Faction } from '@labcabrera-rmu/rmu-react-shared-lib';
 import FactionCard from '../../factions/FactionCard';
 
 export default function StrategicGameViewFactions({ factions }: { factions: Faction[] | undefined }) {
@@ -12,11 +11,7 @@ export default function StrategicGameViewFactions({ factions }: { factions: Fact
   if (!factions) return;
 
   if (factions.length === 0) {
-    return (
-      <Typography variant="body1" color="text.secondary">
-        <em>{t('no-factions-have-been-created')}</em>
-      </Typography>
-    );
+    return <EmptyState dense title={t('no-factions-have-been-created')} />;
   }
   return (
     <CardGrid
