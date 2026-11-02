@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import AddIcon from '@mui/icons-material/Add';
@@ -17,12 +17,15 @@ import {
   Panel,
   SectionLabel,
   selectableSx,
+  StrategicGame,
   StrategicItem,
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import HolderInventory, { holderNames } from '../../../economy/HolderInventory';
+import { CreateMagicItemButton } from '../../../economy/HolderMagicButtons';
 import ItemLedgerList from '../../../economy/ItemLedgerList';
 import { useHolder } from '../../../economy/use-holder';
+import { canChangeCharacter } from '../../../shared/permissions';
 import CharacterEquipmentDialog from './CharacterEquipmentDialog';
 import CharacterViewTransferGold from './CharacterViewTransferGold';
 
@@ -37,9 +40,14 @@ const SLOT_LAYOUT: (EquipmentSlot | null)[][] = [
 export default function CharacterEquipmentPanel({
   character,
   setCharacter,
+  strategicGame,
+  refreshKey = 0,
 }: {
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
+  strategicGame?: StrategicGame;
+  /** Changes when something outside the panel (a treasure) changed the items of the character. */
+  refreshKey?: number;
 }) {
   const auth = useAuth();
   const notify = useNotify();
@@ -66,6 +74,17 @@ export default function CharacterEquipmentPanel({
       .catch((err) => notify.error(err));
   };
 
+  // A new refresh key (not the first render) reloads the items and the character
+  const lastRefreshKey = useRef(refreshKey);
+  useEffect(() => {
+    if (lastRefreshKey.current === refreshKey) return;
+    lastRefreshKey.current = refreshKey;
+    onChanged();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshKey]);
+
+  const canManage = canChangeCharacter(auth, character, strategicGame);
+
   return (
     <>
       <Box sx={{ mt: 2 }}>
@@ -87,7 +106,21 @@ export default function CharacterEquipmentPanel({
             />
             <StatsPanel character={character} />
           </Stack>
-          <Panel variant="outlined" title={t('inventory')} sx={{ minWidth: 0 }}>
+          <Panel
+            variant="outlined"
+            title={t('inventory')}
+            sx={{ minWidth: 0 }}
+            extra={
+              canManage && (
+                <CreateMagicItemButton
+                  size="small"
+                  holder={{ kind: 'character', id: character.id }}
+                  gameId={character.gameId}
+                  onChanged={() => onChanged()}
+                />
+              )
+            }
+          >
             {view ? (
               <HolderInventory
                 view={view}

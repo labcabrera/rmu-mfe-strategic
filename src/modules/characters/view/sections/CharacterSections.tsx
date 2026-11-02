@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Chip, Stack } from '@mui/material';
 import {
@@ -176,13 +176,25 @@ export const CharacterCombat = ({ character, strategicGame }: Omit<SectionProps,
   );
 };
 
-/** Equipment slots, carried and stored items, and gold. */
-export const CharacterEquipment = ({ character, setCharacter }: SectionProps) => (
-  <Stack spacing={2}>
-    <CharacterEquipmentButtons character={character} />
-    <CharacterEquipmentPanel character={character} setCharacter={setCharacter} />
-  </Stack>
-);
+/** Equipment slots, carried and stored items, and gold. A treasure awarded from the buttons reloads the items. */
+export const CharacterEquipment = ({ character, setCharacter, strategicGame }: SectionProps) => {
+  const [refreshKey, setRefreshKey] = useState(0);
+  return (
+    <Stack spacing={2}>
+      <CharacterEquipmentButtons
+        character={character}
+        strategicGame={strategicGame}
+        onChanged={() => setRefreshKey((key) => key + 1)}
+      />
+      <CharacterEquipmentPanel
+        character={character}
+        setCharacter={setCharacter}
+        strategicGame={strategicGame}
+        refreshKey={refreshKey}
+      />
+    </Stack>
+  );
+};
 
 /** Experience and level. */
 export const CharacterProgression = ({ character, setCharacter, strategicGame }: SectionProps) => (

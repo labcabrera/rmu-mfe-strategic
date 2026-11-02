@@ -7,14 +7,24 @@ import StorefrontIcon from '@mui/icons-material/Storefront';
 import { Box, Button, Stack } from '@mui/material';
 import { Faction, LoadingState, Panel, span } from '@labcabrera-rmu/rmu-react-shared-lib';
 import HolderInventory, { holderNames } from '../../economy/HolderInventory';
+import { CreateMagicItemButton, HolderTreasureButton } from '../../economy/HolderMagicButtons';
 import ItemLedgerList from '../../economy/ItemLedgerList';
 import { holderPath, useHolder } from '../../economy/use-holder';
 
 /**
  * The armory of a faction (spec 023): the items the faction holds, with the same operations as the equipment of a
- * character, its market and workshop, and the ledger. Only the game master spends the gold of the faction.
+ * character, its market and workshop, and the ledger. Only the game master spends the gold of the faction, rolls a
+ * random treasure for it and creates magic items in it (spec 067).
  */
-export default function FactionViewArmory({ faction, onGoldChanged }: { faction: Faction; onGoldChanged: () => void }) {
+export default function FactionViewArmory({
+  faction,
+  gameMaster,
+  onGoldChanged,
+}: {
+  faction: Faction;
+  gameMaster: boolean;
+  onGoldChanged: () => void;
+}) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { view, refresh } = useHolder('faction', faction.id);
@@ -24,7 +34,7 @@ export default function FactionViewArmory({ faction, onGoldChanged }: { faction:
     onGoldChanged();
   };
   const links = (
-    <Stack direction="row" spacing={1}>
+    <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
       <Button size="small" startIcon={<StorefrontIcon />} onClick={() => navigate(holderPath('market', holder))}>
         {t('market')}
       </Button>
@@ -34,6 +44,12 @@ export default function FactionViewArmory({ faction, onGoldChanged }: { faction:
       <Button size="small" startIcon={<AutoAwesomeIcon />} onClick={() => navigate(holderPath('enchantments', holder))}>
         {t('enchantments')}
       </Button>
+      {gameMaster && (
+        <>
+          <HolderTreasureButton size="small" holder={holder} gameId={faction.gameId} onChanged={onChanged} />
+          <CreateMagicItemButton size="small" holder={holder} gameId={faction.gameId} onChanged={onChanged} />
+        </>
+      )}
     </Stack>
   );
   return (
