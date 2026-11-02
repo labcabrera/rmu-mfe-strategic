@@ -1,7 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import { AuthContextProps, useAuth } from 'react-oidc-context';
-import { apiCoreUrl, callApi, HealingType } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  apiCoreUrl,
+  callApi,
+  HealingType,
+  InjurySeverity,
+  InjuryType,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 
 /**
  * Part of the healing tables of rmu-api-core (`GET /v1/healing-tables`) used for the previews of the Health section.
@@ -14,6 +20,10 @@ export interface HealingTables {
   restPeriodHours: number;
   fullRestDayMultiplier: number;
   talentMultipliers?: Record<string, number>;
+  /** Workspace spec 068: injuries that only surgery or magic can treat (empty or missing before it). */
+  surgeryRequired?: { injuryType: InjuryType; severity: InjurySeverity }[] | null;
+  /** Workspace spec 068: range of the recovery modifier of a salve, null in documents imported before it. */
+  salveModifier?: { min: number; max: number } | null;
 }
 
 export async function fetchHealingTables(auth: AuthContextProps): Promise<HealingTables> {

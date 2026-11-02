@@ -16,6 +16,8 @@ import {
   Typography,
 } from '@mui/material';
 import {
+  CAST_SUPPORTS,
+  CastSupport,
   Character,
   DifficultyPicker,
   FlowSteps,
@@ -27,6 +29,7 @@ import {
   HealerPicker,
   HealerSelection,
   InjuryCard,
+  InjuryCareChips,
   KeyValue,
   MANEUVER_DIFFICULTIES,
   OPEN_D100,
@@ -45,10 +48,11 @@ import {
   TreatmentProcedure,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useHealingTables } from '../../../api/healing-tables';
-import { useStrategicNotify } from '../../../services/notify-service';
+import { apiErrorCode, useStrategicNotify } from '../../../services/notify-service';
 import {
   ALL_PROCEDURES,
   bodyDevelopmentRanks,
+  DEFAULT_SALVE_RANGE,
   HEALING_OPTIONS,
   HealingOption,
   healingTypeKey,
@@ -59,7 +63,9 @@ import {
   isUntreated,
   latestTreatment,
   recoveryMultiplierOf,
+  requiresSurgery,
   suggestedProcedures,
+  SURGERY_ONLY_PROCEDURES,
 } from './health-rules';
 
 type StepId = 'healer' | 'treatment' | 'recovery';
@@ -120,14 +126,22 @@ const InjuryHealingDialog: FC<{
   const [permanentRequired, setPermanentRequired] = useState(false);
   const [permanentRoll, setPermanentRoll] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
+  // Workspace spec 068: the support of a cast leg, the salve modifier and a refusal for want of surgery
+  const [castSupport, setCastSupport] = useState<CastSupport>('none');
+  const [salveModifier, setSalveModifier] = useState(0);
+  const [surgeryRefused, setSurgeryRefused] = useState(false);
+  const surgeryOnly = !!injury && (surgeryRefused || requiresSurgery(injury, tables?.surgeryRequired));
+  const salveRange = tables?.salveModifier ?? DEFAULT_SALVE_RANGE;
 
   // The procedures that fit the injury: the suggestions (or all), without the ones the API refuses or has no row for.
   const procedures = useMemo(() => {
     if (!injury) return ALL_PROCEDURES;
+    // An injury that requires surgery only admits surgery or magic, whatever the API difficulty says.
+    if (surgeryOnly) return SURGERY_ONLY_PROCEDURES;
     return (showAll ? ALL_PROCEDURES : suggestedProcedures(injury)).filter(
       (option) => isProcedureAllowed(injury, option) && difficulties[option]?.applicable !== false
     );
-  }, [injury, showAll, difficulties]);
+  }, [injury, showAll, difficulties, surgeryOnly]);
 
   // Treatment difficulties from the API, again when a treatment changes what they depend on.
   useEffect(() => {
@@ -170,6 +184,9 @@ const InjuryHealingDialog: FC<{
     setHerbalismEnabled(false);
     setHerbalismRoll(null);
     setHerbItemId('');
+    setCastSupport('none');
+    setSalveModifier(0);
+    setSurgeryRefused(false);
     fetchStrategicItems(`characterId==${character.id}`, 0, 1000, auth)
       .then((page) =>
         setHerbs(
@@ -191,6 +208,8 @@ const InjuryHealingDialog: FC<{
   const resolvedHealer = resolveHealer(healer, healers, character.id);
   const healerPenalty = resolvedHealer?.characterId ? healerPenalties[resolvedHealer.characterId] || 0 : 0;
   const isMagic = procedure === 'magic';
+  const askCastSupport = procedure === 'cast' && injury.location === 'leg';
+  const salveInRange = salveModifier >= salveRange.min && salveModifier <= salveRange.max;
   // The API difficulty of the procedure; a game master override replaces its grade, the bleeding extra still applies.
   const computed = difficulties[procedure];
   const extraDifficulty = computed?.bleedingModifier ?? 0;
@@ -225,7 +244,11 @@ const InjuryHealingDialog: FC<{
         onUpdated(updated);
         after(updated);
       })
-      .catch(notify.error)
+      .catch((error) => {
+        // The tables of the client may be missing or stale: the refusal of the API leaves only surgery and magic.
+        if (apiErrorCode(error) === 'err-treatment-surgery-required') setSurgeryRefused(true);
+        notify.error(error);
+      })
       .finally(() => setBusy(false));
   };
 
@@ -247,6 +270,8 @@ const InjuryHealingDialog: FC<{
             },
           }),
       ...(usesHerbs && herbItemId ? { herbItemId } : {}),
+      ...(askCastSupport ? { castSupport } : {}),
+      ...(procedure === 'salve' ? { salveModifier } : {}),
       ...(herbalismEnabled && herbalismRoll !== null
         ? {
             herbalism: resolvedHealer.characterId
@@ -291,6 +316,7 @@ const InjuryHealingDialog: FC<{
     !resolvedHealer ||
     !isTreatable(injury) ||
     (!isMagic && roll === null) ||
+    (procedure === 'salve' && !salveInRange) ||
     (herbalismEnabled && herbalismRoll === null);
 
   // Recovery preview: Body Development ranks + Co bonus + type of healing - |penalty|.
@@ -365,6 +391,7 @@ const InjuryHealingDialog: FC<{
           })}
         </Typography>
       )}
+      {surgeryOnly && <Alert severity="warning">{t('err-treatment-surgery-required')}</Alert>}
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
@@ -380,10 +407,12 @@ const InjuryHealingDialog: FC<{
               </MenuItem>
             ))}
           </TextField>
-          <FormControlLabel
-            control={<Checkbox size="small" checked={showAll} onChange={(_, checked) => setShowAll(checked)} />}
-            label={t('treatment-show-all-procedures')}
-          />
+          {!surgeryOnly && (
+            <FormControlLabel
+              control={<Checkbox size="small" checked={showAll} onChange={(_, checked) => setShowAll(checked)} />}
+              label={t('treatment-show-all-procedures')}
+            />
+          )}
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
@@ -400,6 +429,41 @@ const InjuryHealingDialog: FC<{
             ))}
           </TextField>
         </Grid>
+        {askCastSupport && (
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField
+              select
+              fullWidth
+              label={t('cast-support')}
+              value={castSupport}
+              onChange={(event) => setCastSupport(event.target.value as CastSupport)}
+              helperText={t('cast-support-help')}
+            >
+              {CAST_SUPPORTS.map((option) => (
+                <MenuItem key={option} value={option}>
+                  {t(`cast-support-${option}`)}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+        )}
+        {procedure === 'salve' && (
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField
+              fullWidth
+              type="number"
+              label={t('salve-modifier')}
+              value={salveModifier}
+              onChange={(event) => setSalveModifier(Math.trunc(Number(event.target.value) || 0))}
+              error={!salveInRange}
+              helperText={t('salve-modifier-help', {
+                min: formatBonus(salveRange.min),
+                max: formatBonus(salveRange.max),
+              })}
+              slotProps={{ htmlInput: { min: salveRange.min, max: salveRange.max, step: 5 } }}
+            />
+          </Grid>
+        )}
         {usesHerbs && (
           <Grid size={12}>
             <TextField
@@ -504,6 +568,16 @@ const InjuryHealingDialog: FC<{
               {t('treatment-healer-penalty', { value: formatBonus(latest.healer.penalty) })}
             </Box>
           )}
+        </Alert>
+      )}
+      {treated && injury.limits && (latest?.procedure === 'splint' || latest?.procedure === 'cast') && (
+        <Alert severity="info">
+          {t('treatment-limits-applied')}
+          <Stack direction="row" useFlexGap sx={{ flexWrap: 'wrap', gap: 0.75, mt: 0.75 }}>
+            <InjuryCareChips
+              injury={{ ...injury, treatmentInProgress: undefined, tourniquet: undefined, reopenOn: undefined }}
+            />
+          </Stack>
         </Alert>
       )}
       {treated && latest?.herb && (
