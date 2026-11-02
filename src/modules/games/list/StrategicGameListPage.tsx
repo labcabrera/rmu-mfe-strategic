@@ -6,14 +6,14 @@ import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import { Button } from '@mui/material';
 import {
-  ClearableTextField,
   EmptyState,
   EntityCard,
   EnumPicker,
   fetchRealms,
   fetchStrategicGames,
-  FilterBar,
   FilterSchema,
+  FilterSearchField,
+  FilterSection,
   ListPage,
   Realm,
   RealmPicker,
@@ -76,31 +76,34 @@ export default function StrategicGameListPage() {
       ]}
       query={query}
       onAdd={onCreate}
+      filtersLayout="side"
       filterState={filters}
+      filtersStorageKey="strategic.games"
       filters={
-        <FilterBar>
-          <ClearableTextField
-            label={t('name')}
-            name="q"
-            value={filters.get('q')}
-            onChange={(value) => filters.set('q', value ?? '')}
-          />
-          <RealmPicker
-            realms={realms}
-            variant="select"
-            value={filters.get('realm') || null}
-            onChange={(id) => filters.set('realm', id)}
-            allowAll
-          />
-          <EnumPicker
-            label={t('status')}
-            values={GAME_STATUSES}
-            variant="select"
-            value={filters.get('status') || null}
-            onChange={(id) => filters.set('status', id)}
-            allowAll
-          />
-        </FilterBar>
+        <>
+          <FilterSection title={t('search')} collapsible={false}>
+            <FilterSearchField filters={filters} filter="q" label={t('name')} />
+          </FilterSection>
+          <FilterSection title={t('realm')}>
+            <RealmPicker
+              realms={realms}
+              variant="select"
+              value={filters.get('realm') || null}
+              onChange={(id) => filters.set('realm', id)}
+              allowAll
+            />
+          </FilterSection>
+          <FilterSection title={t('status')}>
+            <EnumPicker
+              label={t('status')}
+              values={GAME_STATUSES}
+              variant="select"
+              value={filters.get('status') || null}
+              onChange={(id) => filters.set('status', id)}
+              allowAll
+            />
+          </FilterSection>
+        </>
       }
       collection={{ modes: ['cards'], storageKey: 'strategic.games' }}
       emptyState={
