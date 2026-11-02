@@ -5,8 +5,8 @@ import { useAuth } from 'react-oidc-context';
 import { Alert, Box, FormControlLabel, Stack, Switch, Typography } from '@mui/material';
 import {
   Character,
-  CharacterPicker,
   characterOption,
+  CharacterPicker,
   fetchManeuverModifiers,
   fetchTradingTables,
   formatPriceFactorValue,
@@ -18,8 +18,9 @@ import {
   PriceFactor,
   PriceFactorSelection,
   PriceQuote,
-  QuotePriceDto,
   quoteItemPrice,
+  QuotePriceDto,
+  SectionLabel,
   selectedPriceFactors,
   selectedRollModifiers,
   TradingRequest,
@@ -76,7 +77,7 @@ export const MarketConditions: FC<{
   if (!tables) return <Alert severity="info">{t('market-conditions-unavailable')}</Alert>;
   return (
     <Stack spacing={1}>
-      <Typography variant="subtitle2">{t('market-conditions')}</Typography>
+      <SectionLabel>{t('market-conditions')}</SectionLabel>
       <Typography variant="caption" color="text.secondary">
         {t('market-conditions-hint')}
       </Typography>
@@ -198,7 +199,12 @@ export const TradingFields: FC<{
     <Stack spacing={1.5}>
       {!alwaysOn && (
         <FormControlLabel
-          control={<Switch checked={value.enabled} onChange={(event) => onChange({ ...value, enabled: event.target.checked })} />}
+          control={
+            <Switch
+              checked={value.enabled}
+              onChange={(event) => onChange({ ...value, enabled: event.target.checked })}
+            />
+          }
           label={t('trading-maneuver')}
         />
       )}

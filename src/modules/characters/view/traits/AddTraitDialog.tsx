@@ -247,7 +247,14 @@ const AddTraitDialog: FC<{
         ))}
       </ChipRow>
       <Box
-        sx={{ flex: 1, minHeight: 0, overflowY: 'auto', border: 1, borderColor: 'divider', borderRadius: 1 }}
+        sx={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          border: 1,
+          borderColor: 'divider',
+          borderRadius: (theme) => `${theme.radius.sm}px`,
+        }}
         role="region"
         aria-label={t('traits')}
       >

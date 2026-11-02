@@ -2,9 +2,10 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { Alert, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { MenuItem, Stack, TextField, Typography } from '@mui/material';
 import {
   applyCharacterHerb,
+  EmptyState,
   fetchStrategicItems,
   isHealingHerb,
   NumericInput,
@@ -73,7 +74,7 @@ const UseHerbDialog: FC<{
     >
       <Stack spacing={2} sx={{ pt: 1 }}>
         {herbs.length === 0 ? (
-          <Alert severity="info">{t('herb-use-no-items')}</Alert>
+          <EmptyState dense title={t('herb-use-no-items')} />
         ) : (
           <TextField
             select

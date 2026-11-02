@@ -1,9 +1,10 @@
 import React, { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { Box, Card, CardActionArea, Chip, Stack, Typography } from '@mui/material';
+import { Box, Chip, Stack, Typography } from '@mui/material';
 import {
   Character,
+  EmptyState,
   equipItem,
   EquipmentSlot,
   imageBaseUrl,
@@ -12,6 +13,7 @@ import {
   ItemModifierChips,
   ItemThumb,
   RmuDialog,
+  SelectableCard,
   StrategicItem,
   unequipItem,
   useNotify,
@@ -56,42 +58,40 @@ const ItemOption: FC<{
   const broken = !!item.condition?.broken || !!item.condition?.unrepairable;
   const base = equipped && equipped.id !== item.id ? statsOf(equipped) : [];
   return (
-    <Card variant="outlined" sx={{ borderColor: selected ? 'success.main' : undefined, opacity: broken ? 0.6 : 1 }}>
-      <CardActionArea onClick={onClick} disabled={broken} sx={{ p: 1.5 }}>
-        <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
-          <ItemThumb item={item} size={64} disabled={broken} />
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
-              <Typography sx={{ fontWeight: 600 }}>{item.name}</Typography>
-              {selected && <Chip size="small" color="success" label={t('equipped')} />}
-              <ItemConditionChip condition={item.condition} />
-            </Stack>
-            <Stack direction="row" spacing={1} sx={{ mt: 0.5, flexWrap: 'wrap' }} useFlexGap>
-              {statsOf(item).map((stat) => {
-                const other = base.find((b) => b.key === stat.key);
-                const diff = other ? stat.value - other.value : 0;
-                const better = LOWER_IS_BETTER.includes(stat.key) ? diff < 0 : diff > 0;
-                return (
-                  <Typography key={stat.key} variant="caption" color="text.secondary">
-                    {`${t(stat.key)} ${stat.value}`}
-                    {diff !== 0 && (
-                      <Box component="span" sx={{ ml: 0.5, color: better ? 'success.main' : 'error.main' }}>
-                        {`(${diff > 0 ? '+' : ''}${Math.round(diff * 100) / 100})`}
-                      </Box>
-                    )}
-                  </Typography>
-                );
-              })}
-            </Stack>
-            {(item.modifiers ?? []).some((m) => m.type !== 'breakage') && (
-              <Box sx={{ mt: 0.5 }}>
-                <ItemModifierChips modifiers={(item.modifiers ?? []).filter((m) => m.type !== 'breakage')} max={3} />
-              </Box>
-            )}
-          </Box>
-        </Stack>
-      </CardActionArea>
-    </Card>
+    <SelectableCard selected={selected} disabled={broken} onClick={onClick}>
+      <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
+        <ItemThumb item={item} size={64} disabled={broken} />
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
+            <Typography sx={{ fontWeight: 600 }}>{item.name}</Typography>
+            {selected && <Chip size="small" color="success" label={t('equipped')} />}
+            <ItemConditionChip condition={item.condition} />
+          </Stack>
+          <Stack direction="row" spacing={1} sx={{ mt: 0.5, flexWrap: 'wrap' }} useFlexGap>
+            {statsOf(item).map((stat) => {
+              const other = base.find((b) => b.key === stat.key);
+              const diff = other ? stat.value - other.value : 0;
+              const better = LOWER_IS_BETTER.includes(stat.key) ? diff < 0 : diff > 0;
+              return (
+                <Typography key={stat.key} variant="caption" color="text.secondary">
+                  {`${t(stat.key)} ${stat.value}`}
+                  {diff !== 0 && (
+                    <Box component="span" sx={{ ml: 0.5, color: better ? 'success.main' : 'error.main' }}>
+                      {`(${diff > 0 ? '+' : ''}${Math.round(diff * 100) / 100})`}
+                    </Box>
+                  )}
+                </Typography>
+              );
+            })}
+          </Stack>
+          {(item.modifiers ?? []).some((m) => m.type !== 'breakage') && (
+            <Box sx={{ mt: 0.5 }}>
+              <ItemModifierChips modifiers={(item.modifiers ?? []).filter((m) => m.type !== 'breakage')} max={3} />
+            </Box>
+          )}
+        </Box>
+      </Stack>
+    </SelectableCard>
   );
 };
 
@@ -136,19 +136,17 @@ export default function CharacterEquipmentDialog({
   return (
     <RmuDialog open={open} maxWidth="sm" title={t(slot)} onCancel={onClose}>
       <Stack spacing={1} sx={{ pt: 1 }}>
-        <Card variant="outlined" sx={{ borderColor: slotItemId ? undefined : 'success.main' }}>
-          <CardActionArea onClick={() => handleEquip(null)} sx={{ p: 1.5 }}>
-            <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
-              <Box
-                component="img"
-                src={`${imageBaseUrl}images/items/no-item.png`}
-                alt=""
-                sx={{ width: 64, height: 64, objectFit: 'cover', filter: itemFilter }}
-              />
-              <Typography>{t('empty-slot')}</Typography>
-            </Stack>
-          </CardActionArea>
-        </Card>
+        <SelectableCard selected={!slotItemId} onClick={() => handleEquip(null)}>
+          <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
+            <Box
+              component="img"
+              src={`${imageBaseUrl}images/items/no-item.png`}
+              alt=""
+              sx={{ width: 64, height: 64, objectFit: 'cover', filter: itemFilter }}
+            />
+            <Typography>{t('empty-slot')}</Typography>
+          </Stack>
+        </SelectableCard>
         {options.map((item) => (
           <ItemOption
             key={item.id}
@@ -158,11 +156,7 @@ export default function CharacterEquipmentDialog({
             onClick={() => handleEquip(item)}
           />
         ))}
-        {options.length === 0 && (
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
-            {t('equip-no-options')}
-          </Typography>
-        )}
+        {options.length === 0 && <EmptyState dense title={t('equip-no-options')} />}
       </Stack>
     </RmuDialog>
   );

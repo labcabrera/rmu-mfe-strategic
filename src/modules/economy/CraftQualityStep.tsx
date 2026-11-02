@@ -2,13 +2,13 @@ import React, { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Alert,
+  Box,
   Chip,
   Divider,
   FormControlLabel,
   Grid,
   ListSubheader,
   MenuItem,
-  Paper,
   Stack,
   Switch,
   TextField,
@@ -25,6 +25,7 @@ import {
   materialsFor,
   MATERIAL_GROUPS,
   MoneyDisplay,
+  Panel,
   WORKSHOP_QUALITIES,
   WorkshopQuality,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
@@ -68,7 +69,7 @@ const CraftQualityStep: FC<{
 
   return (
     <Stack spacing={2}>
-      <Paper variant="outlined" sx={{ p: 2 }}>
+      <Panel variant="outlined">
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 6 }}>
             <TextField
@@ -209,15 +210,14 @@ const CraftQualityStep: FC<{
             </Grid>
           )}
         </Grid>
-      </Paper>
+      </Panel>
 
-      <Paper variant="outlined" sx={{ p: 2 }} data-testid="craft-plan">
-        <Typography variant="overline" color="text.secondary">
-          {t('craft-plan')}
-        </Typography>
-        {planError && <Alert severity="warning">{t(planError, planError)}</Alert>}
-        {plan && !planError && <CraftPlanSummary plan={plan} free={free} />}
-      </Paper>
+      <Box data-testid="craft-plan">
+        <Panel variant="outlined" title={t('craft-plan')}>
+          {planError && <Alert severity="warning">{t(planError, planError)}</Alert>}
+          {plan && !planError && <CraftPlanSummary plan={plan} free={free} />}
+        </Panel>
+      </Box>
     </Stack>
   );
 };

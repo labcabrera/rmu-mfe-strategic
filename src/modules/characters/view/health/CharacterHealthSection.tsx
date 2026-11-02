@@ -9,9 +9,10 @@ import HealingIcon from '@mui/icons-material/Healing';
 import HotelIcon from '@mui/icons-material/Hotel';
 import ScienceIcon from '@mui/icons-material/Science';
 import SpaIcon from '@mui/icons-material/Spa';
-import { Alert, Box, Button, Chip, FormControlLabel, Link, Stack, Switch, Typography } from '@mui/material';
+import { Alert, Box, Button, Chip, FormControlLabel, Link, Stack, Switch } from '@mui/material';
 import {
   Character,
+  EmptyState,
   fetchCharacters,
   HealerCandidate,
   Injury,
@@ -19,6 +20,7 @@ import {
   Panel,
   resolveCharacterCondition,
   ResourceBar,
+  SectionLabel,
   StatPill,
   StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
@@ -203,7 +205,7 @@ const CharacterHealthSection: FC<{
           }
         >
           {visibleCount === 0 ? (
-            <Typography color="text.secondary">{t('no-injuries')}</Typography>
+            <EmptyState dense title={t('no-injuries')} />
           ) : (
             <Stack spacing={2}>
               {groups.map((status) => {
@@ -211,9 +213,7 @@ const CharacterHealthSection: FC<{
                 if (items.length === 0) return null;
                 return (
                   <Stack key={status} spacing={1}>
-                    <Typography variant="overline" color="text.secondary">
-                      {t(`injury-group-${status}`, { count: items.length })}
-                    </Typography>
+                    <SectionLabel>{t(`injury-group-${status}`, { count: items.length })}</SectionLabel>
                     <InjuryList
                       injuries={items}
                       showHealed={status === 'healed'}

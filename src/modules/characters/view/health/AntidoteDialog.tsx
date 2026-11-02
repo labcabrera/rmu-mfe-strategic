@@ -2,11 +2,12 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { Alert, Grid, MenuItem, Stack, TextField } from '@mui/material';
+import { Grid, MenuItem, Stack, TextField } from '@mui/material';
 import {
-  ANY_POISON,
   AntidoteSource,
+  ANY_POISON,
   Character,
+  EmptyState,
   fetchStrategicItems,
   GiveAntidoteDto,
   giveCharacterAntidote,
@@ -103,7 +104,7 @@ const AntidoteDialog: FC<{
         </TextField>
         {source === 'item' &&
           (antidotes.length === 0 ? (
-            <Alert severity="info">{t('antidote-no-items')}</Alert>
+            <EmptyState dense title={t('antidote-no-items')} />
           ) : (
             <TextField
               select

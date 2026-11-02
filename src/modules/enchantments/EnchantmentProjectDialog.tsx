@@ -22,6 +22,7 @@ import {
   resumeEnchantment,
   RmuDialog,
   RollField,
+  SectionLabel,
   sendEnchantmentFailureRolls,
   StatusBadge,
   suspendEnchantment,
@@ -212,9 +213,7 @@ const EnchantmentProjectDialog: FC<{
         )}
 
         <Divider />
-        <Typography variant="overline" color="text.secondary">
-          {t('enchantment-scr-results')}
-        </Typography>
+        <SectionLabel>{t('enchantment-scr-results')}</SectionLabel>
         {project.scr.map((scr) => (
           <ScrResult
             key={scr.spellId}
@@ -248,9 +247,7 @@ const EnchantmentProjectDialog: FC<{
         )}
 
         <Divider />
-        <Typography variant="overline" color="text.secondary">
-          {t('enchantment-quote')}
-        </Typography>
+        <SectionLabel>{t('enchantment-quote')}</SectionLabel>
         <EnchantmentPlanView plan={project.plan} free={!project.payer} />
       </Stack>
 
