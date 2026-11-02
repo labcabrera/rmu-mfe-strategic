@@ -3,27 +3,18 @@ import React, { Dispatch, FC, SetStateAction, useEffect, useMemo, useState } fro
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import CloseIcon from '@mui/icons-material/Close';
-import SearchIcon from '@mui/icons-material/Search';
 import {
   Alert,
   Box,
   Button,
   Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   Divider,
   FormControlLabel,
-  IconButton,
-  InputAdornment,
   List,
   ListItemButton,
   ListSubheader,
   Stack,
   Switch,
-  TextField,
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
@@ -33,12 +24,17 @@ import {
 } from '@mui/material';
 import {
   addCharacterTrait,
+  ChipRow,
+  EmptyState,
   BonusDevPointsSummary,
   Character,
   fetchTraits,
   KeyValueList,
   KeyValueRow,
   LoadingState,
+  RmuDialog,
+  SearchField,
+  SectionLabel,
   StrategicGame,
   Trait,
   traitCategories,
@@ -220,23 +216,7 @@ const AddTraitDialog: FC<{
 
   const list = (
     <Stack spacing={1.5} sx={{ minHeight: 0, height: '100%' }}>
-      <TextField
-        size="small"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        placeholder={t('search')}
-        aria-label={t('search')}
-        fullWidth
-        slotProps={{
-          input: {
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon fontSize="small" />
-              </InputAdornment>
-            ),
-          },
-        }}
-      />
+      <SearchField size="small" value={search} onChange={setSearch} delay={0} />
       <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', gap: 1, flexWrap: 'wrap' }}>
         <ToggleButtonGroup
           exclusive
@@ -254,7 +234,7 @@ const AddTraitDialog: FC<{
           label={t('only-affordable')}
         />
       </Stack>
-      <Stack direction="row" sx={{ gap: 0.5, flexWrap: 'wrap' }} aria-label={t('category')}>
+      <ChipRow>
         {[ALL, ...categories].map((option) => (
           <Chip
             key={option}
@@ -265,18 +245,25 @@ const AddTraitDialog: FC<{
             onClick={() => setCategory(option)}
           />
         ))}
-      </Stack>
+      </ChipRow>
       <Box
-        sx={{ flex: 1, minHeight: 0, overflowY: 'auto', border: 1, borderColor: 'divider', borderRadius: 1 }}
+        sx={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          border: 1,
+          borderColor: 'divider',
+          borderRadius: (theme) => `${theme.radius.sm}px`,
+        }}
         role="region"
         aria-label={t('traits')}
       >
         {!traits ? (
           <LoadingState />
         ) : groups.length === 0 ? (
-          <Typography color="text.secondary" sx={{ p: 2, textAlign: 'center' }}>
-            {t('no-results')}
-          </Typography>
+          <Box sx={{ px: 2 }}>
+            <EmptyState dense />
+          </Box>
         ) : (
           <List dense disablePadding>
             {groups.map(([group, items]) => (
@@ -305,28 +292,27 @@ const AddTraitDialog: FC<{
   );
 
   return (
-    <Dialog
+    <RmuDialog
       open={open}
-      onClose={handleClose}
+      title={t('add-trait')}
       fullScreen={compact}
       maxWidth="lg"
-      fullWidth
-      slotProps={{ paper: { sx: compact ? undefined : { height: '85vh' } } }}
+      paperSx={compact ? undefined : { height: '85vh' }}
+      onCancel={handleClose}
+      buttons={
+        <Button onClick={onSubmit} variant="contained" disabled={!valid || submitting}>
+          {purchase?.isImprovement ? t('trait-improve') : t('add')}
+        </Button>
+      }
     >
-      <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, pr: 1 }}>
+      <Stack sx={{ gap: 2, minHeight: 0, height: '100%' }}>
         {compact && showDetail && (
-          <IconButton onClick={() => setShowDetail(false)} aria-label={t('back')} edge="start">
-            <ArrowBackIcon />
-          </IconButton>
+          <Box>
+            <Button startIcon={<ArrowBackIcon />} onClick={() => setShowDetail(false)}>
+              {t('back')}
+            </Button>
+          </Box>
         )}
-        <Box component="span" sx={{ flex: 1, minWidth: 0 }}>
-          {t('add-trait')}
-        </Box>
-        <IconButton onClick={handleClose} aria-label={t('close')}>
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
-      <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2, minHeight: 0 }}>
         <Stack
           direction="row"
           sx={{ flexWrap: 'wrap', alignItems: 'center', columnGap: 3, rowGap: 1 }}
@@ -373,21 +359,13 @@ const AddTraitDialog: FC<{
                   purchase={purchase}
                 />
               ) : (
-                <Typography color="text.secondary" sx={{ p: 2 }}>
-                  {t('trait-select-hint')}
-                </Typography>
+                <EmptyState dense title={t('trait-select-hint')} />
               )}
             </Box>
           )}
         </Box>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose}>{t('cancel')}</Button>
-        <Button onClick={onSubmit} variant="contained" disabled={!valid || submitting}>
-          {purchase?.isImprovement ? t('trait-improve') : t('add')}
-        </Button>
-      </DialogActions>
-    </Dialog>
+      </Stack>
+    </RmuDialog>
   );
 };
 
@@ -484,7 +462,7 @@ const TraitDetail: FC<{
         <Typography variant="h6" component="h3" sx={{ fontFamily: (theme) => theme.fonts?.display }}>
           {traitName(trait)}
         </Typography>
-        <Stack direction="row" sx={{ gap: 0.5, flexWrap: 'wrap', mt: 0.5 }}>
+        <ChipRow sx={{ mt: 0.5 }}>
           <TraitTypeChip isTalent={trait.isTalent} />
           <Chip size="small" variant="outlined" label={t(trait.category)} />
           {current && (
@@ -495,7 +473,7 @@ const TraitDetail: FC<{
               label={current.tier ? t('trait-owned-tier', { tier: toRoman(current.tier) }) : t('trait-owned')}
             />
           )}
-        </Stack>
+        </ChipRow>
       </Box>
       <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-line' }}>
         {trait.description || t('no-description')}
@@ -505,9 +483,7 @@ const TraitDetail: FC<{
       )}
       {trait.isTierBased && (
         <Box>
-          <Typography variant="overline" color="text.secondary" component="div">
-            {t('tier')}
-          </Typography>
+          <SectionLabel>{t('tier')}</SectionLabel>
           <ToggleButtonGroup
             exclusive
             size="small"

@@ -2,15 +2,19 @@
 import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { Autocomplete, Box, Chip, Grid, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, Chip, Grid, Stack, TextField, Typography } from '@mui/material';
 import {
   AddButton,
+  ChipRow,
   Culture,
   CulturePicker,
   CultureSkillRank,
   DeleteButton,
+  EmptyState,
   fetchEnumerations,
   NumericInput,
+  Panel,
+  SectionLabel,
   Skill,
   SkillPicker,
   useSpecializationLabel,
@@ -121,10 +125,8 @@ const CharacterCreateCulture: FC<{
           )}
           {fixedEntries.length > 0 && (
             <Box>
-              <Typography variant="subtitle2" color="primary" gutterBottom>
-                {t('culture-skill-rank-type-skill')}
-              </Typography>
-              <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 0.75 }}>
+              <SectionLabel>{t('culture-skill-rank-type-skill')}</SectionLabel>
+              <ChipRow>
                 {fixedEntries.map((entry, index) => (
                   <Chip
                     key={index}
@@ -132,7 +134,7 @@ const CharacterCreateCulture: FC<{
                     label={`${t(entry.skillId || '')}${entry.specialization ? ` (${specializationLabel(entry.specialization)})` : ''} +${entry.ranks}`}
                   />
                 ))}
-              </Stack>
+              </ChipRow>
             </Box>
           )}
           {culture.skillRanks.map((entry, index) =>
@@ -199,22 +201,11 @@ const CultureEntryBlock: FC<{
   };
 
   return (
-    <Paper variant="outlined" sx={{ p: 2 }}>
-      <Stack
-        direction="row"
-        spacing={1}
-        sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 1.5, flexWrap: 'wrap', rowGap: 1 }}
-      >
-        <Box sx={{ minWidth: 0 }}>
-          <Typography variant="subtitle1" color="primary">
-            {`${t(`culture-skill-rank-type-${entry.type}`)} · ${t('culture-entry-ranks', { count: entry.ranks })}`}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {describe()}
-            {Number.isFinite(max) ? ` · ${t('max-ranks-per-skill')}: ${max}` : ''}
-          </Typography>
-        </Box>
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+    <Panel
+      variant="outlined"
+      title={`${t(`culture-skill-rank-type-${entry.type}`)} · ${t('culture-entry-ranks', { count: entry.ranks })}`}
+      extra={
+        <>
           <Chip
             size="small"
             color={pending === 0 ? 'success' : 'warning'}
@@ -225,8 +216,13 @@ const CultureEntryBlock: FC<{
             }
           />
           <AddButton onClick={onAdd} disabled={pending <= 0} />
-        </Stack>
-      </Stack>
+        </>
+      }
+    >
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+        {describe()}
+        {Number.isFinite(max) ? ` · ${t('max-ranks-per-skill')}: ${max}` : ''}
+      </Typography>
       <Stack spacing={1.5}>
         {rows.map((row) => {
           const skill = options.find((s) => s.id === row.skillId);
@@ -301,18 +297,14 @@ const CultureEntryBlock: FC<{
             </Box>
           );
         })}
-        {rows.length === 0 && (
-          <Typography variant="body2" color="text.secondary">
-            {t('culture-no-assignments')}
-          </Typography>
-        )}
+        {rows.length === 0 && <EmptyState dense title={t('culture-no-assignments')} />}
         {validation?.errors.includes('err-culture-incomplete-entry') && rows.length > 0 && (
           <Typography variant="caption" color="error">
             {t('err-culture-incomplete-entry')}
           </Typography>
         )}
       </Stack>
-    </Paper>
+    </Panel>
   );
 };
 

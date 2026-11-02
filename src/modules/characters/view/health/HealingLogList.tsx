@@ -2,15 +2,17 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { Box, List, ListItem, ListItemText, Pagination, Stack, Typography } from '@mui/material';
+import { Box, List, ListItem, ListItemText, Stack } from '@mui/material';
 import {
   Character,
+  EmptyState,
   fetchCharacterHealingLog,
   HealingLogEntry,
   HealingType,
   HpBySource,
   HpBreakdown,
   LoadingState,
+  RmuPagination,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useStrategicNotify } from '../../../services/notify-service';
 import { healingTypeKey } from './health-rules';
@@ -132,7 +134,7 @@ const HealingLogList: FC<{ character: Character }> = ({ character }) => {
   }, [character.id, page, character.hp.current, character.injuries, character.conditions]);
 
   if (!entries) return <LoadingState />;
-  if (entries.length === 0) return <Typography color="text.secondary">{t('healing-log-empty')}</Typography>;
+  if (entries.length === 0) return <EmptyState dense title={t('healing-log-empty')} />;
 
   const injuryLabel = (injuryId?: string) => {
     const injury = injuryId ? (character.injuries || []).find((item) => item.id === injuryId) : undefined;
@@ -164,13 +166,7 @@ const HealingLogList: FC<{ character: Character }> = ({ character }) => {
         ))}
       </List>
       {totalPages > 1 && (
-        <Pagination
-          count={totalPages}
-          page={page + 1}
-          onChange={(_, value) => setPage(value - 1)}
-          size="small"
-          sx={{ alignSelf: 'center' }}
-        />
+        <RmuPagination dense page={page} pageSize={PAGE_SIZE} totalPages={totalPages} setPage={setPage} />
       )}
     </Stack>
   );

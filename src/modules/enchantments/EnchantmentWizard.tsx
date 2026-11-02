@@ -10,11 +10,7 @@ import {
   Chip,
   Grid,
   MenuItem,
-  Paper,
   Stack,
-  Step,
-  StepLabel,
-  Stepper,
   Table,
   TableBody,
   TableCell,
@@ -29,6 +25,7 @@ import {
   CharacterPicker,
   characterOption,
   createEnchantment,
+  EmptyState,
   DEFAULT_POWER_LEVEL,
   ENCHANTMENT_SCOPES,
   EnchantmentPlan,
@@ -36,6 +33,7 @@ import {
   EnchantmentRequest,
   EnchantmentScope,
   fetchCharacterSpells,
+  FlowSteps,
   isEnchantmentActive,
   ItemHolder,
   ItemInventory,
@@ -45,10 +43,12 @@ import {
   LoadingState,
   MoneyDisplay,
   OPEN_D100,
+  Panel,
   POWER_LEVELS,
   PowerLevel,
   quoteEnchantment,
   RollField,
+  SearchField,
   StrategicItem,
   useModifierLabel,
   useNotify,
@@ -218,15 +218,247 @@ const EnchantmentWizard: FC<{
       (entry.list.name ?? entry.list.code).toLowerCase().includes(filter)
   );
 
+  const stepContent = [
+    <Panel variant="outlined">
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <CharacterPicker
+            label={t('enchantment-alchemist')}
+            options={alchemists.map((member) => characterOption(member))}
+            relation="friends"
+            factionId={view.faction?.id}
+            value={alchemistId}
+            onChange={(id) => id && setAlchemistId(id)}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <TextField
+            select
+            fullWidth
+            label={t('payer')}
+            value={payer}
+            onChange={(e) => setPayer(e.target.value as PayerOption)}
+            helperText={t('enchantment-payer-hint')}
+          >
+            <MenuItem value="holder">{view.name}</MenuItem>
+            {view.holder.kind === 'character' && view.faction && (
+              <MenuItem value="faction">{t('armory-of', { name: view.faction.name })}</MenuItem>
+            )}
+            <MenuItem value="free">{t('craft-free')}</MenuItem>
+          </TextField>
+        </Grid>
+        {!alchemists.length && (
+          <Grid size={12}>
+            <Alert severity="warning">{t('enchantment-no-alchemist')}</Alert>
+          </Grid>
+        )}
+      </Grid>
+    </Panel>,
+    <Stack spacing={1}>
+      <Typography variant="body2" color="text.secondary">
+        {t('enchantment-item-hint')}
+      </Typography>
+      <ItemInventory
+        items={items}
+        hideItemTypeIds={[GOLD_COIN]}
+        emptyTitle={t('enchantment-no-items')}
+        onSelect={(next) => {
+          setItem(next);
+          setStep(2);
+        }}
+      />
+    </Stack>,
+    <Panel variant="outlined">
+      <Stack spacing={2}>
+        <Typography variant="body2" color="text.secondary">
+          {t('enchantment-spells-hint')}
+        </Typography>
+        <Box sx={{ maxWidth: 320 }}>
+          <SearchField size="small" value={search} onChange={setSearch} delay={0} />
+        </Box>
+        {!grimoire ? (
+          <LoadingState />
+        ) : grimoire.length === 0 ? (
+          <EmptyState dense title={t('enchantment-no-spells')} />
+        ) : (
+          <Box sx={{ overflowX: 'auto' }}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell padding="checkbox" />
+                  <TableCell>{t('spell')}</TableCell>
+                  <TableCell>{t('spell-list')}</TableCell>
+                  <TableCell>{t('alchemy-effect')}</TableCell>
+                  <TableCell>{t('enchantment-scope')}</TableCell>
+                  <TableCell>{t('enchantment-target')}</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {shown.map((entry) => {
+                  const spell = entry.known.spell;
+                  const choice = chosen[spell.id];
+                  const effect = spell.alchemy?.effect;
+                  return (
+                    <TableRow key={spell.id} hover selected={!!choice}>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={!!choice}
+                          onChange={() => toggle(spell.id)}
+                          slotProps={{ input: { 'aria-label': t(spell.name, spell.name) } }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+                          <Typography variant="body2">{`${t(spell.name, spell.name)} (${spell.level})`}</Typography>
+                          {isAlchemical(entry) && <Chip size="small" color="secondary" label={t('alchemical')} />}
+                        </Stack>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {entry.list.name ? t(entry.list.name, entry.list.name) : entry.list.code}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {effect ? alchemyEffectText(effect, t) : '—'}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <TextField
+                          select
+                          size="small"
+                          value={choice?.scope ?? 'normal'}
+                          disabled={!choice}
+                          onChange={(e) => choose(spell.id, { scope: e.target.value as EnchantmentScope })}
+                          sx={{ minWidth: 130 }}
+                        >
+                          {ENCHANTMENT_SCOPES.map((scope) => (
+                            <MenuItem key={scope} value={scope}>
+                              {t(`enchantment-scope-${scope}`)}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                      </TableCell>
+                      <TableCell>
+                        {effect?.kind === 'skill' && (
+                          <TextField
+                            select
+                            size="small"
+                            value={choice?.target ?? ''}
+                            disabled={!choice}
+                            error={!!choice && !choice.target}
+                            onChange={(e) => choose(spell.id, { target: e.target.value || null })}
+                            sx={{ minWidth: 180 }}
+                          >
+                            {skillIds(alchemist).map((skillId) => (
+                              <MenuItem key={skillId} value={skillId}>
+                                {t(skillId)}
+                              </MenuItem>
+                            ))}
+                          </TextField>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </Box>
+        )}
+        {selected.length > 0 && !hasAlchemical && (
+          <Alert severity="warning">{t('err-enchantment-no-alchemical-spell')}</Alert>
+        )}
+        {!targetsReady && <Alert severity="warning">{t('enchantment-target-required')}</Alert>}
+      </Stack>
+    </Panel>,
+    <Panel variant="outlined">
+      <Stack spacing={2}>
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField
+              select
+              fullWidth
+              label={t('enchantment-power-level')}
+              value={powerLevel}
+              onChange={(e) => setPowerLevel(e.target.value as PowerLevel)}
+              helperText={t('enchantment-power-level-hint')}
+            >
+              {POWER_LEVELS.map((level) => (
+                <MenuItem key={level} value={level}>
+                  {t(`power-level-${level}`)}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+          {stack && (
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Typography variant="body2">{t('enchantment-batch-whole-stack', { count: stack })}</Typography>
+              <Typography variant="caption" color="text.secondary" component="div">
+                {t('enchantment-batch-hint')}
+              </Typography>
+            </Grid>
+          )}
+        </Grid>
+        {planError ? (
+          <Alert severity="error">{t(planError)}</Alert>
+        ) : plan ? (
+          <EnchantmentPlanView plan={plan} free={payer === 'free'} />
+        ) : (
+          <LoadingState />
+        )}
+      </Stack>
+    </Panel>,
+    plan ? (
+      <Panel variant="outlined">
+        <Stack spacing={2}>
+          <Typography variant="body2" color="text.secondary">
+            {t('enchantment-scr-hint')}
+          </Typography>
+          {plan.spells.map((spell) => {
+            const roll = rolls[spell.spellId];
+            const total = roll === undefined ? null : roll + spell.scrBonus;
+            return (
+              <Grid key={spell.spellId} container spacing={2} sx={{ alignItems: 'center' }}>
+                <Grid size={{ xs: 12, md: 4 }}>
+                  <Typography sx={{ fontWeight: 600 }}>{`${t(spell.name, spell.name)} (${spell.level})`}</Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {spell.scrModifiers
+                      .map(
+                        (modifier) =>
+                          `${modifierLabel(modifier.key)} ${modifier.value >= 0 ? '+' : ''}${modifier.value}`
+                      )
+                      .join(' · ')}
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <RollField
+                    spec={OPEN_D100}
+                    label={t('enchantment-scr-roll')}
+                    value={roll}
+                    onChange={(value) => setRolls((current) => ({ ...current, [spell.spellId]: value.total }))}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+                    <Typography variant="body2" color="text.secondary">
+                      {`${t('enchantment-scr-bonus')}: ${spell.scrBonus >= 0 ? '+' : ''}${spell.scrBonus}`}
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{`${t('total')}: ${total ?? '—'}`}</Typography>
+                    {total !== null && total <= 0 && (
+                      <Chip size="small" color="error" label={t('enchantment-scr-failed')} />
+                    )}
+                  </Stack>
+                </Grid>
+              </Grid>
+            );
+          })}
+        </Stack>
+      </Panel>
+    ) : undefined,
+  ];
+
   return (
     <Stack spacing={2}>
-      <Stepper activeStep={step} alternativeLabel>
-        {STEPS.map((label) => (
-          <Step key={label}>
-            <StepLabel>{t(label)}</StepLabel>
-          </Step>
-        ))}
-      </Stepper>
       {item && step > 1 && (
         <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
           <ItemThumb item={item} size={48} />
@@ -246,277 +478,32 @@ const EnchantmentWizard: FC<{
           </Stack>
         </Stack>
       )}
-
-      {step === 0 && (
-        <Paper variant="outlined" sx={{ p: 2 }}>
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CharacterPicker
-                label={t('enchantment-alchemist')}
-                options={alchemists.map((member) => characterOption(member))}
-                relation="friends"
-                factionId={view.faction?.id}
-                value={alchemistId}
-                onChange={(id) => id && setAlchemistId(id)}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                select
-                fullWidth
-                label={t('payer')}
-                value={payer}
-                onChange={(e) => setPayer(e.target.value as PayerOption)}
-                helperText={t('enchantment-payer-hint')}
-              >
-                <MenuItem value="holder">{view.name}</MenuItem>
-                {view.holder.kind === 'character' && view.faction && (
-                  <MenuItem value="faction">{t('armory-of', { name: view.faction.name })}</MenuItem>
-                )}
-                <MenuItem value="free">{t('craft-free')}</MenuItem>
-              </TextField>
-            </Grid>
-            {!alchemists.length && (
-              <Grid size={12}>
-                <Alert severity="warning">{t('enchantment-no-alchemist')}</Alert>
-              </Grid>
-            )}
-          </Grid>
-        </Paper>
-      )}
-
-      {step === 1 && (
-        <Stack spacing={1}>
-          <Typography variant="body2" color="text.secondary">
-            {t('enchantment-item-hint')}
-          </Typography>
-          <ItemInventory
-            items={items}
-            hideItemTypeIds={[GOLD_COIN]}
-            emptyTitle={t('enchantment-no-items')}
-            onSelect={(next) => {
-              setItem(next);
-              setStep(2);
-            }}
-          />
-        </Stack>
-      )}
-
-      {step === 2 && (
-        <Paper variant="outlined" sx={{ p: 2 }}>
-          <Stack spacing={2}>
-            <Typography variant="body2" color="text.secondary">
-              {t('enchantment-spells-hint')}
-            </Typography>
-            <TextField
-              size="small"
-              label={t('search')}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              sx={{ maxWidth: 320 }}
-            />
-            {!grimoire ? (
-              <LoadingState />
-            ) : grimoire.length === 0 ? (
-              <Alert severity="info">{t('enchantment-no-spells')}</Alert>
+      <FlowSteps
+        activeIndex={step}
+        onReview={(id) => id && !busy && setStep(STEPS.indexOf(id))}
+        steps={STEPS.map((label, index) => ({
+          id: label,
+          label: t(label),
+          summary: index === 1 && item ? t(item.name, item.name) : undefined,
+          content: stepContent[index],
+        }))}
+        footer={
+          <Stack direction="row" spacing={1} sx={{ justifyContent: 'space-between' }}>
+            <Button disabled={step === 0} onClick={() => setStep(step - 1)}>
+              {t('back')}
+            </Button>
+            {step < STEPS.length - 1 ? (
+              <Button variant="contained" disabled={!canNext} onClick={() => setStep(step + 1)}>
+                {t('next')}
+              </Button>
             ) : (
-              <Box sx={{ overflowX: 'auto' }}>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell padding="checkbox" />
-                      <TableCell>{t('spell')}</TableCell>
-                      <TableCell>{t('spell-list')}</TableCell>
-                      <TableCell>{t('alchemy-effect')}</TableCell>
-                      <TableCell>{t('enchantment-scope')}</TableCell>
-                      <TableCell>{t('enchantment-target')}</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {shown.map((entry) => {
-                      const spell = entry.known.spell;
-                      const choice = chosen[spell.id];
-                      const effect = spell.alchemy?.effect;
-                      return (
-                        <TableRow key={spell.id} hover selected={!!choice}>
-                          <TableCell padding="checkbox">
-                            <Checkbox
-                              checked={!!choice}
-                              onChange={() => toggle(spell.id)}
-                              slotProps={{ input: { 'aria-label': t(spell.name, spell.name) } }}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-                              <Typography variant="body2">{`${t(spell.name, spell.name)} (${spell.level})`}</Typography>
-                              {isAlchemical(entry) && <Chip size="small" color="secondary" label={t('alchemical')} />}
-                            </Stack>
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant="body2" color="text.secondary">
-                              {entry.list.name ? t(entry.list.name, entry.list.name) : entry.list.code}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant="body2" color="text.secondary">
-                              {effect ? alchemyEffectText(effect, t) : '—'}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <TextField
-                              select
-                              size="small"
-                              value={choice?.scope ?? 'normal'}
-                              disabled={!choice}
-                              onChange={(e) => choose(spell.id, { scope: e.target.value as EnchantmentScope })}
-                              sx={{ minWidth: 130 }}
-                            >
-                              {ENCHANTMENT_SCOPES.map((scope) => (
-                                <MenuItem key={scope} value={scope}>
-                                  {t(`enchantment-scope-${scope}`)}
-                                </MenuItem>
-                              ))}
-                            </TextField>
-                          </TableCell>
-                          <TableCell>
-                            {effect?.kind === 'skill' && (
-                              <TextField
-                                select
-                                size="small"
-                                value={choice?.target ?? ''}
-                                disabled={!choice}
-                                error={!!choice && !choice.target}
-                                onChange={(e) => choose(spell.id, { target: e.target.value || null })}
-                                sx={{ minWidth: 180 }}
-                              >
-                                {skillIds(alchemist).map((skillId) => (
-                                  <MenuItem key={skillId} value={skillId}>
-                                    {t(skillId)}
-                                  </MenuItem>
-                                ))}
-                              </TextField>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </Box>
-            )}
-            {selected.length > 0 && !hasAlchemical && (
-              <Alert severity="warning">{t('err-enchantment-no-alchemical-spell')}</Alert>
-            )}
-            {!targetsReady && <Alert severity="warning">{t('enchantment-target-required')}</Alert>}
-          </Stack>
-        </Paper>
-      )}
-
-      {step === 3 && (
-        <Paper variant="outlined" sx={{ p: 2 }}>
-          <Stack spacing={2}>
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
-                  select
-                  fullWidth
-                  label={t('enchantment-power-level')}
-                  value={powerLevel}
-                  onChange={(e) => setPowerLevel(e.target.value as PowerLevel)}
-                  helperText={t('enchantment-power-level-hint')}
-                >
-                  {POWER_LEVELS.map((level) => (
-                    <MenuItem key={level} value={level}>
-                      {t(`power-level-${level}`)}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-              {stack && (
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Typography variant="body2">{t('enchantment-batch-whole-stack', { count: stack })}</Typography>
-                  <Typography variant="caption" color="text.secondary" component="div">
-                    {t('enchantment-batch-hint')}
-                  </Typography>
-                </Grid>
-              )}
-            </Grid>
-            {planError ? (
-              <Alert severity="error">{t(planError)}</Alert>
-            ) : plan ? (
-              <EnchantmentPlanView plan={plan} free={payer === 'free'} />
-            ) : (
-              <LoadingState />
+              <Button variant="contained" disabled={!canNext} onClick={onStart}>
+                {t('enchantment-start')}
+              </Button>
             )}
           </Stack>
-        </Paper>
-      )}
-
-      {step === 4 && plan && (
-        <Paper variant="outlined" sx={{ p: 2 }}>
-          <Stack spacing={2}>
-            <Typography variant="body2" color="text.secondary">
-              {t('enchantment-scr-hint')}
-            </Typography>
-            {plan.spells.map((spell) => {
-              const roll = rolls[spell.spellId];
-              const total = roll === undefined ? null : roll + spell.scrBonus;
-              return (
-                <Grid key={spell.spellId} container spacing={2} sx={{ alignItems: 'center' }}>
-                  <Grid size={{ xs: 12, md: 4 }}>
-                    <Typography sx={{ fontWeight: 600 }}>{`${t(spell.name, spell.name)} (${spell.level})`}</Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {spell.scrModifiers
-                        .map(
-                          (modifier) =>
-                            `${modifierLabel(modifier.key)} ${modifier.value >= 0 ? '+' : ''}${modifier.value}`
-                        )
-                        .join(' · ')}
-                    </Typography>
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                    <RollField
-                      spec={OPEN_D100}
-                      label={t('enchantment-scr-roll')}
-                      value={roll}
-                      onChange={(value) => setRolls((current) => ({ ...current, [spell.spellId]: value.total }))}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-                      <Typography variant="body2" color="text.secondary">
-                        {`${t('enchantment-scr-bonus')}: ${spell.scrBonus >= 0 ? '+' : ''}${spell.scrBonus}`}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ fontWeight: 600 }}
-                      >{`${t('total')}: ${total ?? '—'}`}</Typography>
-                      {total !== null && total <= 0 && (
-                        <Chip size="small" color="error" label={t('enchantment-scr-failed')} />
-                      )}
-                    </Stack>
-                  </Grid>
-                </Grid>
-              );
-            })}
-          </Stack>
-        </Paper>
-      )}
-
-      <Stack direction="row" spacing={1} sx={{ justifyContent: 'space-between' }}>
-        <Button disabled={step === 0} onClick={() => setStep(step - 1)}>
-          {t('back')}
-        </Button>
-        {step < STEPS.length - 1 ? (
-          <Button variant="contained" disabled={!canNext} onClick={() => setStep(step + 1)}>
-            {t('next')}
-          </Button>
-        ) : (
-          <Button variant="contained" disabled={!canNext} onClick={onStart}>
-            {t('enchantment-start')}
-          </Button>
-        )}
-      </Stack>
+        }
+      />
     </Stack>
   );
 };

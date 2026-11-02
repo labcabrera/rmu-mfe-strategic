@@ -4,16 +4,18 @@ import { useAuth } from 'react-oidc-context';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
 import { Alert, Button, FormControlLabel, MenuItem, Stack, Switch, TextField, Typography } from '@mui/material';
 import {
-  CharacterPicker,
-  coatItem,
-  COATING_FORMS,
   characterOption,
+  CharacterPicker,
+  COATING_FORMS,
+  coatItem,
   ConfirmDialog,
   discardItem,
+  EmptyState,
   ItemConditionChip,
   ItemHolder,
   ItemOperationResult,
   itemUnits,
+  ModifierSelectionValues,
   MoneyDisplay,
   NumericInput,
   PriceBreakdownView,
@@ -22,9 +24,9 @@ import {
   RmuDialog,
   sellItem,
   StrategicItem,
-  ModifierSelectionValues,
   transferItem,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { useStrategicNotify } from '../services/notify-service';
 import ItemLedgerOutcome from './ItemLedgerOutcome';
 import ManeuverFields, { defaultSkillKey, emptyManeuver, isManeuverReady, toManeuverDto } from './ManeuverFields';
 import {
@@ -39,7 +41,6 @@ import {
   useTradingModifiers,
   useTradingTables,
 } from './TradingFields';
-import { useStrategicNotify } from '../services/notify-service';
 import { HolderView } from './use-holder';
 
 /** Crafting skills offered first to craft or repair (spec 023, decisions 10 and 11). */
@@ -105,7 +106,12 @@ export const SellItemDialog: FC<DialogProps> = ({ item, view, onClose, onDone })
   const canJeweler = isJewelerItem(item);
   const [jeweler, setJeweler] = useState(canJeweler);
   const [jewelerPercent, setJewelerPercent] = useState<number | null>(null);
-  const trading = tradingRequest(tradingValue, negotiatorOf(tradingValue, view.character, view.members), modifiers, 'sale');
+  const trading = tradingRequest(
+    tradingValue,
+    negotiatorOf(tradingValue, view.character, view.members),
+    modifiers,
+    'sale'
+  );
   const factors = marketFactors(tables, 'sale', conditions);
   const dto = jeweler
     ? {
@@ -197,7 +203,9 @@ export const SellItemDialog: FC<DialogProps> = ({ item, view, onClose, onDone })
           </>
         )}
         {quote && <PriceBreakdownView price={quote.price} funds={{ label: t('price-funds-after'), gold: view.gold }} />}
-        {noDeal && <Alert severity="error">{t(`trading-outcome-${quote?.price.trading?.outcome ?? 'no-agreement'}`)}</Alert>}
+        {noDeal && (
+          <Alert severity="error">{t(`trading-outcome-${quote?.price.trading?.outcome ?? 'no-agreement'}`)}</Alert>
+        )}
         {!!error && <Alert severity="warning">{t('price-quote-unavailable')}</Alert>}
       </Stack>
     </RmuDialog>
@@ -452,7 +460,7 @@ export const CoatItemDialog: FC<DialogProps> = ({ item, view, onClose, onDone })
     >
       <Stack spacing={2} sx={{ pt: 1 }}>
         {poisons.length === 0 ? (
-          <Alert severity="info">{t('coat-item-no-poisons')}</Alert>
+          <EmptyState dense title={t('coat-item-no-poisons')} />
         ) : (
           <TextField
             select

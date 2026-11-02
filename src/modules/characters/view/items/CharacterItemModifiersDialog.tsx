@@ -16,9 +16,10 @@ import {
   Typography,
 } from '@mui/material';
 import {
-  AddStrategicItemModifierDto,
   addStrategicItemModifier,
+  AddStrategicItemModifierDto,
   deleteStrategicItemModifier,
+  EmptyState,
   itemCondition,
   ItemConditionChip,
   RmuDialog,
@@ -101,11 +102,7 @@ export default function CharacterItemModifiersDialog({
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           <ItemConditionChip condition={item.condition ?? itemCondition(modifiers)} showIntact />
         </Stack>
-        {modifiers.length === 0 && (
-          <Typography variant="body2" color="text.secondary">
-            {t('item-modifiers-none')}
-          </Typography>
-        )}
+        {modifiers.length === 0 && <EmptyState dense title={t('item-modifiers-none')} />}
         {modifiers.map((modifier) => (
           <Stack key={modifier.id} direction="row" spacing={2} sx={{ alignItems: 'center' }}>
             <Typography variant="body2" sx={{ minWidth: 90 }}>

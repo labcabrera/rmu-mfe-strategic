@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import {
   Alert,
-  Box,
   Checkbox,
   Chip,
   FormControlLabel,
@@ -12,16 +11,12 @@ import {
   MenuItem,
   Stack,
   Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   TextField,
   Typography,
 } from '@mui/material';
 import {
   Character,
+  DataTable,
   difficultyCodeKey,
   EntityPicker,
   EnumPicker,
@@ -317,40 +312,47 @@ const HerbSearchDialog: FC<{
               {t('herb-search-base', { roll: result.roll, bonus: formatBonus(result.bonus), base: result.base })}
             </Typography>
             {result.unusualEvent && <Alert severity="warning">{t('unusual-event')}</Alert>}
-            <Box sx={{ overflowX: 'auto' }}>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>{t('item-category-herb')}</TableCell>
-                    <TableCell align="right">{t('difficulty')}</TableCell>
-                    <TableCell align="right">{t('total')}</TableCell>
-                    <TableCell>{t('result')}</TableCell>
-                    <TableCell align="right">{t('herb-search-doses')}</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {result.herbs.map((entry) => (
-                    <TableRow key={entry.itemTypeId}>
-                      <TableCell>{t(entry.name, herbName(entry.itemTypeId))}</TableCell>
-                      <TableCell align="right">
-                        {entry.difficulty ? t(difficultyCodeKey(entry.difficulty)) : '-'}
-                      </TableCell>
-                      <TableCell align="right">{entry.result === 'not-here' ? '-' : entry.total}</TableCell>
-                      <TableCell>
-                        <Chip
-                          size="small"
-                          color={RESULT_COLORS[entry.result]}
-                          label={t(`herb-search-result-${entry.result}`)}
-                        />
-                      </TableCell>
-                      <TableCell align="right">
-                        {entry.result === 'found' ? `${entry.doses}${entry.d10 ? ` (d10 ${entry.d10})` : ''}` : '-'}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Box>
+            <DataTable
+              rows={result.herbs}
+              getKey={(entry) => entry.itemTypeId}
+              columns={[
+                {
+                  key: 'herb',
+                  header: t('item-category-herb'),
+                  render: (entry) => t(entry.name, herbName(entry.itemTypeId)),
+                },
+                {
+                  key: 'difficulty',
+                  header: t('difficulty'),
+                  align: 'right',
+                  render: (entry) => (entry.difficulty ? t(difficultyCodeKey(entry.difficulty)) : '-'),
+                },
+                {
+                  key: 'total',
+                  header: t('total'),
+                  align: 'right',
+                  render: (entry) => (entry.result === 'not-here' ? '-' : entry.total),
+                },
+                {
+                  key: 'result',
+                  header: t('result'),
+                  render: (entry) => (
+                    <Chip
+                      size="small"
+                      color={RESULT_COLORS[entry.result]}
+                      label={t(`herb-search-result-${entry.result}`)}
+                    />
+                  ),
+                },
+                {
+                  key: 'doses',
+                  header: t('herb-search-doses'),
+                  align: 'right',
+                  render: (entry) =>
+                    entry.result === 'found' ? `${entry.doses}${entry.d10 ? ` (d10 ${entry.d10})` : ''}` : '-',
+                },
+              ]}
+            />
           </Stack>
         )}
       </Stack>

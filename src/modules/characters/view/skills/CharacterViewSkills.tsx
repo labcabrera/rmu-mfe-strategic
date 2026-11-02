@@ -1,28 +1,16 @@
 import React, { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import CloseIcon from '@mui/icons-material/Close';
-import SearchIcon from '@mui/icons-material/Search';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import ViewAgendaIcon from '@mui/icons-material/ViewAgenda';
-import {
-  Alert,
-  alpha,
-  Box,
-  Button,
-  InputAdornment,
-  IconButton,
-  Stack,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from '@mui/material';
+import { Alert, alpha, Box, Button, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import {
   AddButton,
   BonusDevPointsSummary,
   Character,
   CharacterSkill,
   Profession,
+  SearchField,
+  SectionLabel,
   SkillGroupList,
   sortSkillsByName,
   StrategicGame,
@@ -89,9 +77,7 @@ const CharacterViewSkills: FC<{
           sx={{ alignItems: { xs: 'stretch', sm: 'center' }, justifyContent: 'space-between' }}
         >
           <Box>
-            <Typography variant="h6" color="primary">
-              {t('skills')}
-            </Typography>
+            <SectionLabel>{t('skills')}</SectionLabel>
             <Typography variant="caption" color="text.secondary">
               {t('manage-character-skills')}
             </Typography>
@@ -106,35 +92,16 @@ const CharacterViewSkills: FC<{
               rowGap: 1,
             }}
           >
-            <TextField
-              size="small"
-              value={skillNameFilter}
-              onChange={(event) => setSkillNameFilter(event.target.value)}
-              placeholder={t('search-skill')}
-              aria-label={t('filter-skills')}
-              sx={{ width: { xs: '100%', sm: 280 } }}
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon fontSize="small" />
-                    </InputAdornment>
-                  ),
-                  endAdornment: skillNameFilter ? (
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label={t('clear')}
-                        edge="end"
-                        size="small"
-                        onClick={() => setSkillNameFilter('')}
-                      >
-                        <CloseIcon fontSize="small" />
-                      </IconButton>
-                    </InputAdornment>
-                  ) : undefined,
-                },
-              }}
-            />
+            <Box sx={{ width: { xs: '100%', sm: 280 } }}>
+              <SearchField
+                size="small"
+                label={t('filter-skills')}
+                placeholder={t('search-skill')}
+                value={skillNameFilter}
+                onChange={setSkillNameFilter}
+                delay={0}
+              />
+            </Box>
             <AddButton onClick={() => setOpenAddSkillDialog(true)} />
             <ToggleButtonGroup
               value={displaySkillTable ? 'table' : 'list'}
@@ -261,7 +228,7 @@ function DevelopmentPointsProgress({ available, total }: { available: number; to
           width: { xs: '100%', sm: 220 },
           height: 8,
           p: 0.25,
-          borderRadius: 999,
+          borderRadius: (theme) => `${theme.radius.pill}px`,
           bgcolor: (theme) => alpha(theme.palette.success.main, 0.08),
           overflow: 'hidden',
         }}
@@ -271,7 +238,7 @@ function DevelopmentPointsProgress({ available, total }: { available: number; to
             key={index}
             sx={(theme) => ({
               flex: 1,
-              borderRadius: 999,
+              borderRadius: `${theme.radius.pill}px`,
               bgcolor: index < filledSegments ? theme.palette.success.light : alpha(theme.palette.common.white, 0.06),
               boxShadow: index < filledSegments ? `0 0 8px ${alpha(theme.palette.success.light, 0.35)}` : 'none',
             })}

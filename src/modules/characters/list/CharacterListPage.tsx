@@ -5,13 +5,13 @@ import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
 import {
   Character,
-  ClearableTextField,
   Faction,
   FactionPicker,
   fetchCharacters,
   fetchFactions,
   fetchStrategicGames,
   FilterSchema,
+  FilterSearchField,
   FilterSection,
   ListPage,
   StrategicGame,
@@ -87,12 +87,7 @@ export default function CharacterListPage() {
       filters={
         <>
           <FilterSection title={t('search')} collapsible={false}>
-            <ClearableTextField
-              label={t('name')}
-              name="q"
-              value={filters.get('q')}
-              onChange={(value) => filters.set('q', value ?? '')}
-            />
+            <FilterSearchField filters={filters} filter="q" label={t('name')} />
           </FilterSection>
           <FilterSection title={t('strategic-game')}>
             <StrategicGamePicker

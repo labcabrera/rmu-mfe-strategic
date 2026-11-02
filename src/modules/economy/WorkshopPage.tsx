@@ -5,25 +5,10 @@ import { useAuth } from 'react-oidc-context';
 import { useParams, useSearchParams } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import {
-  Alert,
-  Box,
-  Button,
-  Grid,
-  IconButton,
-  MenuItem,
-  Paper,
-  Stack,
-  Step,
-  StepLabel,
-  Stepper,
-  Tab,
-  Tabs,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Alert, Box, Button, Grid, IconButton, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import {
   CharacterPicker,
+  FlowSteps,
   characterOption,
   craftItem,
   CraftingEnhancement,
@@ -45,7 +30,9 @@ import {
   MoneyDisplay,
   NotFound,
   NumericInput,
+  Panel,
   roundGold,
+  SectionLabel,
   STRATEGIC_ITEM_MODIFIER_TARGETS,
   StrategicItem,
   useItemCatalog,
@@ -80,28 +67,28 @@ export default function WorkshopPage() {
   if (invalid) return <NotFound />;
 
   return (
-    <EconomyLayout page="workshop" view={view} error={error} onRetry={refresh}>
+    <EconomyLayout
+      page="workshop"
+      view={view}
+      error={error}
+      onRetry={refresh}
+      tabs={{
+        sections: TABS.map((value) => ({ id: value, label: t(`workshop-tab-${value}`) })),
+        value: tab,
+        // Merge into the query, which also holds the filters of the catalog (spec 056, B-04)
+        onChange: (value) =>
+          setParams(
+            (current) => {
+              const next = new URLSearchParams(current);
+              next.set('tab', value);
+              return next;
+            },
+            { replace: true }
+          ),
+      }}
+    >
       {view && (
         <>
-          <Tabs
-            value={tab}
-            onChange={(_, value: WorkshopTab) =>
-              // Merge into the query, which also holds the filters of the catalog (spec 056, B-04)
-              setParams(
-                (current) => {
-                  const next = new URLSearchParams(current);
-                  next.set('tab', value);
-                  return next;
-                },
-                { replace: true }
-              )
-            }
-            sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
-          >
-            {TABS.map((value) => (
-              <Tab key={value} value={value} label={t(`workshop-tab-${value}`)} />
-            ))}
-          </Tabs>
           {tab === 'craft' && <CraftWizard view={view} onDone={refresh} />}
           {tab === 'repair' && <RepairList view={view} onDone={refresh} />}
         </>
@@ -241,12 +228,12 @@ const CraftWizard: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDon
 
   if (result) {
     return (
-      <Paper variant="outlined" sx={{ p: 2 }}>
+      <Panel variant="outlined">
         <ItemLedgerOutcome entry={result.entry} item={result.item} />
         <Button sx={{ mt: 2 }} variant="contained" onClick={reset}>
           {t('craft-another')}
         </Button>
-      </Paper>
+      </Panel>
     );
   }
 
@@ -260,15 +247,209 @@ const CraftWizard: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDon
   ][step];
   const automatic = (plan?.modifiers ?? []).reduce((sum, modifier) => sum + modifier.value, 0);
 
+  const stepContent = [
+    <ItemCatalogBrowser
+      items={catalog.items}
+      filters={filters}
+      layout="drawer"
+      truncated={catalog.truncated}
+      error={catalog.error}
+      refresh={catalog.refresh}
+      storageKey="strategic.workshop"
+      selectedId={itemType?.id}
+      onSelect={(item) => {
+        setItemType(item);
+        setQuality({});
+        setPlan(undefined);
+        setStep(1);
+      }}
+      price={(item) => (
+        <Stack component="span">
+          <MoneyDisplay
+            gold={roundGold(((item.info.cost?.average ?? 0) * (rules?.materialsPercent ?? 50)) / 100)}
+            variant="subtitle2"
+          />
+          {item.info.productionHours !== null && (
+            <Typography component="span" variant="caption" color="text.secondary">
+              {t('production-hours-value', { hours: item.info.productionHours })}
+            </Typography>
+          )}
+        </Stack>
+      )}
+    />,
+    <Panel variant="outlined">
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <CharacterPicker
+            label={t('craftsman')}
+            options={craftsmen.map((member) => characterOption(member))}
+            relation="friends"
+            factionId={view.faction?.id}
+            value={actorId}
+            onChange={(id) => {
+              if (!id) return;
+              setActorId(id);
+              const next = craftsmen.find((member) => member.id === id);
+              setManeuver({ ...maneuver, skillKey: defaultSkillKey(next, CRAFT_SKILLS) });
+            }}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <TextField
+            select
+            fullWidth
+            label={t('payer')}
+            value={payer}
+            onChange={(e) => setPayer(e.target.value as PayerOption)}
+          >
+            <MenuItem value="recipient">{view.name}</MenuItem>
+            {view.holder.kind === 'character' && view.faction && (
+              <MenuItem value="faction">{t('armory-of', { name: view.faction.name })}</MenuItem>
+            )}
+            <MenuItem value="free">{t('craft-free')}</MenuItem>
+          </TextField>
+        </Grid>
+        {!craftsmen.length && (
+          <Grid size={12}>
+            <Alert severity="warning">{t('craft-no-craftsman')}</Alert>
+          </Grid>
+        )}
+      </Grid>
+    </Panel>,
+    itemType ? (
+      <CraftQualityStep
+        kind={kind}
+        blunt={blunt}
+        materials={materialList}
+        materialsError={materialsError}
+        value={quality}
+        onChange={setQuality}
+        plan={plan}
+        planError={planError}
+        free={payer === 'free'}
+      />
+    ) : undefined,
+    <Panel variant="outlined">
+      <Stack spacing={2}>
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField
+              fullWidth
+              label={t('name')}
+              placeholder={itemType ? t(itemType.name, itemType.name) : undefined}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </Grid>
+          {itemType?.info.stackable && (
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <NumericInput label={t('amount')} value={amount} onChange={setAmount} min={1} integer />
+            </Grid>
+          )}
+          <Grid size={{ xs: 6, sm: 3 }}>
+            <NumericInput
+              label={t('craft-materials-cost')}
+              placeholder={`${plan && !planError && !plan.cost.asked ? plan.cost.materials : materials}`}
+              value={materialsCost}
+              onChange={setMaterialsCost}
+              min={0}
+              maxFractionDigits={3}
+            />
+          </Grid>
+          <Grid size={{ xs: 6, sm: 3 }}>
+            <NumericInput
+              label={t('craft-enhancements-cost')}
+              value={enhancementsCost}
+              onChange={setEnhancementsCost}
+              min={0}
+              maxFractionDigits={3}
+            />
+          </Grid>
+        </Grid>
+        <SectionLabel>{t('craft-enhancements')}</SectionLabel>
+        <Typography variant="caption" color="text.secondary">
+          {t('craft-enhancements-hint')}
+        </Typography>
+        {enhancements.map((enhancement, index) => (
+          <Stack key={index} direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ alignItems: { sm: 'center' } }}>
+            <TextField
+              select
+              size="small"
+              label={t('item-modifier-applies-to')}
+              value={enhancement.appliesTo}
+              onChange={(e) =>
+                setEnhancements(
+                  enhancements.map((other, i) => (i === index ? { ...other, appliesTo: e.target.value } : other))
+                )
+              }
+              sx={{ minWidth: 160 }}
+            >
+              {STRATEGIC_ITEM_MODIFIER_TARGETS.map((target) => (
+                <MenuItem key={target} value={target}>
+                  {t(`item-modifier-target-${target}`)}
+                </MenuItem>
+              ))}
+            </TextField>
+            <Box sx={{ width: 100 }}>
+              <NumericInput
+                label={t('value')}
+                value={enhancement.value}
+                onChange={(value) =>
+                  setEnhancements(
+                    enhancements.map((other, i) => (i === index ? { ...other, value: value ?? 0 } : other))
+                  )
+                }
+                integer
+                allowNegatives
+              />
+            </Box>
+            <TextField
+              size="small"
+              label={t('description')}
+              value={enhancement.description ?? ''}
+              onChange={(e) =>
+                setEnhancements(
+                  enhancements.map((other, i) => (i === index ? { ...other, description: e.target.value } : other))
+                )
+              }
+              sx={{ flex: 1 }}
+            />
+            <IconButton
+              aria-label={t('remove')}
+              onClick={() => setEnhancements(enhancements.filter((_, i) => i !== index))}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Stack>
+        ))}
+        <Button
+          startIcon={<AddIcon />}
+          sx={{ alignSelf: 'flex-start' }}
+          onClick={() => setEnhancements([...enhancements, { appliesTo: 'attack', value: 5 }])}
+        >
+          {t('craft-add-enhancement')}
+        </Button>
+      </Stack>
+    </Panel>,
+    <Panel variant="outlined">
+      <Stack spacing={2}>
+        <Typography variant="body2" color="text.secondary">
+          {t('craft-roll-hint')}
+        </Typography>
+        <ManeuverFields
+          character={actor}
+          value={maneuver}
+          onChange={setManeuver}
+          preferred={CRAFT_SKILLS}
+          showDifficulty
+          extra={{ label: t('craft-quality-modifiers'), value: automatic }}
+        />
+      </Stack>
+    </Panel>,
+  ];
+
   return (
     <Stack spacing={2}>
-      <Stepper activeStep={step} alternativeLabel>
-        {STEPS.map((label) => (
-          <Step key={label}>
-            <StepLabel>{t(label)}</StepLabel>
-          </Step>
-        ))}
-      </Stepper>
       {itemType && step > 0 && (
         <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
           <ItemThumb item={itemType} size={48} />
@@ -288,241 +469,34 @@ const CraftWizard: FC<{ view: HolderView; onDone: () => void }> = ({ view, onDon
           </Stack>
         </Stack>
       )}
-
-      {step === 0 && (
-        <ItemCatalogBrowser
-          items={catalog.items}
-          filters={filters}
-          layout="drawer"
-          truncated={catalog.truncated}
-          error={catalog.error}
-          refresh={catalog.refresh}
-          storageKey="strategic.workshop"
-          selectedId={itemType?.id}
-          onSelect={(item) => {
-            setItemType(item);
-            setQuality({});
-            setPlan(undefined);
-            setStep(1);
-          }}
-          price={(item) => (
-            <Stack component="span">
-              <MoneyDisplay
-                gold={roundGold(((item.info.cost?.average ?? 0) * (rules?.materialsPercent ?? 50)) / 100)}
-                variant="subtitle2"
-              />
-              {item.info.productionHours !== null && (
-                <Typography component="span" variant="caption" color="text.secondary">
-                  {t('production-hours-value', { hours: item.info.productionHours })}
-                </Typography>
-              )}
-            </Stack>
-          )}
-        />
-      )}
-
-      {step === 1 && (
-        <Paper variant="outlined" sx={{ p: 2 }}>
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CharacterPicker
-                label={t('craftsman')}
-                options={craftsmen.map((member) => characterOption(member))}
-                relation="friends"
-                factionId={view.faction?.id}
-                value={actorId}
-                onChange={(id) => {
-                  if (!id) return;
-                  setActorId(id);
-                  const next = craftsmen.find((member) => member.id === id);
-                  setManeuver({ ...maneuver, skillKey: defaultSkillKey(next, CRAFT_SKILLS) });
-                }}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                select
-                fullWidth
-                label={t('payer')}
-                value={payer}
-                onChange={(e) => setPayer(e.target.value as PayerOption)}
-              >
-                <MenuItem value="recipient">{view.name}</MenuItem>
-                {view.holder.kind === 'character' && view.faction && (
-                  <MenuItem value="faction">{t('armory-of', { name: view.faction.name })}</MenuItem>
-                )}
-                <MenuItem value="free">{t('craft-free')}</MenuItem>
-              </TextField>
-            </Grid>
-            {!craftsmen.length && (
-              <Grid size={12}>
-                <Alert severity="warning">{t('craft-no-craftsman')}</Alert>
-              </Grid>
+      <FlowSteps
+        activeIndex={step}
+        onReview={(id) => id && !busy && setStep(STEPS.indexOf(id))}
+        steps={STEPS.map((label, index) => ({
+          id: label,
+          label: t(label),
+          summary: index === 0 && itemType ? t(itemType.name, itemType.name) : undefined,
+          content: stepContent[index],
+        }))}
+        footer={
+          <Stack direction="row" spacing={1} sx={{ justifyContent: 'space-between' }}>
+            <Button disabled={step === 0} onClick={() => setStep(step - 1)}>
+              {t('back')}
+            </Button>
+            {step < STEPS.length - 1 ? (
+              step > 0 && (
+                <Button variant="contained" disabled={!canNext} onClick={() => setStep(step + 1)}>
+                  {t('next')}
+                </Button>
+              )
+            ) : (
+              <Button variant="contained" disabled={!canNext} onClick={onCraft}>
+                {t('craft')}
+              </Button>
             )}
-          </Grid>
-        </Paper>
-      )}
-
-      {step === 2 && itemType && (
-        <CraftQualityStep
-          kind={kind}
-          blunt={blunt}
-          materials={materialList}
-          materialsError={materialsError}
-          value={quality}
-          onChange={setQuality}
-          plan={plan}
-          planError={planError}
-          free={payer === 'free'}
-        />
-      )}
-
-      {step === 3 && (
-        <Paper variant="outlined" sx={{ p: 2 }}>
-          <Stack spacing={2}>
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
-                  fullWidth
-                  label={t('name')}
-                  placeholder={itemType ? t(itemType.name, itemType.name) : undefined}
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </Grid>
-              {itemType?.info.stackable && (
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <NumericInput label={t('amount')} value={amount} onChange={setAmount} min={1} integer />
-                </Grid>
-              )}
-              <Grid size={{ xs: 6, sm: 3 }}>
-                <NumericInput
-                  label={t('craft-materials-cost')}
-                  placeholder={`${plan && !planError && !plan.cost.asked ? plan.cost.materials : materials}`}
-                  value={materialsCost}
-                  onChange={setMaterialsCost}
-                  min={0}
-                  maxFractionDigits={3}
-                />
-              </Grid>
-              <Grid size={{ xs: 6, sm: 3 }}>
-                <NumericInput
-                  label={t('craft-enhancements-cost')}
-                  value={enhancementsCost}
-                  onChange={setEnhancementsCost}
-                  min={0}
-                  maxFractionDigits={3}
-                />
-              </Grid>
-            </Grid>
-            <Typography variant="overline" color="text.secondary">
-              {t('craft-enhancements')}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {t('craft-enhancements-hint')}
-            </Typography>
-            {enhancements.map((enhancement, index) => (
-              <Stack
-                key={index}
-                direction={{ xs: 'column', sm: 'row' }}
-                spacing={1}
-                sx={{ alignItems: { sm: 'center' } }}
-              >
-                <TextField
-                  select
-                  size="small"
-                  label={t('item-modifier-applies-to')}
-                  value={enhancement.appliesTo}
-                  onChange={(e) =>
-                    setEnhancements(
-                      enhancements.map((other, i) => (i === index ? { ...other, appliesTo: e.target.value } : other))
-                    )
-                  }
-                  sx={{ minWidth: 160 }}
-                >
-                  {STRATEGIC_ITEM_MODIFIER_TARGETS.map((target) => (
-                    <MenuItem key={target} value={target}>
-                      {t(`item-modifier-target-${target}`)}
-                    </MenuItem>
-                  ))}
-                </TextField>
-                <Box sx={{ width: 100 }}>
-                  <NumericInput
-                    label={t('value')}
-                    value={enhancement.value}
-                    onChange={(value) =>
-                      setEnhancements(
-                        enhancements.map((other, i) => (i === index ? { ...other, value: value ?? 0 } : other))
-                      )
-                    }
-                    integer
-                    allowNegatives
-                  />
-                </Box>
-                <TextField
-                  size="small"
-                  label={t('description')}
-                  value={enhancement.description ?? ''}
-                  onChange={(e) =>
-                    setEnhancements(
-                      enhancements.map((other, i) => (i === index ? { ...other, description: e.target.value } : other))
-                    )
-                  }
-                  sx={{ flex: 1 }}
-                />
-                <IconButton
-                  aria-label={t('remove')}
-                  onClick={() => setEnhancements(enhancements.filter((_, i) => i !== index))}
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              </Stack>
-            ))}
-            <Button
-              startIcon={<AddIcon />}
-              sx={{ alignSelf: 'flex-start' }}
-              onClick={() => setEnhancements([...enhancements, { appliesTo: 'attack', value: 5 }])}
-            >
-              {t('craft-add-enhancement')}
-            </Button>
           </Stack>
-        </Paper>
-      )}
-
-      {step === 4 && (
-        <Paper variant="outlined" sx={{ p: 2 }}>
-          <Stack spacing={2}>
-            <Typography variant="body2" color="text.secondary">
-              {t('craft-roll-hint')}
-            </Typography>
-            <ManeuverFields
-              character={actor}
-              value={maneuver}
-              onChange={setManeuver}
-              preferred={CRAFT_SKILLS}
-              showDifficulty
-              extra={{ label: t('craft-quality-modifiers'), value: automatic }}
-            />
-          </Stack>
-        </Paper>
-      )}
-
-      <Stack direction="row" spacing={1} sx={{ justifyContent: 'space-between' }}>
-        <Button disabled={step === 0} onClick={() => setStep(step - 1)}>
-          {t('back')}
-        </Button>
-        {step < STEPS.length - 1 ? (
-          step > 0 && (
-            <Button variant="contained" disabled={!canNext} onClick={() => setStep(step + 1)}>
-              {t('next')}
-            </Button>
-          )
-        ) : (
-          <Button variant="contained" disabled={!canNext} onClick={onCraft}>
-            {t('craft')}
-          </Button>
-        )}
-      </Stack>
+        }
+      />
     </Stack>
   );
 };

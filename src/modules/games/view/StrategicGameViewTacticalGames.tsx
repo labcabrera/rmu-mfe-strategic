@@ -1,8 +1,16 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Chip, Typography } from '@mui/material';
-import { CardGrid, EntityCard, Faction, imageBaseUrl, LoadingState, TacticalGame } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Chip } from '@mui/material';
+import {
+  CardGrid,
+  EmptyState,
+  EntityCard,
+  Faction,
+  imageBaseUrl,
+  LoadingState,
+  TacticalGame,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const STATUS_COLORS: Record<TacticalGame['status'], 'default' | 'success' | 'info'> = {
   created: 'default',
@@ -20,11 +28,7 @@ const StrategicGameViewTacticalGames: FC<{
 
   if (!tacticalGames) return <LoadingState />;
   if (tacticalGames.length === 0) {
-    return (
-      <Typography variant="body2" color="text.secondary">
-        {t('no-tactical-games-have-been-created')}
-      </Typography>
-    );
+    return <EmptyState dense title={t('no-tactical-games-have-been-created')} />;
   }
 
   const factionNames = (tacticalGame: TacticalGame) =>

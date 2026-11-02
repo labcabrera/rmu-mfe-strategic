@@ -5,13 +5,14 @@ import {
   AddButton,
   Character,
   CharacterTrait,
+  EmptyState,
   LoadingState,
   Panel,
   StrategicGame,
   TraitTypeChip,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import MissingReferenceChip from '../../../shared/chips/MissingReferenceChip';
 import { toRoman } from '../../../services/roman-number-service';
+import MissingReferenceChip from '../../../shared/chips/MissingReferenceChip';
 import AddTraitDialog from './AddTraitDialog';
 import CharacterViewTraitDialog from './CharacterViewTraitDialog';
 
@@ -37,9 +38,7 @@ const CharacterViewTraits: FC<{
     <>
       <Panel title={t('traits')} extra={<AddButton onClick={() => setOpenAddTraitDialog(true)} />}>
         {character.traits.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">
-            {t('character-no-traits')}
-          </Typography>
+          <EmptyState dense title={t('character-no-traits')} />
         ) : (
           <List dense disablePadding>
             {character.traits.map((trait, index) => (

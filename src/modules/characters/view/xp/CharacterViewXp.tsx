@@ -1,13 +1,14 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { Badge, Box, Button, Divider, Grid, Paper, Stack, Typography } from '@mui/material';
+import { Badge, Box, Button, Divider, Grid, Stack, Typography } from '@mui/material';
 import {
   AddButton,
   addCharacterXP,
   Character,
   LoadingState,
   NumericInput,
+  Panel,
   RmuDialog,
   EntityCard,
   Section,
@@ -164,10 +165,7 @@ const CharacterViewExperience: FC<{
             {t('more-info-in-core-law', { section: '12.4' })}
           </Typography>
           {xpEventGroups.map((group) => (
-            <Paper key={group.title} elevation={-2} sx={{ p: 2 }}>
-              <Typography variant="h6" gutterBottom>
-                {t(group.title)}
-              </Typography>
+            <Panel key={group.title} variant="outlined" dense title={t(group.title)}>
               <Stack spacing={1}>
                 {group.events.map((event) => (
                   <Typography key={event.label} variant="body1">
@@ -175,7 +173,7 @@ const CharacterViewExperience: FC<{
                   </Typography>
                 ))}
               </Stack>
-            </Paper>
+            </Panel>
           ))}
           <Divider />
           <Stack

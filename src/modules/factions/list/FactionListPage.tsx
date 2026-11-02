@@ -4,12 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
 import {
-  ClearableTextField,
   Faction,
   fetchFactions,
   fetchStrategicGames,
-  FilterBar,
   FilterSchema,
+  FilterSearchField,
+  FilterSection,
   ListPage,
   StrategicGame,
   StrategicGamePicker,
@@ -73,23 +73,24 @@ export default function FactionListPage() {
       ]}
       query={query}
       onAdd={() => navigate('/strategic/factions/create')}
+      filtersLayout="side"
       filterState={filters}
+      filtersStorageKey="strategic.factions"
       filters={
-        <FilterBar>
-          <ClearableTextField
-            label={t('name')}
-            name="q"
-            value={filters.get('q')}
-            onChange={(value) => filters.set('q', value ?? '')}
-          />
-          <StrategicGamePicker
-            games={games}
-            variant="select"
-            value={filters.get('game') || null}
-            onChange={(id) => filters.set('game', id)}
-            allowAll
-          />
-        </FilterBar>
+        <>
+          <FilterSection title={t('search')} collapsible={false}>
+            <FilterSearchField filters={filters} filter="q" label={t('name')} />
+          </FilterSection>
+          <FilterSection title={t('strategic-game')}>
+            <StrategicGamePicker
+              games={games}
+              variant="select"
+              value={filters.get('game') || null}
+              onChange={(id) => filters.set('game', id)}
+              allowAll
+            />
+          </FilterSection>
+        </>
       }
       collection={{ modes: ['cards'], storageKey: 'strategic.factions' }}
       renderItem={(faction) => (

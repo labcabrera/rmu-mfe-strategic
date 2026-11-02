@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { Tab, Tabs } from '@mui/material';
 import { EnchantmentProject, fetchEnchantments, NotFound, useNotify } from '@labcabrera-rmu/rmu-react-shared-lib';
 import EconomyLayout from '../economy/EconomyLayout';
 import { HolderView, useHolder } from '../economy/use-holder';
@@ -77,18 +76,19 @@ export default function EnchantmentsPage() {
   if (invalid) return <NotFound />;
 
   return (
-    <EconomyLayout page="enchantments" view={view} error={error} onRetry={refresh}>
+    <EconomyLayout
+      page="enchantments"
+      view={view}
+      error={error}
+      onRetry={refresh}
+      tabs={{
+        sections: TABS.map((value) => ({ id: value, label: t(`enchantments-tab-${value}`) })),
+        value: tab,
+        onChange: (value) => setTab(value as EnchantmentsTab),
+      }}
+    >
       {view && (
         <>
-          <Tabs
-            value={tab}
-            onChange={(_, value: EnchantmentsTab) => setTab(value)}
-            sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
-          >
-            {TABS.map((value) => (
-              <Tab key={value} value={value} label={t(`enchantments-tab-${value}`)} />
-            ))}
-          </Tabs>
           {tab === 'projects' && (
             <EnchantmentProjectList
               projects={own}

@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Box, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
-import { LoadingState, MoneyDisplay, RmuDialog } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Stack, Typography } from '@mui/material';
+import { DataTable, EmptyState, LoadingState, MoneyDisplay, RmuDialog } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useTradingTables } from './TradingFields';
 
 /**
@@ -19,37 +19,40 @@ const TaxesDialog: FC<{ open: boolean; onClose: () => void }> = ({ open, onClose
           {t('taxes-and-tolls-hint')}
         </Typography>
         {tables === undefined && <LoadingState />}
-        {tables !== undefined && rows.length === 0 && <Alert severity="info">{t('taxes-unavailable')}</Alert>}
+        {tables !== undefined && rows.length === 0 && <EmptyState dense title={t('taxes-unavailable')} />}
         {rows.length > 0 && (
-          <Box sx={{ overflowX: 'auto' }}>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>{t('tax')}</TableCell>
-                  <TableCell align="right">{t('cost')}</TableCell>
-                  <TableCell>{t('tax-unit')}</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={row.key}>
-                    <TableCell>
-                      <Typography variant="body2">{t(`tax-${row.key}`, { defaultValue: row.key })}</Typography>
-                      {row.notes && (
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                          {row.notes}
-                        </Typography>
-                      )}
-                    </TableCell>
-                    <TableCell align="right">
-                      {row.cost === null ? '-' : <MoneyDisplay gold={row.cost} variant="body2" />}
-                    </TableCell>
-                    <TableCell>{row.unit ? t(`tax-unit-${row.unit.replace(/\s+/g, '-')}`, { defaultValue: row.unit }) : '-'}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Box>
+          <DataTable
+            rows={rows}
+            getKey={(row) => row.key}
+            columns={[
+              {
+                key: 'tax',
+                header: t('tax'),
+                render: (row) => (
+                  <>
+                    <Typography variant="body2">{t(`tax-${row.key}`, { defaultValue: row.key })}</Typography>
+                    {row.notes && (
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                        {row.notes}
+                      </Typography>
+                    )}
+                  </>
+                ),
+              },
+              {
+                key: 'cost',
+                header: t('cost'),
+                align: 'right',
+                render: (row) => (row.cost === null ? '-' : <MoneyDisplay gold={row.cost} variant="body2" />),
+              },
+              {
+                key: 'unit',
+                header: t('tax-unit'),
+                render: (row) =>
+                  row.unit ? t(`tax-unit-${row.unit.replace(/\s+/g, '-')}`, { defaultValue: row.unit }) : '-',
+              },
+            ]}
+          />
         )}
       </Stack>
     </RmuDialog>

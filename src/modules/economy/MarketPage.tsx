@@ -4,7 +4,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
-import { Alert, Box, Button, Divider, Paper, Stack, Tab, Tabs, Theme, Typography, useMediaQuery } from '@mui/material';
+import { Alert, Box, Button, Divider, Stack, Theme, Typography, useMediaQuery } from '@mui/material';
 import {
   EmptyState,
   Item,
@@ -13,6 +13,7 @@ import {
   ItemInventory,
   MoneyDisplay,
   NotFound,
+  Panel,
   StrategicItem,
   useItemCatalog,
   useListFilters,
@@ -52,49 +53,38 @@ export default function MarketPage() {
   if (invalid) return <NotFound />;
 
   return (
-    <EconomyLayout page="market" view={view} error={error} onRetry={refresh}>
+    <EconomyLayout
+      page="market"
+      view={view}
+      error={error}
+      onRetry={refresh}
+      tabs={{
+        sections: TABS.map((value) => ({ id: value, label: t(`market-tab-${value}`) })),
+        value: tab,
+        // Merge into the query, which also holds the filters of the catalog (spec 056, B-04)
+        onChange: (value) =>
+          setParams(
+            (current) => {
+              const next = new URLSearchParams(current);
+              next.set('tab', value);
+              return next;
+            },
+            { replace: true }
+          ),
+        extra: (
+          <Button
+            size="small"
+            startIcon={<ReceiptLongIcon />}
+            onClick={() => setTaxesOpen(true)}
+            sx={{ flexShrink: 0 }}
+          >
+            {t('taxes-and-tolls')}
+          </Button>
+        ),
+      }}
+    >
       {view && (
         <>
-          <Stack
-            direction="row"
-            spacing={1}
-            sx={{
-              mb: 2,
-              borderBottom: 1,
-              borderColor: 'divider',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Tabs
-              value={tab}
-              onChange={(_, value: MarketTab) =>
-                // Merge into the query, which also holds the filters of the catalog (spec 056, B-04)
-                setParams(
-                  (current) => {
-                    const next = new URLSearchParams(current);
-                    next.set('tab', value);
-                    return next;
-                  },
-                  { replace: true }
-                )
-              }
-              variant="scrollable"
-              sx={{ minWidth: 0 }}
-            >
-              {TABS.map((value) => (
-                <Tab key={value} value={value} label={t(`market-tab-${value}`)} />
-              ))}
-            </Tabs>
-            <Button
-              size="small"
-              startIcon={<ReceiptLongIcon />}
-              onClick={() => setTaxesOpen(true)}
-              sx={{ flexShrink: 0 }}
-            >
-              {t('taxes-and-tolls')}
-            </Button>
-          </Stack>
           <TaxesDialog open={taxesOpen} onClose={() => setTaxesOpen(false)} />
           {tab === 'buy' && (
             <MarketBuy
@@ -196,21 +186,15 @@ const MarketCart: FC<{
   );
 
   return (
-    <Paper variant="outlined" sx={{ p: 2 }}>
+    <Panel variant="outlined" title={t('cart')} extra={<ShoppingCartIcon color="action" fontSize="small" />}>
       <Stack spacing={1.5}>
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-          <ShoppingCartIcon color="action" />
-          <Typography variant="overline" color="text.secondary">
-            {t('cart')}
-          </Typography>
-        </Stack>
-        {cart.length === 0 && <EmptyState title={t('cart-empty')} description={t('cart-empty-hint')} />}
+        {cart.length === 0 && <EmptyState dense title={t('cart-empty')} description={t('cart-empty-hint')} />}
         <CartLines cart={cart} setCart={setCart} quote={quote} />
         {cart.length > 0 && (
           <>
             <Divider />
             <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
-              <Typography sx={{ fontWeight: 700 }}>{t('cart-direct-total')}</Typography>
+              <Typography sx={{ fontWeight: 600 }}>{t('cart-direct-total')}</Typography>
               {quote ? <MoneyDisplay gold={quote.total} /> : <Typography>…</Typography>}
             </Stack>
             <Typography variant="caption" color="text.secondary">
@@ -228,7 +212,7 @@ const MarketCart: FC<{
           </>
         )}
       </Stack>
-    </Paper>
+    </Panel>
   );
 };
 

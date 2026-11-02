@@ -5,13 +5,14 @@ import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Box, Chip, Stack, Typography } from '@mui/material';
 import {
+  Bento,
   Character,
   CollectionMode,
   CollectionModeSwitch,
   deleteFaction,
   DetailPage,
-  DownloadButton,
   downloadBlob,
+  DownloadButton,
   exportFaction,
   Faction,
   fetchCharacters,
@@ -25,6 +26,7 @@ import {
   LoadingState,
   MoneyDisplay,
   Panel,
+  span,
   StatPill,
   StrategicGame,
   updateFaction,
@@ -34,7 +36,6 @@ import {
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { DEFAULT_FACTION_IMAGE_PATH } from '../../services/image-service';
 import CreateOrImportButton from '../../shared/CreateOrImportButton';
-import { Bento, span } from '../../shared/layout/Bento';
 import { isGameMaster } from '../../shared/permissions';
 import FactionViewArmory from './FactionViewArmory';
 import FactionViewCharactersTable from './FactionViewCharacterTable';

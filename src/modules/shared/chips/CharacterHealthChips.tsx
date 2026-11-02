@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import HealingIcon from '@mui/icons-material/Healing';
-import { Chip, Stack } from '@mui/material';
-import { Character, effectColor, effectIcon, StatusBadge } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Chip } from '@mui/material';
+import { Character, ChipRow, effectColor, effectIcon, StatusBadge } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { TFunction } from 'i18next';
 
 export type HealthChip = {
@@ -74,7 +74,7 @@ const CharacterHealthChips: FC<{ character: Character; onClick?: () => void; var
 
   if (variant === 'compact') {
     return (
-      <Stack direction="row" useFlexGap sx={{ flexWrap: 'wrap', gap: 0.5 }}>
+      <ChipRow>
         {chips.map((chip) =>
           chip.key === 'injuries' ? (
             <StatusBadge
@@ -98,12 +98,12 @@ const CharacterHealthChips: FC<{ character: Character; onClick?: () => void; var
             />
           )
         )}
-      </Stack>
+      </ChipRow>
     );
   }
 
   return (
-    <Stack direction="row" useFlexGap sx={{ flexWrap: 'wrap', gap: 0.5 }}>
+    <ChipRow>
       {chips.map((chip) => (
         <Chip
           key={chip.key}
@@ -114,7 +114,7 @@ const CharacterHealthChips: FC<{ character: Character; onClick?: () => void; var
           onClick={onClick}
         />
       ))}
-    </Stack>
+    </ChipRow>
   );
 };
 

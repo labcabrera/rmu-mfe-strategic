@@ -5,11 +5,10 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import BuildIcon from '@mui/icons-material/Build';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import { Box, Button, Stack } from '@mui/material';
-import { Faction, LoadingState, Panel } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Faction, LoadingState, Panel, span } from '@labcabrera-rmu/rmu-react-shared-lib';
 import HolderInventory, { holderNames } from '../../economy/HolderInventory';
 import ItemLedgerList from '../../economy/ItemLedgerList';
 import { holderPath, useHolder } from '../../economy/use-holder';
-import { span } from '../../shared/layout/Bento';
 
 /**
  * The armory of a faction (spec 023): the items the faction holds, with the same operations as the equipment of a

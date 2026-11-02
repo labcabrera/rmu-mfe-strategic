@@ -1,100 +1,80 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { KeyValuePanel, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { KeyValuePanel, OptionsHelpButton, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { DEFAULT_OPTIONS, resolveOptions } from '../../services/game-rules';
-import { GameOptionLabel } from '../GameOptionHint';
+import { GameOptionRow, gameOptionsHelp } from '../GameOptionHint';
 
-/** Options of a campaign as label / value rows (multipliers, lethality and the creation and combat rules). */
+/**
+ * Options of a campaign as label / value rows (multipliers, lethality and the creation and combat rules), with one
+ * help button in the header that explains every option (spec 066, decision 17).
+ */
 const StrategicGameViewAttributes: FC<{ strategicGame: StrategicGame }> = ({ strategicGame }) => {
   const { t } = useTranslation();
   const options = resolveOptions(strategicGame.options);
   const yesNo = (value: boolean) => t(value ? 'yes' : 'no');
 
+  const rows: GameOptionRow[] = [
+    {
+      option: 'experience-multiplier',
+      label: t('experience-multiplier'),
+      value: `×${strategicGame.options.experienceMultiplier}`,
+      defaultValue: DEFAULT_OPTIONS.experienceMultiplier,
+    },
+    {
+      option: 'fatigue-multiplier',
+      label: t('fatigue-multiplier'),
+      value: `×${strategicGame.options.fatigueMultiplier}`,
+      defaultValue: DEFAULT_OPTIONS.fatigueMultiplier,
+    },
+    {
+      option: 'board-scale',
+      label: t('board-scale'),
+      value: `×${strategicGame.options.boardScaleMultiplier}`,
+      defaultValue: DEFAULT_OPTIONS.boardScaleMultiplier,
+    },
+    {
+      option: 'letality',
+      label: t('letality'),
+      value: strategicGame.options.letality,
+      defaultValue: DEFAULT_OPTIONS.letality,
+    },
+    {
+      option: 'talent-policy',
+      label: t('talent-policy'),
+      value: t(`talent-policy-${options.talentPolicy}`),
+      defaultValue: DEFAULT_OPTIONS.talentPolicy,
+    },
+    {
+      option: 'stat-generation',
+      label: t('stat-generation'),
+      value: t(`stat-generation-${options.statGeneration}`),
+      defaultValue: DEFAULT_OPTIONS.statGeneration,
+    },
+    {
+      option: 'allow-third-rank',
+      label: t('allow-third-rank'),
+      value: yesNo(options.allowThirdRank),
+      defaultValue: DEFAULT_OPTIONS.allowThirdRank,
+    },
+    {
+      option: 'bonus-dev-points-cap-at-creation',
+      label: t('bonus-dev-points-cap-at-creation'),
+      value: yesNo(options.bonusDevPointsCapAtCreation),
+      defaultValue: DEFAULT_OPTIONS.bonusDevPointsCapAtCreation,
+    },
+    {
+      option: 'open-rounds',
+      label: t('open-rounds'),
+      value: yesNo(options.openRounds),
+      defaultValue: DEFAULT_OPTIONS.openRounds,
+    },
+  ];
+
   return (
     <KeyValuePanel
       title={t('settings')}
-      rows={[
-        {
-          label: (
-            <GameOptionLabel
-              option="experience-multiplier"
-              label={t('experience-multiplier')}
-              defaultValue={DEFAULT_OPTIONS.experienceMultiplier}
-            />
-          ),
-          value: `×${strategicGame.options.experienceMultiplier}`,
-        },
-        {
-          label: (
-            <GameOptionLabel
-              option="fatigue-multiplier"
-              label={t('fatigue-multiplier')}
-              defaultValue={DEFAULT_OPTIONS.fatigueMultiplier}
-            />
-          ),
-          value: `×${strategicGame.options.fatigueMultiplier}`,
-        },
-        {
-          label: (
-            <GameOptionLabel
-              option="board-scale"
-              label={t('board-scale')}
-              defaultValue={DEFAULT_OPTIONS.boardScaleMultiplier}
-            />
-          ),
-          value: `×${strategicGame.options.boardScaleMultiplier}`,
-        },
-        {
-          label: <GameOptionLabel option="letality" label={t('letality')} defaultValue={DEFAULT_OPTIONS.letality} />,
-          value: strategicGame.options.letality,
-        },
-        {
-          label: (
-            <GameOptionLabel
-              option="talent-policy"
-              label={t('talent-policy')}
-              defaultValue={DEFAULT_OPTIONS.talentPolicy}
-            />
-          ),
-          value: t(`talent-policy-${options.talentPolicy}`),
-        },
-        {
-          label: (
-            <GameOptionLabel
-              option="stat-generation"
-              label={t('stat-generation')}
-              defaultValue={DEFAULT_OPTIONS.statGeneration}
-            />
-          ),
-          value: t(`stat-generation-${options.statGeneration}`),
-        },
-        {
-          label: (
-            <GameOptionLabel
-              option="allow-third-rank"
-              label={t('allow-third-rank')}
-              defaultValue={DEFAULT_OPTIONS.allowThirdRank}
-            />
-          ),
-          value: yesNo(options.allowThirdRank),
-        },
-        {
-          label: (
-            <GameOptionLabel
-              option="bonus-dev-points-cap-at-creation"
-              label={t('bonus-dev-points-cap-at-creation')}
-              defaultValue={DEFAULT_OPTIONS.bonusDevPointsCapAtCreation}
-            />
-          ),
-          value: yesNo(options.bonusDevPointsCapAtCreation),
-        },
-        {
-          label: (
-            <GameOptionLabel option="open-rounds" label={t('open-rounds')} defaultValue={DEFAULT_OPTIONS.openRounds} />
-          ),
-          value: yesNo(options.openRounds),
-        },
-      ]}
+      extra={<OptionsHelpButton title={t('settings')} options={gameOptionsHelp(rows, t)} />}
+      rows={rows.map(({ label, value }) => ({ label, value }))}
     />
   );
 };

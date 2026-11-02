@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Chip, Stack, Typography } from '@mui/material';
 import {
+  ChipRow,
   ItemConditionChip,
   ItemLedgerEntry,
   ItemModifierChips,
@@ -26,17 +27,17 @@ const ItemLedgerOutcome: FC<{ entry: ItemLedgerEntry; item: StrategicItem | null
     <Stack spacing={2} sx={{ pt: 1 }}>
       {entry.outcome && <Alert severity={bad ? 'error' : 'success'}>{t(`ledger-outcome-${entry.outcome}`)}</Alert>}
       {entry.maneuver && (
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
+        <ChipRow>
           <Typography variant="body2" color="text.secondary">
             {t('maneuver')}
           </Typography>
           <Chip size="small" label={`${t('total')}: ${entry.maneuver.total}`} />
           {entry.maneuver.result && <Chip size="small" label={t(entry.maneuver.result)} />}
           {entry.maneuver.unusualEvent && <Chip size="small" color="warning" label={t('unusual-event')} />}
-        </Stack>
+        </ChipRow>
       )}
       {crafting && (
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
+        <ChipRow>
           {crafting.materialId && (
             <Chip size="small" variant="outlined" label={t(`material-${crafting.materialId}`, crafting.materialId)} />
           )}
@@ -50,7 +51,7 @@ const ItemLedgerOutcome: FC<{ entry: ItemLedgerEntry; item: StrategicItem | null
           {crafting.workshop && crafting.workshop !== 'basic' && (
             <Chip size="small" variant="outlined" label={t(`workshop-quality-${crafting.workshop}`)} />
           )}
-        </Stack>
+        </ChipRow>
       )}
       {entry.note && (
         <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>

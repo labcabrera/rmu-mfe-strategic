@@ -1,20 +1,8 @@
 import React, { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import {
-  Avatar,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TableSortLabel,
-  Tooltip,
-  Typography,
-} from '@mui/material';
-import { Character, resolveAssetUrl } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Avatar, TableSortLabel, Tooltip, Typography } from '@mui/material';
+import { Character, DataTable, resolveAssetUrl } from '@labcabrera-rmu/rmu-react-shared-lib';
 import CharacterHealthChips from '../../shared/chips/CharacterHealthChips';
 
 type SortField = 'name' | 'level' | null;
@@ -66,132 +54,116 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
   // The name column stays in place while the table scrolls sideways on narrow screens.
   const stickySx = { position: 'sticky', left: 0, zIndex: 1, bgcolor: 'background.paper' } as const;
 
+  const sortBy = (field: Exclude<SortField, null>, firstDirection: SortDirection) => {
+    if (sortField === field) {
+      setSortDirection((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortDirection(firstDirection);
+    }
+  };
+  const abbreviation = (title: string, text: string) => (
+    <Tooltip title={title}>
+      <span>{text}</span>
+    </Tooltip>
+  );
+  const bonus = (value: number) => <Typography color={value < 0 ? 'error' : 'success'}>{value}</Typography>;
+
   return (
-    <TableContainer component={Paper} sx={{ width: '100%' }}>
-      <Table size="small" aria-label={t('faction-characters-table')}>
-        <TableHead>
-          <TableRow>
-            <TableCell sx={stickySx}>
-              <TableSortLabel
-                active={sortField === 'name'}
-                direction={sortField === 'name' ? sortDirection : 'asc'}
-                onClick={() => {
-                  if (sortField === 'name') {
-                    setSortDirection((d) => (d === 'asc' ? 'desc' : 'asc'));
-                  } else {
-                    setSortField('name');
-                    setSortDirection('asc');
-                  }
-                }}
-              >
-                {t('name')}
-              </TableSortLabel>
-            </TableCell>
-            <TableCell>{t('race')}</TableCell>
-            <TableCell align="right">
-              <TableSortLabel
-                active={sortField === 'level'}
-                direction={sortField === 'level' ? sortDirection : 'asc'}
-                onClick={() => {
-                  if (sortField === 'level') {
-                    setSortDirection((d) => (d === 'asc' ? 'desc' : 'asc'));
-                  } else {
-                    setSortField('level');
-                    setSortDirection('desc');
-                  }
-                }}
-              >
-                {t('level')}
-              </TableSortLabel>
-            </TableCell>
-            <TableCell align="right">
-              <Tooltip title={t('hp')}>
-                <span>{t('hp-short')}</span>
-              </Tooltip>
-            </TableCell>
-            <TableCell>{t('profession')}</TableCell>
-            <TableCell>{t('attacks')}</TableCell>
-            <TableCell align="right">
-              <Tooltip title={t('defensive-bonus')}>
-                <span>{t('db-short')}</span>
-              </Tooltip>
-            </TableCell>
-            <TableCell align="right">
-              <Tooltip title={t('armor-type')}>
-                <span>{t('at-short')}</span>
-              </Tooltip>
-            </TableCell>
-            <TableCell align="right">{t('initiative-short')}</TableCell>
-            <TableCell align="right">
-              <Tooltip title={t('base-movement-rate')}>
-                <span>{t('bmr')}</span>
-              </Tooltip>
-            </TableCell>
-            <TableCell align="right">{t('penalty-short')}</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {sortedCharacters.map((c) => (
-            <TableRow
-              key={c.id}
-              hover
-              sx={{ cursor: 'pointer' }}
-              onClick={() => navigate(`/strategic/characters/view/${c.id}`, { state: { character: c } })}
+    <DataTable
+      rows={sortedCharacters}
+      getKey={(c) => c.id}
+      emptyTitle={t('no-characters-have-been-created')}
+      onRowClick={(c) => navigate(`/strategic/characters/view/${c.id}`, { state: { character: c } })}
+      columns={[
+        {
+          key: 'name',
+          header: (
+            <TableSortLabel
+              active={sortField === 'name'}
+              direction={sortField === 'name' ? sortDirection : 'asc'}
+              onClick={() => sortBy('name', 'asc')}
             >
-              <TableCell sx={stickySx}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <Avatar
-                    src={resolveAssetUrl(c.imageUrl)}
-                    alt={c.name}
-                    sx={{ width: 45, height: 45 }}
-                    variant="square"
-                  />
-                  <div>
-                    <Tooltip title={c.description || ''}>
-                      <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }}>
-                        {c.name}
-                      </Typography>
-                    </Tooltip>
-                    {/* Compact badges: the full text on hover or tap, so the row keeps its height (spec 017). */}
-                    <CharacterHealthChips character={c} variant="compact" />
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell>{c.info?.race?.name}</TableCell>
-              <TableCell align="right">{getExperienceLabel(c)}</TableCell>
-              <TableCell align="right">
-                {c.hp.current === c.hp.max ? c.hp.max : `${c.hp.current}/${c.hp.max}`}
-              </TableCell>
-              <TableCell>{t(c.info?.professionId || '')}</TableCell>
-              {/* One attack per line, never split inside a name or a bonus. */}
-              <TableCell sx={{ whiteSpace: 'pre-line', minWidth: 160 }}>{getAttackDescription(c)}</TableCell>
-              <TableCell align="right">
-                <Typography color={c.defense.defensiveBonus < 0 ? 'error' : 'success'}>
-                  {c.defense.defensiveBonus}
-                </Typography>
-              </TableCell>
-              <TableCell align="right">{getArmorDescription(c)}</TableCell>
-              <TableCell align="right">
-                <Typography color={c.initiative.totalBonus < 0 ? 'error' : 'success'}>
-                  {c.initiative.totalBonus}
-                </Typography>
-              </TableCell>
-              <TableCell align="right">{c.movement.baseMovementRate}</TableCell>
-              <TableCell align="right">
-                <Typography color={c.equipment.maneuverPenalty < 0 ? 'error' : 'success'}>
-                  {c.equipment.maneuverPenalty}
-                </Typography>
-              </TableCell>
-            </TableRow>
-          ))}
-          {characters.length === 0 && (
-            <TableRow>
-              <TableCell colSpan={11}>{t('no-characters-have-been-created')}</TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+              {t('name')}
+            </TableSortLabel>
+          ),
+          cellSx: stickySx,
+          render: (c) => (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Avatar src={resolveAssetUrl(c.imageUrl)} alt={c.name} sx={{ width: 45, height: 45 }} variant="square" />
+              <div>
+                <Tooltip title={c.description || ''}>
+                  <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }}>
+                    {c.name}
+                  </Typography>
+                </Tooltip>
+                {/* Compact badges: the full text on hover or tap, so the row keeps its height (spec 017). */}
+                <CharacterHealthChips character={c} variant="compact" />
+              </div>
+            </div>
+          ),
+        },
+        { key: 'race', header: t('race'), render: (c) => c.info?.race?.name },
+        {
+          key: 'level',
+          header: (
+            <TableSortLabel
+              active={sortField === 'level'}
+              direction={sortField === 'level' ? sortDirection : 'asc'}
+              onClick={() => sortBy('level', 'desc')}
+            >
+              {t('level')}
+            </TableSortLabel>
+          ),
+          align: 'right',
+          render: getExperienceLabel,
+        },
+        {
+          key: 'hp',
+          header: abbreviation(t('hp'), t('hp-short')),
+          align: 'right',
+          render: (c) => (c.hp.current === c.hp.max ? c.hp.max : `${c.hp.current}/${c.hp.max}`),
+        },
+        { key: 'profession', header: t('profession'), render: (c) => t(c.info?.professionId || '') },
+        {
+          key: 'attacks',
+          header: t('attacks'),
+          // One attack per line, never split inside a name or a bonus.
+          cellSx: { whiteSpace: 'pre-line', minWidth: 160 },
+          render: getAttackDescription,
+        },
+        {
+          key: 'db',
+          header: abbreviation(t('defensive-bonus'), t('db-short')),
+          align: 'right',
+          render: (c) => bonus(c.defense.defensiveBonus),
+        },
+        {
+          key: 'at',
+          header: abbreviation(t('armor-type'), t('at-short')),
+          align: 'right',
+          render: getArmorDescription,
+        },
+        {
+          key: 'initiative',
+          header: t('initiative-short'),
+          align: 'right',
+          render: (c) => bonus(c.initiative.totalBonus),
+        },
+        {
+          key: 'bmr',
+          header: abbreviation(t('base-movement-rate'), t('bmr')),
+          align: 'right',
+          render: (c) => c.movement.baseMovementRate,
+        },
+        {
+          key: 'penalty',
+          header: t('penalty-short'),
+          align: 'right',
+          render: (c) => bonus(c.equipment.maneuverPenalty),
+        },
+      ]}
+    />
   );
 };
 

@@ -12,15 +12,13 @@ import {
   Grid,
   MenuItem,
   Stack,
-  Step,
-  StepButton,
-  Stepper,
   TextField,
   Typography,
 } from '@mui/material';
 import {
   Character,
   DifficultyPicker,
+  FlowSteps,
   fetchCharacterTreatmentDifficulty,
   fetchStrategicItems,
   herbTreats,
@@ -347,7 +345,8 @@ const InjuryHealingDialog: FC<{
   const healerStep = (
     <Stack spacing={2}>
       <HealerPicker characters={healers} selfId={character.id} value={healer} onChange={setHealer} />
-      <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
+      <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end' }}>
+        <Button onClick={() => setStep('recovery')}>{t('healing-step-recovery')}</Button>
         <Button variant="contained" disabled={!resolvedHealer} onClick={() => setStep('treatment')}>
           {t('next')}
         </Button>
@@ -648,17 +647,18 @@ const InjuryHealingDialog: FC<{
     <RmuDialog open={open} title={t('heal-injury')} subtitle={character.name} maxWidth="md" onClose={onClose}>
       <Stack spacing={2} sx={{ pt: 1 }}>
         <InjuryCard injury={injury} dense />
-        <Stepper nonLinear activeStep={STEPS.indexOf(step)}>
-          {STEPS.map((id) => (
-            <Step
-              key={id}
-              completed={(id === 'treatment' && (treated || !!latest)) || (id === 'recovery' && !!recovery)}
-            >
-              <StepButton onClick={() => setStep(id)}>{t(`healing-step-${id}`)}</StepButton>
-            </Step>
-          ))}
-        </Stepper>
-        <Box>{content[step]}</Box>
+        <Box sx={{ mx: -2 }}>
+          <FlowSteps
+            activeIndex={STEPS.indexOf(step)}
+            onReview={(id) => id && setStep(id as StepId)}
+            steps={STEPS.map((id) => ({
+              id,
+              label: t(`healing-step-${id}`),
+              summary: id === 'healer' ? resolvedHealer?.name : undefined,
+              content: content[id],
+            }))}
+          />
+        </Box>
       </Stack>
     </RmuDialog>
   );

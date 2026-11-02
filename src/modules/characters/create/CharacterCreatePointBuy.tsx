@@ -1,19 +1,7 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Chip,
-  MenuItem,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Typography,
-} from '@mui/material';
-import { formatBonus, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Box, Chip, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { DataTable, formatBonus, SectionLabel, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { CreationStats, pointBuyBands, pointBuyValue } from '../../services/randomize-stats';
 import { safeStatBonus } from '../../services/stat-service';
 
@@ -40,65 +28,71 @@ const CharacterCreatePointBuy: FC<{
 
   return (
     <Stack spacing={1}>
-      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 1 }}>
-        <Typography variant="subtitle1" color="primary">
-          {t('stat-point-buy')}
-        </Typography>
-        <Chip
-          size="small"
-          color={spent > statPoints ? 'error' : 'success'}
-          label={t('stat-points-spent', { spent, total: statPoints })}
-        />
-      </Stack>
+      <SectionLabel
+        actions={
+          <Chip
+            size="small"
+            color={spent > statPoints ? 'error' : 'success'}
+            label={t('stat-points-spent', { spent, total: statPoints })}
+          />
+        }
+      >
+        {t('stat-point-buy')}
+      </SectionLabel>
       <Typography variant="body2" color="text.secondary">
         {t('stat-point-buy-help')}
       </Typography>
-      <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto' }}>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>{t('stat')}</TableCell>
-              <TableCell align="right">{t('potential-short')}</TableCell>
-              <TableCell sx={{ minWidth: 160 }}>{t('bonus')}</TableCell>
-              <TableCell align="right">{t('temporary-short')}</TableCell>
-              <TableCell align="right">{t('cost')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {STATS.map((key) => {
-              const stat = statistics[key];
-              const bonus = safeStatBonus(stat.temporary);
-              return (
-                <TableRow key={key}>
-                  <TableCell>{t(key)}</TableCell>
-                  <TableCell align="right">{stat.potential}</TableCell>
-                  <TableCell>
-                    <TextField
-                      select
-                      size="small"
-                      variant="standard"
-                      value={bonus}
-                      onChange={(e) => onBuy(key, Number(e.target.value))}
-                      fullWidth
-                      slotProps={{ htmlInput: { 'aria-label': `${t(key)} ${t('bonus')}` } }}
-                    >
-                      {pointBuyBands(stat.potential).map((band) => (
-                        <MenuItem key={band.bonus} value={band.bonus}>
-                          {`${formatBonus(band.bonus)} (${band.min}-${band.max})`}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  </TableCell>
-                  <TableCell align="right">{stat.temporary}</TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 'bold' }}>
-                    {bonus}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <DataTable
+        rows={[...STATS]}
+        getKey={(key) => key}
+        columns={[
+          { key: 'stat', header: t('stat'), render: (key) => t(key) },
+          {
+            key: 'potential',
+            header: t('potential-short'),
+            align: 'right',
+            render: (key) => statistics[key].potential,
+          },
+          {
+            key: 'bonus',
+            header: t('bonus'),
+            cellSx: { minWidth: 160 },
+            render: (key) => (
+              <TextField
+                select
+                size="small"
+                variant="standard"
+                value={safeStatBonus(statistics[key].temporary)}
+                onChange={(e) => onBuy(key, Number(e.target.value))}
+                fullWidth
+                slotProps={{ htmlInput: { 'aria-label': `${t(key)} ${t('bonus')}` } }}
+              >
+                {pointBuyBands(statistics[key].potential).map((band) => (
+                  <MenuItem key={band.bonus} value={band.bonus}>
+                    {`${formatBonus(band.bonus)} (${band.min}-${band.max})`}
+                  </MenuItem>
+                ))}
+              </TextField>
+            ),
+          },
+          {
+            key: 'temporary',
+            header: t('temporary-short'),
+            align: 'right',
+            render: (key) => statistics[key].temporary,
+          },
+          {
+            key: 'cost',
+            header: t('cost'),
+            align: 'right',
+            render: (key) => (
+              <Box component="span" sx={{ fontWeight: 600 }}>
+                {safeStatBonus(statistics[key].temporary)}
+              </Box>
+            ),
+          },
+        ]}
+      />
     </Stack>
   );
 };
