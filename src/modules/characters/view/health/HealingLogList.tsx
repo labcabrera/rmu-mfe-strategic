@@ -7,6 +7,7 @@ import {
   Character,
   EmptyState,
   fetchCharacterHealingLog,
+  formatBonus,
   HealingLogEntry,
   HealingType,
   HpBySource,
@@ -55,6 +56,14 @@ const useEntryText = () => {
             healed: count(s, 'injuriesHealed'),
           }),
           fate ? t(`fate-${fate}`) : undefined,
+          // Workspace spec 068: units spent in the game, ones no longer carried and the lasting modifiers
+          count(s, 'itemsConsumed') ? t('healing-log-items-consumed', { count: count(s, 'itemsConsumed') }) : undefined,
+          count(s, 'itemsConsumedIgnored')
+            ? t('healing-log-items-consumed-ignored', { count: count(s, 'itemsConsumedIgnored') })
+            : undefined,
+          count(s, 'temporaryModifiersAdded')
+            ? t('healing-log-temporary-modifiers-added', { count: count(s, 'temporaryModifiersAdded') })
+            : undefined,
         ]
           .filter(Boolean)
           .join(' · ');
@@ -104,6 +113,15 @@ const useEntryText = () => {
           });
         }
         if (action === 'injury-updated') return t('healing-log-injury-updated');
+        if (action === 'temporary-modifiers-expired') {
+          return t('healing-log-temporary-modifiers-expired', { count: count(s, 'modifiers') });
+        }
+        if (action === 'temporary-modifier-removed') {
+          return t('healing-log-temporary-modifier-removed', {
+            kind: t(`temporary-modifier-kind-${str(s, 'kind') ?? 'morale'}`),
+            value: formatBonus(num(s, 'value') ?? 0),
+          });
+        }
         return t('healing-log-manual');
       }
     }

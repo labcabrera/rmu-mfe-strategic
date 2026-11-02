@@ -7,6 +7,7 @@ import AddIcon from '@mui/icons-material/Add';
 import GrassIcon from '@mui/icons-material/Grass';
 import HealingIcon from '@mui/icons-material/Healing';
 import HotelIcon from '@mui/icons-material/Hotel';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
 import ScienceIcon from '@mui/icons-material/Science';
 import SpaIcon from '@mui/icons-material/Spa';
 import { Alert, Box, Button, Chip, FormControlLabel, Link, Stack, Switch } from '@mui/material';
@@ -19,11 +20,15 @@ import {
   Injury,
   InjuryList,
   Panel,
+  removeCharacterTemporaryModifier,
   resolveCharacterCondition,
   ResourceBar,
   SectionLabel,
   StatPill,
   StrategicGame,
+  TemporaryModifier,
+  TemporaryModifierList,
+  updateCharacterInjury,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useStrategicNotify } from '../../../services/notify-service';
 import { isGameMaster as isGameMasterOf } from '../../../shared/permissions';
@@ -80,6 +85,8 @@ const CharacterHealthSection: FC<{
   const [antidoteFor, setAntidoteFor] = useState<Injury>();
   const [herbUseOpen, setHerbUseOpen] = useState(false);
   const [herbSearchOpen, setHerbSearchOpen] = useState(false);
+  const [removingModifierId, setRemovingModifierId] = useState<string | null>(null);
+  const [clearingLimitsId, setClearingLimitsId] = useState<string | null>(null);
 
   // Adding and editing injuries and resolving conditions are for the game master (the owner of the game).
   const isGameMaster = isGameMasterOf(auth, strategicGame);
@@ -112,13 +119,56 @@ const CharacterHealthSection: FC<{
   const resolveCondition = (conditionId: string) =>
     resolveCharacterCondition(character.id, conditionId, auth).then(setCharacter).catch(notify.error);
 
+  // Workspace spec 068: lasting morale and fear RR modifiers, whose expiry counts from the campaign day (spec 065).
+  const temporaryModifiers = character.temporaryModifiers || [];
+  const currentGameDay = strategicGame?.calendar?.currentDay;
+
+  const removeModifier = (modifier: TemporaryModifier) => {
+    setRemovingModifierId(modifier.id);
+    removeCharacterTemporaryModifier(character.id, modifier.id, auth)
+      .then(setCharacter)
+      .catch(notify.error)
+      .finally(() => setRemovingModifierId(null));
+  };
+
+  // The game master takes off the limits of a splint or a cast before the injury heals (workspace spec 068).
+  const clearLimits = (injury: Injury) => {
+    setClearingLimitsId(injury.id);
+    updateCharacterInjury(character.id, injury.id, { limits: null }, auth)
+      .then(setCharacter)
+      .catch(notify.error)
+      .finally(() => setClearingLimitsId(null));
+  };
+
   const renderGameLink = (tacticalGameId: string, label: string) => (
     <Link component={RouterLink} to={`/tactical/games/view/${tacticalGameId}`} underline="hover">
       {label}
     </Link>
   );
 
-  const renderActions = (injury: Injury) =>
+  const renderActions = (injury: Injury) => {
+    const care = renderCareActions(injury);
+    const clear =
+      isGameMaster && injury.limits && injury.status !== 'healed' ? (
+        <Button
+          size="small"
+          startIcon={<LockOpenIcon />}
+          disabled={clearingLimitsId === injury.id}
+          onClick={() => clearLimits(injury)}
+        >
+          {t('injury-limits-clear')}
+        </Button>
+      ) : undefined;
+    if (!care && !clear) return undefined;
+    return (
+      <>
+        {care}
+        {clear}
+      </>
+    );
+  };
+
+  const renderCareActions = (injury: Injury) =>
     !dead && isPoisoning(injury) ? (
       <Button size="small" startIcon={<ScienceIcon />} onClick={() => setAntidoteFor(injury)}>
         {t('antidote')}
@@ -231,9 +281,21 @@ const CharacterHealthSection: FC<{
       </Box>
 
       <Box sx={span(12, 5, 4)}>
-        <Panel title={t('healing-log')}>
-          <HealingLogList character={character} />
-        </Panel>
+        <Stack spacing={2}>
+          {temporaryModifiers.length > 0 && (
+            <Panel title={t('temporary-modifiers')}>
+              <TemporaryModifierList
+                modifiers={temporaryModifiers}
+                currentGameDay={currentGameDay}
+                onRemove={isGameMaster ? removeModifier : undefined}
+                removingId={removingModifierId}
+              />
+            </Panel>
+          )}
+          <Panel title={t('healing-log')}>
+            <HealingLogList character={character} />
+          </Panel>
+        </Stack>
       </Box>
 
       <InjuryHealingDialog

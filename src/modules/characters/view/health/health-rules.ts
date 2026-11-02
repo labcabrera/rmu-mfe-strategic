@@ -71,6 +71,19 @@ export const isProcedureAllowed = (injury: Injury, procedure: TreatmentProcedure
   return true;
 };
 
+/** Procedures that an injury requiring surgery still admits (workspace spec 068, decision 11). */
+export const SURGERY_ONLY_PROCEDURES: TreatmentProcedure[] = ['surgery', 'magic'];
+
+/** The injury type and severity are in `surgeryRequired` of the core healing tables (none without the list). */
+export const requiresSurgery = (
+  injury: Injury,
+  surgeryRequired: { injuryType: string; severity: string }[] | null | undefined
+): boolean =>
+  (surgeryRequired ?? []).some((row) => row.injuryType === injury.type && row.severity === injury.severity);
+
+/** Salve modifier range when the core tables have none (workspace spec 068). */
+export const DEFAULT_SALVE_RANGE = { min: -25, max: 25 };
+
 /** Without care for the recovery roll: no treatment, or the latest one failed (spec 022). */
 export const isUntreated = (injury: Injury): boolean => {
   const latest = latestTreatment(injury);
