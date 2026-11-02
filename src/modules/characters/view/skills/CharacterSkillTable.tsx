@@ -36,6 +36,7 @@ import {
   Character,
   CharacterSkill,
   deleteCharacterSkill,
+  EmptyState,
   formatBonus,
   levelDownSkill,
   levelUpSkill,
@@ -169,9 +170,7 @@ export default function CharacterSkillTable({
           {displayedSkills.length === 0 && (
             <TableRow>
               <TableCell colSpan={COLUMNS}>
-                <Typography variant="body2" color="text.secondary">
-                  {t('not-found-skills')}
-                </Typography>
+                <EmptyState dense title={t('not-found-skills')} />
               </TableCell>
             </TableRow>
           )}
@@ -315,7 +314,7 @@ function SkillRow({ skill, context }: { skill: CharacterSkill; context: TableCon
             skill.ranks
           )}
         </TableCell>
-        <TableCell align="right" sx={{ fontWeight: 700, color: skill.totalBonus < 0 ? 'error.main' : 'text.primary' }}>
+        <TableCell align="right" sx={{ fontWeight: 600, color: skill.totalBonus < 0 ? 'error.main' : 'text.primary' }}>
           {formatBonus(skill.totalBonus)}
         </TableCell>
         <TableCell align="right" sx={{ ...WIDE, whiteSpace: 'nowrap' }}>
@@ -380,7 +379,7 @@ function SkillRow({ skill, context }: { skill: CharacterSkill; context: TableCon
                     </Box>
                   </Typography>
                 ))}
-                <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>
                   {`= ${formatBonus(skill.totalBonus)}`}
                 </Typography>
               </Stack>

@@ -3,28 +3,20 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import UndoIcon from '@mui/icons-material/UndoOutlined';
-import {
-  Chip,
-  IconButton,
-  Paper,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Chip, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import {
   addStyleAbility,
   Character,
   CharacterSkill,
+  DataTable,
+  EmptyState,
   fetchFightingStyles,
   FightingStyle,
   FightingStyles,
   isFightingStyleSkill,
+  Panel,
   removeStyleAbility,
+  SectionLabel,
   StrategicGame,
   StyleAbility,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
@@ -58,9 +50,7 @@ export default function CharacterFightingStyles({
 
   return (
     <Stack spacing={1.5} sx={{ mt: 2 }}>
-      <Typography variant="h6" color="primary">
-        {t('fighting-styles')}
-      </Typography>
+      <SectionLabel>{t('fighting-styles')}</SectionLabel>
       {styleSkills.map((skill) => (
         <StyleCard
           key={`${skill.skillId}@${skill.specialization}`}
@@ -131,11 +121,13 @@ function StyleCard({
     return null;
   };
 
+  const timesOf = (abilityId: string) => selections.find((s) => s.abilityId === abilityId)?.times ?? 0;
+
   return (
-    <Paper variant="outlined" sx={{ p: 1.5 }}>
+    <Panel variant="outlined">
       <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 1, mb: 1 }}>
-        <Typography variant="subtitle1">
-          <b>{t(skill.specialization!)}</b>
+        <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+          {t(skill.specialization!)}
         </Typography>
         <Typography variant="body2" color="text.secondary">
           {t(skill.skillId)}
@@ -150,30 +142,37 @@ function StyleCard({
         </Tooltip>
       </Stack>
       {!style ? (
-        <Typography variant="body2" color="text.secondary">
-          {t('fighting-style-not-found')}
-        </Typography>
+        <EmptyState dense title={t('fighting-style-not-found')} />
       ) : (
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>{t('style-ability')}</TableCell>
-              <TableCell align="right">{t('cost')}</TableCell>
-              <TableCell align="right">{t('selected')}</TableCell>
-              <TableCell align="right">{t('actions')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {style.abilities.map((entry) => {
-              const ability = abilities.find((a) => a.id === entry.abilityId);
-              const times = selections.find((s) => s.abilityId === entry.abilityId)?.times ?? 0;
-              const blocked = blockedBy(ability, entry.cost, times);
-              return (
-                <TableRow key={entry.abilityId} selected={times > 0}>
-                  <TableCell>{t(`style-ability-${entry.abilityId}`)}</TableCell>
-                  <TableCell align="right">{entry.cost}</TableCell>
-                  <TableCell align="right">{times > 0 ? `×${times}` : '-'}</TableCell>
-                  <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+        <DataTable
+          rows={style.abilities}
+          getKey={(entry) => entry.abilityId}
+          columns={[
+            { key: 'ability', header: t('style-ability'), render: (entry) => t(`style-ability-${entry.abilityId}`) },
+            { key: 'cost', header: t('cost'), align: 'right', render: (entry) => entry.cost },
+            {
+              key: 'selected',
+              header: t('selected'),
+              align: 'right',
+              render: (entry) => {
+                const times = timesOf(entry.abilityId);
+                return times > 0 ? `×${times}` : '-';
+              },
+            },
+            {
+              key: 'actions',
+              header: t('actions'),
+              align: 'right',
+              cellSx: { whiteSpace: 'nowrap' },
+              render: (entry) => {
+                const times = timesOf(entry.abilityId);
+                const blocked = blockedBy(
+                  abilities.find((a) => a.id === entry.abilityId),
+                  entry.cost,
+                  times
+                );
+                return (
+                  <>
                     <Tooltip title={blocked ?? t('style-ability-add')}>
                       <span>
                         <IconButton
@@ -199,13 +198,13 @@ function StyleCard({
                         </IconButton>
                       </Tooltip>
                     )}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+                  </>
+                );
+              },
+            },
+          ]}
+        />
       )}
-    </Paper>
+    </Panel>
   );
 }

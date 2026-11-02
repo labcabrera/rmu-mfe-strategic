@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Box, Grid, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
-import { EnchantmentPlan, KeyValueList, MoneyDisplay } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Alert, Grid, Stack, Typography } from '@mui/material';
+import { DataTable, EnchantmentPlan, KeyValueList, MoneyDisplay } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const signed = (value: number) => (value >= 0 ? `+${value}` : `${value}`);
 
@@ -65,41 +65,36 @@ const EnchantmentPlanView: FC<{ plan: EnchantmentPlan; free?: boolean }> = ({ pl
           />
         </Grid>
       </Grid>
-      <Box sx={{ overflowX: 'auto' }}>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>{t('spell')}</TableCell>
-              <TableCell>{t('enchantment-scope')}</TableCell>
-              <TableCell align="right">{t('days')}</TableCell>
-              <TableCell align="right">{t('enchantment-pp-per-cast')}</TableCell>
-              <TableCell align="right">{t('enchantment-casts')}</TableCell>
-              <TableCell>{t('alchemy-failure-table')}</TableCell>
-              <TableCell align="right">{t('enchantment-scr-bonus')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {plan.spells.map((spell) => (
-              <TableRow key={spell.spellId}>
-                <TableCell>
-                  <Typography variant="body2">{`${t(spell.name, spell.name)} (${spell.level})`}</Typography>
-                  {spell.target && (
-                    <Typography variant="caption" color="text.secondary">
-                      {t(spell.target, spell.target)}
-                    </Typography>
-                  )}
-                </TableCell>
-                <TableCell>{t(`enchantment-scope-${spell.scope}`)}</TableCell>
-                <TableCell align="right">{spell.days}</TableCell>
-                <TableCell align="right">{spell.pp}</TableCell>
-                <TableCell align="right">{spell.casts}</TableCell>
-                <TableCell>{t(`alchemy-failure-table-${spell.failureTable}`)}</TableCell>
-                <TableCell align="right">{signed(spell.scrBonus)}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Box>
+      <DataTable
+        rows={plan.spells}
+        getKey={(spell) => spell.spellId}
+        columns={[
+          {
+            key: 'spell',
+            header: t('spell'),
+            render: (spell) => (
+              <>
+                <Typography variant="body2">{`${t(spell.name, spell.name)} (${spell.level})`}</Typography>
+                {spell.target && (
+                  <Typography variant="caption" color="text.secondary">
+                    {t(spell.target, spell.target)}
+                  </Typography>
+                )}
+              </>
+            ),
+          },
+          { key: 'scope', header: t('enchantment-scope'), render: (spell) => t(`enchantment-scope-${spell.scope}`) },
+          { key: 'days', header: t('days'), align: 'right', render: (spell) => spell.days },
+          { key: 'pp', header: t('enchantment-pp-per-cast'), align: 'right', render: (spell) => spell.pp },
+          { key: 'casts', header: t('enchantment-casts'), align: 'right', render: (spell) => spell.casts },
+          {
+            key: 'failure',
+            header: t('alchemy-failure-table'),
+            render: (spell) => t(`alchemy-failure-table-${spell.failureTable}`),
+          },
+          { key: 'scr', header: t('enchantment-scr-bonus'), align: 'right', render: (spell) => signed(spell.scrBonus) },
+        ]}
+      />
     </Stack>
   );
 };

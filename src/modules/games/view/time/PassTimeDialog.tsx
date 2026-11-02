@@ -2,24 +2,13 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import {
-  Alert,
-  Button,
-  Grid,
-  MenuItem,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Alert, Button, Grid, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import {
   Character,
   fetchCharacters,
   formatCampaignDate,
+  DataTable,
+  EmptyState,
   formatElapsedTime,
   GameTimeLogCharacter,
   isApiError,
@@ -31,6 +20,7 @@ import {
   PassTimeResult,
   passTime,
   RmuDialog,
+  SectionLabel,
   StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useHealingTables } from '../../../api/healing-tables';
@@ -252,13 +242,11 @@ const PassTimeDialog: FC<{
               </Typography>
             )}
             {alive.length === 0 ? (
-              <Alert severity="info">{t('pass-time-no-characters')}</Alert>
+              <EmptyState dense title={t('pass-time-no-characters')} />
             ) : (
               <>
                 <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
-                  <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
-                    {t('characters')}
-                  </Typography>
+                  <SectionLabel sx={{ flexGrow: 1 }}>{t('characters')}</SectionLabel>
                   <TextField
                     select
                     size="small"
@@ -274,67 +262,67 @@ const PassTimeDialog: FC<{
                     ))}
                   </TextField>
                 </Stack>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>{t('character')}</TableCell>
-                      <TableCell>{t('hp')}</TableCell>
-                      <TableCell>{t('power-points')}</TableCell>
-                      <TableCell>{t('injuries')}</TableCell>
-                      <TableCell>{t('pass-time-activity')}</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {(characters ?? []).map((character) => {
-                      const dead = character.status === 'dead';
-                      const active = (character.injuries ?? []).filter((i) => i.status !== 'healed').length;
-                      return (
-                        <TableRow key={character.id}>
-                          <TableCell>{character.name}</TableCell>
-                          <TableCell>{`${character.hp.current} / ${character.hp.max}`}</TableCell>
-                          <TableCell>
-                            {character.power ? `${character.power.current} / ${character.power.max}` : '—'}
-                          </TableCell>
-                          <TableCell>{active || '—'}</TableCell>
-                          <TableCell>
-                            {dead ? (
-                              <Typography variant="body2" color="text.secondary">
-                                {t('dead')}
-                              </Typography>
-                            ) : (
-                              <TextField
-                                select
-                                size="small"
-                                value={activityOf(character.id)}
-                                onChange={(e) =>
-                                  setActivities({ ...activities, [character.id]: e.target.value as PassTimeActivity })
-                                }
-                                slotProps={{
-                                  htmlInput: { 'aria-label': `${t('pass-time-activity')} ${character.name}` },
-                                }}
-                                sx={{ minWidth: 180 }}
-                              >
-                                {PASS_TIME_ACTIVITIES.map((activity) => (
-                                  <MenuItem key={activity} value={activity}>
-                                    {t(`activity-${activity}`)}
-                                  </MenuItem>
-                                ))}
-                              </TextField>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
+                <DataTable
+                  rows={characters ?? []}
+                  getKey={(character) => character.id}
+                  columns={[
+                    { key: 'character', header: t('character'), render: (character) => character.name },
+                    {
+                      key: 'hp',
+                      header: t('hp'),
+                      render: (character) => `${character.hp.current} / ${character.hp.max}`,
+                    },
+                    {
+                      key: 'power',
+                      header: t('power-points'),
+                      render: (character) =>
+                        character.power ? `${character.power.current} / ${character.power.max}` : '—',
+                    },
+                    {
+                      key: 'injuries',
+                      header: t('injuries'),
+                      render: (character) =>
+                        (character.injuries ?? []).filter((i) => i.status !== 'healed').length || '—',
+                    },
+                    {
+                      key: 'activity',
+                      header: t('pass-time-activity'),
+                      render: (character) =>
+                        character.status === 'dead' ? (
+                          <Typography variant="body2" color="text.secondary">
+                            {t('dead')}
+                          </Typography>
+                        ) : (
+                          <TextField
+                            select
+                            size="small"
+                            value={activityOf(character.id)}
+                            onChange={(e) =>
+                              setActivities({ ...activities, [character.id]: e.target.value as PassTimeActivity })
+                            }
+                            slotProps={{
+                              htmlInput: { 'aria-label': `${t('pass-time-activity')} ${character.name}` },
+                            }}
+                            sx={{ minWidth: 180 }}
+                          >
+                            {PASS_TIME_ACTIVITIES.map((activity) => (
+                              <MenuItem key={activity} value={activity}>
+                                {t(`activity-${activity}`)}
+                              </MenuItem>
+                            ))}
+                          </TextField>
+                        ),
+                    },
+                  ]}
+                />
               </>
             )}
             {consumption}
             {preview && (
               <Stack spacing={1}>
-                <Typography variant="subtitle2">
+                <SectionLabel>
                   {t('pass-time-preview-title', { from: preview.fromDay, to: preview.toDay })}
-                </Typography>
+                </SectionLabel>
                 <PassTimeResults results={preview.characters} characters={characters} dense />
               </Stack>
             )}

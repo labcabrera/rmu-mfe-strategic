@@ -1,9 +1,11 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 import {
   CategorySeparator,
   Character,
+  DataTable,
+  DataTableColumn,
   gridSizeCard,
   LoadingState,
   Pace,
@@ -91,6 +93,31 @@ const CharacterViewMovement: FC<{
     return index > maxIndex;
   };
 
+  // The paces above the maximum pace of the character are dimmed in the secondary colour.
+  const paceCell = (item: TableItem, content: React.ReactNode) => (
+    <Box component="span" sx={{ color: isDisabledPace(item.pace) ? 'secondary.main' : 'primary.main' }}>
+      {content}
+    </Box>
+  );
+  const column = (
+    key: string,
+    header: string,
+    value: (item: TableItem) => React.ReactNode,
+    align: 'left' | 'right' = 'right'
+  ): DataTableColumn<TableItem> => ({ key, header, align, render: (item) => paceCell(item, value(item)) });
+  const columns: DataTableColumn<TableItem>[] = [
+    column('pace', t('pace'), (item) => t(item.pace), 'left'),
+    column('round', t('round'), (item) => t('bmr-multiplier', { value: item.roundModifier })),
+    column('phase', t('phase'), (item) => t('bmr-multiplier', { value: item.phaseModifier })),
+    column('penalty', t('penalty'), (item) => item.penalty || '-'),
+    column('ap', t('action-points-short'), (item) => item.ap || '-'),
+    column('load-limit', t('load-limit'), (item) => (item.loadLimit ? `${item.loadLimit}%` : '-')),
+    column('round-feet', t('round'), (item) => `${round(item.roundModifier * bmr)}'`),
+    column('phase-feet', t('phase'), (item) => `${round(item.phaseModifier * bmr)}'`),
+    column('round-scaled', t('round-scaled'), (item) => round(item.roundModifier * bmr * scale)),
+    column('phase-scaled', t('phase-scaled'), (item) => round(item.phaseModifier * bmr * scale)),
+  ];
+
   return (
     <>
       <CategorySeparator text={t('movement')} />
@@ -125,50 +152,7 @@ const CharacterViewMovement: FC<{
         </Grid>
       </Grid>
       <CategorySeparator text={t('speed-table')} />
-      <TableContainer component={Paper}>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>{t('pace')}</TableCell>
-              <TableCell align="right">{t('round')}</TableCell>
-              <TableCell align="right">{t('phase')}</TableCell>
-              <TableCell align="right">{t('penalty')}</TableCell>
-              <TableCell align="right">{t('action-points-short')}</TableCell>
-              <TableCell align="right">{t('load-limit')}</TableCell>
-              <TableCell align="right">{t('round')}</TableCell>
-              <TableCell align="right">{t('phase')}</TableCell>
-              <TableCell align="right">{t('round-scaled')}</TableCell>
-              <TableCell align="right">{t('phase-scaled')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {movementTable.map((item, index) => {
-              const disabled = isDisabledPace(item.pace);
-              return (
-                <TableRow
-                  key={index}
-                  sx={{
-                    '& td, & th': {
-                      color: (theme) => (disabled ? theme.palette.secondary.main : theme.palette.primary.main),
-                    },
-                  }}
-                >
-                  <TableCell>{t(item.pace)}</TableCell>
-                  <TableCell align="right">{t('bmr-multiplier', { value: item.roundModifier })}</TableCell>
-                  <TableCell align="right">{t('bmr-multiplier', { value: item.phaseModifier })}</TableCell>
-                  <TableCell align="right">{item.penalty || '-'}</TableCell>
-                  <TableCell align="right">{item.ap || '-'}</TableCell>
-                  <TableCell align="right">{item.loadLimit ? `${item.loadLimit}%` : '-'}</TableCell>
-                  <TableCell align="right">{round(item.roundModifier * bmr)}'</TableCell>
-                  <TableCell align="right">{round(item.phaseModifier * bmr)}'</TableCell>
-                  <TableCell align="right">{round(item.roundModifier * bmr * scale)}</TableCell>
-                  <TableCell align="right">{round(item.phaseModifier * bmr * scale)}</TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <DataTable rows={movementTable} getKey={(item) => item.pace} columns={columns} />
     </>
   );
 };
