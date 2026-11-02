@@ -198,7 +198,7 @@ export default function FactionViewPage() {
             </Panel>
           </Box>
           <FactionViewNpcs faction={entity} game={game} canEdit={gameMaster} onChanged={state.setEntity} />
-          <FactionViewArmory faction={entity} onGoldChanged={state.refresh} />
+          <FactionViewArmory faction={entity} gameMaster={gameMaster} onGoldChanged={state.refresh} />
           <ImportDialog
             open={importOpen}
             title={t('import-character')}

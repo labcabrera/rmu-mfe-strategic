@@ -152,7 +152,7 @@ export default function CharacterViewPage() {
     ),
     combat: <CharacterCombat character={entity} strategicGame={strategicGame} />,
     health: <CharacterHealthSection character={entity} setCharacter={setCharacter} strategicGame={strategicGame} />,
-    equipment: <CharacterEquipment character={entity} setCharacter={setCharacter} />,
+    equipment: <CharacterEquipment character={entity} setCharacter={setCharacter} strategicGame={strategicGame} />,
     magic: <CharacterMagicSection character={entity} setCharacter={setCharacter} strategicGame={strategicGame} />,
     progression: <CharacterProgression character={entity} setCharacter={setCharacter} strategicGame={strategicGame} />,
   });

@@ -5,7 +5,9 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import BuildIcon from '@mui/icons-material/Build';
+import ContentCutIcon from '@mui/icons-material/ContentCut';
 import DeleteIcon from '@mui/icons-material/Delete';
+import DiamondIcon from '@mui/icons-material/Diamond';
 import HistoryIcon from '@mui/icons-material/History';
 import ScienceIcon from '@mui/icons-material/Science';
 import SellIcon from '@mui/icons-material/Sell';
@@ -15,7 +17,6 @@ import TuneIcon from '@mui/icons-material/Tune';
 import {
   Character,
   ItemAction,
-  ItemEnchantmentInfo,
   ItemInventory,
   isHealingHerb,
   RmuDialog,
@@ -26,6 +27,15 @@ import {
 import UseHerbDialog from '../characters/view/health/UseHerbDialog';
 import CharacterItemModifiersDialog from '../characters/view/items/CharacterItemModifiersDialog';
 import ItemLedgerList from './ItemLedgerList';
+import {
+  CutGemDialog,
+  GemDialog,
+  GemSettingsDialog,
+  isGem,
+  isUncutGem,
+  ItemMagicDialog,
+  settableGems,
+} from './ItemMagicDialogs';
 import {
   CoatItemDialog,
   DiscardItemDialog,
@@ -44,7 +54,10 @@ type Operation =
   | 'modifiers'
   | 'history'
   | 'use-herb'
-  | 'enchantment';
+  | 'magic'
+  | 'gem'
+  | 'cut'
+  | 'settings';
 
 export const isRepairable = (item: StrategicItem) =>
   !item.condition?.unrepairable && (!!item.condition?.broken || (item.condition?.breakagePenalty ?? 0) < 0);
@@ -58,8 +71,9 @@ export const holderNames = (view: HolderView): Record<string, string> => ({
 
 /**
  * The items of a character or of a faction armory (spec 023, decision 13) with the operations on each one: carry or
- * store (a character), use a healing herb (spec 062), give, sell, repair, poison a weapon (spec 042), modifiers,
- * history and discard. The gold coins are shown apart.
+ * store (a character), use a healing herb (spec 062), give, sell, repair, poison a weapon (spec 042), the magic and
+ * charges of an item, cut a gem or set gems in an item (spec 067), modifiers, history and discard. The gold coins are
+ * shown apart.
  */
 const HolderInventory: FC<{
   view: HolderView;
@@ -80,6 +94,12 @@ const HolderInventory: FC<{
   const close = () => setOperation(undefined);
   const done = () => {
     close();
+    onChanged();
+  };
+
+  /** The dialog keeps showing the changed item while the holder reloads. */
+  const changed = (kind: Operation) => (item: StrategicItem) => {
+    setOperation({ kind, item });
     onChanged();
   };
 
@@ -125,14 +145,35 @@ const HolderInventory: FC<{
             },
           ]
         : []),
-      // Spec 064: the level, spells and properties of an enchanted item
-      ...(item.enchantment
+      // Spec 064 and 067: the enchantment of an item and its charges
+      ...(item.enchantment || item.charges
         ? [
             {
-              key: 'enchantment',
-              label: t('item-enchantment'),
+              key: 'magic',
+              label: t(
+                item.enchantment && (!item.enchantment.source || item.enchantment.source === 'alchemy')
+                  ? 'item-enchantment'
+                  : 'item-magic'
+              ),
               icon: <AutoAwesomeIcon fontSize="small" />,
-              onClick: open('enchantment'),
+              onClick: open('magic'),
+            },
+          ]
+        : []),
+      // Spec 067: the traits and the modern cut of a gem, and the gems set in any other item
+      ...(isGem(item)
+        ? [{ key: 'gem', label: t('gem-traits'), icon: <DiamondIcon fontSize="small" />, onClick: open('gem') }]
+        : []),
+      ...(isUncutGem(item)
+        ? [{ key: 'cut', label: t('gem-cut-action'), icon: <ContentCutIcon fontSize="small" />, onClick: open('cut') }]
+        : []),
+      ...(!isGem(item) && ((item.settings?.length ?? 0) > 0 || settableGems(view, item).length > 0)
+        ? [
+            {
+              key: 'settings',
+              label: t(item.settings?.length ? 'gem-settings' : 'gem-set'),
+              icon: <DiamondIcon fontSize="small" />,
+              onClick: open('settings'),
             },
           ]
         : []),
@@ -181,10 +222,13 @@ const HolderInventory: FC<{
           onChange={(item) => setOperation({ kind: 'modifiers', item })}
         />
       )}
-      {operation?.kind === 'enchantment' && (
-        <RmuDialog open maxWidth="sm" title={t('item-enchantment')} subtitle={operation.item.name} onClose={close}>
-          <ItemEnchantmentInfo item={operation.item} bare />
-        </RmuDialog>
+      {operation?.kind === 'magic' && (
+        <ItemMagicDialog item={operation.item} onClose={close} onChange={changed('magic')} />
+      )}
+      {operation?.kind === 'gem' && <GemDialog item={operation.item} onClose={close} />}
+      {operation?.kind === 'cut' && <CutGemDialog item={operation.item} onClose={close} onChange={() => done()} />}
+      {operation?.kind === 'settings' && (
+        <GemSettingsDialog item={operation.item} view={view} onClose={close} onChange={changed('settings')} />
       )}
       {operation?.kind === 'history' && (
         <RmuDialog open maxWidth="md" title={t('item-history', { name: operation.item.name })} onClose={close}>
