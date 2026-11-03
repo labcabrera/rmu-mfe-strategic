@@ -20,6 +20,7 @@ import {
   fetchStrategicGame,
   ImageSelectorDialog,
   importCharacter,
+  isFactionCover,
   ImportDialog,
   ImportRequest,
   ImportResult,
@@ -36,7 +37,8 @@ import {
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { DEFAULT_FACTION_IMAGE_PATH } from '../../services/image-service';
 import CreateOrImportButton from '../../shared/CreateOrImportButton';
-import { isGameMaster } from '../../shared/permissions';
+import { isGameMaster, isGamePlayer } from '../../shared/permissions';
+import FactionViewLeader from './FactionViewLeader';
 import FactionViewArmory from './FactionViewArmory';
 import FactionViewCharactersTable from './FactionViewCharacterTable';
 import FactionViewCharacters from './FactionViewCharacters';
@@ -106,9 +108,11 @@ export default function FactionViewPage() {
     navigate(`/strategic/characters/view/${result.characterIds[0]}`);
   };
 
-  // Exporting the faction is for the game master. Importing a character is offered like creating one: the API
-  // checks the permission.
+  // Exporting and changing the faction is for the game masters; creating or importing a character for the players
+  // (spec 071). A cover (a reader outside the faction) has no gold, NPCs or armory.
   const gameMaster = isGameMaster(auth, game);
+  const player = isGamePlayer(auth, game);
+  const cover = isFactionCover(faction);
 
   const totalLevels = characters?.reduce((sum, c) => sum + (c.experience?.availableLevel ?? 0), 0);
 
@@ -124,15 +128,18 @@ export default function FactionViewPage() {
       actions={(entity) =>
         gameMaster ? [<DownloadButton key="export" tooltip="export" onClick={() => onExport(entity)} />] : []
       }
-      onEdit={(entity) =>
-        navigate(`/strategic/factions/edit/${entity.id}`, { state: { faction: entity, strategicGame: game } })
+      onEdit={
+        gameMaster
+          ? (entity) =>
+              navigate(`/strategic/factions/edit/${entity.id}`, { state: { faction: entity, strategicGame: game } })
+          : undefined
       }
-      onDelete={onDelete}
+      onDelete={gameMaster ? onDelete : undefined}
       hero={(entity) => ({
         title: entity.name,
         overline: t('faction'),
         image: entity.imageUrl || DEFAULT_FACTION_IMAGE_PATH,
-        onImageClick: () => setImageDialogOpen(true),
+        onImageClick: gameMaster ? () => setImageDialogOpen(true) : undefined,
         imageActionLabel: t('change-image'),
         chips: game
           ? [
@@ -144,16 +151,22 @@ export default function FactionViewPage() {
               />,
             ]
           : undefined,
-        pills: [
-          <StatPill key="gold" label={t('gold')} value={<MoneyDisplay gold={entity.management.availableGold} />} />,
-          <StatPill key="characters" label={t('characters')} value={characters?.length ?? '—'} />,
-          <StatPill key="levels" label={t('total-levels')} value={totalLevels ?? '—'} />,
-          <StatPill
-            key="npcs"
-            label={t('npcs')}
-            value={(entity.npcs ?? []).reduce((sum, npc) => sum + npc.count, 0)}
-          />,
-        ],
+        pills: cover
+          ? [<StatPill key="characters" label={t('characters')} value={characters?.length ?? '—'} />]
+          : [
+              <StatPill
+                key="gold"
+                label={t('gold')}
+                value={<MoneyDisplay gold={entity.management.availableGold} />}
+              />,
+              <StatPill key="characters" label={t('characters')} value={characters?.length ?? '—'} />,
+              <StatPill key="levels" label={t('total-levels')} value={totalLevels ?? '—'} />,
+              <StatPill
+                key="npcs"
+                label={t('npcs')}
+                value={(entity.npcs ?? []).reduce((sum, npc) => sum + npc.count, 0)}
+              />,
+            ],
       })}
     >
       {(entity) => (
@@ -172,14 +185,16 @@ export default function FactionViewPage() {
               title={t('characters')}
               extra={
                 <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-                  <CreateOrImportButton
-                    onCreate={() =>
-                      navigate(`/strategic/characters/create?gameId=${entity.gameId}&factionId=${entity.id}`, {
-                        state: { faction: entity },
-                      })
-                    }
-                    onImport={() => setImportOpen(true)}
-                  />
+                  {player && (
+                    <CreateOrImportButton
+                      onCreate={() =>
+                        navigate(`/strategic/characters/create?gameId=${entity.gameId}&factionId=${entity.id}`, {
+                          state: { faction: entity },
+                        })
+                      }
+                      onImport={() => setImportOpen(true)}
+                    />
+                  )}
                   <CollectionModeSwitch
                     modes={CHARACTER_VIEW_MODES}
                     value={characterViewMode}
@@ -197,8 +212,13 @@ export default function FactionViewPage() {
               )}
             </Panel>
           </Box>
-          <FactionViewNpcs faction={entity} game={game} canEdit={gameMaster} onChanged={state.setEntity} />
-          <FactionViewArmory faction={entity} gameMaster={gameMaster} onGoldChanged={state.refresh} />
+          <FactionViewLeader faction={entity} game={game} canEdit={gameMaster} onChanged={state.setEntity} />
+          {!cover && (
+            <>
+              <FactionViewNpcs faction={entity} game={game} canEdit={gameMaster} onChanged={state.setEntity} />
+              <FactionViewArmory faction={entity} gameMaster={gameMaster} onGoldChanged={state.refresh} />
+            </>
+          )}
           <ImportDialog
             open={importOpen}
             title={t('import-character')}

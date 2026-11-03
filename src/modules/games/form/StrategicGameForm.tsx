@@ -1,6 +1,6 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, FormControlLabel, Grid, Switch, TextField, Typography } from '@mui/material';
+import { Alert, FormControlLabel, Grid, MenuItem, Switch, TextField, Typography } from '@mui/material';
 import {
   EnumPicker,
   NumericInput,
@@ -24,7 +24,9 @@ const StrategicGameForm: FC<{
   realms?: Realm[];
   /** Editing an existing game: the elapsed days can be corrected (spec 065). */
   editing?: boolean;
-}> = ({ formData, setFormData, realms, editing = false }) => {
+  /** Only the owner of the game changes its visibility (spec 071). */
+  canChangeVisibility?: boolean;
+}> = ({ formData, setFormData, realms, editing = false, canChangeVisibility = true }) => {
   const { t } = useTranslation();
 
   const handleOptionsChange = (field: string, value: number | string | boolean) => {
@@ -66,6 +68,21 @@ const StrategicGameForm: FC<{
                 autoFocus
                 fullWidth
               />
+            </Grid>
+            <Grid size={12}>
+              <TextField
+                select
+                label={t('game-visibility')}
+                name="accessType"
+                value={formData.accessType ?? 'private'}
+                disabled={!canChangeVisibility}
+                onChange={(e) => setFormData({ ...formData, accessType: e.target.value as 'public' | 'private' })}
+                helperText={t(`game-visibility-${formData.accessType ?? 'private'}-help`)}
+                fullWidth
+              >
+                <MenuItem value="private">{t('game-visibility-private')}</MenuItem>
+                <MenuItem value="public">{t('game-visibility-public')}</MenuItem>
+              </TextField>
             </Grid>
             {realms && (
               <Grid size={12}>

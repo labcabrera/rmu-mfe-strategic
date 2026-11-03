@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Chip, Stack, Typography } from '@mui/material';
+import { Alert, Chip, Stack, Typography } from '@mui/material';
 import {
   AddButton,
   Bento,
@@ -14,6 +14,7 @@ import {
   fetchStrategicGame,
   fetchTacticalGames,
   formatCampaignDate,
+  gameAccessAtLeast,
   imageBaseUrl,
   ImageSelectorDialog,
   ImportDialog,
@@ -30,7 +31,9 @@ import {
   useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import CreateOrImportButton from '../../shared/CreateOrImportButton';
-import { isGameMaster } from '../../shared/permissions';
+import { isGameMaster, isGameOwner } from '../../shared/permissions';
+import StrategicGameViewJoin from './StrategicGameViewJoin';
+import StrategicGameViewMembers from './StrategicGameViewMembers';
 import StrategicGameCardChips from '../list/StrategicGameCardChips';
 import StrategicGameViewAttributes from './StrategicGameViewAttributes';
 import StrategicGameViewFactions from './StrategicGameViewFactions';
@@ -66,15 +69,27 @@ export default function StrategicGameViewPage() {
   const [passTimeOpen, setPassTimeOpen] = useState(false);
   const [timeLogKey, setTimeLogKey] = useState(0);
 
+  // Spec 071: a public game seen from outside only shows its cover; its factions and tactical games are for members.
+  const member = gameAccessAtLeast(strategicGame?.access ?? 'owner', 'spectator');
+
   useEffect(() => {
-    if (!strategicGame) return;
+    if (!strategicGame || !member) return;
     fetchFactions(`gameId==${strategicGame.id}`, 0, 100, auth)
       .then((data) => setFactions(data.content))
       .catch(notify.error);
     fetchTacticalGames(`strategicGameId==${strategicGame.id}`, 0, 100, auth)
       .then((data) => setTacticalGames(data.content))
       .catch(notify.error);
-  }, [strategicGame?.id]);
+  }, [strategicGame?.id, member]);
+
+  // After leaving the game (or losing it) there is nothing left to see.
+  const onMembersChanged = (updated: StrategicGame) => {
+    if (gameAccessAtLeast(updated.access ?? 'owner', 'cover')) state.setEntity(updated);
+    else navigate('/strategic/games', { replace: true });
+  };
+
+  const master = isGameMaster(auth, strategicGame);
+  const owner = isGameOwner(auth, strategicGame);
 
   const onDelete = (game: StrategicGame) =>
     deleteStrategicGame(game.id, auth)
@@ -108,13 +123,15 @@ export default function StrategicGameViewPage() {
         { name: strategicGame?.name ?? t('view') },
       ]}
       entity={state}
-      onEdit={(game) => navigate(`/strategic/games/edit/${game.id}`, { state: { strategicGame: game } })}
-      onDelete={onDelete}
+      onEdit={
+        master ? (game) => navigate(`/strategic/games/edit/${game.id}`, { state: { strategicGame: game } }) : undefined
+      }
+      onDelete={owner ? onDelete : undefined}
       hero={(game) => ({
         title: game.name,
         overline: t('strategic-game'),
         image: game.imageUrl || defaultGameImage,
-        onImageClick: () => setImageDialogOpen(true),
+        onImageClick: master ? () => setImageDialogOpen(true) : undefined,
         imageActionLabel: t('change-image'),
         chips: [
           <Chip
@@ -152,6 +169,7 @@ export default function StrategicGameViewPage() {
         <Bento>
           {/* Columns at their content height: the panels (height 100%) would stretch to the taller column. */}
           <Stack spacing={2} sx={{ ...span(12, 8), alignSelf: 'start' }}>
+            {game.realmReadable === false && <Alert severity="warning">{t('game-realm-not-readable')}</Alert>}
             {game.description && (
               <Panel title={t('description')}>
                 <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-line' }}>
@@ -159,6 +177,9 @@ export default function StrategicGameViewPage() {
                 </Typography>
               </Panel>
             )}
+            {!member && <StrategicGameViewJoin game={game} />}
+            {member && (
+              <>
             <StrategicGameViewCalendar
               game={game}
               canPassTime={isGameMaster(auth, game)}
@@ -168,24 +189,31 @@ export default function StrategicGameViewPage() {
             <Panel
               title={t('factions')}
               extra={
-                <CreateOrImportButton
-                  onCreate={() =>
-                    navigate(`/strategic/factions/create?gameId=${game.id}`, { state: { strategicGame: game } })
-                  }
-                  onImport={isGameMaster(auth, game) ? () => setImportOpen(true) : undefined}
-                />
+                master && (
+                  <CreateOrImportButton
+                    onCreate={() =>
+                      navigate(`/strategic/factions/create?gameId=${game.id}`, { state: { strategicGame: game } })
+                    }
+                    onImport={() => setImportOpen(true)}
+                  />
+                )
               }
             >
               <StrategicGameViewFactions factions={factions} />
             </Panel>
             <Panel
               title={t('tactical-games')}
-              extra={<AddButton onClick={() => navigate(`/tactical/games/create?strategicGame=${game.id}`)} />}
+              extra={
+                master && <AddButton onClick={() => navigate(`/tactical/games/create?strategicGame=${game.id}`)} />
+              }
             >
               <StrategicGameViewTacticalGames tacticalGames={tacticalGames} factions={factions} />
             </Panel>
+              </>
+            )}
           </Stack>
           <Stack spacing={2} sx={{ ...span(12, 4), alignSelf: 'start' }}>
+            {member && <StrategicGameViewMembers game={game} onChanged={onMembersChanged} />}
             <StrategicGameViewAttributes strategicGame={game} />
             <StrategicGameViewPowerLevel strategicGame={game} />
           </Stack>

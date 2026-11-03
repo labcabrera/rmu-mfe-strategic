@@ -39,7 +39,9 @@ import {
   useEntity,
   useNotify,
   useSectionParam,
+  isCharacterSummary,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import CharacterSummaryView from './CharacterSummaryView';
 import { healthChips } from '../../shared/chips/CharacterHealthChips';
 import { canChangeCharacter } from '../../shared/permissions';
 import CharacterHealthSection from './health/CharacterHealthSection';
@@ -94,11 +96,14 @@ export default function CharacterViewPage() {
     if (next) state.setEntity(next);
   };
 
+  const summary = isCharacterSummary(character);
+
   useEffect(() => {
     if (!character) return;
     fetchStrategicGame(character.gameId, auth).then(setStrategicGame).catch(notify.error);
+    if (summary) return;
     fetchProfession(character.info.professionId, auth).then(setProfession).catch(notify.error);
-  }, [character?.gameId, character?.info.professionId]);
+  }, [character?.gameId, character?.info.professionId, summary]);
 
   useEffect(() => {
     const cultureId = character?.info.cultureId;
@@ -157,6 +162,9 @@ export default function CharacterViewPage() {
     progression: <CharacterProgression character={entity} setCharacter={setCharacter} strategicGame={strategicGame} />,
   });
 
+  // Spec 071: a member of the game outside the faction of the character only sees its summary.
+  if (summary) return <CharacterSummaryView state={state} strategicGame={strategicGame} />;
+
   return (
     <DetailPage
       breadcrumbs={[
@@ -175,8 +183,12 @@ export default function CharacterViewPage() {
           ? [<DownloadButton key="export" tooltip="export" onClick={() => onExport(entity)} />]
           : []),
       ]}
-      onEdit={(entity) => navigate(`/strategic/characters/edit/${entity.id}`, { state: { character: entity } })}
-      onDelete={onDelete}
+      onEdit={
+        character && canChangeCharacter(auth, character, strategicGame)
+          ? (entity) => navigate(`/strategic/characters/edit/${entity.id}`, { state: { character: entity } })
+          : undefined
+      }
+      onDelete={character && canChangeCharacter(auth, character, strategicGame) ? onDelete : undefined}
       hero={(entity) => ({
         title: entity.name,
         overline: `${t('level')} ${levelLabel(entity)} · ${t(entity.info.professionId)}`,
