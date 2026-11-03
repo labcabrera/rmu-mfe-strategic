@@ -156,7 +156,6 @@ const MarketBuy: FC<{
       layout={wide ? 'side' : 'drawer'}
       onSelect={add}
       panelHeader={wide ? marketCart : undefined}
-      panelWidth={300}
       truncated={truncated}
       error={error}
       refresh={refresh}
