@@ -22,6 +22,7 @@ import {
 import { DEFAULT_OPTIONS, DEFAULT_POWER_LEVEL, withGameDefaults } from '../../services/game-rules';
 import { DEFAULT_REALM_IMAGE } from '../../services/image-service';
 import StrategicGameForm from './StrategicGameForm';
+import { isGameOwner } from '../../shared/permissions';
 
 const EMPTY_STRATEGIC_GAME = {
   name: '',
@@ -30,6 +31,7 @@ const EMPTY_STRATEGIC_GAME = {
   powerLevel: { ...DEFAULT_POWER_LEVEL },
   description: '',
   imageUrl: 'images/generic/strategic.png',
+  accessType: 'private',
   calendar: { startDate: '', elapsedDays: 0, elapsedHours: 0, currentDay: 1 },
 } as StrategicGame;
 
@@ -56,7 +58,7 @@ export default function StrategicGameFormPage({ mode }: { mode: 'create' | 'edit
     if (mode === 'edit') {
       if (!existing.entity) return;
       // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-      const { id, owner, ...rest } = existing.entity;
+      const { id, owner, access, members, joinRequests, realmReadable, ...rest } = existing.entity;
       // The API fills the defaults, but an update must send the full power level and options anyway
       data = withGameDefaults(rest as StrategicGame);
     }
@@ -115,6 +117,7 @@ export default function StrategicGameFormPage({ mode }: { mode: 'create' | 'edit
             setFormData={setFormData as Dispatch<SetStateAction<StrategicGame>>}
             realms={mode === 'create' ? realms : undefined}
             editing={mode === 'edit'}
+            canChangeVisibility={mode === 'create' || isGameOwner(auth, existing.entity)}
           />
           <TechnicalInfo>
             <pre>{JSON.stringify(formData, null, 2)}</pre>
