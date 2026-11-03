@@ -160,7 +160,7 @@ export default function StrategicGameViewPage() {
             variant="outlined"
             onClick={() => navigate(`/core/realms/view/${game.realmId}`)}
           />,
-          <StrategicGameCardChips key="chips" strategicGame={game} />,
+          <StrategicGameCardChips key="chips" strategicGame={game} size="medium" />,
         ],
         pills: [
           <StatPill key="factions" label={t('factions')} value={factions === undefined ? '—' : factions.length} />,

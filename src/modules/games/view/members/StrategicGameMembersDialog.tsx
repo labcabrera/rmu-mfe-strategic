@@ -7,6 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import {
   Alert,
   Autocomplete,
+  Box,
   Button,
   Chip,
   Dialog,
@@ -44,6 +45,18 @@ import { isGameMaster, isGameOwner } from '../../../shared/permissions';
  * Members of a strategic game (spec 072, decision 14), grouped by role: the masters change roles, expel, add friends of
  * the owner, answer join requests and give each player its factions. Anybody else reads it and can leave the game.
  */
+/**
+ * Columns of a member row, shared with the row that adds one, so that the roles line up whatever the length of the
+ * names: avatar, name (cut with an ellipsis), role and the remove / add button.
+ */
+const rowSx = {
+  display: 'grid',
+  gridTemplateColumns: { xs: '36px minmax(0, 1fr) 130px 72px', sm: '36px minmax(0, 1fr) 160px 88px' },
+  columnGap: 1.5,
+  rowGap: 1,
+  alignItems: 'center',
+} as const;
+
 const StrategicGameMembersDialog: FC<{
   open: boolean;
   game: StrategicGame;
@@ -125,7 +138,7 @@ const StrategicGameMembersDialog: FC<{
       value={value}
       disabled={busy}
       onChange={(e) => onChange(e.target.value as GameMemberRole)}
-      sx={{ minWidth: 140 }}
+      fullWidth
     >
       {rolesFor(member).map((option) => (
         <MenuItem key={option} value={option}>
@@ -138,26 +151,48 @@ const StrategicGameMembersDialog: FC<{
   const memberRow = (member: GameMember) => {
     const memberFactions = factionsOf(member);
     return (
-      <Stack key={member.userId} direction="row" spacing={1.5} sx={{ alignItems: 'flex-start', py: 1 }}>
+      <Box key={member.userId} sx={{ ...rowSx, py: 1 }}>
         <EntityAvatar name={member.userName} size={36} />
-        <Stack spacing={1} sx={{ flex: 1, minWidth: 0 }}>
-          <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
-            <Typography variant="body2" sx={{ fontWeight: member.userId === userId ? 600 : undefined }}>
-              {member.userName}
-            </Typography>
-            {canEdit(member) ? (
-              roleField(
-                member.role,
-                (value) => runGame(() => setGameMember(game.id, member.userId, value, auth)),
-                `role-${member.userId}`,
-                member
-              )
-            ) : (
-              <Chip size="small" variant="outlined" label={t(`game-member-role-${member.role}`)} />
-            )}
-          </Stack>
-          {member.role === 'player' &&
-            (master ? (
+        <Tooltip title={member.userName}>
+          <Typography
+            variant="body2"
+            noWrap
+            sx={{ minWidth: 0, fontWeight: member.userId === userId ? 600 : undefined }}
+          >
+            {member.userName}
+          </Typography>
+        </Tooltip>
+        <Box sx={{ minWidth: 0 }}>
+          {canEdit(member) ? (
+            roleField(
+              member.role,
+              (value) => runGame(() => setGameMember(game.id, member.userId, value, auth)),
+              `role-${member.userId}`,
+              member
+            )
+          ) : (
+            <Chip size="small" variant="outlined" label={t(`game-member-role-${member.role}`)} />
+          )}
+        </Box>
+        <Box sx={{ justifySelf: 'end' }}>
+          {canEdit(member) && (
+            <Tooltip title={t('game-member-remove')}>
+              <span>
+                <IconButton
+                  aria-label={t('game-member-remove')}
+                  disabled={busy}
+                  onClick={() => runGame(() => removeGameMember(game.id, member.userId, auth))}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
+          )}
+        </Box>
+        {member.role === 'player' && (
+          // The factions of a player, under its name and role
+          <Box sx={{ gridColumn: '2 / -1', minWidth: 0 }}>
+            {master ? (
               <Autocomplete
                 multiple
                 size="small"
@@ -182,22 +217,10 @@ const StrategicGameMembersDialog: FC<{
                   memberFactions.map((f) => <Chip key={f.id} size="small" label={f.name} />)
                 )}
               </Stack>
-            ))}
-        </Stack>
-        {canEdit(member) && (
-          <Tooltip title={t('game-member-remove')}>
-            <span>
-              <IconButton
-                aria-label={t('game-member-remove')}
-                disabled={busy}
-                onClick={() => runGame(() => removeGameMember(game.id, member.userId, auth))}
-              >
-                <DeleteIcon />
-              </IconButton>
-            </span>
-          </Tooltip>
+            )}
+          </Box>
         )}
-      </Stack>
+      </Box>
     );
   };
 
@@ -237,10 +260,10 @@ const StrategicGameMembersDialog: FC<{
               {friends !== undefined && available.length === 0 ? (
                 <Alert severity="info">{t('share-no-friends')}</Alert>
               ) : (
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ alignItems: { sm: 'center' } }}>
+                <Box sx={rowSx}>
                   <Autocomplete
                     size="small"
-                    sx={{ flex: 1, minWidth: 200 }}
+                    sx={{ gridColumn: '1 / 3', minWidth: 0 }}
                     options={available}
                     loading={friends === undefined}
                     value={friend}
@@ -251,10 +274,10 @@ const StrategicGameMembersDialog: FC<{
                     renderInput={(params) => <TextField {...params} name={friendName} label={t('share-friend')} />}
                   />
                   {roleField(role, setRole, newRoleName)}
-                  <Button variant="contained" onClick={add} disabled={!friend || busy}>
+                  <Button variant="contained" onClick={add} disabled={!friend || busy} sx={{ justifySelf: 'end' }}>
                     {t('add')}
                   </Button>
-                </Stack>
+                </Box>
               )}
               {!owner && (
                 <Typography variant="caption" color="text.secondary">
