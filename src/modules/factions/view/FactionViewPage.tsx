@@ -20,7 +20,8 @@ import {
   fetchStrategicGame,
   ImageSelectorDialog,
   importCharacter,
-  isFactionCover,
+  canManageStrategic,
+  canWriteStrategic,
   ImportDialog,
   ImportRequest,
   ImportResult,
@@ -37,8 +38,8 @@ import {
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { DEFAULT_FACTION_IMAGE_PATH } from '../../services/image-service';
 import CreateOrImportButton from '../../shared/CreateOrImportButton';
-import { isGameMaster, isGamePlayer } from '../../shared/permissions';
-import FactionViewLeader from './FactionViewLeader';
+import { isGameMaster } from '../../shared/permissions';
+import FactionViewPlayers from './FactionViewPlayers';
 import FactionViewArmory from './FactionViewArmory';
 import FactionViewCharactersTable from './FactionViewCharacterTable';
 import FactionViewCharacters from './FactionViewCharacters';
@@ -108,11 +109,10 @@ export default function FactionViewPage() {
     navigate(`/strategic/characters/view/${result.characterIds[0]}`);
   };
 
-  // Exporting and changing the faction is for the game masters; creating or importing a character for the players
-  // (spec 071). A cover (a reader outside the faction) has no gold, NPCs or armory.
-  const gameMaster = isGameMaster(auth, game);
-  const player = isGamePlayer(auth, game);
-  const cover = isFactionCover(faction);
+  // Spec 072: every member reads it whole. Exporting, its name, image and NPCs are the masters'; creating or importing
+  // characters, the armory and the market are also for its players.
+  const gameMaster = canManageStrategic(faction) || isGameMaster(auth, game);
+  const writer = gameMaster || canWriteStrategic(faction);
 
   const totalLevels = characters?.reduce((sum, c) => sum + (c.experience?.availableLevel ?? 0), 0);
 
@@ -151,9 +151,7 @@ export default function FactionViewPage() {
               />,
             ]
           : undefined,
-        pills: cover
-          ? [<StatPill key="characters" label={t('characters')} value={characters?.length ?? '—'} />]
-          : [
+        pills: [
               <StatPill
                 key="gold"
                 label={t('gold')}
@@ -166,7 +164,7 @@ export default function FactionViewPage() {
                 label={t('npcs')}
                 value={(entity.npcs ?? []).reduce((sum, npc) => sum + npc.count, 0)}
               />,
-            ],
+        ],
       })}
     >
       {(entity) => (
@@ -185,7 +183,7 @@ export default function FactionViewPage() {
               title={t('characters')}
               extra={
                 <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-                  {player && (
+                  {writer && (
                     <CreateOrImportButton
                       onCreate={() =>
                         navigate(`/strategic/characters/create?gameId=${entity.gameId}&factionId=${entity.id}`, {
@@ -212,13 +210,14 @@ export default function FactionViewPage() {
               )}
             </Panel>
           </Box>
-          <FactionViewLeader faction={entity} game={game} canEdit={gameMaster} onChanged={state.setEntity} />
-          {!cover && (
-            <>
-              <FactionViewNpcs faction={entity} game={game} canEdit={gameMaster} onChanged={state.setEntity} />
-              <FactionViewArmory faction={entity} gameMaster={gameMaster} onGoldChanged={state.refresh} />
-            </>
-          )}
+          <FactionViewPlayers faction={entity} game={game} onChanged={state.setEntity} />
+          <FactionViewNpcs faction={entity} game={game} canEdit={gameMaster} onChanged={state.setEntity} />
+          <FactionViewArmory
+            faction={entity}
+            gameMaster={gameMaster}
+            canWrite={writer}
+            onGoldChanged={state.refresh}
+          />
           <ImportDialog
             open={importOpen}
             title={t('import-character')}

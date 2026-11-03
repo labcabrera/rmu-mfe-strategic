@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Alert, Chip, Stack, Typography } from '@mui/material';
+import GroupIcon from '@mui/icons-material/Group';
+import { Alert, Badge, Button, Chip, Stack, Typography } from '@mui/material';
 import {
   AddButton,
   Bento,
@@ -33,7 +34,7 @@ import {
 import CreateOrImportButton from '../../shared/CreateOrImportButton';
 import { isGameMaster, isGameOwner } from '../../shared/permissions';
 import StrategicGameViewJoin from './StrategicGameViewJoin';
-import StrategicGameViewMembers from './StrategicGameViewMembers';
+import StrategicGameMembersDialog from './members/StrategicGameMembersDialog';
 import StrategicGameCardChips from '../list/StrategicGameCardChips';
 import StrategicGameViewAttributes from './StrategicGameViewAttributes';
 import StrategicGameViewFactions from './StrategicGameViewFactions';
@@ -65,6 +66,7 @@ export default function StrategicGameViewPage() {
   const [tacticalGames, setTacticalGames] = useState<TacticalGame[]>();
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [membersOpen, setMembersOpen] = useState(false);
   // Spec 065: the step of time and the reload of its log
   const [passTimeOpen, setPassTimeOpen] = useState(false);
   const [timeLogKey, setTimeLogKey] = useState(0);
@@ -87,6 +89,8 @@ export default function StrategicGameViewPage() {
     if (gameAccessAtLeast(updated.access ?? 'owner', 'cover')) state.setEntity(updated);
     else navigate('/strategic/games', { replace: true });
   };
+  const onFactionChanged = (faction: Faction) =>
+    setFactions((current) => current?.map((f) => (f.id === faction.id ? faction : f)));
 
   const master = isGameMaster(auth, strategicGame);
   const owner = isGameOwner(auth, strategicGame);
@@ -127,6 +131,22 @@ export default function StrategicGameViewPage() {
         master ? (game) => navigate(`/strategic/games/edit/${game.id}`, { state: { strategicGame: game } }) : undefined
       }
       onDelete={owner ? onDelete : undefined}
+      actions={(game) =>
+        member
+          ? [
+              <Badge
+                key="members"
+                color="warning"
+                variant="dot"
+                invisible={!master || (game.joinRequests ?? []).length === 0}
+              >
+                <Button variant="outlined" size="small" startIcon={<GroupIcon />} onClick={() => setMembersOpen(true)}>
+                  {`${t('game-members-button')} (${(game.members ?? []).length})`}
+                </Button>
+              </Badge>,
+            ]
+          : []
+      }
       hero={(game) => ({
         title: game.name,
         overline: t('strategic-game'),
@@ -140,7 +160,7 @@ export default function StrategicGameViewPage() {
             variant="outlined"
             onClick={() => navigate(`/core/realms/view/${game.realmId}`)}
           />,
-          <StrategicGameCardChips key="chips" strategicGame={game} />,
+          <StrategicGameCardChips key="chips" strategicGame={game} size="medium" />,
         ],
         pills: [
           <StatPill key="factions" label={t('factions')} value={factions === undefined ? '—' : factions.length} />,
@@ -213,10 +233,19 @@ export default function StrategicGameViewPage() {
             )}
           </Stack>
           <Stack spacing={2} sx={{ ...span(12, 4), alignSelf: 'start' }}>
-            {member && <StrategicGameViewMembers game={game} onChanged={onMembersChanged} />}
             <StrategicGameViewAttributes strategicGame={game} />
             <StrategicGameViewPowerLevel strategicGame={game} />
           </Stack>
+          {member && (
+            <StrategicGameMembersDialog
+              open={membersOpen}
+              game={game}
+              factions={factions}
+              onClose={() => setMembersOpen(false)}
+              onChanged={onMembersChanged}
+              onFactionChanged={onFactionChanged}
+            />
+          )}
           <ImportDialog
             open={importOpen}
             title={t('import-faction')}

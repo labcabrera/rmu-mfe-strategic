@@ -13,16 +13,19 @@ import { holderPath, useHolder } from '../../economy/use-holder';
 
 /**
  * The armory of a faction (spec 023): the items the faction holds, with the same operations as the equipment of a
- * character, its market and workshop, and the ledger. Only the game master spends the gold of the faction, rolls a
- * random treasure for it and creates magic items in it (spec 067).
+ * character, its market and workshop, and the ledger. Its players and the masters use its gold, market and workshop
+ * (spec 072); only the masters roll a random treasure for it and create magic items in it (spec 067).
  */
 export default function FactionViewArmory({
   faction,
   gameMaster,
+  canWrite,
   onGoldChanged,
 }: {
   faction: Faction;
   gameMaster: boolean;
+  /** Spec 072: the masters and the players of the faction use its market, workshop and enchantments. */
+  canWrite: boolean;
   onGoldChanged: () => void;
 }) {
   const { t } = useTranslation();
@@ -33,7 +36,7 @@ export default function FactionViewArmory({
     refresh();
     onGoldChanged();
   };
-  const links = (
+  const links = canWrite && (
     <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
       <Button size="small" startIcon={<StorefrontIcon />} onClick={() => navigate(holderPath('market', holder))}>
         {t('market')}

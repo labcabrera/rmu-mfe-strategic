@@ -1,5 +1,6 @@
 import type { AuthContextProps } from 'react-oidc-context';
 import {
+  canWriteStrategic,
   gameAccessAtLeast,
   isAdmin,
   type Character,
@@ -11,11 +12,11 @@ export { isAdmin };
 
 const userIdOf = (auth: AuthContextProps) => auth.user?.profile?.sub;
 
-/** The owner of the game, or an admin: deletes it, changes its visibility and its co-masters (spec 071). */
+/** The owner of the game, or an admin: deletes it, changes its visibility and its masters (spec 071). */
 export const isGameOwner = (auth: AuthContextProps, game: StrategicGame | undefined): boolean =>
   isAdmin(auth) || (!!game && (game.access === 'owner' || game.owner === userIdOf(auth)));
 
-/** A game master: its owner, a co-master (spec 071), or an admin. */
+/** A game master: its owner, a master (spec 071), or an admin. */
 export const isGameMaster = (auth: AuthContextProps, game: StrategicGame | undefined): boolean =>
   isGameOwner(auth, game) || (!!game && gameAccessAtLeast(game.access, 'master'));
 
@@ -23,15 +24,19 @@ export const isGameMaster = (auth: AuthContextProps, game: StrategicGame | undef
 export const isGamePlayer = (auth: AuthContextProps, game: StrategicGame | undefined): boolean =>
   isGameMaster(auth, game) || (!!game && gameAccessAtLeast(game.access, 'player'));
 
-/** The leader of the faction (spec 071): spends its gold and buys for it. */
-export const isFactionLeader = (auth: AuthContextProps, faction: Faction | undefined): boolean =>
-  !!faction?.leaderId && faction.leaderId === userIdOf(auth);
+/** The masters and the players of the faction (spec 072): spend its gold, buy for it and change its armory. */
+export const canWriteFaction = (
+  auth: AuthContextProps,
+  faction: Faction | undefined,
+  game: StrategicGame | undefined
+): boolean => isGameMaster(auth, game) || (!!faction && canWriteStrategic(faction));
 
-/** Who can change (and export) a character: the game masters, or its owner while a player of the game (spec 071). */
+/**
+ * Who can change (and export) a character (spec 072): the masters and the players of its faction, as the `access` the
+ * API sends says. The owner of a character no longer changes it by being its owner.
+ */
 export const canChangeCharacter = (
   auth: AuthContextProps,
   character: Character,
   game: StrategicGame | undefined
-): boolean =>
-  isGameMaster(auth, game) ||
-  (!!character.owner && character.owner === userIdOf(auth) && (!game || isGamePlayer(auth, game)));
+): boolean => isGameMaster(auth, game) || canWriteStrategic(character);

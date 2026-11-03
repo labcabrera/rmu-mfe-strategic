@@ -7,9 +7,13 @@ import TalentPolicyChip from '../../shared/chips/TalentPolicyChip';
 
 /**
  * Chips of a campaign card: the status, the power level (development points per level) and the options that differ
- * from the defaults (closed rounds, talent policy).
+ * from the defaults (closed rounds, talent policy). The header of the campaign view shows them medium, as its other
+ * chips.
  */
-const StrategicGameCardChips: FC<{ strategicGame: StrategicGame }> = ({ strategicGame }) => {
+const StrategicGameCardChips: FC<{ strategicGame: StrategicGame; size?: 'small' | 'medium' }> = ({
+  strategicGame,
+  size = 'small',
+}) => {
   const { t } = useTranslation();
   const options = resolveOptions(strategicGame.options);
   const powerLevel = resolvePowerLevel(strategicGame.powerLevel);
@@ -17,18 +21,18 @@ const StrategicGameCardChips: FC<{ strategicGame: StrategicGame }> = ({ strategi
     <>
       {strategicGame.status && (
         <Chip
-          size="small"
+          size={size}
           color={strategicGame.status === 'open' ? 'success' : 'default'}
           label={t(strategicGame.status)}
         />
       )}
       <Tooltip title={t('power-level')}>
-        <Chip size="small" variant="outlined" label={t('power-level-dp', { dp: powerLevel.baseDevPoints })} />
+        <Chip size={size} variant="outlined" label={t('power-level-dp', { dp: powerLevel.baseDevPoints })} />
       </Tooltip>
       {options.openRounds !== DEFAULT_OPTIONS.openRounds && (
-        <Chip size="small" variant="outlined" label={t(options.openRounds ? 'open-rounds-short' : 'closed-rounds')} />
+        <Chip size={size} variant="outlined" label={t(options.openRounds ? 'open-rounds-short' : 'closed-rounds')} />
       )}
-      {options.talentPolicy !== DEFAULT_OPTIONS.talentPolicy && <TalentPolicyChip policy={options.talentPolicy} />}
+      {options.talentPolicy !== DEFAULT_OPTIONS.talentPolicy && <TalentPolicyChip policy={options.talentPolicy} size={size} />}
     </>
   );
 };
