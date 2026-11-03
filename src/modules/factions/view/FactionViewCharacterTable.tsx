@@ -2,7 +2,7 @@ import React, { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Avatar, TableSortLabel, Tooltip, Typography } from '@mui/material';
-import { Character, DataTable, isCharacterSummary, resolveAssetUrl } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Character, DataTable, resolveAssetUrl } from '@labcabrera-rmu/rmu-react-shared-lib';
 import CharacterHealthChips from '../../shared/chips/CharacterHealthChips';
 
 type SortField = 'name' | 'level' | null;
@@ -67,11 +67,6 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
       <span>{text}</span>
     </Tooltip>
   );
-  // Spec 071: a summary only has its name, race, profession and level.
-  const full =
-    (render: (c: Character) => React.ReactNode) =>
-    (c: Character): React.ReactNode =>
-      isCharacterSummary(c) ? '—' : render(c);
   const bonus = (value: number) => <Typography color={value < 0 ? 'error' : 'success'}>{value}</Typography>;
 
   return (
@@ -103,7 +98,7 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
                   </Typography>
                 </Tooltip>
                 {/* Compact badges: the full text on hover or tap, so the row keeps its height (spec 017). */}
-                {!isCharacterSummary(c) && <CharacterHealthChips character={c} variant="compact" />}
+                <CharacterHealthChips character={c} variant="compact" />
               </div>
             </div>
           ),
@@ -127,7 +122,7 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
           key: 'hp',
           header: abbreviation(t('hp'), t('hp-short')),
           align: 'right',
-          render: full((c) => (c.hp.current === c.hp.max ? c.hp.max : `${c.hp.current}/${c.hp.max}`)),
+          render: (c) => (c.hp.current === c.hp.max ? c.hp.max : `${c.hp.current}/${c.hp.max}`),
         },
         { key: 'profession', header: t('profession'), render: (c) => t(c.info?.professionId || '') },
         {
@@ -135,37 +130,37 @@ const FactionViewCharactersTable: FC<{ characters: Character[] }> = ({ character
           header: t('attacks'),
           // One attack per line, never split inside a name or a bonus.
           cellSx: { whiteSpace: 'pre-line', minWidth: 160 },
-          render: full(getAttackDescription),
+          render: getAttackDescription,
         },
         {
           key: 'db',
           header: abbreviation(t('defensive-bonus'), t('db-short')),
           align: 'right',
-          render: full((c) => bonus(c.defense.defensiveBonus)),
+          render: (c) => bonus(c.defense.defensiveBonus),
         },
         {
           key: 'at',
           header: abbreviation(t('armor-type'), t('at-short')),
           align: 'right',
-          render: full(getArmorDescription),
+          render: getArmorDescription,
         },
         {
           key: 'initiative',
           header: t('initiative-short'),
           align: 'right',
-          render: full((c) => bonus(c.initiative.totalBonus)),
+          render: (c) => bonus(c.initiative.totalBonus),
         },
         {
           key: 'bmr',
           header: abbreviation(t('base-movement-rate'), t('bmr')),
           align: 'right',
-          render: full((c) => c.movement.baseMovementRate),
+          render: (c) => c.movement.baseMovementRate,
         },
         {
           key: 'penalty',
           header: t('penalty-short'),
           align: 'right',
-          render: full((c) => bonus(c.equipment.maneuverPenalty)),
+          render: (c) => bonus(c.equipment.maneuverPenalty),
         },
       ]}
     />

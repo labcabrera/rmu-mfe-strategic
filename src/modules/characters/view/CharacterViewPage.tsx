@@ -39,9 +39,7 @@ import {
   useEntity,
   useNotify,
   useSectionParam,
-  isCharacterSummary,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import CharacterSummaryView from './CharacterSummaryView';
 import { healthChips } from '../../shared/chips/CharacterHealthChips';
 import { canChangeCharacter } from '../../shared/permissions';
 import CharacterHealthSection from './health/CharacterHealthSection';
@@ -96,14 +94,11 @@ export default function CharacterViewPage() {
     if (next) state.setEntity(next);
   };
 
-  const summary = isCharacterSummary(character);
-
   useEffect(() => {
     if (!character) return;
     fetchStrategicGame(character.gameId, auth).then(setStrategicGame).catch(notify.error);
-    if (summary) return;
     fetchProfession(character.info.professionId, auth).then(setProfession).catch(notify.error);
-  }, [character?.gameId, character?.info.professionId, summary]);
+  }, [character?.gameId, character?.info.professionId]);
 
   useEffect(() => {
     const cultureId = character?.info.cultureId;
@@ -162,9 +157,6 @@ export default function CharacterViewPage() {
     progression: <CharacterProgression character={entity} setCharacter={setCharacter} strategicGame={strategicGame} />,
   });
 
-  // Spec 071: a member of the game outside the faction of the character only sees its summary.
-  if (summary) return <CharacterSummaryView state={state} strategicGame={strategicGame} />;
-
   return (
     <DetailPage
       breadcrumbs={[
@@ -176,7 +168,7 @@ export default function CharacterViewPage() {
       entity={state}
       technicalInfo={false}
       actions={(entity) => [
-        ...(entity.experience.availableLevel > entity.experience.level
+        ...(entity.experience.availableLevel > entity.experience.level && canChangeCharacter(auth, entity, strategicGame)
           ? [<LevelUpButton key="level-up" onClick={() => onLevelUp(entity, false)} color="success" />]
           : []),
         ...(canChangeCharacter(auth, entity, strategicGame)
