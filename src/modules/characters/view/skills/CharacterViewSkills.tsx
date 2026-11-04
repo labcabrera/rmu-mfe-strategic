@@ -2,13 +2,25 @@ import React, { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import ViewAgendaIcon from '@mui/icons-material/ViewAgenda';
-import { Alert, alpha, Box, Button, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import {
+  Alert,
+  alpha,
+  Box,
+  Button,
+  FormControlLabel,
+  Stack,
+  Switch,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from '@mui/material';
 import {
   AddButton,
   BonusDevPointsSummary,
   Character,
   CharacterSkill,
   Profession,
+  RuleHint,
   SearchField,
   SectionLabel,
   SkillGroupList,
@@ -16,7 +28,14 @@ import {
   StrategicGame,
   useSpecializationLabel,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { MAX_PROFESSIONAL_SKILLS, resolvePowerLevel } from '../../../services/game-rules';
+import {
+  intenseTrainingLimit,
+  MAX_PROFESSIONAL_SKILLS,
+  MAX_RANKS_PER_LEVEL,
+  resolveOptions,
+  resolvePowerLevel,
+  spendableBonusDevPoints,
+} from '../../../services/game-rules';
 import AddSkillDialog from './AddSkillDialog';
 import CharacterFightingStyles from './CharacterFightingStyles';
 import CharacterSkillBreakdown from './CharacterSkillBreakdown';
@@ -36,6 +55,9 @@ const CharacterViewSkills: FC<{
   const [openAddSkillDialog, setOpenAddSkillDialog] = useState(false);
   const [skillNameFilter, setSkillNameFilter] = useState('');
   const [selectedSkill, setSelectedSkill] = useState<CharacterSkill | null>(null);
+  // Spec 076, A3: the ranks of the table may spend the bonus points before the normal ones
+  const [bonusFirst, setBonusFirst] = useState(false);
+  const canSpendBonus = spendableBonusDevPoints(character, strategicGame) > 0;
   const [displaySkillTable, setDisplaySkillTable] = useState<boolean>(() => {
     try {
       return localStorage.getItem(STORAGE_KEY) === 'true';
@@ -129,6 +151,14 @@ const CharacterViewSkills: FC<{
           strategicGame={strategicGame}
           limit={resolvePowerLevel(strategicGame?.powerLevel).raceDevPointsPerLevel}
         />
+        {displaySkillTable && (
+          <RankRules
+            character={character}
+            strategicGame={strategicGame}
+            bonusFirst={canSpendBonus ? bonusFirst : undefined}
+            onBonusFirstChange={setBonusFirst}
+          />
+        )}
         <ProfessionalBonusesAlert
           character={character}
           profession={profession}
@@ -144,12 +174,13 @@ const CharacterViewSkills: FC<{
           setCharacter={setCharacter}
           profession={profession}
           strategicGame={strategicGame}
+          pool={canSpendBonus && bonusFirst ? 'bonus' : 'auto'}
         />
       ) : (
         <SkillGroupList skills={filteredSkills} onSelect={setSelectedSkill} searchable={false} />
       )}
       <CharacterFightingStyles character={character} setCharacter={setCharacter} strategicGame={strategicGame} />
-      <CharacterSkillBreakdown skill={selectedSkill} onClose={() => setSelectedSkill(null)} />
+      <CharacterSkillBreakdown skill={selectedSkill} traits={character.traits} onClose={() => setSelectedSkill(null)} />
       <AddSkillDialog
         open={openAddSkillDialog}
         strategicGame={strategicGame}
@@ -160,6 +191,61 @@ const CharacterViewSkills: FC<{
     </>
   );
 };
+
+/**
+ * The ranks a skill can take in a level (Core Law §3, workspace spec 076) as a rule hint and, while the character has
+ * bonus points to spend in the level, the switch that spends them first (A3). `bonusFirst` undefined hides it.
+ */
+function RankRules({
+  character,
+  strategicGame,
+  bonusFirst,
+  onBonusFirstChange,
+}: {
+  character: Character;
+  strategicGame?: StrategicGame;
+  bonusFirst?: boolean;
+  onBonusFirstChange: (value: boolean) => void;
+}) {
+  const { t } = useTranslation();
+  const specializationLabel = useSpecializationLabel();
+  const intenseTraining = resolveOptions(strategicGame?.options).intenseTraining;
+  const marked = character.experience.intenseTrainingSkill;
+  const markedName = marked
+    ? [t(marked.skillId), marked.specialization && specializationLabel(marked.specialization)]
+        .filter(Boolean)
+        .join(' · ')
+    : '';
+  return (
+    <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
+      <RuleHint
+        title={t('ranks-per-level')}
+        description={t(intenseTraining ? 'ranks-per-level-intense-training-help' : 'ranks-per-level-help')}
+        params={{
+          'max-ranks': MAX_RANKS_PER_LEVEL,
+          ...(intenseTraining ? { 'intense-training-limit': intenseTrainingLimit(character.experience.level) } : {}),
+        }}
+        reference="Core Law §3"
+      >
+        <Typography variant="body2" color="text.secondary">
+          {t('ranks-per-level')}
+          {': '}
+          <b>{intenseTraining ? t('ranks-per-level-intense-training') : MAX_RANKS_PER_LEVEL}</b>
+          {intenseTraining && marked && ` · ${t('intense-training-skill', { skill: markedName })}`}
+        </Typography>
+      </RuleHint>
+      {bonusFirst !== undefined && (
+        <FormControlLabel
+          sx={{ ml: { sm: 'auto' } }}
+          control={
+            <Switch size="small" checked={bonusFirst} onChange={(event) => onBonusFirstChange(event.target.checked)} />
+          }
+          label={<Typography variant="body2">{t('use-bonus-dev-points-first')}</Typography>}
+        />
+      )}
+    </Stack>
+  );
+}
 
 /**
  * Professional bonuses still to assign (Core Law 2.4): 10 skills of the profession get the professional bonus and the

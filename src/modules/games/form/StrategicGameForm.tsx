@@ -242,19 +242,37 @@ const StrategicGameForm: FC<{
             </Grid>
             <Grid size={wideSize}>
               <GameOptionField
-                option="allow-third-rank"
-                label={t('allow-third-rank')}
-                defaultValue={DEFAULT_OPTIONS.allowThirdRank}
+                option="intense-training"
+                label={t('intense-training')}
+                defaultValue={DEFAULT_OPTIONS.intenseTraining}
               >
                 <FormControlLabel
                   control={
                     <Switch
-                      name="allowThirdRank"
-                      checked={!!formData.options.allowThirdRank}
-                      onChange={(e) => handleOptionsChange('allowThirdRank', e.target.checked)}
+                      name="intenseTraining"
+                      checked={!!formData.options.intenseTraining}
+                      onChange={(e) => handleOptionsChange('intenseTraining', e.target.checked)}
                     />
                   }
-                  label={t('allow-third-rank')}
+                  label={t('intense-training')}
+                />
+              </GameOptionField>
+            </Grid>
+            <Grid size={wideSize}>
+              <GameOptionField
+                option="allow-saving-dev-points"
+                label={t('allow-saving-dev-points')}
+                defaultValue={DEFAULT_OPTIONS.allowSavingDevPoints}
+              >
+                <FormControlLabel
+                  control={
+                    <Switch
+                      name="allowSavingDevPoints"
+                      checked={!!formData.options.allowSavingDevPoints}
+                      onChange={(e) => handleOptionsChange('allowSavingDevPoints', e.target.checked)}
+                    />
+                  }
+                  label={t('allow-saving-dev-points')}
                 />
               </GameOptionField>
             </Grid>
