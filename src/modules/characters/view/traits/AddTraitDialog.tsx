@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { Dispatch, FC, SetStateAction, useEffect, useMemo, useState } from 'react';
+import React, { Dispatch, FC, ReactNode, SetStateAction, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -28,10 +28,13 @@ import {
   EmptyState,
   BonusDevPointsSummary,
   Character,
+  DEV_POINTS_POOLS,
+  DevPointsPool,
   fetchTraits,
   KeyValueList,
   KeyValueRow,
   LoadingState,
+  MULTILINGUAL_TRAIT_ID,
   RmuDialog,
   SearchField,
   SectionLabel,
@@ -44,6 +47,12 @@ import { resolvePowerLevel } from '../../../services/game-rules';
 import { useStrategicNotify } from '../../../services/notify-service';
 import { toRoman } from '../../../services/roman-number-service';
 import TalentPolicyChip from '../../../shared/chips/TalentPolicyChip';
+import MultilingualRanksPicker, {
+  emptyMultilingualRows,
+  isMultilingualValid,
+  MultilingualRow,
+  toLanguageRanks,
+} from './MultilingualRanksPicker';
 import TraitSpecializationPicker from './TraitSpecializationPicker';
 import {
   evaluateTraitPurchase,
@@ -67,6 +76,7 @@ const COST_REASONS = [
   'err-talent-policy-bonus-points-only',
   'err-talent-policy-flaw-points-only',
   'err-talent-policy-creation-only',
+  'err-dev-points-insufficient',
 ];
 
 /** Order of the categories: the catalog ones first, any other one after them. */
@@ -118,6 +128,9 @@ const AddTraitDialog: FC<{
   const [specialization, setSpecialization] = useState<string>();
   const [showDetail, setShowDetail] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  // Spec 076: the pool that pays the trait and the languages of Multilingual
+  const [pool, setPool] = useState<DevPointsPool>('auto');
+  const [languageRows, setLanguageRows] = useState<MultilingualRow[]>(() => emptyMultilingualRows(1));
 
   // Every trait at once, kept while the dialog is open.
   useEffect(() => {
@@ -138,6 +151,8 @@ const AddTraitDialog: FC<{
     setSpecialization(undefined);
     setShowDetail(false);
     setSubmitting(false);
+    setPool('auto');
+    setLanguageRows(emptyMultilingualRows(1));
   };
 
   const handleClose = () => {
@@ -175,6 +190,7 @@ const AddTraitDialog: FC<{
     setSelected(trait);
     setSpecialization(undefined);
     setTier(initialTier(character, trait));
+    setLanguageRows(emptyMultilingualRows(1));
     setShowDetail(true);
   };
 
@@ -184,20 +200,29 @@ const AddTraitDialog: FC<{
   };
 
   const purchase =
-    selected && evaluateTraitPurchase(character, strategicGame, selected, tier, specialization || undefined);
+    selected && evaluateTraitPurchase(character, strategicGame, selected, tier, specialization || undefined, pool);
+  // Multilingual needs the languages that receive its ranks; improving a tier grants none
+  const multilingual = selected?.id === MULTILINGUAL_TRAIT_ID && !purchase?.isImprovement;
   const valid =
     !!selected &&
     !!purchase &&
     !purchase.blocked &&
     (!selected.isTierBased || (!!tier && tier >= 1 && tier <= (selected.maxTier ?? tier))) &&
-    (!selected.specialization || !!specialization);
+    (!selected.specialization || !!specialization) &&
+    (!multilingual || isMultilingualValid(languageRows));
 
   const onSubmit = () => {
     if (!selected || !valid) return;
     setSubmitting(true);
     addCharacterTrait(
       character.id,
-      { traitId: selected.id, tier: selected.isTierBased ? tier : undefined, specialization },
+      {
+        traitId: selected.id,
+        tier: selected.isTierBased ? tier : undefined,
+        specialization,
+        pool: purchase?.poolChoosable && pool !== 'auto' ? pool : undefined,
+        languageRanks: multilingual ? toLanguageRanks(languageRows) : undefined,
+      },
       auth
     )
       .then((updated) => {
@@ -357,6 +382,17 @@ const AddTraitDialog: FC<{
                   specialization={specialization}
                   setSpecialization={changeSpecialization}
                   purchase={purchase}
+                  pool={pool}
+                  setPool={setPool}
+                  extra={
+                    multilingual && (
+                      <MultilingualRanksPicker
+                        realmId={strategicGame?.realmId}
+                        rows={languageRows}
+                        onChange={setLanguageRows}
+                      />
+                    )
+                  }
                 />
               ) : (
                 <EmptyState dense title={t('trait-select-hint')} />
@@ -427,7 +463,11 @@ const TraitDetail: FC<{
   specialization?: string;
   setSpecialization: (value: string) => void;
   purchase: TraitPurchase;
-}> = ({ character, trait, tier, setTier, specialization, setSpecialization, purchase }) => {
+  pool: DevPointsPool;
+  setPool: (pool: DevPointsPool) => void;
+  /** Choices of a particular trait (the languages of Multilingual). */
+  extra?: ReactNode;
+}> = ({ character, trait, tier, setTier, specialization, setSpecialization, purchase, pool, setPool, extra }) => {
   const { t } = useTranslation();
   const traitName = useTraitName();
   const reasonText = useReasonText();
@@ -509,7 +549,28 @@ const TraitDetail: FC<{
           )}
         </Box>
       )}
+      {extra}
       <Divider />
+      {/* Spec 076, A3: the pool that pays it, when the talent policy fixes none */}
+      {purchase.poolChoosable && purchase.charged > 0 && (
+        <Box>
+          <SectionLabel>{t('dev-points-pool')}</SectionLabel>
+          <ToggleButtonGroup
+            exclusive
+            size="small"
+            value={pool}
+            onChange={(_, value: DevPointsPool | null) => value && setPool(value)}
+            aria-label={t('dev-points-pool')}
+            sx={{ flexWrap: 'wrap' }}
+          >
+            {DEV_POINTS_POOLS.map((option) => (
+              <ToggleButton key={option} value={option}>
+                {t(`dev-points-pool-${option}`)}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
+        </Box>
+      )}
       <KeyValueList rows={costRows} />
       {purchase.blocked && <Alert severity="warning">{reasonText(purchase.blocked)}</Alert>}
       {!purchase.blocked && trait.specialization && !specialization && (

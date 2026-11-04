@@ -8,6 +8,7 @@ import {
   ResourceBar,
   StatPill,
   StrategicGame,
+  useSpecializationLabel,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 /** A label and its value on one line. */
@@ -39,6 +40,22 @@ export const formatMeleeRange = (attack: CharacterAttack, strategicGame?: Strate
   if (!scale || scale === 1) return `${attack.meleeRange}'`;
   const scaled = Math.round(attack.meleeRange * scale * 10) / 10;
   return `${attack.meleeRange}' (${scaled}")`;
+};
+
+/**
+ * The attack as its card shows it. An unarmed attack (workspace spec 076, A8) has no item: its name is the unarmed
+ * skill and its specialization (`unarmed-st@strikes`), unless the locales name the attack itself.
+ */
+export const useAttackView = () => {
+  const { t, i18n } = useTranslation();
+  const specializationLabel = useSpecializationLabel();
+  return (attack: CharacterAttack): CharacterAttack => {
+    if (attack.weaponCategory !== 'unarmed' || i18n.exists(attack.attackName)) return attack;
+    const [skillId, specialization] = (attack.skillId ?? '').split('@');
+    if (!skillId) return attack;
+    const name = specialization ? `${t(skillId)} · ${specializationLabel(specialization)}` : t(skillId);
+    return { ...attack, attackName: name };
+  };
 };
 
 /** Fumble range, with the weapon's own range when they differ. */

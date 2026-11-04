@@ -1,4 +1,11 @@
-import { Character, CharacterTrait, StrategicGame, TalentPolicy, Trait } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  Character,
+  CharacterTrait,
+  DevPointsPool as PoolChoice,
+  StrategicGame,
+  TalentPolicy,
+  Trait,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { resolveOptions, resolvePowerLevel } from '../../../services/game-rules';
 
 /*
@@ -34,7 +41,13 @@ export interface TraitPurchase {
   payment: TraitPaymentPreview;
   /** First rule the purchase breaks, if any. */
   blocked?: TraitBlockReason;
+  /** The talent policy leaves the player choose the pool that pays it (workspace spec 076, A3). */
+  poolChoosable?: boolean;
 }
+
+/** Pools of a pool choice, in order, as rmu-api-strategic `poolsFor`. */
+const poolsOf = (choice: PoolChoice): DevPointsPool[] =>
+  choice === 'bonus' ? ['bonus', 'normal'] : choice === 'normal' ? ['normal'] : ['normal', 'bonus'];
 
 /** Character level up to which the character is in creation (the API's isCreationLevel). */
 export const isInCreation = (character: Character): boolean => character.experience.level <= 1;
@@ -86,8 +99,9 @@ const spendingRules = (
   character: Character,
   game: StrategicGame | undefined,
   charged: number,
-  isImprovement: boolean
-): { pools: DevPointsPool[]; capBonus: boolean; insufficientKey: string; blockedKey?: string } => {
+  isImprovement: boolean,
+  choice: PoolChoice
+): { pools: DevPointsPool[]; capBonus: boolean; insufficientKey: string; blockedKey?: string; choosable?: boolean } => {
   const creation = isInCreation(character);
   const { talentPolicy, bonusDevPointsCapAtCreation } = resolveOptions(game?.options);
   const capBonus = !creation || bonusDevPointsCapAtCreation;
@@ -107,7 +121,13 @@ const spendingRules = (
   if (talentPolicy === 'flaw-points-at-creation' && creation) {
     return { pools: ['flaw'], capBonus, insufficientKey: 'err-talent-policy-flaw-points-only' };
   }
-  return { pools: ['normal', 'bonus'], capBonus, insufficientKey: 'trait-reason-not-affordable' };
+  // The player's choice only applies when the policy fixes no pool (spec 076)
+  return {
+    pools: poolsOf(choice),
+    capBonus,
+    insufficientKey: choice === 'normal' ? 'err-dev-points-insufficient' : 'trait-reason-not-affordable',
+    choosable: true,
+  };
 };
 
 /**
@@ -119,7 +139,8 @@ export const evaluateTraitPurchase = (
   game: StrategicGame | undefined,
   trait: Trait,
   tier: number | undefined,
-  specialization?: string
+  specialization?: string,
+  choice: PoolChoice = 'auto'
 ): TraitPurchase => {
   const cost = traitCost(trait, tier);
   const current = findOwnedTrait(character, trait.id, specialization);
@@ -159,8 +180,9 @@ export const evaluateTraitPurchase = (
   }
   if (charged === 0) return result([], 0);
 
-  const rules = spendingRules(character, game, charged, isImprovement);
+  const rules = spendingRules(character, game, charged, isImprovement, choice);
   if (rules.blockedKey) return result([], 0, { key: rules.blockedKey });
+  const withChoice = (purchase: TraitPurchase): TraitPurchase => ({ ...purchase, poolChoosable: !!rules.choosable });
   let remaining = charged;
   let available = 0;
   rules.pools.forEach((pool) => {
@@ -171,9 +193,11 @@ export const evaluateTraitPurchase = (
     remaining -= taken;
   });
   if (remaining > 0) {
-    return result(rules.pools, available, { key: rules.insufficientKey, params: { cost: charged, available } });
+    return withChoice(
+      result(rules.pools, available, { key: rules.insufficientKey, params: { cost: charged, available } })
+    );
   }
-  return result(rules.pools, available);
+  return withChoice(result(rules.pools, available));
 };
 
 /**
