@@ -15,6 +15,7 @@ import { toRoman } from '../../../services/roman-number-service';
 import MissingReferenceChip from '../../../shared/chips/MissingReferenceChip';
 import AddTraitDialog from './AddTraitDialog';
 import CharacterViewTraitDialog from './CharacterViewTraitDialog';
+import { useTraitSpecializationLabel } from './use-trait-specialization-label';
 
 /** Traits of the character: name and tier, specialization, type, source and the development points paid. */
 const CharacterViewTraits: FC<{
@@ -26,6 +27,7 @@ const CharacterViewTraits: FC<{
   const [openAddTraitDialog, setOpenAddTraitDialog] = useState(false);
   const [openTraitDialog, setOpenTraitDialog] = useState(false);
   const [characterTrait, setCharacterTrait] = useState<CharacterTrait>();
+  const specializationLabel = useTraitSpecializationLabel(character?.traits ?? []);
 
   if (!character) return <LoadingState />;
 
@@ -59,7 +61,7 @@ const CharacterViewTraits: FC<{
                   </Typography>
                   {trait.specialization && (
                     <Typography variant="caption" color="text.secondary" noWrap component="div">
-                      {t(trait.specialization)}
+                      {specializationLabel(trait.specialization)}
                     </Typography>
                   )}
                   {trait.linkedTo && (
