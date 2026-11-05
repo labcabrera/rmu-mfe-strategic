@@ -74,6 +74,12 @@ const StrategicGameViewAttributes: FC<{ strategicGame: StrategicGame }> = ({ str
       value: yesNo(options.openRounds),
       defaultValue: DEFAULT_OPTIONS.openRounds,
     },
+    {
+      option: 'talent-purchase-rules',
+      label: t('talent-purchase-rules'),
+      value: yesNo(options.talentPurchaseRules),
+      defaultValue: DEFAULT_OPTIONS.talentPurchaseRules,
+    },
   ];
 
   return (

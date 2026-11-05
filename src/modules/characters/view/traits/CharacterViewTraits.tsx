@@ -15,6 +15,7 @@ import { toRoman } from '../../../services/roman-number-service';
 import MissingReferenceChip from '../../../shared/chips/MissingReferenceChip';
 import AddTraitDialog from './AddTraitDialog';
 import CharacterViewTraitDialog from './CharacterViewTraitDialog';
+import { useTraitSpecializationLabel } from './use-trait-specialization-label';
 
 /** Traits of the character: name and tier, specialization, type, source and the development points paid. */
 const CharacterViewTraits: FC<{
@@ -26,8 +27,14 @@ const CharacterViewTraits: FC<{
   const [openAddTraitDialog, setOpenAddTraitDialog] = useState(false);
   const [openTraitDialog, setOpenTraitDialog] = useState(false);
   const [characterTrait, setCharacterTrait] = useState<CharacterTrait>();
+  const specializationLabel = useTraitSpecializationLabel(character?.traits ?? []);
 
   if (!character) return <LoadingState />;
+
+  const linkedTalentName = (traitId: string) => {
+    const talent = character.traits.find((owned) => owned.traitId === traitId);
+    return t(traitId, { defaultValue: talent?.traitName ?? traitId });
+  };
 
   const handleTraitView = (trait: CharacterTrait) => {
     setCharacterTrait(trait);
@@ -54,7 +61,12 @@ const CharacterViewTraits: FC<{
                   </Typography>
                   {trait.specialization && (
                     <Typography variant="caption" color="text.secondary" noWrap component="div">
-                      {t(trait.specialization)}
+                      {specializationLabel(trait.specialization)}
+                    </Typography>
+                  )}
+                  {trait.linkedTo && (
+                    <Typography variant="caption" color="text.secondary" noWrap component="div">
+                      {t('trait-linked-to', { talent: linkedTalentName(trait.linkedTo.traitId) })}
                     </Typography>
                   )}
                 </Box>
@@ -63,6 +75,17 @@ const CharacterViewTraits: FC<{
                     <Chip label={t('trait-source-race')} size="small" color="primary" variant="outlined" />
                   )}
                   {trait.missingReference && <MissingReferenceChip />}
+                  {/* Spec 077: a flaw waiting for the game master, a restricted trait */}
+                  {trait.pendingApproval && (
+                    <Tooltip title={t('trait-pending-approval-help')}>
+                      <Chip label={t('trait-pending-approval')} size="small" color="warning" />
+                    </Tooltip>
+                  )}
+                  {trait.restricted && (
+                    <Tooltip title={trait.restricted.note || t('trait-restricted-help')}>
+                      <Chip label={t('trait-restricted')} size="small" variant="outlined" />
+                    </Tooltip>
+                  )}
                   <TraitTypeChip isTalent={trait.isTalent} />
                   {trait.source !== 'race' && <TraitPaidChip trait={trait} />}
                 </Stack>

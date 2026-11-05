@@ -17,6 +17,7 @@ import CharacterEquipmentButtons from '../items/CharacterEquipmentButtons';
 import CharacterEquipmentPanel from '../items/CharacterEquipmentPanel';
 import CharacterViewStats from '../stats/CharacterViewStats';
 import CharacterViewTraits from '../traits/CharacterViewTraits';
+import { useTraitSpecializationLabel } from '../traits/use-trait-specialization-label';
 import CharacterViewExperience from '../xp/CharacterViewXp';
 import {
   Bento,
@@ -58,6 +59,7 @@ export const CharacterOverview = ({
   const { t } = useTranslation();
   // Spec 050: specializations are catalog keys shown by their name
   const specializationLabel = useSpecializationLabel();
+  const traitSpecializationLabel = useTraitSpecializationLabel(character.traits);
   const attackView = useAttackView();
   const seeAll = (id: CharacterSectionId) => ({ label: t('see-all'), onClick: () => go(id) });
   const topSkills = [...character.skills].sort((a, b) => b.totalBonus - a.totalBonus).slice(0, TOP_SKILLS);
@@ -119,7 +121,11 @@ export const CharacterOverview = ({
             {character.traits.map((trait) => (
               <Chip
                 key={`${trait.traitId}-${trait.specialization ?? ''}`}
-                label={trait.specialization ? `${t(trait.traitName)} (${t(trait.specialization)})` : t(trait.traitName)}
+                label={
+                  trait.specialization
+                    ? `${t(trait.traitName)} (${traitSpecializationLabel(trait.specialization)})`
+                    : t(trait.traitName)
+                }
                 color={trait.isTalent ? 'primary' : 'default'}
                 variant={trait.isTalent ? 'outlined' : 'filled'}
               />

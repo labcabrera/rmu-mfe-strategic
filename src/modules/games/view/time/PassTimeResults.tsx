@@ -1,7 +1,13 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Chip, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
-import { Character, GameTimeLogCharacter } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Character, GameTimeLogCharacter, PassTimeRestResult } from '@labcabrera-rmu/rmu-react-shared-lib';
+
+/** The rest took fatigue away (spec 077). */
+const fatigueRecovered = (result: PassTimeRestResult): boolean =>
+  result.fatigueBefore !== undefined &&
+  result.fatigueAfter !== undefined &&
+  result.fatigueBefore !== result.fatigueAfter;
 
 /** What a step of time did (or would do) to each character (spec 065): hits, power points and injury days. */
 const PassTimeResults: FC<{
@@ -59,7 +65,9 @@ const PassTimeResults: FC<{
                           : `${result.powerBefore} → ${result.powerAfter}`}
                     </TableCell>
                     <TableCell>
-                      {result.injuries.length === 0 && (result.poisonings ?? []).length === 0
+                      {result.injuries.length === 0 &&
+                      (result.poisonings ?? []).length === 0 &&
+                      !fatigueRecovered(result)
                         ? '—'
                         : [
                             ...result.injuries.map((injury) => (
@@ -86,6 +94,22 @@ const PassTimeResults: FC<{
                                 sx={{ mr: 0.5, mb: 0.5 }}
                               />
                             )),
+                            // Spec 077: fatigue recovered resting
+                            ...(fatigueRecovered(result)
+                              ? [
+                                  <Chip
+                                    key="fatigue"
+                                    size="small"
+                                    variant="outlined"
+                                    color="success"
+                                    label={t('pass-time-fatigue', {
+                                      before: -(result.fatigueBefore ?? 0),
+                                      after: -(result.fatigueAfter ?? 0),
+                                    })}
+                                    sx={{ mr: 0.5, mb: 0.5 }}
+                                  />,
+                                ]
+                              : []),
                           ]}
                     </TableCell>
                   </>

@@ -86,6 +86,8 @@ export const DefensePanel = ({ character }: { character: Character }) => {
   );
 };
 
+const round2 = (value: number) => Math.round(value * 100) / 100;
+
 export const LoadPanel = ({ character }: { character: Character }) => {
   const { t } = useTranslation();
   const { equipment } = character;
@@ -98,6 +100,12 @@ export const LoadPanel = ({ character }: { character: Character }) => {
         kind="fatigue"
       />
       <Box sx={{ mt: 1 }}>
+        {equipment.load && (
+          <Row
+            label={t('load-worn-carried')}
+            value={`${round2(equipment.load.worn)} / ${round2(equipment.load.carried)} ${t('lbs')} (${round2(equipment.load.percent)} %)`}
+          />
+        )}
         <Row label={t('maneuver-penalty')} value={formatBonus(equipment.maneuverPenalty)} />
         <Row label={t('ranged-penalty')} value={formatBonus(equipment.rangedPenalty)} />
         <Row label={t('encumbrance')} value={formatBonus(equipment.encumbrancePenalty)} />

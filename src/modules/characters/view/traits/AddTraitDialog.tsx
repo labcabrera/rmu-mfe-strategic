@@ -47,20 +47,26 @@ import { resolvePowerLevel } from '../../../services/game-rules';
 import { useStrategicNotify } from '../../../services/notify-service';
 import { toRoman } from '../../../services/roman-number-service';
 import TalentPolicyChip from '../../../shared/chips/TalentPolicyChip';
+import { isGameMaster } from '../../../shared/permissions';
 import MultilingualRanksPicker, {
   emptyMultilingualRows,
   isMultilingualValid,
   MultilingualRow,
   toLanguageRanks,
 } from './MultilingualRanksPicker';
+import TraitPurchaseRules, { PrerequisiteChoice, traitKey } from './TraitPurchaseRules';
 import TraitSpecializationPicker from './TraitSpecializationPicker';
 import {
+  evaluatePrerequisites,
   evaluateTraitPurchase,
   evaluateTraitRow,
   findOwnedTrait,
+  flawLimitReason,
   initialTier,
+  linkableTalents,
   ownedTraits,
   talentPolicyOf,
+  talentPurchaseRulesOf,
   TraitBlockReason,
   TraitPurchase,
 } from './trait-rules';
@@ -131,6 +137,14 @@ const AddTraitDialog: FC<{
   // Spec 076: the pool that pays the trait and the languages of Multilingual
   const [pool, setPool] = useState<DevPointsPool>('auto');
   const [languageRows, setLanguageRows] = useState<MultilingualRow[]>(() => emptyMultilingualRows(1));
+  // Spec 077: the prerequisite the game master grants, the talent a flaw is linked to and the restriction
+  const [chosenPrerequisite, setChosenPrerequisite] = useState<PrerequisiteChoice>('auto');
+  const [prerequisiteNote, setPrerequisiteNote] = useState('');
+  const [linkKey, setLinkKey] = useState('');
+  const [restricted, setRestricted] = useState(false);
+  const [restrictedNote, setRestrictedNote] = useState('');
+  const gameMaster = isGameMaster(auth, strategicGame);
+  const rulesOn = talentPurchaseRulesOf(strategicGame);
 
   // Every trait at once, kept while the dialog is open.
   useEffect(() => {
@@ -153,6 +167,15 @@ const AddTraitDialog: FC<{
     setSubmitting(false);
     setPool('auto');
     setLanguageRows(emptyMultilingualRows(1));
+    resetPurchaseRules();
+  };
+
+  const resetPurchaseRules = () => {
+    setChosenPrerequisite('auto');
+    setPrerequisiteNote('');
+    setLinkKey('');
+    setRestricted(false);
+    setRestrictedNote('');
   };
 
   const handleClose = () => {
@@ -161,9 +184,12 @@ const AddTraitDialog: FC<{
   };
 
   const rows = useMemo(
-    () => (traits ?? []).map((trait) => ({ trait, check: evaluateTraitRow(character, strategicGame, trait) })),
-    [traits, character, strategicGame]
+    () =>
+      (traits ?? []).map((trait) => ({ trait, check: evaluateTraitRow(character, strategicGame, trait, gameMaster) })),
+    [traits, character, strategicGame, gameMaster]
   );
+
+  const catalog = useMemo(() => new Map((traits ?? []).map((trait) => [trait.id, trait])), [traits]);
 
   const categories = useMemo(
     () => [...new Set(rows.map((row) => row.trait.category))].sort((a, b) => categoryOrder(a) - categoryOrder(b)),
@@ -189,18 +215,45 @@ const AddTraitDialog: FC<{
   const selectTrait = (trait: Trait) => {
     setSelected(trait);
     setSpecialization(undefined);
-    setTier(initialTier(character, trait));
+    setTier(initialTier(character, trait, undefined, gameMaster));
     setLanguageRows(emptyMultilingualRows(1));
+    resetPurchaseRules();
     setShowDetail(true);
   };
 
   const changeSpecialization = (value: string) => {
     setSpecialization(value || undefined);
-    if (selected) setTier(initialTier(character, selected, value || undefined));
+    if (selected) setTier(initialTier(character, selected, value || undefined, gameMaster));
   };
 
-  const purchase =
-    selected && evaluateTraitPurchase(character, strategicGame, selected, tier, specialization || undefined, pool);
+  const current = selected ? findOwnedTrait(character, selected.id, specialization || undefined) : undefined;
+  const basePurchase =
+    selected &&
+    evaluateTraitPurchase(character, strategicGame, selected, tier, specialization || undefined, pool, {
+      restricted: gameMaster && restricted,
+      gameMaster,
+    });
+  // Spec 077, C11: the prerequisite of each new tier, and the limits of the flaws
+  const chosenType = rulesOn && chosenPrerequisite !== 'auto' ? chosenPrerequisite : undefined;
+  const acquisitions =
+    selected && rulesOn
+      ? evaluatePrerequisites(character, selected, tier, specialization || undefined, chosenType)
+      : [];
+  const linkable = selected ? linkableTalents(character, selected, catalog) : [];
+  const linkTalent = current?.linkedTo
+    ? character.traits.find((owned) => traitKey(owned) === traitKey(current.linkedTo!))
+    : linkable.find((owned) => traitKey(owned) === linkKey);
+  const rulesBlocked: TraitBlockReason | undefined = !basePurchase
+    ? undefined
+    : acquisitions.some((entry) => !entry.type)
+      ? { key: 'trait-reason-prerequisite-unmet' }
+      : selected
+        ? flawLimitReason(character, selected, specialization || undefined, basePurchase.cost, linkTalent, rulesOn)
+        : undefined;
+  const purchase: TraitPurchase | undefined = basePurchase && {
+    ...basePurchase,
+    blocked: basePurchase.blocked ?? rulesBlocked,
+  };
   // Multilingual needs the languages that receive its ranks; improving a tier grants none
   const multilingual = selected?.id === MULTILINGUAL_TRAIT_ID && !purchase?.isImprovement;
   const valid =
@@ -222,6 +275,17 @@ const AddTraitDialog: FC<{
         specialization,
         pool: purchase?.poolChoosable && pool !== 'auto' ? pool : undefined,
         languageRanks: multilingual ? toLanguageRanks(languageRows) : undefined,
+        prerequisite: chosenType
+          ? { type: chosenType, ...(prerequisiteNote.trim() ? { note: prerequisiteNote.trim() } : {}) }
+          : undefined,
+        linkedTo:
+          !current && linkTalent
+            ? {
+                traitId: linkTalent.traitId,
+                ...(linkTalent.specialization ? { specialization: linkTalent.specialization } : {}),
+              }
+            : undefined,
+        restricted: gameMaster && restricted && !current?.restricted ? { note: restrictedNote.trim() } : undefined,
       },
       auth
     )
@@ -326,7 +390,7 @@ const AddTraitDialog: FC<{
       onCancel={handleClose}
       buttons={
         <Button onClick={onSubmit} variant="contained" disabled={!valid || submitting}>
-          {purchase?.isImprovement ? t('trait-improve') : t('add')}
+          {purchase?.isImprovement ? t('trait-improve') : purchase?.isLowering ? t('trait-lower') : t('add')}
         </Button>
       }
     >
@@ -385,13 +449,34 @@ const AddTraitDialog: FC<{
                   pool={pool}
                   setPool={setPool}
                   extra={
-                    multilingual && (
-                      <MultilingualRanksPicker
-                        realmId={strategicGame?.realmId}
-                        rows={languageRows}
-                        onChange={setLanguageRows}
+                    <>
+                      {multilingual && (
+                        <MultilingualRanksPicker
+                          realmId={strategicGame?.realmId}
+                          rows={languageRows}
+                          onChange={setLanguageRows}
+                        />
+                      )}
+                      <TraitPurchaseRules
+                        trait={selected}
+                        catalog={catalog}
+                        current={current}
+                        rulesOn={rulesOn}
+                        gameMaster={gameMaster}
+                        acquisitions={acquisitions}
+                        chosen={chosenPrerequisite}
+                        setChosen={setChosenPrerequisite}
+                        prerequisiteNote={prerequisiteNote}
+                        setPrerequisiteNote={setPrerequisiteNote}
+                        linkable={linkable}
+                        linkKey={linkKey}
+                        setLinkKey={setLinkKey}
+                        restricted={restricted}
+                        setRestricted={setRestricted}
+                        restrictedNote={restrictedNote}
+                        setRestrictedNote={setRestrictedNote}
                       />
-                    )
+                    </>
                   }
                 />
               ) : (
@@ -483,7 +568,7 @@ const TraitDetail: FC<{
         : undefined,
     },
   ];
-  if (purchase.isImprovement && current) {
+  if ((purchase.isImprovement || purchase.isLowering) && current) {
     costRows.push({ label: t('trait-already-paid'), value: current.cost });
     costRows.push({ label: t('trait-charged'), value: purchase.charged });
   }
@@ -533,11 +618,26 @@ const TraitDetail: FC<{
             sx={{ flexWrap: 'wrap' }}
           >
             {Array.from({ length: trait.maxTier ?? 1 }, (_, index) => index + 1).map((option) => (
-              <ToggleButton key={option} value={option} disabled={option <= currentTier} sx={{ minWidth: 44 }}>
+              <ToggleButton
+                key={option}
+                value={option}
+                // Spec 077, C10: an owned flaw can be lowered; a talent only goes up
+                disabled={trait.isTalent ? option <= currentTier : option === currentTier}
+                sx={{ minWidth: 44 }}
+              >
                 {toRoman(option)}
               </ToggleButton>
             ))}
           </ToggleButtonGroup>
+          {purchase.isLowering && current?.tier && tier && (
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              {t('trait-lower-summary', {
+                from: toRoman(current.tier),
+                to: toRoman(tier),
+                cost: purchase.charged,
+              })}
+            </Typography>
+          )}
           {purchase.isImprovement && current?.tier && tier && (
             <Typography variant="body2" sx={{ mt: 1 }}>
               {t('trait-improve-summary', {

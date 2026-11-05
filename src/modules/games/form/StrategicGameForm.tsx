@@ -308,6 +308,24 @@ const StrategicGameForm: FC<{
                 />
               </GameOptionField>
             </Grid>
+            <Grid size={wideSize}>
+              <GameOptionField
+                option="talent-purchase-rules"
+                label={t('talent-purchase-rules')}
+                defaultValue={DEFAULT_OPTIONS.talentPurchaseRules}
+              >
+                <FormControlLabel
+                  control={
+                    <Switch
+                      name="talentPurchaseRules"
+                      checked={!!formData.options.talentPurchaseRules}
+                      onChange={(e) => handleOptionsChange('talentPurchaseRules', e.target.checked)}
+                    />
+                  }
+                  label={t('talent-purchase-rules')}
+                />
+              </GameOptionField>
+            </Grid>
           </Grid>
         </Section>
       </Grid>
