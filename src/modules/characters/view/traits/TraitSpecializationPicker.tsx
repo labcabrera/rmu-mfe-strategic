@@ -7,10 +7,14 @@ import {
   fetchRaces,
   fetchSkillCategories,
   fetchSkills,
+  fetchSpellLists,
   EnumPicker,
   LoadingState,
   REALM_TYPES,
   Skill,
+  SPELL_LIST_CATALOG_MAX,
+  SpellList,
+  SpellListPicker,
   STATS,
   Trait,
   useNotify,
@@ -29,6 +33,39 @@ const filterCombatSkills = (skills: Skill[], specialization: string): Skill[] =>
 
 /** Free text specialization (life goal, phobia, vow...) of the Character Companion traits (spec 039). */
 const TEXT_SPECIALIZATION = 'text';
+
+/**
+ * Talents taken for a spell list (Perfected Technique, Quick-Caster, Spatial Skills...; workspace spec 077): core has no
+ * `spell-list` enumeration, so the lists of rmu-api-spells are offered and the list code is stored, the one tactical
+ * matches with the `listCode` of a cast. Lists without a code (made by users) cannot be matched and are left out.
+ */
+const SPELL_LIST_SPECIALIZATION = 'spell-list';
+
+const SpellListSpecializationPicker: FC<{ value: string | null; onChange: (code: string) => void }> = ({
+  value,
+  onChange,
+}) => {
+  const auth = useAuth();
+  const notify = useNotify();
+  const [lists, setLists] = useState<SpellList[]>();
+
+  useEffect(() => {
+    fetchSpellLists('', 0, SPELL_LIST_CATALOG_MAX, auth)
+      .then((page) => setLists(page.content.filter((list) => !!list.code)))
+      .catch((err) => notify.error(err));
+  }, []);
+
+  if (!lists) return <LoadingState />;
+
+  return (
+    <SpellListPicker
+      spellLists={lists}
+      variant="select"
+      value={lists.find((list) => list.code === value)?.id ?? null}
+      onChange={(_, list) => list?.code && onChange(list.code)}
+    />
+  );
+};
 
 /**
  * Values a trait specialization can take: the stat keys for `stat`, the realms for `realm`, the skills of the core
@@ -66,7 +103,12 @@ const TraitSpecializationPicker: FC<{
   const [availableSpecializations, setAvailableSpecializations] = useState<string[]>();
 
   useEffect(() => {
-    if (!trait?.specialization || trait.specialization === TEXT_SPECIALIZATION) return;
+    if (
+      !trait?.specialization ||
+      trait.specialization === TEXT_SPECIALIZATION ||
+      trait.specialization === SPELL_LIST_SPECIALIZATION
+    )
+      return;
     setAvailableSpecializations(undefined);
     loadSpecializations(trait.specialization, auth)
       .then((options) => setAvailableSpecializations(options))
@@ -79,6 +121,10 @@ const TraitSpecializationPicker: FC<{
     return (
       <TextField label={t('specialization')} value={value || ''} onChange={(e) => onChange(e.target.value)} fullWidth />
     );
+  }
+
+  if (trait.specialization === SPELL_LIST_SPECIALIZATION) {
+    return <SpellListSpecializationPicker value={value || null} onChange={onChange} />;
   }
 
   if (!availableSpecializations) return <LoadingState />;
