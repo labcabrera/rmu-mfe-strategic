@@ -38,6 +38,7 @@ export const DEFAULT_OPTIONS: Required<StrategicGameOptions> = {
   bonusDevPointsCapAtCreation: false,
   statGeneration: 'roll',
   openRounds: true,
+  talentPurchaseRules: false,
 };
 
 /** Ranks of a skill that can be developed in a single level without intense training (Core Law §3). */

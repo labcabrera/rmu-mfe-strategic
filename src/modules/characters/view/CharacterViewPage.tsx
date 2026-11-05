@@ -6,6 +6,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import BackpackIcon from '@mui/icons-material/Backpack';
 import BarChartIcon from '@mui/icons-material/BarChart';
+import CalculateIcon from '@mui/icons-material/Calculate';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import HealingIcon from '@mui/icons-material/Healing';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
@@ -31,7 +32,9 @@ import {
   LevelUpButton,
   levelUpCharacter,
   Profession,
+  recalculateCharacter,
   ResourceBar,
+  RmuIconButton,
   RmuDialog,
   SectionNav,
   StatPill,
@@ -44,7 +47,7 @@ import {
 import { resolveOptions } from '../../services/game-rules';
 import { useStrategicNotify } from '../../services/notify-service';
 import { healthChips } from '../../shared/chips/CharacterHealthChips';
-import { canChangeCharacter } from '../../shared/permissions';
+import { canChangeCharacter, isAdmin } from '../../shared/permissions';
 import CharacterHealthSection from './health/CharacterHealthSection';
 import CharacterMagicSection, { hasMagic } from './magic/CharacterMagicSection';
 import { armorLabel } from './sections/CharacterPanels';
@@ -135,6 +138,15 @@ export default function CharacterViewPage() {
       });
   };
 
+  /** Admin only (spec 077): runs the character processor again and stores the sheet. */
+  const onRecalculate = (entity: Character) =>
+    recalculateCharacter(entity.id, auth)
+      .then((updated) => {
+        state.setEntity(updated);
+        notify.success(t('character-recalculated'));
+      })
+      .catch(strategicNotify.error);
+
   const onExport = (entity: Character) =>
     exportCharacter(entity.id, auth)
       .then(({ blob, fileName }) => downloadBlob(blob, fileName))
@@ -188,6 +200,17 @@ export default function CharacterViewPage() {
           : []),
         ...(canChangeCharacter(auth, entity, strategicGame)
           ? [<DownloadButton key="export" tooltip="export" onClick={() => onExport(entity)} />]
+          : []),
+        ...(isAdmin(auth)
+          ? [
+              <RmuIconButton
+                key="recalculate"
+                Icon={CalculateIcon}
+                ariaLabel="recalculate-character"
+                tooltip="recalculate-character"
+                onClick={() => onRecalculate(entity)}
+              />,
+            ]
           : []),
       ]}
       onEdit={

@@ -7,6 +7,7 @@ import { useHealingTables } from '../../../api/healing-tables';
 import { useStrategicNotify } from '../../../services/notify-service';
 
 const HOURS_PER_DAY = 24;
+const MINUTES_PER_HOUR = 60;
 // Rest values of spec 013 §4, used only when the healing tables of rmu-api-core cannot be read.
 const FALLBACK_HP_PERCENT = 10;
 const FALLBACK_PERIOD_HOURS = 2;
@@ -14,19 +15,23 @@ const FALLBACK_FULL_REST_MULTIPLIER = 2;
 const POWER_PERIOD_HOURS = 2;
 const POWER_PERIODS_PER_DAY = 4;
 
-/** Passes time resting (spec 013 §6.4): hours or days and complete rest, with a preview of hits and days. */
+/**
+ * Passes time resting (spec 013 §6.4): minutes, hours or days and complete rest, with a preview of hits, days and
+ * fatigue (spec 077: one point per minute of the whole rest).
+ */
 const RestDialog: FC<{
   character: Character;
   open: boolean;
   onClose: () => void;
   onRested: (character: Character) => void;
   /** Starting values, like the rest still pending from a step of time of the campaign (spec 065) */
-  initial?: { hours: number; days: number; fullRest: boolean };
+  initial?: { hours: number; days: number; fullRest: boolean; minutes?: number };
 }> = ({ character, open, onClose, onRested, initial }) => {
   const { t } = useTranslation();
   const auth = useAuth();
   const notify = useStrategicNotify();
   const tables = useHealingTables();
+  const [minutes, setMinutes] = useState(0);
   const [hours, setHours] = useState(0);
   const [days, setDays] = useState(0);
   const [fullRest, setFullRest] = useState(false);
@@ -34,6 +39,7 @@ const RestDialog: FC<{
 
   useEffect(() => {
     if (!open) return;
+    setMinutes(initial?.minutes ?? 0);
     setHours(initial?.hours ?? 0);
     setDays(initial?.days ?? 0);
     setFullRest(initial?.fullRest ?? false);
@@ -58,12 +64,19 @@ const RestDialog: FC<{
   const powerAfter = power
     ? Math.min(power.max, Math.max(power.current, power.current + Math.ceil((power.max * powerPeriods) / 10)))
     : undefined;
+  // Spec 077 (§5.5), as rmu-api-strategic: one point of fatigue per minute of the whole rest
+  const fatigueBefore = Math.abs(character.endurance?.fatiguePenalty ?? 0);
+  const fatigueAfter = Math.max(0, fatigueBefore - (totalHours * MINUTES_PER_HOUR + minutes));
   const recovering = (character.injuries || []).filter((injury) => injury.status === 'recovering' && injury.recovery);
   const dead = character.status === 'dead';
 
   const save = () => {
     setSaving(true);
-    restCharacter(character.id, { hours: hours || undefined, days: days || undefined, fullRest }, auth)
+    restCharacter(
+      character.id,
+      { minutes: minutes || undefined, hours: hours || undefined, days: days || undefined, fullRest },
+      auth
+    )
       .then((updated) => {
         onRested(updated);
         notify.success(t('rest-applied'));
@@ -81,12 +94,22 @@ const RestDialog: FC<{
       maxWidth="sm"
       onCancel={onClose}
       onConfirm={save}
-      onConfirmDisabled={saving || dead || totalHours === 0}
+      onConfirmDisabled={saving || dead || (totalHours === 0 && minutes === 0)}
     >
       <Stack spacing={2} sx={{ pt: 1 }}>
         {dead && <Alert severity="error">{t('err-character-dead')}</Alert>}
         <Grid container spacing={2}>
-          <Grid size={{ xs: 6 }}>
+          <Grid size={{ xs: 4 }}>
+            <NumericInput
+              integer
+              min={0}
+              allowNegatives={false}
+              label={t('minutes')}
+              value={minutes}
+              onChange={(value) => setMinutes(value ?? 0)}
+            />
+          </Grid>
+          <Grid size={{ xs: 4 }}>
             <NumericInput
               integer
               min={0}
@@ -96,7 +119,7 @@ const RestDialog: FC<{
               onChange={(value) => setHours(value ?? 0)}
             />
           </Grid>
-          <Grid size={{ xs: 6 }}>
+          <Grid size={{ xs: 4 }}>
             <NumericInput
               integer
               min={0}
@@ -126,6 +149,11 @@ const RestDialog: FC<{
                 max: power.max,
                 gain: powerAfter - power.current,
               })}
+            </Typography>
+          )}
+          {fatigueBefore > 0 && (
+            <Typography variant="body2">
+              {t('rest-preview-fatigue', { before: -fatigueBefore, after: -fatigueAfter })}
             </Typography>
           )}
           <Typography variant="body2">{t('rest-preview-days', { count: counterDays })}</Typography>

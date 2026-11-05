@@ -32,7 +32,10 @@ const StrategicGameCardChips: FC<{ strategicGame: StrategicGame; size?: 'small' 
       {options.openRounds !== DEFAULT_OPTIONS.openRounds && (
         <Chip size={size} variant="outlined" label={t(options.openRounds ? 'open-rounds-short' : 'closed-rounds')} />
       )}
-      {options.talentPolicy !== DEFAULT_OPTIONS.talentPolicy && <TalentPolicyChip policy={options.talentPolicy} size={size} />}
+      {options.talentPolicy !== DEFAULT_OPTIONS.talentPolicy && (
+        <TalentPolicyChip policy={options.talentPolicy} size={size} />
+      )}
+      {options.talentPurchaseRules && <Chip size={size} variant="outlined" label={t('talent-purchase-rules-short')} />}
     </>
   );
 };

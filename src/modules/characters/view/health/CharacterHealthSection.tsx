@@ -218,6 +218,12 @@ const CharacterHealthSection: FC<{
             <Stack direction="row" useFlexGap sx={{ flexWrap: 'wrap', gap: 1 }}>
               <StatPill label={t('injury-penalty')} value={summary?.injuryPenalty ?? 0} signed />
               <StatPill label={t('active-injuries')} value={summary?.activeInjuries ?? 0} />
+              {/* Spec 077 (§5.5): accumulated fatigue, 0-50, one point recovered per minute of rest */}
+              <StatPill
+                label={t('fatigue-penalty')}
+                value={-Math.abs(character.endurance?.fatiguePenalty ?? 0)}
+                signed
+              />
               {(summary?.bleeding ?? 0) > 0 && (
                 <StatPill label={t('bleeding')} value={t('bleeding-per-round-value', { value: summary?.bleeding })} />
               )}

@@ -29,6 +29,11 @@ const CharacterViewTraits: FC<{
 
   if (!character) return <LoadingState />;
 
+  const linkedTalentName = (traitId: string) => {
+    const talent = character.traits.find((owned) => owned.traitId === traitId);
+    return t(traitId, { defaultValue: talent?.traitName ?? traitId });
+  };
+
   const handleTraitView = (trait: CharacterTrait) => {
     setCharacterTrait(trait);
     setOpenTraitDialog(true);
@@ -57,12 +62,28 @@ const CharacterViewTraits: FC<{
                       {t(trait.specialization)}
                     </Typography>
                   )}
+                  {trait.linkedTo && (
+                    <Typography variant="caption" color="text.secondary" noWrap component="div">
+                      {t('trait-linked-to', { talent: linkedTalentName(trait.linkedTo.traitId) })}
+                    </Typography>
+                  )}
                 </Box>
                 <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', flex: 'none' }}>
                   {trait.source === 'race' && (
                     <Chip label={t('trait-source-race')} size="small" color="primary" variant="outlined" />
                   )}
                   {trait.missingReference && <MissingReferenceChip />}
+                  {/* Spec 077: a flaw waiting for the game master, a restricted trait */}
+                  {trait.pendingApproval && (
+                    <Tooltip title={t('trait-pending-approval-help')}>
+                      <Chip label={t('trait-pending-approval')} size="small" color="warning" />
+                    </Tooltip>
+                  )}
+                  {trait.restricted && (
+                    <Tooltip title={trait.restricted.note || t('trait-restricted-help')}>
+                      <Chip label={t('trait-restricted')} size="small" variant="outlined" />
+                    </Tooltip>
+                  )}
                   <TraitTypeChip isTalent={trait.isTalent} />
                   {trait.source !== 'race' && <TraitPaidChip trait={trait} />}
                 </Stack>

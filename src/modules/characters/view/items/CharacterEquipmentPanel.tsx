@@ -347,6 +347,14 @@ function StatsPanel({ character }: { character: Character }) {
       <StatGroup
         title={t('weight')}
         rows={[
+          // Spec 077 (B1.5): the worn equipment counts too, worn armor scaled to the body it was made for
+          ...(eq.load
+            ? [
+                { label: t('load-worn'), value: `${formatWeight(eq.load.worn)} ${t('lbs')}` },
+                { label: t('load-carried'), value: `${formatWeight(eq.load.carried)} ${t('lbs')}` },
+                { label: t('load-percent'), value: `${formatWeight(eq.load.percent)} %`, hint: t('load-percent-hint') },
+              ]
+            : []),
           ...(overload > 0
             ? [{ label: t('overload'), value: `${overload.toFixed(2)} ${t('lbs')}`, tone: 'danger' as const }]
             : []),
@@ -358,6 +366,9 @@ function StatsPanel({ character }: { character: Character }) {
         title={t('armor')}
         rows={[
           { label: t('armor-type'), value: getArmorType() },
+          ...(eq.armorEncumbrance !== undefined
+            ? [{ label: t('armor-encumbrance'), value: `${eq.armorEncumbrance} %`, hint: t('armor-encumbrance-hint') }]
+            : []),
           { label: t('armor-base-penalty'), value: eq.baseManeuverPenalty, tone: 'penalty' },
           { label: t('maneuver-penalty'), value: eq.maneuverPenalty, tone: 'penalty' },
         ]}
@@ -383,6 +394,9 @@ function StatsPanel({ character }: { character: Character }) {
     </Panel>
   );
 }
+
+/** Weights and percents with at most two decimals. */
+const formatWeight = (value: number): string => `${Math.round(value * 100) / 100}`;
 
 /** A group of the equipment stats: its title and the label / value rows (penalties red when negative). */
 function StatGroup({ title, rows }: { title: string; rows: KeyValueRow[] }) {
