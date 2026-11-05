@@ -11,10 +11,9 @@ import HealingIcon from '@mui/icons-material/Healing';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import SportsMmaIcon from '@mui/icons-material/SportsMma';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import { Box, Chip, Stack } from '@mui/material';
+import { Box, Button, Chip, Stack, Typography } from '@mui/material';
 import {
   Character,
-  ConfirmDialog,
   Culture,
   deleteCharacter,
   DetailPage,
@@ -28,10 +27,12 @@ import {
   fetchStrategicGame,
   ImageSelectorDialog,
   imageBaseUrl,
+  isApiError,
   LevelUpButton,
   levelUpCharacter,
   Profession,
   ResourceBar,
+  RmuDialog,
   SectionNav,
   StatPill,
   StrategicGame,
@@ -40,6 +41,8 @@ import {
   useNotify,
   useSectionParam,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { resolveOptions } from '../../services/game-rules';
+import { useStrategicNotify } from '../../services/notify-service';
 import { healthChips } from '../../shared/chips/CharacterHealthChips';
 import { canChangeCharacter } from '../../shared/permissions';
 import CharacterHealthSection from './health/CharacterHealthSection';
@@ -84,7 +87,9 @@ export default function CharacterViewPage() {
   const [strategicGame, setStrategicGame] = useState<StrategicGame>();
   const [profession, setProfession] = useState<Profession>();
   const [culture, setCulture] = useState<Culture>();
-  const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
+  // Unspent normal points the API refused the level up for (spec 076, A5): they open the confirmation
+  const [unspentDevPoints, setUnspentDevPoints] = useState<number>();
+  const strategicNotify = useStrategicNotify();
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [section, setSection] = useSectionParam(sectionIds);
 
@@ -109,15 +114,24 @@ export default function CharacterViewPage() {
     fetchCulture(cultureId, auth).then(setCulture).catch(notify.error);
   }, [character?.info.cultureId]);
 
-  const onLevelUp = (entity: Character, force: boolean) => {
-    levelUpCharacter(entity.id, force, auth)
+  /**
+   * Levels up. Only unspent normal points open the confirmation, which keeps them for the next level (`save`, when the
+   * game allows it) or loses them (`force`); any other error is shown as such (spec 076, A5).
+   */
+  const onLevelUp = (entity: Character, mode: 'check' | 'force' | 'save') => {
+    levelUpCharacter(entity.id, mode === 'force', auth, mode === 'save')
       .then((updated) => {
         state.setEntity(updated);
-        setLevelUpDialogOpen(false);
+        setUnspentDevPoints(undefined);
       })
       .catch((err) => {
-        if (force === false) setLevelUpDialogOpen(true);
-        else notify.error(err);
+        if (mode === 'check' && isApiError(err) && err.code === 'err-level-up-unspent-dev-points') {
+          const details = err.details as { unspent?: number } | undefined;
+          setUnspentDevPoints(details?.unspent ?? entity.experience.availableDevPoints);
+          return;
+        }
+        setUnspentDevPoints(undefined);
+        strategicNotify.error(err);
       });
   };
 
@@ -168,8 +182,9 @@ export default function CharacterViewPage() {
       entity={state}
       technicalInfo={false}
       actions={(entity) => [
-        ...(entity.experience.availableLevel > entity.experience.level && canChangeCharacter(auth, entity, strategicGame)
-          ? [<LevelUpButton key="level-up" onClick={() => onLevelUp(entity, false)} color="success" />]
+        ...(entity.experience.availableLevel > entity.experience.level &&
+        canChangeCharacter(auth, entity, strategicGame)
+          ? [<LevelUpButton key="level-up" onClick={() => onLevelUp(entity, 'check')} color="success" />]
           : []),
         ...(canChangeCharacter(auth, entity, strategicGame)
           ? [<DownloadButton key="export" tooltip="export" onClick={() => onExport(entity)} />]
@@ -304,16 +319,12 @@ export default function CharacterViewPage() {
           <Box key={section} sx={enterSx()}>
             {renderSection(entity)[section as CharacterSectionId]}
           </Box>
-          <ConfirmDialog
-            open={levelUpDialogOpen}
-            title={t('level-up')}
-            message={t('level-up-confirmation', {
-              name: entity.name,
-              points: entity.experience.availableDevPoints,
-            })}
-            confirmLabel={t('level-up')}
-            onClose={() => setLevelUpDialogOpen(false)}
-            onConfirm={() => onLevelUp(entity, true)}
+          <LevelUpUnspentDialog
+            name={entity.name}
+            unspent={unspentDevPoints}
+            canSave={resolveOptions(strategicGame?.options).allowSavingDevPoints}
+            onClose={() => setUnspentDevPoints(undefined)}
+            onLevelUp={(mode) => onLevelUp(entity, mode)}
           />
           <ImageSelectorDialog
             value={entity.imageUrl || defaultCharacterImage}
@@ -324,5 +335,49 @@ export default function CharacterViewPage() {
         </Stack>
       )}
     </DetailPage>
+  );
+}
+
+/**
+ * Confirmation of a level up with unspent normal development points (Core Law §2.8, workspace spec 076, A5): they
+ * are kept for the next level when the game master allows it, or lost.
+ */
+function LevelUpUnspentDialog({
+  name,
+  unspent,
+  canSave,
+  onClose,
+  onLevelUp,
+}: {
+  name: string;
+  unspent?: number;
+  canSave: boolean;
+  onClose: () => void;
+  onLevelUp: (mode: 'force' | 'save') => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <RmuDialog
+      open={unspent !== undefined}
+      title={t('level-up')}
+      maxWidth="sm"
+      onCancel={onClose}
+      buttons={
+        <>
+          <Button color="error" variant={canSave ? 'outlined' : 'contained'} onClick={() => onLevelUp('force')}>
+            {t('level-up-lose-dev-points')}
+          </Button>
+          {canSave && (
+            <Button variant="contained" onClick={() => onLevelUp('save')}>
+              {t('level-up-save-dev-points')}
+            </Button>
+          )}
+        </>
+      }
+    >
+      <Typography variant="body2">
+        {t(canSave ? 'level-up-confirmation-save' : 'level-up-confirmation', { name, points: unspent ?? 0 })}
+      </Typography>
+    </RmuDialog>
   );
 }

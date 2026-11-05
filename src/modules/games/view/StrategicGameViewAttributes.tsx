@@ -51,10 +51,16 @@ const StrategicGameViewAttributes: FC<{ strategicGame: StrategicGame }> = ({ str
       defaultValue: DEFAULT_OPTIONS.statGeneration,
     },
     {
-      option: 'allow-third-rank',
-      label: t('allow-third-rank'),
-      value: yesNo(options.allowThirdRank),
-      defaultValue: DEFAULT_OPTIONS.allowThirdRank,
+      option: 'intense-training',
+      label: t('intense-training'),
+      value: yesNo(options.intenseTraining),
+      defaultValue: DEFAULT_OPTIONS.intenseTraining,
+    },
+    {
+      option: 'allow-saving-dev-points',
+      label: t('allow-saving-dev-points'),
+      value: yesNo(options.allowSavingDevPoints),
+      defaultValue: DEFAULT_OPTIONS.allowSavingDevPoints,
     },
     {
       option: 'bonus-dev-points-cap-at-creation',

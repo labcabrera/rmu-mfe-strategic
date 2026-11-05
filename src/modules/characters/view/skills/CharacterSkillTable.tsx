@@ -15,6 +15,7 @@ import TurnedInIcon from '@mui/icons-material/TurnedIn';
 import TurnedInNotIcon from '@mui/icons-material/TurnedInNot';
 import {
   Box,
+  Chip,
   Collapse,
   IconButton,
   ListItemIcon,
@@ -36,8 +37,10 @@ import {
   Character,
   CharacterSkill,
   deleteCharacterSkill,
+  DevPointsPool,
   EmptyState,
   formatBonus,
+  isIntenseTrainingSkill,
   levelDownSkill,
   levelUpSkill,
   Profession,
@@ -48,9 +51,11 @@ import {
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import {
   MAX_PROFESSIONAL_SKILLS,
-  maxRanksPerLevel,
+  MAX_RANKS_PER_LEVEL,
+  nextRankCost,
+  nextRankRule,
   resolvePowerLevel,
-  spendableDevPoints,
+  spendableDevPointsWith,
 } from '../../../services/game-rules';
 import { useStrategicNotify } from '../../../services/notify-service';
 import MissingReferenceChip from '../../../shared/chips/MissingReferenceChip';
@@ -72,6 +77,8 @@ type TableContext = {
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   profession?: Profession;
   strategicGame?: StrategicGame;
+  /** Pool that pays the ranks (workspace spec 076, A3). */
+  pool: DevPointsPool;
   /** Marked skills of each type, and how many the character may have. */
   marked: Record<ProfessionalType, number>;
   limits: Record<ProfessionalType, number>;
@@ -89,12 +96,14 @@ export default function CharacterSkillTable({
   setCharacter,
   profession,
   strategicGame,
+  pool = 'auto',
 }: {
   character: Character;
   skills?: CharacterSkill[];
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   profession?: Profession;
   strategicGame?: StrategicGame;
+  pool?: DevPointsPool;
 }) {
   const { t, i18n } = useTranslation();
   const displayedSkills = skills ?? character.skills;
@@ -104,6 +113,7 @@ export default function CharacterSkillTable({
     setCharacter,
     profession,
     strategicGame,
+    pool,
     marked: { professional: count('professional'), knack: count('knack') },
     limits: { professional: MAX_PROFESSIONAL_SKILLS, knack: resolvePowerLevel(strategicGame?.powerLevel).knackCount },
   };
@@ -188,23 +198,29 @@ function SkillRow({ skill, context }: { skill: CharacterSkill; context: TableCon
   const auth = useAuth();
   const { t } = useTranslation();
   const notify = useStrategicNotify();
-  const { character, setCharacter, profession, strategicGame } = context;
+  const { character, setCharacter, profession, strategicGame, pool } = context;
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState<HTMLElement | null>(null);
-  const maxRanks = maxRanksPerLevel(strategicGame);
   const cultureRanks = skill.cultureRanks ?? 0;
+  const talentRanks = skill.talentRanks ?? 0;
+  const cultureSources = skill.cultureSources?.length ?? 0;
+  const intenseTraining = isIntenseTrainingSkill(character.experience, skill);
+  // Two squares, or as many ranks as intense training gave the skill in this level
+  const maxRanks = Math.max(MAX_RANKS_PER_LEVEL, skill.ranksDeveloped);
   const professionSkill = !!profession && (profession.professionalSkills as string[]).includes(skill.skillId);
 
   const update = (request: Promise<Character>) => request.then(setCharacter).catch(notify.error);
 
-  // Up to 2 ranks per level (3 with the game's allowThirdRank option); the third rank costs the same as the second
-  const nextCost = skill.development[Math.min(skill.ranksDeveloped, skill.development.length - 1, 1)];
+  // Two ranks per level, more in one skill with intense training (spec 076); every rank but the first costs the second
+  const rankRule = nextRankRule(character, skill, strategicGame);
+  const nextCost = nextRankCost(skill);
   const canLevelUp =
-    skill.ranksDeveloped < maxRanks &&
-    nextCost !== undefined &&
-    spendableDevPoints(character, strategicGame) >= nextCost;
-  // Culture ranks cannot be removed
-  const canLevelDown = skill.ranksDeveloped >= 1 && skill.ranks - 1 >= cultureRanks;
+    !rankRule.blocked && nextCost !== undefined && spendableDevPointsWith(character, strategicGame, pool) >= nextCost;
+  // Why the + is disabled by the rules, once the two ranks of the level are developed
+  const levelUpHint =
+    rankRule.blocked && rankRule.blocked !== 'err-skill-max-ranks-per-level' ? t(rankRule.blocked) : '';
+  // Culture and talent ranks cannot be removed
+  const canLevelDown = skill.ranksDeveloped >= 1 && skill.ranks - 1 >= cultureRanks + talentRanks;
   const canDelete = skill.skillId !== 'body-development' && skill.ranks <= skill.ranksDeveloped;
 
   const toggle = (type: ProfessionalType) => {
@@ -271,6 +287,7 @@ function SkillRow({ skill, context }: { skill: CharacterSkill; context: TableCon
               )}
             </Typography>
             {skill.missingReference && <MissingReferenceChip />}
+            {intenseTraining && <Chip size="small" color="warning" variant="outlined" label={t('intense-training')} />}
             {/* On phones the marks are in the menu of the row */}
             <Stack direction="row" sx={{ display: { xs: 'none', sm: 'flex' } }}>
               <MarkToggle
@@ -294,7 +311,8 @@ function SkillRow({ skill, context }: { skill: CharacterSkill; context: TableCon
             max={maxRanks}
             canUp={canLevelUp}
             canDown={canLevelDown}
-            onUp={() => update(levelUpSkill(character.id, skill.skillId, skill.specialization, auth))}
+            upHint={levelUpHint}
+            onUp={() => update(levelUpSkill(character.id, skill.skillId, skill.specialization, auth, pool))}
             onDown={() => update(levelDownSkill(character.id, skill.skillId, skill.specialization, auth))}
           />
         </TableCell>
@@ -400,6 +418,13 @@ function SkillRow({ skill, context }: { skill: CharacterSkill; context: TableCon
               {cultureRanks > 0 && (
                 <Typography variant="caption" color="text.secondary">
                   {t('culture-ranks-breakdown', { culture: cultureRanks, total: skill.ranks })}
+                  {/* Two entries of the culture may grant the same language (spec 076, A6) */}
+                  {cultureSources > 1 && ` ${t('culture-ranks-sources', { count: cultureSources })}`}
+                </Typography>
+              )}
+              {talentRanks > 0 && (
+                <Typography variant="caption" color="text.secondary">
+                  {t('talent-ranks-breakdown', { talent: talentRanks, total: skill.ranks })}
                 </Typography>
               )}
             </Stack>
@@ -425,9 +450,11 @@ const RankStepper: FC<{
   max: number;
   canUp: boolean;
   canDown: boolean;
+  /** Why the + is disabled, when the rules say so. */
+  upHint?: string;
   onUp: () => void;
   onDown: () => void;
-}> = ({ developed, max, canUp, canDown, onUp, onDown }) => {
+}> = ({ developed, max, canUp, canDown, upHint, onUp, onDown }) => {
   const { t } = useTranslation();
   return (
     <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'center' }}>
@@ -443,15 +470,23 @@ const RankStepper: FC<{
       >
         {Array.from({ length: max }, (_, index) =>
           index < developed ? (
-            <SquareIcon key={index} sx={{ fontSize: 14 }} />
+            // Ranks beyond two come from intense training
+            <SquareIcon
+              key={index}
+              sx={{ fontSize: 14, color: index >= MAX_RANKS_PER_LEVEL ? 'warning.main' : undefined }}
+            />
           ) : (
             <CropSquareIcon key={index} sx={{ fontSize: 14, color: 'text.disabled' }} />
           )
         )}
       </Stack>
-      <IconButton size="small" color="primary" aria-label={t('skill-rank-add')} disabled={!canUp} onClick={onUp}>
-        <AddIcon fontSize="small" />
-      </IconButton>
+      <Tooltip title={!canUp && upHint ? upHint : ''}>
+        <span>
+          <IconButton size="small" color="primary" aria-label={t('skill-rank-add')} disabled={!canUp} onClick={onUp}>
+            <AddIcon fontSize="small" />
+          </IconButton>
+        </span>
+      </Tooltip>
     </Stack>
   );
 };

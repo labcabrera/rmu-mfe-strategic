@@ -18,7 +18,16 @@ import CharacterEquipmentPanel from '../items/CharacterEquipmentPanel';
 import CharacterViewStats from '../stats/CharacterViewStats';
 import CharacterViewTraits from '../traits/CharacterViewTraits';
 import CharacterViewExperience from '../xp/CharacterViewXp';
-import { Bento, DefensePanel, formatFumble, formatMeleeRange, LoadPanel, Row, span } from './CharacterPanels';
+import {
+  Bento,
+  DefensePanel,
+  formatFumble,
+  formatMeleeRange,
+  LoadPanel,
+  Row,
+  span,
+  useAttackView,
+} from './CharacterPanels';
 
 export const characterSectionIds = [
   'overview',
@@ -49,6 +58,7 @@ export const CharacterOverview = ({
   const { t } = useTranslation();
   // Spec 050: specializations are catalog keys shown by their name
   const specializationLabel = useSpecializationLabel();
+  const attackView = useAttackView();
   const seeAll = (id: CharacterSectionId) => ({ label: t('see-all'), onClick: () => go(id) });
   const topSkills = [...character.skills].sort((a, b) => b.totalBonus - a.totalBonus).slice(0, TOP_SKILLS);
   return (
@@ -74,7 +84,7 @@ export const CharacterOverview = ({
             {character.attacks.map((attack) => (
               <AttackCard
                 key={`${attack.attackName}-${attack.type}`}
-                attack={attack}
+                attack={attackView(attack)}
                 meleeRangeLabel={formatMeleeRange(attack, strategicGame)}
                 fumbleLabel={formatFumble(attack)}
                 dense
@@ -146,6 +156,7 @@ export const CharacterAttributes = ({ character, setCharacter, strategicGame }: 
 /** Attacks, defense, and movement with its pace table. */
 export const CharacterCombat = ({ character, strategicGame }: Omit<SectionProps, 'setCharacter'>) => {
   const { t } = useTranslation();
+  const attackView = useAttackView();
   return (
     <Bento>
       <Box sx={span(12, 8, 9)}>
@@ -153,7 +164,7 @@ export const CharacterCombat = ({ character, strategicGame }: Omit<SectionProps,
           {character.attacks.map((attack) => (
             <AttackCard
               key={`${attack.attackName}-${attack.type}`}
-              attack={attack}
+              attack={attackView(attack)}
               meleeRangeLabel={formatMeleeRange(attack, strategicGame)}
               fumbleLabel={formatFumble(attack)}
             />
