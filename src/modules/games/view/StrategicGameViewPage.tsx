@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import GroupIcon from '@mui/icons-material/Group';
+import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 import { Alert, Badge, Button, Chip, Stack, Typography } from '@mui/material';
 import {
   AddButton,
@@ -33,15 +34,16 @@ import {
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import CreateOrImportButton from '../../shared/CreateOrImportButton';
 import { isGameMaster, isGameOwner } from '../../shared/permissions';
-import StrategicGameViewJoin from './StrategicGameViewJoin';
-import StrategicGameMembersDialog from './members/StrategicGameMembersDialog';
 import StrategicGameCardChips from '../list/StrategicGameCardChips';
 import StrategicGameViewAttributes from './StrategicGameViewAttributes';
 import StrategicGameViewFactions from './StrategicGameViewFactions';
+import StrategicGameViewJoin from './StrategicGameViewJoin';
 import StrategicGameViewPowerLevel from './StrategicGameViewPowerLevel';
 import StrategicGameViewTacticalGames from './StrategicGameViewTacticalGames';
+import StrategicGameMembersDialog from './members/StrategicGameMembersDialog';
 import PassTimeDialog from './time/PassTimeDialog';
 import StrategicGameViewCalendar from './time/StrategicGameViewCalendar';
+import GroupXpDialog from './xp/GroupXpDialog';
 
 const defaultGameImage = `${imageBaseUrl}images/generic/strategic.png`;
 
@@ -70,6 +72,8 @@ export default function StrategicGameViewPage() {
   // Spec 065: the step of time and the reload of its log
   const [passTimeOpen, setPassTimeOpen] = useState(false);
   const [timeLogKey, setTimeLogKey] = useState(0);
+  // Spec 079: experience for the group
+  const [groupXpOpen, setGroupXpOpen] = useState(false);
 
   // Spec 071: a public game seen from outside only shows its cover; its factions and tactical games are for members.
   const member = gameAccessAtLeast(strategicGame?.access ?? 'owner', 'spectator');
@@ -144,6 +148,19 @@ export default function StrategicGameViewPage() {
                   {`${t('game-members-button')} (${(game.members ?? []).length})`}
                 </Button>
               </Badge>,
+              ...(master
+                ? [
+                    <Button
+                      key="group-xp"
+                      variant="outlined"
+                      size="small"
+                      startIcon={<MilitaryTechIcon />}
+                      onClick={() => setGroupXpOpen(true)}
+                    >
+                      {t('group-xp')}
+                    </Button>,
+                  ]
+                : []),
             ]
           : []
       }
@@ -200,35 +217,35 @@ export default function StrategicGameViewPage() {
             {!member && <StrategicGameViewJoin game={game} />}
             {member && (
               <>
-            <StrategicGameViewCalendar
-              game={game}
-              canPassTime={isGameMaster(auth, game)}
-              onPassTime={() => setPassTimeOpen(true)}
-              refreshKey={timeLogKey}
-            />
-            <Panel
-              title={t('factions')}
-              extra={
-                master && (
-                  <CreateOrImportButton
-                    onCreate={() =>
-                      navigate(`/strategic/factions/create?gameId=${game.id}`, { state: { strategicGame: game } })
-                    }
-                    onImport={() => setImportOpen(true)}
-                  />
-                )
-              }
-            >
-              <StrategicGameViewFactions factions={factions} />
-            </Panel>
-            <Panel
-              title={t('tactical-games')}
-              extra={
-                master && <AddButton onClick={() => navigate(`/tactical/games/create?strategicGame=${game.id}`)} />
-              }
-            >
-              <StrategicGameViewTacticalGames tacticalGames={tacticalGames} factions={factions} />
-            </Panel>
+                <StrategicGameViewCalendar
+                  game={game}
+                  canPassTime={isGameMaster(auth, game)}
+                  onPassTime={() => setPassTimeOpen(true)}
+                  refreshKey={timeLogKey}
+                />
+                <Panel
+                  title={t('factions')}
+                  extra={
+                    master && (
+                      <CreateOrImportButton
+                        onCreate={() =>
+                          navigate(`/strategic/factions/create?gameId=${game.id}`, { state: { strategicGame: game } })
+                        }
+                        onImport={() => setImportOpen(true)}
+                      />
+                    )
+                  }
+                >
+                  <StrategicGameViewFactions factions={factions} />
+                </Panel>
+                <Panel
+                  title={t('tactical-games')}
+                  extra={
+                    master && <AddButton onClick={() => navigate(`/tactical/games/create?strategicGame=${game.id}`)} />
+                  }
+                >
+                  <StrategicGameViewTacticalGames tacticalGames={tacticalGames} factions={factions} />
+                </Panel>
               </>
             )}
           </Stack>
@@ -265,6 +282,7 @@ export default function StrategicGameViewPage() {
             }}
             onConflict={() => state.refresh()}
           />
+          {master && <GroupXpDialog game={game} open={groupXpOpen} onClose={() => setGroupXpOpen(false)} />}
           <ImageSelectorDialog
             value={game.imageUrl || defaultGameImage}
             open={imageDialogOpen}

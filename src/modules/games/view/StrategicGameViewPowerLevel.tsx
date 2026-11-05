@@ -12,7 +12,11 @@ const StrategicGameViewPowerLevel: FC<{ strategicGame: StrategicGame }> = ({ str
   const { t } = useTranslation();
   const powerLevel = resolvePowerLevel(strategicGame.powerLevel);
 
-  const row = (option: string, label: string, key: keyof typeof DEFAULT_POWER_LEVEL): GameOptionRow => ({
+  const row = (
+    option: string,
+    label: string,
+    key: Exclude<keyof typeof DEFAULT_POWER_LEVEL, 'preset'>
+  ): GameOptionRow => ({
     option,
     label: t(label),
     value: powerLevel[key],
@@ -20,6 +24,13 @@ const StrategicGameViewPowerLevel: FC<{ strategicGame: StrategicGame }> = ({ str
   });
 
   const rows: GameOptionRow[] = [
+    {
+      option: 'power-level-preset',
+      label: t('power-level-preset'),
+      value: powerLevel.preset ? t(`power-level-${powerLevel.preset}`) : t('power-level-preset-custom'),
+      // The help shows t('power-level-preset-custom')
+      defaultValue: 'custom',
+    },
     row('base-dev-points', 'dev-points', 'baseDevPoints'),
     row('race-dev-points-per-level', 'race-dev-points-per-level', 'raceDevPointsPerLevel'),
     row('creation-bonus-dev-points', 'creation-bonus-dev-points', 'creationBonusDevPoints'),
@@ -32,6 +43,10 @@ const StrategicGameViewPowerLevel: FC<{ strategicGame: StrategicGame }> = ({ str
     row('max-trait-cost', 'max-trait-cost', 'maxTraitCost'),
     row('knack-count', 'knack-count', 'knackCount'),
     row('knack-bonus', 'knack-bonus', 'knackBonus'),
+    {
+      ...row('pp-recovery-percent', 'pp-recovery-percent', 'ppRecoveryPercent'),
+      value: `${powerLevel.ppRecoveryPercent}%`,
+    },
   ];
 
   return (

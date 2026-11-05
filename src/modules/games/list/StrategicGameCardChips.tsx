@@ -26,6 +26,11 @@ const StrategicGameCardChips: FC<{ strategicGame: StrategicGame; size?: 'small' 
           label={t(strategicGame.status)}
         />
       )}
+      {powerLevel.preset && (
+        <Tooltip title={t('power-level-preset')}>
+          <Chip size={size} variant="outlined" color="primary" label={t(`power-level-${powerLevel.preset}`)} />
+        </Tooltip>
+      )}
       <Tooltip title={t('power-level')}>
         <Chip size={size} variant="outlined" label={t('power-level-dp', { dp: powerLevel.baseDevPoints })} />
       </Tooltip>
@@ -36,6 +41,11 @@ const StrategicGameCardChips: FC<{ strategicGame: StrategicGame; size?: 'small' 
         <TalentPolicyChip policy={options.talentPolicy} size={size} />
       )}
       {options.talentPurchaseRules && <Chip size={size} variant="outlined" label={t('talent-purchase-rules-short')} />}
+      {options.startingWealth !== DEFAULT_OPTIONS.startingWealth && (
+        <Tooltip title={t('starting-wealth')}>
+          <Chip size={size} variant="outlined" label={t(`starting-wealth-${options.startingWealth}`)} />
+        </Tooltip>
+      )}
     </>
   );
 };

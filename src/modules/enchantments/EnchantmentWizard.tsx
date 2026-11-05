@@ -33,6 +33,7 @@ import {
   EnchantmentRequest,
   EnchantmentScope,
   fetchCharacterSpells,
+  fetchStrategicGame,
   FlowSteps,
   isEnchantmentActive,
   ItemHolder,
@@ -120,6 +121,14 @@ const EnchantmentWizard: FC<{
   const [planError, setPlanError] = useState<string>();
   const [rolls, setRolls] = useState<Record<string, number>>({});
   const [busy, setBusy] = useState(false);
+
+  // Spec 079: the power level preset of the game, when it has one, instead of Superior
+  useEffect(() => {
+    if (!view.gameId) return;
+    fetchStrategicGame(view.gameId, auth)
+      .then((game) => game.powerLevel?.preset && setPowerLevel(game.powerLevel.preset))
+      .catch(() => undefined);
+  }, [view.gameId]);
 
   useEffect(() => {
     setGrimoire(undefined);
