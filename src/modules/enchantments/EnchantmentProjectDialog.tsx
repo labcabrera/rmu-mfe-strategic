@@ -114,7 +114,7 @@ const EnchantmentProjectDialog: FC<{
       maxWidth="md"
       title={title}
       subtitle={t('enchantment-by', { name: project.alchemistName })}
-      onClose={onClose}
+      onDismiss={onClose}
       buttons={
         <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', justifyContent: 'flex-end' }} useFlexGap>
           {status === 'in-progress' && (
@@ -351,7 +351,7 @@ const EnchantmentAdjustDialog: FC<{
       maxWidth="sm"
       title={t('enchantment-adjust')}
       subtitle={t(project.itemName, project.itemName)}
-      onClose={onClose}
+      onDismiss={onClose}
       buttons={
         <>
           <Button onClick={onClose}>{t('cancel')}</Button>

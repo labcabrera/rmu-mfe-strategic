@@ -95,7 +95,7 @@ export default function CharacterItemModifiersDialog({
       title={t('item-modifiers')}
       subtitle={item.name}
       maxWidth="md"
-      onClose={onClose}
+      onDismiss={onClose}
       buttons={<Button onClick={onClose}>{t('close')}</Button>}
     >
       <Stack spacing={2}>
