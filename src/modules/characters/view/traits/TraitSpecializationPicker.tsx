@@ -8,6 +8,7 @@ import {
   fetchSkillCategories,
   fetchSkills,
   fetchSpellLists,
+  ELEMENTS,
   EnumPicker,
   LoadingState,
   REALM_TYPES,
@@ -21,6 +22,9 @@ import {
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const COMBAT_SKILL_CATEGORY = 'combat-training';
+
+/** Specialization of Elemental Resistance and Susceptibility (workspace spec 079, D4). */
+const ELEMENTAL_TYPE = 'elemental-type';
 
 const SKILL_SPECIALIZATIONS = ['skill', 'combat-skill', 'melee-combat-skill', 'ranged-combat-skill'];
 
@@ -68,13 +72,16 @@ const SpellListSpecializationPicker: FC<{ value: string | null; onChange: (code:
 };
 
 /**
- * Values a trait specialization can take: the stat keys for `stat`, the realms for `realm`, the skills of the core
+ * Values a trait specialization can take: the stat keys for `stat`, the realms for `realm`, the elements for
+ * `elemental-type`, the skills of the core
  * catalog for the skill kinds (only the combat-training ones for the combat kinds), the skill categories, the race
  * names, and the enumerations of the category for the rest (weapon types, senses, languages...).
  */
 const loadSpecializations = async (specialization: string, auth: ReturnType<typeof useAuth>): Promise<string[]> => {
   if (specialization === 'stat') return [...STATS];
   if (specialization === 'realm') return [...REALM_TYPES];
+  // Workspace spec 079, D4: core has no `elemental-type` enumeration; the elements tactical reads (i18n `element-<id>`)
+  if (specialization === ELEMENTAL_TYPE) return [...ELEMENTS];
   if (specialization === 'skill-category') {
     const response = await fetchSkillCategories('', 0, 100, auth);
     return response.content.map((category) => category.id);
@@ -134,6 +141,7 @@ const TraitSpecializationPicker: FC<{
       label={t('specialization')}
       value={value || null}
       values={availableSpecializations}
+      labelPrefix={trait.specialization === ELEMENTAL_TYPE ? 'element-' : undefined}
       onChange={(specialization) => specialization && onChange(specialization)}
     />
   );

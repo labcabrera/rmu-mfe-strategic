@@ -109,6 +109,11 @@ export const LoadPanel = ({ character }: { character: Character }) => {
         <Row label={t('maneuver-penalty')} value={formatBonus(equipment.maneuverPenalty)} />
         <Row label={t('ranged-penalty')} value={formatBonus(equipment.rangedPenalty)} />
         <Row label={t('encumbrance')} value={formatBonus(equipment.encumbrancePenalty)} />
+        {/* Workspace spec 079, D2: Beast of Burden lowers the load penalty but not the one of the dodge */}
+        {equipment.dodgeEncumbrancePenalty !== undefined &&
+          equipment.dodgeEncumbrancePenalty !== equipment.encumbrancePenalty && (
+            <Row label={t('dodge-encumbrance')} value={formatBonus(equipment.dodgeEncumbrancePenalty)} />
+          )}
       </Box>
     </>
   );

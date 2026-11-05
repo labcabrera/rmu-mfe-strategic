@@ -7,6 +7,7 @@ import {
   formatBonus,
   PreviewDrawer,
   SituationalSenseTraits,
+  SituationalTalentBonuses,
   skillCategoryOf,
   useSpecializationLabel,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
@@ -14,7 +15,8 @@ import { Row } from '../sections/CharacterPanels';
 
 /**
  * Side panel with how a skill's total bonus adds up. On Perception and Tracking it also lists the sense traits of the
- * character, which apply in the roll and not in the total (workspace spec 076, C8).
+ * character, which apply in the roll and not in the total (workspace spec 076, C8), and on any skill the situational
+ * talents the game master ticks on the maneuver (workspace spec 079, D3).
  */
 export default function CharacterSkillBreakdown({
   skill,
@@ -58,6 +60,7 @@ export default function CharacterSkillBreakdown({
           <Row label={t('total')} value={formatBonus(skill.totalBonus)} />
           <Box sx={{ mt: 1 }}>
             <SituationalSenseTraits skill={skill} traits={traits} />
+            <SituationalTalentBonuses skill={skill} traits={traits} />
           </Box>
         </Stack>
       )}

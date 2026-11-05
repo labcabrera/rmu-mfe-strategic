@@ -261,6 +261,10 @@ const CharacterHealthSection: FC<{
                 value={-Math.abs(character.endurance?.fatiguePenalty ?? 0)}
                 signed
               />
+              {/* Workspace spec 079, D2: Vigorous/Feeble, added to the Endurance of the tactical fatigue */}
+              {(character.endurance?.traitBonus ?? 0) !== 0 && (
+                <StatPill label={t('endurance-trait-bonus')} value={character.endurance?.traitBonus ?? 0} signed />
+              )}
               {(summary?.bleeding ?? 0) > 0 && (
                 <StatPill label={t('bleeding')} value={t('bleeding-per-round-value', { value: summary?.bleeding })} />
               )}
