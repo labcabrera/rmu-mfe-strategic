@@ -359,6 +359,17 @@ function StatsPanel({ character }: { character: Character }) {
             ? [{ label: t('overload'), value: `${overload.toFixed(2)} ${t('lbs')}`, tone: 'danger' as const }]
             : []),
           { label: t('encumbrance-penalty'), value: eq.encumbrancePenalty, tone: 'penalty' },
+          // Workspace spec 079, D2: Beast of Burden lowers the load penalty but not the one of the dodge
+          ...(eq.dodgeEncumbrancePenalty !== undefined && eq.dodgeEncumbrancePenalty !== eq.encumbrancePenalty
+            ? [
+                {
+                  label: t('dodge-encumbrance'),
+                  value: eq.dodgeEncumbrancePenalty,
+                  tone: 'penalty' as const,
+                  hint: t('dodge-encumbrance-hint'),
+                },
+              ]
+            : []),
         ]}
       />
 

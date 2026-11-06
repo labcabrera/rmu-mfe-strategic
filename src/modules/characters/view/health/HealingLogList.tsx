@@ -97,8 +97,32 @@ const useEntryText = () => {
             before: num(s, 'hpBefore') ?? '-',
             after: num(s, 'hpAfter') ?? '-',
             counter: num(s, 'days') ?? 0,
-          }) + (s.fullRest ? ` · ${t('full-rest')}` : '')
+          }) +
+          (s.fullRest ? ` · ${t('full-rest')}` : '') +
+          (s.active ? ` · ${t('rest-active')}` : '')
         );
+      // Workspace spec 079, C1 and C2
+      case 'amputation':
+        return [
+          t('healing-log-amputation', {
+            method: t(`amputation-method-${str(s, 'method') ?? 'surgical'}`),
+            limb: t('lost-limb-label', {
+              location: t(str(s, 'location') ?? 'arm'),
+              side: t(`side-${str(s, 'side') ?? 'left'}`),
+            }),
+            total: num(s, 'total') ?? '-',
+            result: t(str(s, 'result') ?? ''),
+          }),
+          s.critical ? t('amputation-critical-short') : undefined,
+          s.systemShock ? t('amputation-system-shock-short') : undefined,
+        ]
+          .filter(Boolean)
+          .join(' · ');
+      case 'strenuous-failure':
+        return t(s.absolute ? 'healing-log-strenuous-failure-absolute' : 'healing-log-strenuous-failure', {
+          before: num(s, 'penaltyBefore') ?? 0,
+          after: num(s, 'penalty') ?? 0,
+        });
       default: {
         const action = str(s, 'action');
         if (action === 'condition-resolved') {

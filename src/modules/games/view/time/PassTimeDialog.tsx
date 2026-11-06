@@ -142,7 +142,12 @@ const PassTimeDialog: FC<{
 
   const failed = done?.characters.filter((c) => c.error) ?? [];
   const retryInitial = retry
-    ? { hours: done?.hours ?? 0, days: done?.days ?? 0, fullRest: retry.entry.activity === 'full-rest' }
+    ? {
+        hours: done?.hours ?? 0,
+        days: done?.days ?? 0,
+        fullRest: retry.entry.activity === 'full-rest',
+        active: retry.entry.activity === 'active',
+      }
     : undefined;
 
   return (

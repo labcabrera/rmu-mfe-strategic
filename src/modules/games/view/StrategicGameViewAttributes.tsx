@@ -51,6 +51,12 @@ const StrategicGameViewAttributes: FC<{ strategicGame: StrategicGame }> = ({ str
       defaultValue: DEFAULT_OPTIONS.statGeneration,
     },
     {
+      option: 'starting-wealth',
+      label: t('starting-wealth'),
+      value: t(`starting-wealth-${options.startingWealth}`),
+      defaultValue: DEFAULT_OPTIONS.startingWealth,
+    },
+    {
       option: 'intense-training',
       label: t('intense-training'),
       value: yesNo(options.intenseTraining),

@@ -3,6 +3,7 @@ import {
   CharacterSkill,
   DevPointsPool,
   isIntenseTrainingSkill,
+  PowerLevelPreset,
   StrategicGame,
   StrategicGameOptions,
   StrategicGamePowerLevel,
@@ -25,7 +26,86 @@ export const DEFAULT_POWER_LEVEL: Required<StrategicGamePowerLevel> = {
   statPoints: 15,
   knackCount: 2,
   knackBonus: 5,
+  preset: null,
+  ppRecoveryPercent: 10,
 };
+
+/** Values of a power level a preset fills; the others (development points, traits, swaps) stay as they are. */
+export type PowerLevelPresetValues = Pick<
+  Required<StrategicGamePowerLevel>,
+  | 'statRandomMin'
+  | 'statBoostTemporary'
+  | 'statBoostPotential'
+  | 'statCreationBoost'
+  | 'statPoints'
+  | 'knackCount'
+  | 'knackBonus'
+  | 'ppRecoveryPercent'
+>;
+
+/**
+ * Core Law table 12-1, as rmu-api-strategic has it (workspace spec 079, E). A knack line "+N (+M max)" is N / M knacks
+ * of +M; the Average level has none and no rerolls (a minimum of 1).
+ */
+export const POWER_LEVEL_PRESET_VALUES: Record<PowerLevelPreset, PowerLevelPresetValues> = {
+  average: {
+    statRandomMin: 1,
+    statBoostTemporary: 51,
+    statBoostPotential: 76,
+    statCreationBoost: 1,
+    statPoints: 5,
+    knackCount: 0,
+    knackBonus: 0,
+    ppRecoveryPercent: 5,
+  },
+  superior: {
+    statRandomMin: 11,
+    statBoostTemporary: 56,
+    statBoostPotential: 78,
+    statCreationBoost: 2,
+    statPoints: 15,
+    knackCount: 2,
+    knackBonus: 5,
+    ppRecoveryPercent: 10,
+  },
+  heroic: {
+    statRandomMin: 21,
+    statBoostTemporary: 61,
+    statBoostPotential: 81,
+    statCreationBoost: 3,
+    statPoints: 25,
+    knackCount: 2,
+    knackBonus: 10,
+    ppRecoveryPercent: 15,
+  },
+  legendary: {
+    statRandomMin: 31,
+    statBoostTemporary: 66,
+    statBoostPotential: 83,
+    statCreationBoost: 4,
+    statPoints: 35,
+    knackCount: 2,
+    knackBonus: 15,
+    ppRecoveryPercent: 20,
+  },
+  epic: {
+    statRandomMin: 41,
+    statBoostTemporary: 71,
+    statBoostPotential: 86,
+    statCreationBoost: 5,
+    statPoints: 45,
+    knackCount: 2,
+    knackBonus: 20,
+    ppRecoveryPercent: 25,
+  },
+};
+
+/** The power level with the values of a preset (spec 079): they stay editable. No preset keeps the values. */
+export const applyPowerLevelPreset = (
+  powerLevel: StrategicGamePowerLevel,
+  preset: PowerLevelPreset | null
+): StrategicGamePowerLevel =>
+  preset ? { ...powerLevel, ...POWER_LEVEL_PRESET_VALUES[preset], preset } : { ...powerLevel, preset: null };
 
 export const DEFAULT_OPTIONS: Required<StrategicGameOptions> = {
   experienceMultiplier: 1,
@@ -39,6 +119,7 @@ export const DEFAULT_OPTIONS: Required<StrategicGameOptions> = {
   statGeneration: 'roll',
   openRounds: true,
   talentPurchaseRules: false,
+  startingWealth: 'none',
 };
 
 /** Ranks of a skill that can be developed in a single level without intense training (Core Law §3). */
@@ -54,8 +135,14 @@ const withDefaults = <T extends object>(defaults: Required<T>, value: T | undefi
   return result as Required<T>;
 };
 
-export const resolvePowerLevel = (powerLevel?: StrategicGamePowerLevel): Required<StrategicGamePowerLevel> =>
-  withDefaults(DEFAULT_POWER_LEVEL, powerLevel);
+export const resolvePowerLevel = (powerLevel?: StrategicGamePowerLevel): Required<StrategicGamePowerLevel> => {
+  const resolved = withDefaults(DEFAULT_POWER_LEVEL, powerLevel);
+  // As the API: a preset without its own recovery recovers as the preset says
+  if ((powerLevel?.ppRecoveryPercent ?? null) === null && resolved.preset) {
+    resolved.ppRecoveryPercent = POWER_LEVEL_PRESET_VALUES[resolved.preset].ppRecoveryPercent;
+  }
+  return resolved;
+};
 
 export const resolveOptions = (options?: StrategicGameOptions): Required<StrategicGameOptions> =>
   withDefaults(DEFAULT_OPTIONS, options);

@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Link as RouterLink } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
+import ContentCutIcon from '@mui/icons-material/ContentCut';
+import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import GrassIcon from '@mui/icons-material/Grass';
 import HealingIcon from '@mui/icons-material/Healing';
 import HotelIcon from '@mui/icons-material/Hotel';
@@ -33,6 +35,7 @@ import {
 import { useStrategicNotify } from '../../../services/notify-service';
 import { isGameMaster as isGameMasterOf } from '../../../shared/permissions';
 import { Bento, span } from '../sections/CharacterPanels';
+import AmputationDialog from './AmputationDialog';
 import AntidoteDialog from './AntidoteDialog';
 import HealingLogList from './HealingLogList';
 import HerbSearchDialog from './HerbSearchDialog';
@@ -40,14 +43,17 @@ import InjuryFormDialog from './InjuryFormDialog';
 import InjuryHealingDialog, { HealingStepId } from './InjuryHealingDialog';
 import PoisonCharacterDialog from './PoisonCharacterDialog';
 import RestDialog from './RestDialog';
+import StrenuousFailureDialog from './StrenuousFailureDialog';
 import UseHerbDialog from './UseHerbDialog';
 import {
   activeConditions,
+  canFailStrenuous,
   HERBALISM_SKILL,
   INJURY_GROUPS,
   isPoisoning,
   isTreatable,
   MEDICINE_SKILL,
+  needsNewTreatment,
   skillBonus,
 } from './health-rules';
 
@@ -87,6 +93,8 @@ const CharacterHealthSection: FC<{
   const [herbSearchOpen, setHerbSearchOpen] = useState(false);
   const [removingModifierId, setRemovingModifierId] = useState<string | null>(null);
   const [clearingLimitsId, setClearingLimitsId] = useState<string | null>(null);
+  const [amputationOpen, setAmputationOpen] = useState(false);
+  const [strenuousFor, setStrenuousFor] = useState<Injury>();
 
   // Adding and editing injuries and resolving conditions are for the game master (the owner of the game).
   const isGameMaster = isGameMasterOf(auth, strategicGame);
@@ -113,6 +121,7 @@ const CharacterHealthSection: FC<{
   const conditions = activeConditions(character);
   const summary = character.healthSummary;
   const dead = character.status === 'dead';
+  const lostLimbs = character.lostLimbs || [];
   const groups = INJURY_GROUPS.filter((status) => status !== 'healed' || showHealed);
   const visibleCount = injuries.filter((injury) => showHealed || injury.status !== 'healed').length;
 
@@ -159,10 +168,23 @@ const CharacterHealthSection: FC<{
           {t('injury-limits-clear')}
         </Button>
       ) : undefined;
-    if (!care && !clear) return undefined;
+    // Workspace spec 079, C2: a failed strenuous activity reopens a treated injury
+    const strenuous =
+      isGameMaster && !dead && canFailStrenuous(injury) ? (
+        <Button size="small" startIcon={<DirectionsRunIcon />} onClick={() => setStrenuousFor(injury)}>
+          {t('strenuous-failure')}
+        </Button>
+      ) : undefined;
+    const retreat =
+      injury.status === 'active' && needsNewTreatment(injury) ? (
+        <Chip size="small" color="warning" label={t('strenuous-failure-retreat')} />
+      ) : undefined;
+    if (!care && !clear && !strenuous && !retreat) return undefined;
     return (
       <>
+        {retreat}
         {care}
+        {strenuous}
         {clear}
       </>
     );
@@ -177,7 +199,12 @@ const CharacterHealthSection: FC<{
       <Button
         size="small"
         startIcon={<HealingIcon />}
-        onClick={() => setHealing({ injuryId: injury.id, step: injury.treatments.length > 0 ? 'recovery' : 'healer' })}
+        onClick={() =>
+          setHealing({
+            injuryId: injury.id,
+            step: injury.treatments.length > 0 && !needsNewTreatment(injury) ? 'recovery' : 'healer',
+          })
+        }
       >
         {t('heal')}
       </Button>
@@ -205,6 +232,16 @@ const CharacterHealthSection: FC<{
                 </Button>
               )}
               {isGameMaster && (
+                <Button
+                  size="small"
+                  startIcon={<ContentCutIcon />}
+                  disabled={dead}
+                  onClick={() => setAmputationOpen(true)}
+                >
+                  {t('amputation')}
+                </Button>
+              )}
+              {isGameMaster && (
                 <Button size="small" startIcon={<AddIcon />} onClick={() => setEditing({})}>
                   {t('add-injury')}
                 </Button>
@@ -224,6 +261,10 @@ const CharacterHealthSection: FC<{
                 value={-Math.abs(character.endurance?.fatiguePenalty ?? 0)}
                 signed
               />
+              {/* Workspace spec 079, D2: Vigorous/Feeble, added to the Endurance of the tactical fatigue */}
+              {(character.endurance?.traitBonus ?? 0) !== 0 && (
+                <StatPill label={t('endurance-trait-bonus')} value={character.endurance?.traitBonus ?? 0} signed />
+              )}
               {(summary?.bleeding ?? 0) > 0 && (
                 <StatPill label={t('bleeding')} value={t('bleeding-per-round-value', { value: summary?.bleeding })} />
               )}
@@ -238,11 +279,33 @@ const CharacterHealthSection: FC<{
                       t(`condition-${condition.status}`),
                       condition.source.tacticalGameName,
                       condition.description,
+                      // Workspace spec 079, C6: the day of the campaign of a death
+                      condition.gameDay !== undefined ? t('campaign-day', { day: condition.gameDay }) : undefined,
                     ]
                       .filter(Boolean)
                       .join(' · ')}
                     onDelete={isGameMaster ? () => resolveCondition(condition.id) : undefined}
                     title={isGameMaster ? t('resolve-condition') : undefined}
+                  />
+                ))}
+              </ChipRow>
+            )}
+            {/* Workspace spec 079, C1: limbs lost for good */}
+            {lostLimbs.length > 0 && (
+              <ChipRow>
+                {lostLimbs.map((limb) => (
+                  <Chip
+                    key={`${limb.location}-${limb.side}`}
+                    color="error"
+                    variant="outlined"
+                    label={[
+                      t('lost-limb-label', { location: t(limb.location), side: t(`side-${limb.side}`) }),
+                      limb.cause ? t(`lost-limb-cause-${limb.cause}`) : undefined,
+                      limb.gameDay !== undefined ? t('campaign-day', { day: limb.gameDay }) : undefined,
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
+                    title={t(`lost-limb-${limb.location}-help`)}
                   />
                 ))}
               </ChipRow>
@@ -345,6 +408,21 @@ const CharacterHealthSection: FC<{
       />
       <HerbSearchDialog character={character} open={herbSearchOpen} onClose={() => setHerbSearchOpen(false)} />
       <RestDialog character={character} open={restOpen} onClose={() => setRestOpen(false)} onRested={setCharacter} />
+      <AmputationDialog
+        character={character}
+        healers={healers}
+        healerPenalties={healerPenalties}
+        open={amputationOpen}
+        onClose={() => setAmputationOpen(false)}
+        onUpdated={setCharacter}
+      />
+      <StrenuousFailureDialog
+        character={character}
+        injury={strenuousFor}
+        open={!!strenuousFor}
+        onClose={() => setStrenuousFor(undefined)}
+        onUpdated={setCharacter}
+      />
     </Bento>
   );
 };

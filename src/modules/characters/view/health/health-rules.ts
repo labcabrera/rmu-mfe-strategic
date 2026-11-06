@@ -78,8 +78,7 @@ export const SURGERY_ONLY_PROCEDURES: TreatmentProcedure[] = ['surgery', 'magic'
 export const requiresSurgery = (
   injury: Injury,
   surgeryRequired: { injuryType: string; severity: string }[] | null | undefined
-): boolean =>
-  (surgeryRequired ?? []).some((row) => row.injuryType === injury.type && row.severity === injury.severity);
+): boolean => (surgeryRequired ?? []).some((row) => row.injuryType === injury.type && row.severity === injury.severity);
 
 /** Salve modifier range when the core tables have none (workspace spec 068). */
 export const DEFAULT_SALVE_RANGE = { min: -25, max: 25 };
@@ -143,6 +142,20 @@ export const isPoisoning = (injury: Injury): boolean => !!injury.poison && !inju
 
 export const isTreatable = (injury: Injury): boolean =>
   !isPoisoning(injury) && (injury.status === 'active' || injury.status === 'recovering');
+
+/**
+ * Workspace spec 079, C2, as rmu-api-strategic: after a strenuous failure the next recovery roll needs a new treatment
+ * (one recovery roll per treatment).
+ */
+export const needsNewTreatment = (injury: Injury): boolean => {
+  const failure = injury.strenuousFailure;
+  if (!failure?.treatmentId) return false;
+  return failure.treatmentId === injury.treatments[injury.treatments.length - 1]?.id;
+};
+
+/** Workspace spec 079, C2: a strenuous activity can only fail on a recovering injury with a successful treatment. */
+export const canFailStrenuous = (injury: Injury): boolean =>
+  !isPoisoning(injury) && injury.status === 'recovering' && injury.treatments.length > 0 && !needsNewTreatment(injury);
 
 /** Active conditions (not resolved). */
 export const activeConditions = (character: Character) =>

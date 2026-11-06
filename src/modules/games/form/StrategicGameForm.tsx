@@ -4,14 +4,19 @@ import { Alert, FormControlLabel, Grid, MenuItem, Switch, TextField, Typography 
 import {
   EnumPicker,
   NumericInput,
+  POWER_LEVEL_PRESETS,
+  PowerLevelPreset,
   Realm,
   RealmPicker,
   Section,
+  STARTING_WEALTH_SP_PER_LEVEL,
+  STARTING_WEALTHS,
+  StartingWealth,
   STAT_GENERATIONS,
   StrategicGame,
   TALENT_POLICIES,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { DEFAULT_OPTIONS, DEFAULT_POWER_LEVEL } from '../../services/game-rules';
+import { applyPowerLevelPreset, DEFAULT_OPTIONS, DEFAULT_POWER_LEVEL } from '../../services/game-rules';
 import { GameOptionField } from '../GameOptionHint';
 
 const gridSize = { xs: 12, md: 3 };
@@ -48,6 +53,10 @@ const StrategicGameForm: FC<{
       },
     }));
   };
+
+  // Spec 079 (table 12-1): a preset fills its values, which stay editable
+  const handlePresetChange = (preset: PowerLevelPreset | null) =>
+    setFormData((prevData) => ({ ...prevData, powerLevel: applyPowerLevelPreset(prevData.powerLevel, preset) }));
 
   const calendar = formData.calendar ?? { startDate: '', elapsedDays: 0, elapsedHours: 0, currentDay: 1 };
   const setCalendar = (changes: Partial<typeof calendar>) =>
@@ -242,6 +251,29 @@ const StrategicGameForm: FC<{
             </Grid>
             <Grid size={wideSize}>
               <GameOptionField
+                option="starting-wealth"
+                label={t('starting-wealth')}
+                defaultValue={DEFAULT_OPTIONS.startingWealth}
+              >
+                <EnumPicker
+                  label={t('starting-wealth')}
+                  name="startingWealth"
+                  variant="select"
+                  values={STARTING_WEALTHS}
+                  labelPrefix="starting-wealth-"
+                  formatDescription={(wealth) =>
+                    wealth === 'none'
+                      ? t('starting-wealth-none-help')
+                      : t('starting-wealth-rate', { sp: STARTING_WEALTH_SP_PER_LEVEL[wealth as StartingWealth] })
+                  }
+                  value={formData.options.startingWealth ?? 'none'}
+                  onChange={(wealth) => wealth && handleOptionsChange('startingWealth', wealth)}
+                  required
+                />
+              </GameOptionField>
+            </Grid>
+            <Grid size={wideSize}>
+              <GameOptionField
                 option="intense-training"
                 label={t('intense-training')}
                 defaultValue={DEFAULT_OPTIONS.intenseTraining}
@@ -336,6 +368,38 @@ const StrategicGameForm: FC<{
               <Typography variant="body2" color="text.secondary">
                 {t('game-power-level-intro')}
               </Typography>
+            </Grid>
+            <Grid size={wideSize}>
+              <GameOptionField option="power-level-preset" label={t('power-level-preset')}>
+                <EnumPicker
+                  label={t('power-level-preset')}
+                  name="powerLevelPreset"
+                  variant="select"
+                  values={POWER_LEVEL_PRESETS}
+                  labelPrefix="power-level-"
+                  descriptionPrefix="power-level-preset-help-"
+                  value={formData.powerLevel.preset ?? null}
+                  onChange={(preset) => handlePresetChange((preset as PowerLevelPreset | null) ?? null)}
+                />
+              </GameOptionField>
+            </Grid>
+            <Grid size={wideSize}>
+              <GameOptionField
+                option="pp-recovery-percent"
+                label={t('pp-recovery-percent')}
+                defaultValue={DEFAULT_POWER_LEVEL.ppRecoveryPercent}
+              >
+                <NumericInput
+                  label={t('pp-recovery-percent')}
+                  name="ppRecoveryPercent"
+                  value={formData.powerLevel.ppRecoveryPercent ?? DEFAULT_POWER_LEVEL.ppRecoveryPercent}
+                  onChange={(e) => handlePowerLevelChange('ppRecoveryPercent', Math.min(100, e || 0))}
+                  integer
+                  min={0}
+                  max={100}
+                  allowNegatives={false}
+                />
+              </GameOptionField>
             </Grid>
             <Grid size={gridSize}>
               <GameOptionField
