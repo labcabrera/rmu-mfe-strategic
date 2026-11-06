@@ -127,6 +127,7 @@ const GroupXpDialog: FC<{ game: StrategicGame; open: boolean; onClose: () => voi
             <Grid size={{ xs: 12, md: 6 }}>
               <NumericInput
                 integer
+                formatOnBlur={false}
                 min={1}
                 max={MAX_GROUP_XP}
                 allowNegatives={false}
