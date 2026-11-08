@@ -10,6 +10,7 @@ import {
   LoadingState,
   MoneyDisplay,
   StatusBadge,
+  useSpellName,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { enchantmentPercent, STATUS_COLORS } from './enchantment-format';
 
@@ -20,6 +21,7 @@ const EnchantmentProjectList: FC<{
   onNew: () => void;
 }> = ({ projects, onOpen, onNew }) => {
   const { t } = useTranslation();
+  const spellName = useSpellName();
   if (!projects) return <LoadingState />;
   if (projects.length === 0) {
     return (
@@ -50,7 +52,7 @@ const EnchantmentProjectList: FC<{
                 {t(project.itemName, project.itemName)}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {project.plan.spells.map((spell) => t(spell.name, spell.name)).join(', ')}
+                {project.plan.spells.map((spell) => spellName(spell.name)).join(', ')}
               </Typography>
             </Stack>
           ),

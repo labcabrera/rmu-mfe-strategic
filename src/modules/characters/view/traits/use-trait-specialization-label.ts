@@ -6,6 +6,7 @@ import {
   fetchSpellLists,
   SPELL_LIST_CATALOG_MAX,
   useSpecializationLabel,
+  useSpellName,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 /** Names of the spell lists by code, loaded once per page. */
@@ -36,6 +37,7 @@ export const useTraitSpecializationLabel = (traits: CharacterTrait[]): ((key: st
   const { i18n } = useTranslation();
   const auth = useAuth();
   const specializationLabel = useSpecializationLabel();
+  const spellName = useSpellName();
   const [lists, setLists] = useState<Map<string, string>>(new Map());
   const untranslated = traits.some((trait) => !!trait.specialization && !i18n.exists(trait.specialization));
 
@@ -48,5 +50,5 @@ export const useTraitSpecializationLabel = (traits: CharacterTrait[]): ((key: st
     };
   }, [untranslated, auth?.isAuthenticated]);
 
-  return (key) => (key && !i18n.exists(key) && lists.has(key) ? lists.get(key)! : specializationLabel(key));
+  return (key) => (key && !i18n.exists(key) && lists.has(key) ? spellName(lists.get(key)!) : specializationLabel(key));
 };

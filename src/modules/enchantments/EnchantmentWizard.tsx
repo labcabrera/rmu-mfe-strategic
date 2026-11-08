@@ -22,11 +22,11 @@ import {
 import {
   alchemyEffectText,
   Character,
-  CharacterPicker,
   characterOption,
+  CharacterPicker,
   createEnchantment,
-  EmptyState,
   DEFAULT_POWER_LEVEL,
+  EmptyState,
   ENCHANTMENT_SCOPES,
   EnchantmentPlan,
   EnchantmentProject,
@@ -53,6 +53,7 @@ import {
   StrategicItem,
   useModifierLabel,
   useNotify,
+  useSpellName,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { GOLD_COIN, HolderView } from '../economy/use-holder';
 import EnchantmentPlanView from './EnchantmentPlanView';
@@ -105,6 +106,7 @@ const EnchantmentWizard: FC<{
 }> = ({ view, projects, onStarted }) => {
   const auth = useAuth();
   const { t } = useTranslation();
+  const spellName = useSpellName();
   const notify = useNotify();
   const modifierLabel = useModifierLabel();
   const [step, setStep] = useState(0);
@@ -223,7 +225,7 @@ const EnchantmentWizard: FC<{
   const shown = (grimoire ?? []).filter(
     (entry) =>
       !filter ||
-      t(entry.known.spell.name, entry.known.spell.name).toLowerCase().includes(filter) ||
+      spellName(entry.known.spell.name).toLowerCase().includes(filter) ||
       (entry.list.name ?? entry.list.code).toLowerCase().includes(filter)
   );
 
@@ -313,12 +315,12 @@ const EnchantmentWizard: FC<{
                         <Checkbox
                           checked={!!choice}
                           onChange={() => toggle(spell.id)}
-                          slotProps={{ input: { 'aria-label': t(spell.name, spell.name) } }}
+                          slotProps={{ input: { 'aria-label': spellName(spell.name) } }}
                         />
                       </TableCell>
                       <TableCell>
                         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-                          <Typography variant="body2">{`${t(spell.name, spell.name)} (${spell.level})`}</Typography>
+                          <Typography variant="body2">{`${spellName(spell.name)} (${spell.level})`}</Typography>
                           {isAlchemical(entry) && <Chip size="small" color="secondary" label={t('alchemical')} />}
                         </Stack>
                       </TableCell>
@@ -429,7 +431,7 @@ const EnchantmentWizard: FC<{
             return (
               <Grid key={spell.spellId} container spacing={2} sx={{ alignItems: 'center' }}>
                 <Grid size={{ xs: 12, md: 4 }}>
-                  <Typography sx={{ fontWeight: 600 }}>{`${t(spell.name, spell.name)} (${spell.level})`}</Typography>
+                  <Typography sx={{ fontWeight: 600 }}>{`${spellName(spell.name)} (${spell.level})`}</Typography>
                   <Typography variant="caption" color="text.secondary">
                     {spell.scrModifiers
                       .map(

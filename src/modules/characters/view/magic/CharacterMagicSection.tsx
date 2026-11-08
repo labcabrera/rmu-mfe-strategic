@@ -26,6 +26,7 @@ import {
   SpellEffectList,
   spendCharacterPower,
   StrategicGame,
+  useSpellName,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useStrategicNotify } from '../../../services/notify-service';
 import { canChangeCharacter } from '../../../shared/permissions';
@@ -51,6 +52,7 @@ const CharacterMagicSection: FC<{
   strategicGame?: StrategicGame;
 }> = ({ character, setCharacter, strategicGame }) => {
   const { t } = useTranslation();
+  const spellName = useSpellName();
   const auth = useAuth();
   const notify = useStrategicNotify();
   const [lists, setLists] = useState<KnownSpellList[]>();
@@ -121,7 +123,7 @@ const CharacterMagicSection: FC<{
                 spacing={1}
                 sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 1, minWidth: 0 }}
               >
-                <Typography sx={{ fontWeight: 600 }}>{list.name ?? list.code}</Typography>
+                <Typography sx={{ fontWeight: 600 }}>{list.name ? spellName(list.name) : list.code}</Typography>
                 <Chip size="small" label={t(list.skillId)} />
                 <Chip size="small" variant="outlined" label={`${t('ranks')}: ${list.ranks}`} />
                 <Chip
@@ -140,7 +142,7 @@ const CharacterMagicSection: FC<{
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                       <Stack direction="row" spacing={1} sx={{ alignItems: 'center', minWidth: 0 }}>
                         <Chip size="small" label={spell.level} />
-                        <Typography noWrap>{spell.name}</Typography>
+                        <Typography noWrap>{spellName(spell.name)}</Typography>
                         <Typography variant="caption" color="text.secondary">
                           {t('spell-power-points', { count: powerPoints })}
                         </Typography>
