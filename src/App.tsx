@@ -23,7 +23,7 @@ const TradeRedirect: FC = () => {
 };
 
 const App: FC = () => (
-  <MfeRoot sx={{ p: 2 }}>
+  <MfeRoot sx={{ p: 2 }} namespace="strategic">
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/games" element={<StrategicGameListPage />} />
