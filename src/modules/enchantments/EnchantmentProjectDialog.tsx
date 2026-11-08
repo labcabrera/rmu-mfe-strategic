@@ -28,6 +28,7 @@ import {
   suspendEnchantment,
   updateEnchantment,
   useNotify,
+  useSpellName,
   useTableText,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import EnchantmentPlanView from './EnchantmentPlanView';
@@ -48,6 +49,7 @@ const EnchantmentProjectDialog: FC<{
 }> = ({ projectId, initial, onClose, onChanged, onDeleted }) => {
   const auth = useAuth();
   const { t } = useTranslation();
+  const translatedSpellName = useSpellName();
   const notify = useNotify();
   const [project, setProject] = useState<EnchantmentProject | undefined>(initial);
   const [busy, setBusy] = useState(false);
@@ -106,7 +108,7 @@ const EnchantmentProjectDialog: FC<{
   const finished = project.daysCompleted >= total;
   const spellName = (spellId: string) => {
     const spell = project.plan.spells.find((other) => other.spellId === spellId);
-    return spell ? `${t(spell.name, spell.name)} (${spell.level})` : spellId;
+    return spell ? `${translatedSpellName(spell.name)} (${spell.level})` : spellId;
   };
 
   return (

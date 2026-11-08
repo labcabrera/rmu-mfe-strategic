@@ -1,13 +1,20 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Grid, Stack, Typography } from '@mui/material';
-import { DataTable, EnchantmentPlan, KeyValueList, MoneyDisplay } from '@labcabrera-rmu/rmu-react-shared-lib';
+import {
+  DataTable,
+  EnchantmentPlan,
+  KeyValueList,
+  MoneyDisplay,
+  useSpellName,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const signed = (value: number) => (value >= 0 ? `+${value}` : `${value}`);
 
 /** The quote of an enchantment as the API makes it: days, power points, level, costs and the spells. */
 const EnchantmentPlanView: FC<{ plan: EnchantmentPlan; free?: boolean }> = ({ plan, free = false }) => {
   const { t } = useTranslation();
+  const spellName = useSpellName();
   return (
     <Stack spacing={2}>
       {plan.warnings.map((warning) => (
@@ -74,7 +81,7 @@ const EnchantmentPlanView: FC<{ plan: EnchantmentPlan; free?: boolean }> = ({ pl
             header: t('spell'),
             render: (spell) => (
               <>
-                <Typography variant="body2">{`${t(spell.name, spell.name)} (${spell.level})`}</Typography>
+                <Typography variant="body2">{`${spellName(spell.name)} (${spell.level})`}</Typography>
                 {spell.target && (
                   <Typography variant="caption" color="text.secondary">
                     {t(spell.target, spell.target)}
