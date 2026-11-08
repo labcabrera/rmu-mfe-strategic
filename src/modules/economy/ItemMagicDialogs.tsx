@@ -21,6 +21,7 @@ import {
   setGem,
   StrategicItem,
   unsetGem,
+  itemName,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useStrategicNotify } from '../services/notify-service';
 import { HolderView } from './use-holder';
@@ -93,7 +94,7 @@ export const ItemMagicDialog: FC<Props> = ({ item, onClose, onChange }) => {
         open
         maxWidth="sm"
         title={t(alchemy ? 'item-enchantment' : 'item-magic')}
-        subtitle={item.name}
+        subtitle={itemName(item, t)}
         onClose={onClose}
         buttons={
           charges && (
@@ -172,7 +173,7 @@ export const GemDialog: FC<Omit<Props, 'onChange'>> = ({ item, onClose }) => {
   const { t } = useTranslation();
   const gem = item.catalog?.features?.gem;
   return (
-    <RmuDialog open maxWidth="sm" title={t('gem-traits')} subtitle={item.name} onClose={onClose}>
+    <RmuDialog open maxWidth="sm" title={t('gem-traits')} subtitle={itemName(item, t)} onClose={onClose}>
       <Stack spacing={1.5}>
         <KeyValueList rows={gemRows(item, t)} />
         {gem?.magic ? <GemTraits gem={gem} bare dense /> : <EmptyState dense title={t('gem-traits-none')} />}
@@ -203,7 +204,7 @@ export const CutGemDialog: FC<Props> = ({ item, onClose, onChange }) => {
       open
       maxWidth="xs"
       title={t('gem-cut-action')}
-      subtitle={item.name}
+      subtitle={itemName(item, t)}
       onCancel={onClose}
       buttons={
         <Button variant="contained" disabled={busy} onClick={onCut}>
@@ -263,7 +264,7 @@ export const GemSettingsDialog: FC<Props & { view: HolderView }> = ({ item, view
   };
 
   return (
-    <RmuDialog open maxWidth="sm" title={t('gem-settings')} subtitle={item.name} onClose={onClose}>
+    <RmuDialog open maxWidth="sm" title={t('gem-settings')} subtitle={itemName(item, t)} onClose={onClose}>
       <Stack spacing={1.5}>
         {settings.length === 0 ? (
           <EmptyState dense title={t('gem-settings-empty')} />

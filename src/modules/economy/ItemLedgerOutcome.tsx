@@ -9,6 +9,7 @@ import {
   ItemThumb,
   MoneyDisplay,
   StrategicItem,
+  itemName,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 /** Outcomes that leave the item worse or lose the materials. */
@@ -71,7 +72,7 @@ const ItemLedgerOutcome: FC<{ entry: ItemLedgerEntry; item: StrategicItem | null
           <ItemThumb item={item} size={56} disabled={!!item.condition?.broken} />
           <Stack spacing={0.5}>
             <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-              <Typography sx={{ fontWeight: 600 }}>{item.name}</Typography>
+              <Typography sx={{ fontWeight: 600 }}>{itemName(item, t)}</Typography>
               <ItemConditionChip condition={item.condition} />
             </Stack>
             <ItemModifierChips modifiers={item.modifiers ?? []} />

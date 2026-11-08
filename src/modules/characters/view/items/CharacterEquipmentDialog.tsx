@@ -11,6 +11,7 @@ import {
   ItemConditionChip,
   itemFilter,
   ItemModifierChips,
+  itemName,
   ItemThumb,
   RmuDialog,
   SelectableCard,
@@ -63,7 +64,7 @@ const ItemOption: FC<{
         <ItemThumb item={item} size={64} disabled={broken} />
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
-            <Typography sx={{ fontWeight: 600 }}>{item.name}</Typography>
+            <Typography sx={{ fontWeight: 600 }}>{itemName(item, t)}</Typography>
             {selected && <Chip size="small" color="success" label={t('equipped')} />}
             <ItemConditionChip condition={item.condition} />
           </Stack>

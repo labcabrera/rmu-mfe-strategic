@@ -22,6 +22,7 @@ import {
   EmptyState,
   itemCondition,
   ItemConditionChip,
+  itemName,
   RmuDialog,
   STRATEGIC_ITEM_MODIFIER_TARGETS,
   STRATEGIC_ITEM_MODIFIER_TYPES,
@@ -93,7 +94,7 @@ export default function CharacterItemModifiersDialog({
     <RmuDialog
       open={open}
       title={t('item-modifiers')}
-      subtitle={item.name}
+      subtitle={itemName(item, t)}
       maxWidth="md"
       onDismiss={onClose}
       buttons={<Button onClick={onClose}>{t('close')}</Button>}
