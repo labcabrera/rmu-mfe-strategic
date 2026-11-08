@@ -28,6 +28,7 @@ import {
   suspendEnchantment,
   updateEnchantment,
   useNotify,
+  useTableText,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import EnchantmentPlanView from './EnchantmentPlanView';
 import { enchantmentPercent, pendingFailures, STATUS_COLORS } from './enchantment-format';
@@ -283,6 +284,8 @@ const ScrResult: FC<{
   onRoll: (value: number) => void;
 }> = ({ scr, name, roll, onRoll }) => {
   const { t } = useTranslation();
+  // Workspace spec 086: the English text of a table entry, translated when there is one
+  const tableText = useTableText();
   return (
     <Stack spacing={1} sx={{ pl: 1, borderLeft: 3, borderColor: scr.failed ? 'error.main' : 'success.main' }}>
       <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
@@ -326,7 +329,7 @@ const ScrResult: FC<{
           </Typography>
           {scr.failure && (
             <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-              {scr.failure.text}
+              {tableText(scr.failure.text)}
             </Typography>
           )}
         </Box>
