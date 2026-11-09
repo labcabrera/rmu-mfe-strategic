@@ -1,8 +1,15 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box } from '@mui/material';
 import { CreateCharacterDto, DataTable, StatKey, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { StatBonusFormData } from './CharacterCreatePage';
+
+interface StatBonus {
+  potential: number;
+  temporary: number;
+}
+
+export interface StatBonusFormData {
+  [key: string]: StatBonus;
+}
 
 const bonusColor = (value: number): string => {
   if (value > 0) return 'success.main';

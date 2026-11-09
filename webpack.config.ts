@@ -1,7 +1,6 @@
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import dotenv from 'dotenv';
 import fs from 'fs';
-import HtmlWebPackPlugin from 'html-webpack-plugin';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import type { Configuration as WebpackConfiguration } from 'webpack';
@@ -37,6 +36,9 @@ export default (_env: unknown, argv: { mode?: string }): Configuration => {
   const port = process.env.PORT ? Number(process.env.PORT) : 8082;
   return {
     output: {
+      // Workspace spec 091, E5: what changes gets a new name, so nginx can cache it for good.
+      filename: mode === 'production' ? '[name].[contenthash].js' : '[name].js',
+      chunkFilename: mode === 'production' ? '[name].[contenthash].js' : '[name].js',
       // Chunks load from wherever strategic-app.js was loaded (gateway /mfe/strategic/, dev server, CDN).
       publicPath: 'auto',
       devtoolNamespace: 'strategic',
@@ -105,23 +107,25 @@ export default (_env: unknown, argv: { mode?: string }): Configuration => {
         },
         {
           test: /\.(css|s[ac]ss)$/i,
-          use: ['style-loader', 'css-loader', 'postcss-loader'],
+          use: ['style-loader', 'css-loader'],
         },
         {
           test: /\.(ts|tsx|js|jsx)$/,
           exclude: /node_modules/,
           use: {
-            loader: 'babel-loader',
+            loader: 'swc-loader',
+            options: {
+              jsc: {
+                parser: { syntax: 'typescript', tsx: true },
+                transform: { react: { runtime: 'automatic' } },
+                target: 'es2020',
+              },
+            },
           },
         },
         {
           test: /\.(ico|jpg|jpeg|png|gif|jfif)$/i,
           use: ['file-loader'],
-        },
-        {
-          test: /\.json$/,
-          type: 'javascript/auto',
-          use: 'json-loader',
         },
       ],
     },
@@ -146,17 +150,14 @@ export default (_env: unknown, argv: { mode?: string }): Configuration => {
           'react-dom': { singleton: true, requiredVersion: deps['react-dom'] },
           'react-router-dom': { singleton: true, requiredVersion: deps['react-router-dom'] },
           '@mui/material': { singleton: true, requiredVersion: deps['@mui/material'] },
-          '@mui/icons-material': { singleton: true, requiredVersion: deps['@mui/icons-material'] },
           '@emotion/react': { singleton: true, requiredVersion: deps['@emotion/react'] },
           '@emotion/styled': { singleton: true, requiredVersion: deps['@emotion/styled'] },
           'react-oidc-context': { singleton: true, requiredVersion: deps['react-oidc-context'] },
           'oidc-client-ts': { singleton: true, requiredVersion: deps['oidc-client-ts'] },
           i18next: { singleton: true, requiredVersion: deps.i18next },
           'react-i18next': { singleton: true, requiredVersion: deps['react-i18next'] },
+          '@tanstack/react-query': { singleton: true, requiredVersion: deps['@tanstack/react-query'] },
         },
-      }),
-      new HtmlWebPackPlugin({
-        template: './src/index.html',
       }),
       new webpack.DefinePlugin(runtimeConfigDefines),
     ],

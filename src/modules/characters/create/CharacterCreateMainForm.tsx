@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import { Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Grid } from '@mui/material';
 import {
@@ -9,10 +9,10 @@ import {
   ProfessionPicker,
   Race,
   RacePicker,
-  RealmTypePicker,
   REALM_TYPES,
+  RealmTypePicker,
   STATS,
-  useNotify,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import NameTextField from '../../shared/inputs/NameTextField';
 
@@ -28,7 +28,7 @@ const CharacterCreateMainForm: FC<{
   profession: Profession | undefined;
 }> = ({ formData, setFormData, setProfession, setSelectedRace, selectedRace, races, profession }) => {
   const { t } = useTranslation();
-  const notify = useNotify();
+  const notify = useApiNotify();
 
   const onRaceChange = (race: Race) => {
     if (!race) return;

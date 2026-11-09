@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tooltip, Typography } from '@mui/material';
 import { EntityCard, Faction, factionPlayerNames } from '@labcabrera-rmu/rmu-react-shared-lib';

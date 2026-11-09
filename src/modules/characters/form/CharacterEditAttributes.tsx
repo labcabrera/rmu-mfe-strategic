@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Grid, TextField } from '@mui/material';
 import { EnumPicker, NumericInput, UpdateCharacterDto } from '@labcabrera-rmu/rmu-react-shared-lib';

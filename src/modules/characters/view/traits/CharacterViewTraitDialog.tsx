@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
+import { useEffect, FC, Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Alert, Box, Chip, Typography } from '@mui/material';
@@ -12,9 +12,9 @@ import {
   KeyValueRow,
   RmuDialog,
   TechnicalInfo,
-  Trait,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useStrategicNotify } from '../../../services/notify-service';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { toRoman } from '../../../services/roman-number-service';
 
 const CharacterViewTraitDialog: FC<{
@@ -26,8 +26,15 @@ const CharacterViewTraitDialog: FC<{
 }> = ({ character, setCharacter, characterTrait, open, onClose }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useStrategicNotify();
-  const [trait, setTrait] = useState<Trait | null>(null);
+  const notify = useApiNotify();
+  const query = useQuery({
+    queryKey: ['trait', characterTrait?.traitId],
+    queryFn: () => fetchTrait(characterTrait.traitId, auth),
+    enabled: !!characterTrait,
+    gcTime: 0,
+    placeholderData: keepPreviousData,
+  });
+  const trait = query.data;
 
   const onDeleteTrait = () => {
     const dto: DeleteTraitDto = {
@@ -43,12 +50,8 @@ const CharacterViewTraitDialog: FC<{
   };
 
   useEffect(() => {
-    if (characterTrait) {
-      fetchTrait(characterTrait.traitId, auth)
-        .then((data) => setTrait(data))
-        .catch((error) => notify.error(error));
-    }
-  }, [characterTrait]);
+    if (query.error) notify.error(query.error);
+  }, [query.error]);
 
   if (!trait) return null;
 

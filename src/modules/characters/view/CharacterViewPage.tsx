@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { Dispatch, ReactElement, ReactNode, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, ReactElement, ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -12,42 +12,39 @@ import HealingIcon from '@mui/icons-material/Healing';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import SportsMmaIcon from '@mui/icons-material/SportsMma';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import { Box, Button, Chip, Stack, Typography } from '@mui/material';
+import { Box, Chip, Stack } from '@mui/material';
 import {
   Character,
-  Culture,
   deleteCharacter,
   DetailPage,
-  DownloadButton,
   downloadBlob,
+  DownloadButton,
   enterSx,
   exportCharacter,
   fetchCharacter,
   fetchCulture,
   fetchProfession,
   fetchStrategicGame,
-  ImageSelectorDialog,
   imageBaseUrl,
+  ImageSelectorDialog,
   isApiError,
   LevelUpButton,
   levelUpCharacter,
-  Profession,
   recalculateCharacter,
   ResourceBar,
   RmuIconButton,
-  RmuDialog,
   SectionNav,
   StatPill,
-  StrategicGame,
   updateCharacter,
+  useApiNotify,
   useEntity,
-  useNotify,
   useSectionParam,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { resolveOptions } from '../../services/game-rules';
-import { useStrategicNotify } from '../../services/notify-service';
 import { healthChips } from '../../shared/chips/CharacterHealthChips';
 import { canChangeCharacter, isAdmin } from '../../shared/permissions';
+import { LevelUpUnspentDialog } from './LevelUpUnspentDialog';
 import CharacterHealthSection from './health/CharacterHealthSection';
 import CharacterMagicSection, { hasMagic } from './magic/CharacterMagicSection';
 import { armorLabel } from './sections/CharacterPanels';
@@ -63,7 +60,9 @@ import {
 import CharacterViewSkills from './skills/CharacterViewSkills';
 
 const defaultCharacterImage = `${imageBaseUrl}images/npcs/unknown.png`;
+
 const sectionIds = [...characterSectionIds];
+
 const sectionIcons: Record<CharacterSectionId, ReactElement> = {
   overview: <DashboardIcon />,
   attributes: <BarChartIcon />,
@@ -80,19 +79,16 @@ export default function CharacterViewPage() {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const { characterId } = useParams<{ characterId: string }>();
   const state = useEntity<Character>(characterId, (id) => fetchCharacter(id, auth), {
     initial: location.state?.character,
     onError: notify.error,
   });
   const character = state.entity;
-  const [strategicGame, setStrategicGame] = useState<StrategicGame>();
-  const [profession, setProfession] = useState<Profession>();
-  const [culture, setCulture] = useState<Culture>();
   // Unspent normal points the API refused the level up for (spec 076, A5): they open the confirmation
   const [unspentDevPoints, setUnspentDevPoints] = useState<number>();
-  const strategicNotify = useStrategicNotify();
+  const strategicNotify = useApiNotify();
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [section, setSection] = useSectionParam(sectionIds);
 
@@ -102,20 +98,43 @@ export default function CharacterViewPage() {
     if (next) state.setEntity(next);
   };
 
-  useEffect(() => {
-    if (!character) return;
-    fetchStrategicGame(character.gameId, auth).then(setStrategicGame).catch(notify.error);
-    fetchProfession(character.info.professionId, auth).then(setProfession).catch(notify.error);
-  }, [character?.gameId, character?.info.professionId]);
+  const gameQuery = useQuery({
+    queryKey: ['character-game', character?.gameId],
+    queryFn: () => fetchStrategicGame(character!.gameId, auth),
+    enabled: !!character,
+    gcTime: 0,
+    placeholderData: keepPreviousData,
+  });
+  const professionQuery = useQuery({
+    queryKey: ['character-profession', character?.info.professionId],
+    queryFn: () => fetchProfession(character!.info.professionId, auth),
+    enabled: !!character,
+    gcTime: 0,
+    placeholderData: keepPreviousData,
+  });
+  const cultureId = character?.info.cultureId;
+  const cultureQuery = useQuery({
+    queryKey: ['character-culture', cultureId],
+    queryFn: () => fetchCulture(cultureId as string, auth),
+    enabled: !!cultureId,
+    gcTime: 0,
+    placeholderData: keepPreviousData,
+  });
+  const strategicGame = gameQuery.data;
+  const profession = professionQuery.data;
+  const culture = cultureId ? cultureQuery.data : undefined;
 
   useEffect(() => {
-    const cultureId = character?.info.cultureId;
-    if (!cultureId) {
-      setCulture(undefined);
-      return;
-    }
-    fetchCulture(cultureId, auth).then(setCulture).catch(notify.error);
-  }, [character?.info.cultureId]);
+    if (gameQuery.error) notify.error(gameQuery.error);
+  }, [gameQuery.error]);
+
+  useEffect(() => {
+    if (professionQuery.error) notify.error(professionQuery.error);
+  }, [professionQuery.error]);
+
+  useEffect(() => {
+    if (cultureQuery.error) notify.error(cultureQuery.error);
+  }, [cultureQuery.error]);
 
   /**
    * Levels up. Only unspent normal points open the confirmation, which keeps them for the next level (`save`, when the
@@ -358,49 +377,5 @@ export default function CharacterViewPage() {
         </Stack>
       )}
     </DetailPage>
-  );
-}
-
-/**
- * Confirmation of a level up with unspent normal development points (Core Law §2.8, workspace spec 076, A5): they
- * are kept for the next level when the game master allows it, or lost.
- */
-function LevelUpUnspentDialog({
-  name,
-  unspent,
-  canSave,
-  onClose,
-  onLevelUp,
-}: {
-  name: string;
-  unspent?: number;
-  canSave: boolean;
-  onClose: () => void;
-  onLevelUp: (mode: 'force' | 'save') => void;
-}) {
-  const { t } = useTranslation();
-  return (
-    <RmuDialog
-      open={unspent !== undefined}
-      title={t('level-up')}
-      maxWidth="sm"
-      onCancel={onClose}
-      buttons={
-        <>
-          <Button color="error" variant={canSave ? 'outlined' : 'contained'} onClick={() => onLevelUp('force')}>
-            {t('level-up-lose-dev-points')}
-          </Button>
-          {canSave && (
-            <Button variant="contained" onClick={() => onLevelUp('save')}>
-              {t('level-up-save-dev-points')}
-            </Button>
-          )}
-        </>
-      }
-    >
-      <Typography variant="body2">
-        {t(canSave ? 'level-up-confirmation-save' : 'level-up-confirmation', { name, points: unspent ?? 0 })}
-      </Typography>
-    </RmuDialog>
   );
 }

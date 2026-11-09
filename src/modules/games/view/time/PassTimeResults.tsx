@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Chip, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { Character, GameTimeLogCharacter, PassTimeRestResult } from '@labcabrera-rmu/rmu-react-shared-lib';

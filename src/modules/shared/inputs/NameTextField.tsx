@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import CachedIcon from '@mui/icons-material/Cached';
-import IconButton from '@mui/material/IconButton';
-import InputAdornment from '@mui/material/InputAdornment';
-import TextField from '@mui/material/TextField';
+import { IconButton } from '@mui/material';
+import { InputAdornment } from '@mui/material';
+import { TextField } from '@mui/material';
 import { fetchRandomName } from '../../api/npc-random-names';
 
 interface NameTextFieldProps {
@@ -25,6 +26,7 @@ const NameTextField: FC<NameTextFieldProps> = ({
   onChange,
   onError,
 }) => {
+  const { t } = useTranslation();
   const auth = useAuth();
 
   const handleRandomNameClick = () => {
@@ -49,7 +51,7 @@ const NameTextField: FC<NameTextFieldProps> = ({
           input: {
             endAdornment: (
               <InputAdornment position="start">
-                <IconButton onClick={handleRandomNameClick} color="primary">
+                <IconButton onClick={handleRandomNameClick} color="primary" aria-label={t('random-name')}>
                   <CachedIcon />
                 </IconButton>
               </InputAdornment>

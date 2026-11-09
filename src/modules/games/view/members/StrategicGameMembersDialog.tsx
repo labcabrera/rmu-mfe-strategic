@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import CheckIcon from '@mui/icons-material/Check';
@@ -37,9 +37,11 @@ import {
   removeJoinRequest,
   setGameMember,
   StrategicGame,
-  useNotify,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { useQuery } from '@tanstack/react-query';
 import { isGameMaster, isGameOwner } from '../../../shared/permissions';
+import { useBusyAction } from '../../../shared/useBusyAction';
 
 /**
  * Members of a strategic game (spec 072, decision 14), grouped by role: the masters change roles, expel, add friends of
@@ -67,27 +69,32 @@ const StrategicGameMembersDialog: FC<{
 }> = ({ open, game, factions, onClose, onChanged, onFactionChanged }) => {
   const { t } = useTranslation();
   const auth = useAuth();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const userId = auth.user?.profile?.sub;
   const master = isGameMaster(auth, game);
   const owner = isGameOwner(auth, game);
   const members = game.members ?? [];
   const joinRequests = game.joinRequests ?? [];
-  const [friends, setFriends] = useState<Friend[]>();
   const [friend, setFriend] = useState<Friend | null>(null);
   const [role, setRole] = useState<GameMemberRole>('player');
-  const [busy, setBusy] = useState(false);
+  const { busy, run } = useBusyAction();
+
+  const friendsQuery = useQuery({
+    queryKey: ['friends'],
+    queryFn: () => fetchFriends(auth),
+    enabled: open && master,
+    gcTime: 0,
+    // Read once while the dialog is mounted
+    staleTime: Infinity,
+  });
+  const friends = friendsQuery.data;
 
   useEffect(() => {
-    if (open && master && friends === undefined) fetchFriends(auth).then(setFriends).catch(notify.error);
-  }, [open, master]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (friendsQuery.error) notify.error(friendsQuery.error);
+  }, [friendsQuery.error]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const runGame = (action: () => Promise<StrategicGame>) => {
-    setBusy(true);
-    action()
-      .then(onChanged)
-      .catch(notify.error)
-      .finally(() => setBusy(false));
+    run(action(), onChanged);
   };
 
   // Masters are the owner's business (spec 071).
@@ -104,14 +111,13 @@ const StrategicGameMembersDialog: FC<{
     const current = factionsOf(member);
     const added = selected.filter((f) => !current.some((c) => c.id === f.id));
     const removed = current.filter((c) => !selected.some((f) => f.id === c.id));
-    setBusy(true);
-    Promise.all([
-      ...added.map((f) => addFactionPlayer(f.id, member.userId, auth)),
-      ...removed.map((f) => removeFactionPlayer(f.id, member.userId, auth)),
-    ])
-      .then((updated) => updated.forEach(onFactionChanged))
-      .catch(notify.error)
-      .finally(() => setBusy(false));
+    run(
+      Promise.all([
+        ...added.map((f) => addFactionPlayer(f.id, member.userId, auth)),
+        ...removed.map((f) => removeFactionPlayer(f.id, member.userId, auth)),
+      ]),
+      (updated) => updated.forEach(onFactionChanged)
+    );
   };
 
   const add = () => {

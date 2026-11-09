@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Chip, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import { DataTable, formatBonus, SectionLabel, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Alert, Box, FormControlLabel, Stack, Switch, Typography } from '@mui/material';
@@ -28,7 +28,7 @@ import {
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import ManeuverFields, { emptyManeuver, maneuverBonus, ManeuverValue, skillKeyOf } from './ManeuverFields';
 
-export const TRADING_SKILL = 'trading';
+const TRADING_SKILL = 'trading';
 
 export type TradingContext = 'purchase' | 'sale';
 
@@ -58,7 +58,7 @@ export function useTradingTables(): { tables: TradingTables | null | undefined }
 }
 
 /** The market conditions of a side of the deal. */
-export const contextFactors = (tables: TradingTables | null | undefined, context: TradingContext): PriceFactor[] =>
+const contextFactors = (tables: TradingTables | null | undefined, context: TradingContext): PriceFactor[] =>
   (tables?.priceFactors ?? []).filter((factor) => !factor.contexts?.length || factor.contexts.includes(context));
 
 /**

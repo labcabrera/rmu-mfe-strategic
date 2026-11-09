@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Chip, Grid } from '@mui/material';
 import { Profession } from '@labcabrera-rmu/rmu-react-shared-lib';

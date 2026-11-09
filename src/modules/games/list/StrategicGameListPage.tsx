@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +9,7 @@ import {
   EmptyState,
   EntityCard,
   EnumPicker,
+  fetchFullPage,
   fetchRealms,
   fetchStrategicGames,
   FilterSchema,
@@ -18,8 +19,8 @@ import {
   Realm,
   RealmPicker,
   StrategicGame,
+  useApiNotify,
   useListFilters,
-  useNotify,
   usePagedQuery,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { DEFAULT_GAME_IMAGE_PATH } from '../../services/image-service';
@@ -32,7 +33,7 @@ export default function StrategicGameListPage() {
   const auth = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const [realms, setRealms] = useState<Realm[]>([]);
   const schema: FilterSchema<StrategicGame> = {
     q: { kind: 'text', label: t('name'), toRsql: (value) => `name=re=${value}` },
@@ -59,7 +60,7 @@ export default function StrategicGameListPage() {
 
   // The realms feed the realm filter and the image of the games without their own one.
   useEffect(() => {
-    fetchRealms('', 0, 100, auth)
+    fetchFullPage((rsql, page, size) => fetchRealms(rsql, page, size, auth), '')
       .then((response) => setRealms(response.content))
       .catch(notify.error);
   }, []);

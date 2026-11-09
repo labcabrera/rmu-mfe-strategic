@@ -1,6 +1,6 @@
 import type { RollSpec } from '@labcabrera-rmu/rmu-react-shared-lib';
 
-export const getStatBonus = (temporary: number) => {
+const getStatBonus = (temporary: number) => {
   switch (temporary) {
     case 1:
       return -15;

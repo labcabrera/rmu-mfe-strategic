@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -10,7 +10,7 @@ import {
   NumericInput,
   Panel,
   transferFactionGold,
-  useNotify,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { HolderView } from '../../../economy/use-holder';
 
@@ -29,7 +29,7 @@ export default function CharacterViewTransferGold({
 }) {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const [amount, setAmount] = useState<number | null>(1);
   const factionGold = view.faction?.management.availableGold ?? 0;
   const characterGold = view.gold;

@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import {
@@ -34,7 +34,7 @@ import {
   RmuDialog,
   RollField,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useStrategicNotify } from '../../../services/notify-service';
+import { useBusyAction } from '../../../shared/useBusyAction';
 
 const SIDES: BodySide[] = ['left', 'right'];
 
@@ -53,7 +53,6 @@ const AmputationDialog: FC<{
 }> = ({ character, healers, healerPenalties, open, onClose, onUpdated }) => {
   const { t } = useTranslation();
   const auth = useAuth();
-  const notify = useStrategicNotify();
   const [method, setMethod] = useState<AmputationMethod>('surgical');
   const [location, setLocation] = useState<LostLimbLocation>('arm');
   const [side, setSide] = useState<BodySide>('left');
@@ -62,7 +61,7 @@ const AmputationDialog: FC<{
   const [healer, setHealer] = useState<HealerSelection>({ mode: 'self' });
   const [roll, setRoll] = useState<number | null>(null);
   const [difficulty, setDifficulty] = useState<number | undefined>();
-  const [busy, setBusy] = useState(false);
+  const { busy, run } = useBusyAction();
   const [outcome, setOutcome] = useState<AmputationResult<Character>>();
 
   useEffect(() => {
@@ -86,29 +85,28 @@ const AmputationDialog: FC<{
 
   const submit = () => {
     if (!resolvedHealer || roll === null) return;
-    setBusy(true);
-    amputateCharacterLimb(
-      character.id,
-      {
-        method,
-        location,
-        side,
-        ...(method === 'surgical' ? { cauterized } : {}),
-        ...(injuryId ? { injuryId } : {}),
-        ...(resolvedHealer.characterId
-          ? { healerCharacterId: resolvedHealer.characterId }
-          : { healer: { name: resolvedHealer.name, bonus: resolvedHealer.medicine } }),
-        roll,
-        ...(difficulty !== undefined ? { difficulty } : {}),
-      },
-      auth
-    )
-      .then((result) => {
+    run(
+      amputateCharacterLimb(
+        character.id,
+        {
+          method,
+          location,
+          side,
+          ...(method === 'surgical' ? { cauterized } : {}),
+          ...(injuryId ? { injuryId } : {}),
+          ...(resolvedHealer.characterId
+            ? { healerCharacterId: resolvedHealer.characterId }
+            : { healer: { name: resolvedHealer.name, bonus: resolvedHealer.medicine } }),
+          roll,
+          ...(difficulty !== undefined ? { difficulty } : {}),
+        },
+        auth
+      ),
+      (result) => {
         onUpdated(result.character);
         setOutcome(result);
-      })
-      .catch(notify.error)
-      .finally(() => setBusy(false));
+      }
+    );
   };
 
   if (outcome) {

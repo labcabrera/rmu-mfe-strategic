@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -18,8 +18,8 @@ import {
   StrategicGame,
   TechnicalInfo,
   updateFaction,
+  useApiNotify,
   useEntity,
-  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import StrategicGameRequired from '../../shared/StrategicGameRequired';
 import FactionForm from './FactionForm';
@@ -55,7 +55,7 @@ export default function FactionFormPage({ mode }: { mode: 'create' | 'edit' }) {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const [searchParams, setSearchParams] = useSearchParams();
   const { factionId } = useParams<{ factionId?: string }>();
   const gameId = mode === 'create' ? searchParams.get('gameId') || undefined : undefined;

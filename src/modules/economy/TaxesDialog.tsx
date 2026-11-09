@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Stack, Typography } from '@mui/material';
 import { DataTable, EmptyState, LoadingState, MoneyDisplay, RmuDialog } from '@labcabrera-rmu/rmu-react-shared-lib';

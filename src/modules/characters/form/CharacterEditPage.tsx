@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -14,8 +14,8 @@ import {
   TechnicalInfo,
   updateCharacter,
   UpdateCharacterDto,
+  useApiNotify,
   useEntity,
-  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import CharacterEditAttributes from './CharacterEditAttributes';
 
@@ -39,7 +39,7 @@ export default function CharacterEditPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const { characterId } = useParams<{ characterId: string }>();
   const existing = useEntity<Character>(characterId, (id) => fetchCharacter(id, auth), {
     initial: location.state?.character,

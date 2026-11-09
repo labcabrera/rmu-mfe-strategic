@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import {
@@ -36,11 +36,14 @@ import {
   RollModifier,
   RollValue,
   searchCharacterHerbs,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useStrategicNotify } from '../../../services/notify-service';
+import { useQuery } from '@tanstack/react-query';
+import { useBusyAction } from '../../../shared/useBusyAction';
 import { HERBALISM_SKILL } from './health-rules';
 
 const REGION_LORE_SKILL = 'region-lore';
+const NO_ITEMS: Item[] = [];
 
 const RESULT_COLORS: Record<HerbSearchOutcome, 'success' | 'default' | 'error' | 'warning'> = {
   found: 'success',
@@ -57,7 +60,7 @@ const bestRanks = (character: Character, skillId: string): number =>
  * Complementary skills of Core Law (p. 85): the ranks of the first are added, the next one adds half. The best one
  * goes first.
  */
-export const complementaryModifiers = (entries: { key: string; ranks: number }[]): RollModifier[] =>
+const complementaryModifiers = (entries: { key: string; ranks: number }[]): RollModifier[] =>
   [...entries]
     .sort((a, b) => b.ranks - a.ranks)
     .map((entry, index) => ({ key: entry.key, value: index === 0 ? entry.ranks : Math.floor(entry.ranks / 2) }))
@@ -76,8 +79,7 @@ const HerbSearchDialog: FC<{
 }> = ({ character, open, onClose, onDone }) => {
   const { t } = useTranslation();
   const auth = useAuth();
-  const notify = useStrategicNotify();
-  const [catalog, setCatalog] = useState<Item[]>([]);
+  const notify = useApiNotify();
   const [biome, setBiome] = useState<HerbBiome | null>(null);
   const [highAltitude, setHighAltitude] = useState(false);
   const [herbIds, setHerbIds] = useState<string[]>([]);
@@ -90,18 +92,29 @@ const HerbSearchDialog: FC<{
   const [regionLore, setRegionLore] = useState(false);
   const [extra, setExtra] = useState<number | null>(null);
   const [result, setResult] = useState<HerbSearchResult>();
-  const [saving, setSaving] = useState(false);
+  const { busy: saving, run } = useBusyAction();
 
   useEffect(() => {
     if (!open) return;
     setResult(undefined);
     setRoll(null);
     setHerbIds([]);
-    if (catalog.length > 0) return;
-    fetchItems('category==herb', 0, 1000, auth)
-      .then((page) => setCatalog(page.content.filter((item) => item.features?.herb)))
-      .catch(notify.error);
   }, [open]);
+
+  const catalogQuery = useQuery({
+    queryKey: ['herb-catalog'],
+    queryFn: () =>
+      fetchItems('category==herb', 0, 1000, auth).then((page) => page.content.filter((item) => item.features?.herb)),
+    enabled: open,
+    gcTime: 0,
+    // A catalog: read once while the dialog is mounted
+    staleTime: Infinity,
+  });
+  const catalog = catalogQuery.data ?? NO_ITEMS;
+
+  useEffect(() => {
+    if (catalogQuery.error) notify.error(catalogQuery.error);
+  }, [catalogQuery.error]);
 
   // The herbs of the biome; the ones of high altitude only up there
   const herbs = useMemo(
@@ -134,29 +147,28 @@ const HerbSearchDialog: FC<{
 
   const save = () => {
     if (!biome || roll === null) return;
-    setSaving(true);
-    searchCharacterHerbs(
-      character.id,
-      {
-        biome,
-        highAltitude,
-        herbItemTypeIds: herbIds,
-        skillId,
-        ...(skill?.specialization ? { specialization: skill.specialization } : {}),
-        roll: roll.total,
-        ...(roll.unmodified !== undefined ? { unmodifiedRoll: roll.unmodified } : {}),
-        ...(modifiers.length ? { modifiers } : {}),
-        previousSearches: previousSearches ?? 0,
-        familiar,
-      },
-      auth
-    )
-      .then((response) => {
+    run(
+      searchCharacterHerbs(
+        character.id,
+        {
+          biome,
+          highAltitude,
+          herbItemTypeIds: herbIds,
+          skillId,
+          ...(skill?.specialization ? { specialization: skill.specialization } : {}),
+          roll: roll.total,
+          ...(roll.unmodified !== undefined ? { unmodifiedRoll: roll.unmodified } : {}),
+          ...(modifiers.length ? { modifiers } : {}),
+          previousSearches: previousSearches ?? 0,
+          familiar,
+        },
+        auth
+      ),
+      (response) => {
         setResult(response);
         onDone?.(response);
-      })
-      .catch(notify.error)
-      .finally(() => setSaving(false));
+      }
+    );
   };
 
   const herbName = (id: string) => {

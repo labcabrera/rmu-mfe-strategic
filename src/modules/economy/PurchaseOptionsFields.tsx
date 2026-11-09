@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MenuItem, Stack, TextField, Typography } from '@mui/material';
 import {
@@ -20,7 +20,7 @@ const isGem = (item: Item) => item.category === 'gem' || !!item.features?.gem;
 const isJewel = (item: Item) => item.category === 'jewelry' && !!item.features?.jewelry;
 
 /** Whether a catalog item takes instance data when it is bought (spec 062): a size, carats or a jewelry class. */
-export const hasPurchaseOptions = (item: Item): boolean => isSized(item) || isGem(item) || isJewel(item);
+const hasPurchaseOptions = (item: Item): boolean => isSized(item) || isGem(item) || isJewel(item);
 
 /** The instance data a purchase starts with: one carat without a modern cut, a jewel of quality. */
 export const defaultPurchaseOptions = (item: Item): PurchaseItemOptions | undefined => {

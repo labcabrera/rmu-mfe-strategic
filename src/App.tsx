@@ -1,20 +1,22 @@
-import React, { FC } from 'react';
+import { lazy, FC } from 'react';
 import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 import { MfeRoot, NotFound } from '@labcabrera-rmu/rmu-react-shared-lib';
-import HomePage from './HomePage';
-import CharacterCreatePage from './modules/characters/create/CharacterCreatePage';
-import CharacterEditPage from './modules/characters/form/CharacterEditPage';
-import CharacterListPage from './modules/characters/list/CharacterListPage';
-import CharacterViewPage from './modules/characters/view/CharacterViewPage';
-import MarketPage from './modules/economy/MarketPage';
-import WorkshopPage from './modules/economy/WorkshopPage';
-import EnchantmentsPage from './modules/enchantments/EnchantmentsPage';
-import FactionFormPage from './modules/factions/form/FactionFormPage';
-import FactionListPage from './modules/factions/list/FactionListPage';
-import FactionViewPage from './modules/factions/view/FactionViewPage';
-import StrategicGameFormPage from './modules/games/form/StrategicGameFormPage';
-import StrategicGameListPage from './modules/games/list/StrategicGameListPage';
-import StrategicGameViewPage from './modules/games/view/StrategicGameViewPage';
+
+// Workspace spec 091, E1: every page is its own chunk; the Suspense is in MfeRoot / the shell layout.
+const HomePage = lazy(() => import('./HomePage'));
+const CharacterCreatePage = lazy(() => import('./modules/characters/create/CharacterCreatePage'));
+const CharacterEditPage = lazy(() => import('./modules/characters/form/CharacterEditPage'));
+const CharacterListPage = lazy(() => import('./modules/characters/list/CharacterListPage'));
+const CharacterViewPage = lazy(() => import('./modules/characters/view/CharacterViewPage'));
+const MarketPage = lazy(() => import('./modules/economy/MarketPage'));
+const WorkshopPage = lazy(() => import('./modules/economy/WorkshopPage'));
+const EnchantmentsPage = lazy(() => import('./modules/enchantments/EnchantmentsPage'));
+const FactionFormPage = lazy(() => import('./modules/factions/form/FactionFormPage'));
+const FactionListPage = lazy(() => import('./modules/factions/list/FactionListPage'));
+const FactionViewPage = lazy(() => import('./modules/factions/view/FactionViewPage'));
+const StrategicGameFormPage = lazy(() => import('./modules/games/form/StrategicGameFormPage'));
+const StrategicGameListPage = lazy(() => import('./modules/games/list/StrategicGameListPage'));
+const StrategicGameViewPage = lazy(() => import('./modules/games/view/StrategicGameViewPage'));
 
 /** The trade page of a character became its market (spec 023). */
 const TradeRedirect: FC = () => {

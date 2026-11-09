@@ -1,11 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
 import {
   Faction,
   fetchFactions,
+  fetchFullPage,
   fetchStrategicGames,
   FilterSchema,
   FilterSearchField,
@@ -13,8 +14,8 @@ import {
   ListPage,
   StrategicGame,
   StrategicGamePicker,
+  useApiNotify,
   useListFilters,
-  useNotify,
   usePagedQuery,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import FactionCard from '../FactionCard';
@@ -23,7 +24,7 @@ export default function FactionListPage() {
   const auth = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const [games, setGames] = useState<StrategicGame[]>([]);
   const schema: FilterSchema<Faction> = {
     q: { kind: 'text', label: t('name'), toRsql: (value) => `name=re=${value}` },
@@ -44,7 +45,7 @@ export default function FactionListPage() {
   });
 
   useEffect(() => {
-    fetchStrategicGames('', 0, 100, auth)
+    fetchFullPage((rsql, page, size) => fetchStrategicGames(rsql, page, size, auth), '')
       .then((response) => setGames(response.content))
       .catch(notify.error);
   }, []);

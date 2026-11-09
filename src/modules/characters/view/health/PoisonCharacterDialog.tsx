@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Alert, Stack, Typography } from '@mui/material';
@@ -10,21 +10,25 @@ import {
   Item,
   NumericInput,
   OPEN_D100,
+  poisonCharacter,
   PoisonData,
   PoisonDataFields,
-  poisonCharacter,
   PoisonRrResult,
   RmuDialog,
   RollBreakdown,
   RollField,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useStrategicNotify } from '../../../services/notify-service';
+import { useQuery } from '@tanstack/react-query';
+import { useBusyAction } from '../../../shared/useBusyAction';
 
 /**
  * A poison reaches the character (spec 042): the game master picks it, the roll (empty, the server rolls it) and a
  * modifier of the RR (dose, size...). The server resolves the RR with the poison resistance of the sheet, and the
  * dialog then shows the RR entry by entry with its rules (workspace spec 052).
  */
+const NO_ITEMS: Item[] = [];
+
 const PoisonCharacterDialog: FC<{
   character: Character;
   open: boolean;
@@ -33,12 +37,11 @@ const PoisonCharacterDialog: FC<{
 }> = ({ character, open, onClose, onUpdated }) => {
   const { t } = useTranslation();
   const auth = useAuth();
-  const notify = useStrategicNotify();
-  const [catalog, setCatalog] = useState<Item[]>([]);
+  const notify = useApiNotify();
   const [poison, setPoison] = useState<PoisonData>();
   const [roll, setRoll] = useState<number | null>(null);
   const [modifier, setModifier] = useState<number | null>(null);
-  const [saving, setSaving] = useState(false);
+  const { busy: saving, run } = useBusyAction();
   const [rr, setRr] = useState<PoisonRrResult>();
 
   useEffect(() => {
@@ -47,30 +50,39 @@ const PoisonCharacterDialog: FC<{
     setRoll(null);
     setModifier(null);
     setRr(undefined);
-    if (catalog.length === 0)
-      fetchItems('category==poison', 0, 1000, auth)
-        .then((page) => setCatalog(page.content))
-        .catch(notify.error);
   }, [open]);
+
+  const catalogQuery = useQuery({
+    queryKey: ['poison-catalog'],
+    queryFn: () => fetchItems('category==poison', 0, 1000, auth).then((page) => page.content),
+    enabled: open,
+    gcTime: 0,
+    // A catalog: read once while the dialog is mounted
+    staleTime: Infinity,
+  });
+  const catalog = catalogQuery.data ?? NO_ITEMS;
+
+  useEffect(() => {
+    if (catalogQuery.error) notify.error(catalogQuery.error);
+  }, [catalogQuery.error]);
 
   const save = () => {
     if (!isPoisonDataValid(poison)) return;
-    setSaving(true);
-    poisonCharacter(
-      character.id,
-      {
-        poison,
-        roll: roll ?? undefined,
-        modifiers: modifier ? [{ key: 'game-master', value: modifier }] : undefined,
-      },
-      auth
-    )
-      .then((result) => {
+    run(
+      poisonCharacter(
+        character.id,
+        {
+          poison,
+          roll: roll ?? undefined,
+          modifiers: modifier ? [{ key: 'game-master', value: modifier }] : undefined,
+        },
+        auth
+      ),
+      (result) => {
         onUpdated(result.character);
         setRr(result.rr);
-      })
-      .catch(notify.error)
-      .finally(() => setSaving(false));
+      }
+    );
   };
 
   if (rr) {

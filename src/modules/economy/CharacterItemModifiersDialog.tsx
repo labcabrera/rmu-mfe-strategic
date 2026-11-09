@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -28,7 +28,7 @@ import {
   STRATEGIC_ITEM_MODIFIER_TYPES,
   StrategicItem,
   StrategicItemModifier,
-  useNotify,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const emptyModifier = (): AddStrategicItemModifierDto => ({ type: 'breakage', value: 0, appliesTo: 'all' });
@@ -50,7 +50,7 @@ export default function CharacterItemModifiersDialog({
 }) {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const [form, setForm] = useState<AddStrategicItemModifierDto>(emptyModifier());
   const [busy, setBusy] = useState(false);
   const modifiers = item.modifiers ?? [];
@@ -125,7 +125,12 @@ export default function CharacterItemModifiersDialog({
             </Typography>
             <Tooltip title={t('item-modifier-delete')}>
               <span>
-                <IconButton size="small" disabled={busy} onClick={() => handleDelete(modifier.id)}>
+                <IconButton
+                  size="small"
+                  disabled={busy}
+                  onClick={() => handleDelete(modifier.id)}
+                  aria-label={t('item-modifier-delete')}
+                >
                   <DeleteIcon fontSize="small" />
                 </IconButton>
               </span>

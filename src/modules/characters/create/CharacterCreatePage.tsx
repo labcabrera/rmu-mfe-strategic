@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
@@ -15,6 +15,7 @@ import {
   Faction,
   fetchCultures,
   fetchFaction,
+  fetchFullPage,
   fetchRaces,
   fetchSkills,
   fetchStrategicGame,
@@ -30,8 +31,10 @@ import {
   STATS,
   StrategicGame,
   TechnicalInfo,
+  useApiNotify,
   useEntity,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { useQuery } from '@tanstack/react-query';
 import {
   CultureAssignmentRow,
   isCultureValid,
@@ -39,11 +42,10 @@ import {
   validateCulture,
 } from '../../services/culture-assignments';
 import { resolveOptions, resolvePowerLevel } from '../../services/game-rules';
-import { useStrategicNotify } from '../../services/notify-service';
 import { CreationStats, randomizePointBuyStats, randomizeStats } from '../../services/randomize-stats';
 import { safeStatBonus } from '../../services/stat-service';
 import StrategicGameRequired from '../../shared/StrategicGameRequired';
-import CharacterViewStatsChart from '../view/stats/CharacterViewStatsChart';
+import CharacterViewStatsChart from '../view/stats/LazyStatsChart';
 import CharacterCreateBoostOptionsDialog, {
   initialStatCreationBudget,
   StatCreationBudget,
@@ -55,9 +57,10 @@ import CharacterCreatePointBuy, { pointBuySpent } from './CharacterCreatePointBu
 import CharacterCreateProfessionalSkills from './CharacterCreateProfessionalSkills';
 import CharacterCreateSkillCosts from './CharacterCreateSkillCosts';
 import CharacterCreateSortCombat from './CharacterCreateSortCombat';
-import CharacterCreateStats from './CharacterCreateStats';
+import CharacterCreateStats, { StatBonusFormData } from './CharacterCreateStats';
 
 const defaultImage = `${imageBaseUrl}images/races/unknown.png`;
+const NO_RACES: Race[] = [];
 
 const CHARACTER_EMPTY_TEMPLATE = {
   name: '',
@@ -176,15 +179,6 @@ const CHARACTER_EMPTY_TEMPLATE = {
   imageUrl: 'images/generic/races.png',
 } as unknown as CreateCharacterDto;
 
-export interface StatBonus {
-  potential: number;
-  temporary: number;
-}
-
-export interface StatBonusFormData {
-  [key: string]: StatBonus;
-}
-
 /**
  * Character creation wizard. It needs the strategic game (`gameId` query param) and asks for it when
  * it is missing; `factionId` is optional.
@@ -194,7 +188,7 @@ export default function CharacterCreatePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const notify = useStrategicNotify();
+  const notify = useApiNotify();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const gameId = searchParams.get('gameId') || undefined;
@@ -209,7 +203,6 @@ export default function CharacterCreatePage() {
   const faction = factionState.entity;
 
   const [profession, setProfession] = useState<Profession>();
-  const [races, setRaces] = useState<Race[]>([]);
   const [selectedRace, setSelectedRace] = useState<Race>();
 
   const [formData, setFormData] = useState<CreateCharacterDto>(CHARACTER_EMPTY_TEMPLATE);
@@ -289,20 +282,27 @@ export default function CharacterCreatePage() {
     }));
   };
 
+  const racesQuery = useQuery({
+    queryKey: ['races', game?.realmId],
+    queryFn: () =>
+      fetchFullPage((rsql, page, size) => fetchRaces(rsql, page, size, auth), `realmId==${game!.realmId}`).then(
+        (data) => data.content
+      ),
+    enabled: !!game,
+    gcTime: 0,
+  });
+  const races = racesQuery.data ?? NO_RACES;
+
   useEffect(() => {
-    if (game) {
-      fetchRaces(`realmId==${game.realmId}`, 0, 100, auth)
-        .then((data) => setRaces(data.content))
-        .catch(notify.error);
-    }
-  }, [game]);
+    if (racesQuery.error) notify.error(racesQuery.error);
+  }, [racesQuery.error]);
 
   useEffect(() => {
     if (game) setStatBudget(initialStatCreationBudget(game));
   }, [game]);
 
   useEffect(() => {
-    fetchCultures('', 0, 100, auth)
+    fetchFullPage((rsql, page, size) => fetchCultures(rsql, page, size, auth), '')
       .then((data) => setCultures(data.content))
       .catch(notify.error);
     fetchSkills('', 0, 500, auth)

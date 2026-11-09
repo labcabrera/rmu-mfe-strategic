@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import { FC, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Stack } from '@mui/material';
 import { FieldHint, OptionHelp } from '@labcabrera-rmu/rmu-react-shared-lib';
@@ -8,7 +8,7 @@ import type { TFunction } from 'i18next';
  * The help of a campaign option (spec 052): what it does, what raising or lowering it implies and its default,
  * `game-option-<option>-help`. Click or tap pins it; a resting mouse previews it.
  */
-export const GameOptionHint: FC<{ option: string; label: string; defaultValue?: number | string | boolean }> = ({
+const GameOptionHint: FC<{ option: string; label: string; defaultValue?: number | string | boolean }> = ({
   option,
   label,
   defaultValue,

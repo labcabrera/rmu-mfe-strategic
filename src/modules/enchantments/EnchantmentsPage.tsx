@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { EnchantmentProject, fetchEnchantments, NotFound, useNotify } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { EnchantmentProject, fetchEnchantments, NotFound, useApiNotify } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { keepPreviousData, Updater, useQuery, useQueryClient } from '@tanstack/react-query';
 import EconomyLayout from '../economy/EconomyLayout';
 import { HolderView, useHolder } from '../economy/use-holder';
 import EnchantmentProjectDialog from './EnchantmentProjectDialog';
@@ -29,27 +30,33 @@ const isOfHolder = (project: EnchantmentProject, view: HolderView): boolean => {
 export default function EnchantmentsPage() {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const { holderKind, holderId } = useParams<{ holderKind: string; holderId: string }>();
   const [params, setParams] = useSearchParams();
   const tab = (TABS.find((value) => value === params.get('tab')) ?? 'projects') as EnchantmentsTab;
   const { view, refresh, invalid, error } = useHolder(holderKind, holderId);
-  const [projects, setProjects] = useState<EnchantmentProject[]>();
+  const queryClient = useQueryClient();
   const [openId, setOpenId] = useState<string>();
 
-  const loadProjects = useCallback(() => {
-    if (!view) return;
-    fetchEnchantments(`gameId==${view.gameId}`, 0, PROJECTS_PAGE_SIZE, auth)
-      .then((page) => setProjects(page.content))
-      .catch((e) => {
-        setProjects([]);
-        notify.error(e);
-      });
-  }, [view?.gameId]);
+  const projectsKey = ['enchantment-projects', view?.gameId];
+  const query = useQuery({
+    queryKey: projectsKey,
+    queryFn: () =>
+      fetchEnchantments(`gameId==${view!.gameId}`, 0, PROJECTS_PAGE_SIZE, auth).then((page) => page.content),
+    enabled: !!view,
+    gcTime: 0,
+    placeholderData: keepPreviousData,
+  });
+  const projects = query.isError ? [] : query.data;
+  const setProjects = (update: Updater<EnchantmentProject[] | undefined, EnchantmentProject[]>) =>
+    queryClient.setQueryData<EnchantmentProject[]>(projectsKey, update);
+  const loadProjects = () => {
+    if (view) query.refetch();
+  };
 
   useEffect(() => {
-    loadProjects();
-  }, [loadProjects]);
+    if (query.error) notify.error(query.error);
+  }, [query.error]);
 
   const own = useMemo(
     () => (view && projects ? projects.filter((p) => isOfHolder(p, view)) : undefined),

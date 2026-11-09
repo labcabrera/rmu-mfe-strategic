@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyValuePanel, OptionsHelpButton, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { DEFAULT_POWER_LEVEL, resolvePowerLevel } from '../../services/game-rules';

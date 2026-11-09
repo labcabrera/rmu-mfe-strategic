@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +9,7 @@ import {
   FactionPicker,
   fetchCharacters,
   fetchFactions,
+  fetchFullPage,
   fetchStrategicGames,
   FilterSchema,
   FilterSearchField,
@@ -16,8 +17,8 @@ import {
   ListPage,
   StrategicGame,
   StrategicGamePicker,
+  useApiNotify,
   useListFilters,
-  useNotify,
   usePagedQuery,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import CharacterCard from '../CharacterCard';
@@ -29,7 +30,7 @@ export default function CharacterListPage() {
   const auth = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const [games, setGames] = useState<StrategicGame[]>([]);
   const [factions, setFactions] = useState<Faction[]>([]);
   const schema: FilterSchema<Character> = {
@@ -57,10 +58,10 @@ export default function CharacterListPage() {
   });
 
   useEffect(() => {
-    fetchStrategicGames('', 0, 100, auth)
+    fetchFullPage((rsql, page, size) => fetchStrategicGames(rsql, page, size, auth), '')
       .then((response) => setGames(response.content))
       .catch(notify.error);
-    fetchFactions('', 0, 100, auth)
+    fetchFullPage((rsql, page, size) => fetchFactions(rsql, page, size, auth), '')
       .then((response) => setFactions(response.content))
       .catch(notify.error);
   }, []);

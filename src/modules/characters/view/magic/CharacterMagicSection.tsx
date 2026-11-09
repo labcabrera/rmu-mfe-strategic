@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -18,7 +18,6 @@ import {
   EmptyState,
   fetchCharacterSpells,
   formatBonus,
-  KnownSpellList,
   NumericInput,
   Panel,
   ResourceBar,
@@ -26,9 +25,10 @@ import {
   SpellEffectList,
   spendCharacterPower,
   StrategicGame,
+  useApiNotify,
   useSpellName,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useStrategicNotify } from '../../../services/notify-service';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { canChangeCharacter } from '../../../shared/permissions';
 
 /** Skills whose specialization is a spell list (spec 029). */
@@ -54,8 +54,7 @@ const CharacterMagicSection: FC<{
   const { t } = useTranslation();
   const spellName = useSpellName();
   const auth = useAuth();
-  const notify = useStrategicNotify();
-  const [lists, setLists] = useState<KnownSpellList[]>();
+  const notify = useApiNotify();
   const [amount, setAmount] = useState(1);
   const canChange = canChangeCharacter(auth, character, strategicGame);
   // The known spells change with the ranks of the lists
@@ -64,14 +63,17 @@ const CharacterMagicSection: FC<{
     .map((skill) => `${skill.specialization}:${skill.ranks}`)
     .join(',');
 
+  const query = useQuery({
+    queryKey: ['character-spells', character.id, listsKey],
+    queryFn: () => fetchCharacterSpells(character.id, auth),
+    gcTime: 0,
+    placeholderData: keepPreviousData,
+  });
+  const lists = query.isError ? [] : query.data;
+
   useEffect(() => {
-    fetchCharacterSpells(character.id, auth)
-      .then(setLists)
-      .catch((err) => {
-        setLists([]);
-        notify.error(err);
-      });
-  }, [character.id, listsKey]);
+    if (query.error) notify.error(query.error);
+  }, [query.error]);
 
   const changePower = (change: 'spend' | 'restore') => {
     const call = change === 'spend' ? spendCharacterPower : restoreCharacterPower;

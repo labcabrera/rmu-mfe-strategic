@@ -1,109 +1,22 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { Dispatch, FC, ReactNode, SetStateAction, useEffect, useMemo, useState } from 'react';
+import { Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from 'react-oidc-context';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Box, Button, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import {
-  Alert,
-  Box,
-  Button,
-  Chip,
-  Divider,
-  FormControlLabel,
-  List,
-  ListItemButton,
-  ListSubheader,
-  Stack,
-  Switch,
-  ToggleButton,
-  ToggleButtonGroup,
-  Tooltip,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material';
-import {
-  addCharacterTrait,
-  ChipRow,
-  EmptyState,
   BonusDevPointsSummary,
   Character,
-  DEV_POINTS_POOLS,
-  DevPointsPool,
-  fetchTraits,
-  KeyValueList,
-  KeyValueRow,
-  LoadingState,
-  MULTILINGUAL_TRAIT_ID,
+  EmptyState,
   RmuDialog,
-  SearchField,
-  SectionLabel,
   StrategicGame,
-  Trait,
-  traitCategories,
-  TraitTypeChip,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { resolvePowerLevel } from '../../../services/game-rules';
-import { useStrategicNotify } from '../../../services/notify-service';
-import { toRoman } from '../../../services/roman-number-service';
 import TalentPolicyChip from '../../../shared/chips/TalentPolicyChip';
-import { isGameMaster } from '../../../shared/permissions';
-import MultilingualRanksPicker, {
-  emptyMultilingualRows,
-  isMultilingualValid,
-  MultilingualRow,
-  toLanguageRanks,
-} from './MultilingualRanksPicker';
-import TraitPurchaseRules, { PrerequisiteChoice, traitKey } from './TraitPurchaseRules';
-import TraitSpecializationPicker from './TraitSpecializationPicker';
-import {
-  evaluatePrerequisites,
-  evaluateTraitPurchase,
-  evaluateTraitRow,
-  findOwnedTrait,
-  flawLimitReason,
-  initialTier,
-  linkableTalents,
-  ownedTraits,
-  talentPolicyOf,
-  talentPurchaseRulesOf,
-  TraitBlockReason,
-  TraitPurchase,
-} from './trait-rules';
-
-type TypeFilter = 'all' | 'talent' | 'flaw';
-
-const ALL = 'all';
-
-/** Reasons that only depend on the points or the cost limits ("only affordable" hides them). */
-const COST_REASONS = [
-  'trait-reason-max-cost',
-  'trait-reason-not-affordable',
-  'err-talent-policy-bonus-points-only',
-  'err-talent-policy-flaw-points-only',
-  'err-talent-policy-creation-only',
-  'err-dev-points-insufficient',
-];
-
-/** Order of the categories: the catalog ones first, any other one after them. */
-const categoryOrder = (category: string) => {
-  const index = traitCategories.indexOf(category);
-  return index < 0 ? traitCategories.length : index;
-};
-
-const useTraitName = () => {
-  const { t } = useTranslation();
-  return (trait: Trait) => t(trait.id, { defaultValue: trait.name });
-};
-
-const useReasonText = () => {
-  const { t } = useTranslation();
-  return (reason: TraitBlockReason) => {
-    const params = { ...reason.params };
-    if (typeof params.tier === 'number') params.tier = toRoman(params.tier);
-    return t(reason.key, params);
-  };
-};
+import MultilingualRanksPicker from './MultilingualRanksPicker';
+import TraitDetail from './TraitDetail';
+import TraitListPanel from './TraitListPanel';
+import TraitPurchaseRules from './TraitPurchaseRules';
+import { talentPolicyOf } from './trait-rules';
+import { useAddTraitForm } from './use-add-trait-form';
 
 /**
  * Trait selector: a searchable list grouped by category with the cost and the reason a trait cannot be bought, and a
@@ -117,268 +30,30 @@ const AddTraitDialog: FC<{
   open: boolean;
   onClose: () => void;
 }> = ({ character, setCharacter, strategicGame, open, onClose }) => {
-  const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useStrategicNotify();
   const theme = useTheme();
   const compact = useMediaQuery(theme.breakpoints.down('md'));
-  const traitName = useTraitName();
-
-  const [traits, setTraits] = useState<Trait[]>();
-  const [search, setSearch] = useState('');
-  const [typeFilter, setTypeFilter] = useState<TypeFilter>(ALL);
-  const [category, setCategory] = useState<string>(ALL);
-  const [onlyAffordable, setOnlyAffordable] = useState(false);
-  const [selected, setSelected] = useState<Trait>();
-  const [tier, setTier] = useState<number>();
-  const [specialization, setSpecialization] = useState<string>();
-  const [showDetail, setShowDetail] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  // Spec 076: the pool that pays the trait and the languages of Multilingual
-  const [pool, setPool] = useState<DevPointsPool>('auto');
-  const [languageRows, setLanguageRows] = useState<MultilingualRow[]>(() => emptyMultilingualRows(1));
-  // Spec 077: the prerequisite the game master grants, the talent a flaw is linked to and the restriction
-  const [chosenPrerequisite, setChosenPrerequisite] = useState<PrerequisiteChoice>('auto');
-  const [prerequisiteNote, setPrerequisiteNote] = useState('');
-  const [linkKey, setLinkKey] = useState('');
-  const [restricted, setRestricted] = useState(false);
-  const [restrictedNote, setRestrictedNote] = useState('');
-  const gameMaster = isGameMaster(auth, strategicGame);
-  const rulesOn = talentPurchaseRulesOf(strategicGame);
-
-  // Every trait at once, kept while the dialog is open.
-  useEffect(() => {
-    if (!open || traits) return;
-    fetchTraits('', 0, 500, auth)
-      .then((page) => setTraits(page.content))
-      .catch((error) => notify.error(error));
-  }, [open]);
-
-  const reset = () => {
-    setTraits(undefined);
-    setSearch('');
-    setTypeFilter(ALL);
-    setCategory(ALL);
-    setOnlyAffordable(false);
-    setSelected(undefined);
-    setTier(undefined);
-    setSpecialization(undefined);
-    setShowDetail(false);
-    setSubmitting(false);
-    setPool('auto');
-    setLanguageRows(emptyMultilingualRows(1));
-    resetPurchaseRules();
-  };
-
-  const resetPurchaseRules = () => {
-    setChosenPrerequisite('auto');
-    setPrerequisiteNote('');
-    setLinkKey('');
-    setRestricted(false);
-    setRestrictedNote('');
-  };
-
-  const handleClose = () => {
-    reset();
-    onClose();
-  };
-
-  const rows = useMemo(
-    () =>
-      (traits ?? []).map((trait) => ({ trait, check: evaluateTraitRow(character, strategicGame, trait, gameMaster) })),
-    [traits, character, strategicGame, gameMaster]
-  );
-
-  const catalog = useMemo(() => new Map((traits ?? []).map((trait) => [trait.id, trait])), [traits]);
-
-  const categories = useMemo(
-    () => [...new Set(rows.map((row) => row.trait.category))].sort((a, b) => categoryOrder(a) - categoryOrder(b)),
-    [rows]
-  );
-
-  const groups = useMemo(() => {
-    const text = search.trim().toLowerCase();
-    const visible = rows.filter(({ trait, check }) => {
-      if (typeFilter === 'talent' && !trait.isTalent) return false;
-      if (typeFilter === 'flaw' && trait.isTalent) return false;
-      if (category !== ALL && trait.category !== category) return false;
-      if (onlyAffordable && check.blocked && COST_REASONS.includes(check.blocked.key)) return false;
-      return !text || traitName(trait).toLowerCase().includes(text);
-    });
-    const byCategory = new Map<string, typeof visible>();
-    visible
-      .sort((a, b) => traitName(a.trait).localeCompare(traitName(b.trait)))
-      .forEach((row) => byCategory.set(row.trait.category, [...(byCategory.get(row.trait.category) ?? []), row]));
-    return [...byCategory.entries()].sort(([a], [b]) => categoryOrder(a) - categoryOrder(b));
-  }, [rows, search, typeFilter, category, onlyAffordable, t]);
-
-  const selectTrait = (trait: Trait) => {
-    setSelected(trait);
-    setSpecialization(undefined);
-    setTier(initialTier(character, trait, undefined, gameMaster));
-    setLanguageRows(emptyMultilingualRows(1));
-    resetPurchaseRules();
-    setShowDetail(true);
-  };
-
-  const changeSpecialization = (value: string) => {
-    setSpecialization(value || undefined);
-    if (selected) setTier(initialTier(character, selected, value || undefined, gameMaster));
-  };
-
-  const current = selected ? findOwnedTrait(character, selected.id, specialization || undefined) : undefined;
-  const basePurchase =
-    selected &&
-    evaluateTraitPurchase(character, strategicGame, selected, tier, specialization || undefined, pool, {
-      restricted: gameMaster && restricted,
-      gameMaster,
-    });
-  // Spec 077, C11: the prerequisite of each new tier, and the limits of the flaws
-  const chosenType = rulesOn && chosenPrerequisite !== 'auto' ? chosenPrerequisite : undefined;
-  const acquisitions =
-    selected && rulesOn
-      ? evaluatePrerequisites(character, selected, tier, specialization || undefined, chosenType)
-      : [];
-  const linkable = selected ? linkableTalents(character, selected, catalog) : [];
-  const linkTalent = current?.linkedTo
-    ? character.traits.find((owned) => traitKey(owned) === traitKey(current.linkedTo!))
-    : linkable.find((owned) => traitKey(owned) === linkKey);
-  const rulesBlocked: TraitBlockReason | undefined = !basePurchase
-    ? undefined
-    : acquisitions.some((entry) => !entry.type)
-      ? { key: 'trait-reason-prerequisite-unmet' }
-      : selected
-        ? flawLimitReason(character, selected, specialization || undefined, basePurchase.cost, linkTalent, rulesOn)
-        : undefined;
-  const purchase: TraitPurchase | undefined = basePurchase && {
-    ...basePurchase,
-    blocked: basePurchase.blocked ?? rulesBlocked,
-  };
-  // Multilingual needs the languages that receive its ranks; improving a tier grants none
-  const multilingual = selected?.id === MULTILINGUAL_TRAIT_ID && !purchase?.isImprovement;
-  const valid =
-    !!selected &&
-    !!purchase &&
-    !purchase.blocked &&
-    (!selected.isTierBased || (!!tier && tier >= 1 && tier <= (selected.maxTier ?? tier))) &&
-    (!selected.specialization || !!specialization) &&
-    (!multilingual || isMultilingualValid(languageRows));
-
-  const onSubmit = () => {
-    if (!selected || !valid) return;
-    setSubmitting(true);
-    addCharacterTrait(
-      character.id,
-      {
-        traitId: selected.id,
-        tier: selected.isTierBased ? tier : undefined,
-        specialization,
-        pool: purchase?.poolChoosable && pool !== 'auto' ? pool : undefined,
-        languageRanks: multilingual ? toLanguageRanks(languageRows) : undefined,
-        prerequisite: chosenType
-          ? { type: chosenType, ...(prerequisiteNote.trim() ? { note: prerequisiteNote.trim() } : {}) }
-          : undefined,
-        linkedTo:
-          !current && linkTalent
-            ? {
-                traitId: linkTalent.traitId,
-                ...(linkTalent.specialization ? { specialization: linkTalent.specialization } : {}),
-              }
-            : undefined,
-        restricted: gameMaster && restricted && !current?.restricted ? { note: restrictedNote.trim() } : undefined,
-      },
-      auth
-    )
-      .then((updated) => {
-        setCharacter(updated);
-        handleClose();
-      })
-      .catch((error) => {
-        setSubmitting(false);
-        notify.error(error);
-      });
-  };
-
+  const state = useAddTraitForm({ character, setCharacter, strategicGame, open, onClose });
+  const {
+    form,
+    update,
+    catalog,
+    gameMaster,
+    rulesOn,
+    current,
+    purchase,
+    acquisitions,
+    linkable,
+    multilingual,
+    valid,
+    changeSpecialization,
+    submit,
+    handleClose,
+  } = state;
+  const { selected, tier, specialization, showDetail, submitting, pool } = form;
   const powerLevel = resolvePowerLevel(strategicGame?.powerLevel);
   const listVisible = !compact || !showDetail;
   const detailVisible = !compact || showDetail;
-
-  const list = (
-    <Stack spacing={1.5} sx={{ minHeight: 0, height: '100%' }}>
-      <SearchField size="small" value={search} onChange={setSearch} delay={0} />
-      <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', gap: 1, flexWrap: 'wrap' }}>
-        <ToggleButtonGroup
-          exclusive
-          size="small"
-          value={typeFilter}
-          onChange={(_, value: TypeFilter | null) => value && setTypeFilter(value)}
-          aria-label={t('trait-type')}
-        >
-          <ToggleButton value={ALL}>{t('all')}</ToggleButton>
-          <ToggleButton value="talent">{t('talents')}</ToggleButton>
-          <ToggleButton value="flaw">{t('flaws')}</ToggleButton>
-        </ToggleButtonGroup>
-        <FormControlLabel
-          control={<Switch size="small" checked={onlyAffordable} onChange={(_, v) => setOnlyAffordable(v)} />}
-          label={t('only-affordable')}
-        />
-      </Stack>
-      <ChipRow>
-        {[ALL, ...categories].map((option) => (
-          <Chip
-            key={option}
-            size="small"
-            label={t(option)}
-            color={category === option ? 'primary' : 'default'}
-            variant={category === option ? 'filled' : 'outlined'}
-            onClick={() => setCategory(option)}
-          />
-        ))}
-      </ChipRow>
-      <Box
-        sx={{
-          flex: 1,
-          minHeight: 0,
-          overflowY: 'auto',
-          border: 1,
-          borderColor: 'divider',
-          borderRadius: (theme) => `${theme.radius.sm}px`,
-        }}
-        role="region"
-        aria-label={t('traits')}
-      >
-        {!traits ? (
-          <LoadingState />
-        ) : groups.length === 0 ? (
-          <Box sx={{ px: 2 }}>
-            <EmptyState dense />
-          </Box>
-        ) : (
-          <List dense disablePadding>
-            {groups.map(([group, items]) => (
-              <li key={group}>
-                <Box component="ul" sx={{ p: 0 }}>
-                  <ListSubheader sx={{ lineHeight: '32px', bgcolor: 'background.paper' }}>
-                    {t(group)} · {items.length}
-                  </ListSubheader>
-                  {items.map(({ trait, check }) => (
-                    <TraitRow
-                      key={trait.id}
-                      trait={trait}
-                      check={check}
-                      character={character}
-                      selected={selected?.id === trait.id}
-                      onSelect={() => selectTrait(trait)}
-                    />
-                  ))}
-                </Box>
-              </li>
-            ))}
-          </List>
-        )}
-      </Box>
-    </Stack>
-  );
 
   return (
     <RmuDialog
@@ -389,7 +64,7 @@ const AddTraitDialog: FC<{
       paperSx={compact ? undefined : { height: '85vh' }}
       onCancel={handleClose}
       buttons={
-        <Button onClick={onSubmit} variant="contained" disabled={!valid || submitting}>
+        <Button onClick={submit} variant="contained" disabled={!valid || submitting}>
           {purchase?.isImprovement ? t('trait-improve') : purchase?.isLowering ? t('trait-lower') : t('add')}
         </Button>
       }
@@ -397,7 +72,7 @@ const AddTraitDialog: FC<{
       <Stack sx={{ gap: 2, minHeight: 0, height: '100%' }}>
         {compact && showDetail && (
           <Box>
-            <Button startIcon={<ArrowBackIcon />} onClick={() => setShowDetail(false)}>
+            <Button startIcon={<ArrowBackIcon />} onClick={() => update({ showDetail: false })}>
               {t('back')}
             </Button>
           </Box>
@@ -434,7 +109,11 @@ const AddTraitDialog: FC<{
             gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 5fr) minmax(0, 7fr)' },
           }}
         >
-          {listVisible && <Box sx={{ minHeight: { xs: 320, md: 0 }, display: 'flex' }}>{list}</Box>}
+          {listVisible && (
+            <Box sx={{ minHeight: { xs: 320, md: 0 }, display: 'flex' }}>
+              <TraitListPanel character={character} state={state} />
+            </Box>
+          )}
           {detailVisible && (
             <Box sx={{ minHeight: 0, overflowY: 'auto' }}>
               {selected && purchase ? (
@@ -442,19 +121,19 @@ const AddTraitDialog: FC<{
                   character={character}
                   trait={selected}
                   tier={tier}
-                  setTier={setTier}
+                  setTier={(value) => update({ tier: value })}
                   specialization={specialization}
                   setSpecialization={changeSpecialization}
                   purchase={purchase}
                   pool={pool}
-                  setPool={setPool}
+                  setPool={(value) => update({ pool: value })}
                   extra={
                     <>
                       {multilingual && (
                         <MultilingualRanksPicker
                           realmId={strategicGame?.realmId}
-                          rows={languageRows}
-                          onChange={setLanguageRows}
+                          rows={form.languageRows}
+                          onChange={(languageRows) => update({ languageRows })}
                         />
                       )}
                       <TraitPurchaseRules
@@ -464,17 +143,17 @@ const AddTraitDialog: FC<{
                         rulesOn={rulesOn}
                         gameMaster={gameMaster}
                         acquisitions={acquisitions}
-                        chosen={chosenPrerequisite}
-                        setChosen={setChosenPrerequisite}
-                        prerequisiteNote={prerequisiteNote}
-                        setPrerequisiteNote={setPrerequisiteNote}
+                        chosen={form.chosenPrerequisite}
+                        setChosen={(chosenPrerequisite) => update({ chosenPrerequisite })}
+                        prerequisiteNote={form.prerequisiteNote}
+                        setPrerequisiteNote={(prerequisiteNote) => update({ prerequisiteNote })}
                         linkable={linkable}
-                        linkKey={linkKey}
-                        setLinkKey={setLinkKey}
-                        restricted={restricted}
-                        setRestricted={setRestricted}
-                        restrictedNote={restrictedNote}
-                        setRestrictedNote={setRestrictedNote}
+                        linkKey={form.linkKey}
+                        setLinkKey={(linkKey) => update({ linkKey })}
+                        restricted={form.restricted}
+                        setRestricted={(restricted) => update({ restricted })}
+                        restrictedNote={form.restrictedNote}
+                        setRestrictedNote={(restrictedNote) => update({ restrictedNote })}
                       />
                     </>
                   }
@@ -487,196 +166,6 @@ const AddTraitDialog: FC<{
         </Box>
       </Stack>
     </RmuDialog>
-  );
-};
-
-/** One trait of the list: name, type, cost and owned marker; disabled with the reason when it cannot be bought. */
-const TraitRow: FC<{
-  trait: Trait;
-  check: TraitPurchase;
-  character: Character;
-  selected: boolean;
-  onSelect: () => void;
-}> = ({ trait, check, character, selected, onSelect }) => {
-  const { t } = useTranslation();
-  const traitName = useTraitName();
-  const reasonText = useReasonText();
-  const owned = ownedTraits(character, trait.id);
-  const ownedTier = owned.find((item) => item.tier)?.tier;
-  const row = (
-    <ListItemButton
-      selected={selected}
-      disabled={!!check.blocked}
-      onClick={onSelect}
-      sx={{ gap: 1, alignItems: 'center', flexWrap: 'wrap' }}
-    >
-      <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Typography variant="body2" noWrap>
-          {traitName(trait)}
-        </Typography>
-        <Typography variant="caption" color="text.secondary">
-          {t('trait-cost-value', { cost: trait.adquisitionCost })}
-          {trait.isTierBased && ` · ${t('trait-cost-per-tier', { cost: trait.tierCost ?? 0 })}`}
-        </Typography>
-      </Box>
-      {owned.length > 0 && (
-        <Chip
-          size="small"
-          color="info"
-          variant="outlined"
-          label={ownedTier ? t('trait-owned-tier', { tier: toRoman(ownedTier) }) : t('trait-owned')}
-        />
-      )}
-      <TraitTypeChip isTalent={trait.isTalent} />
-    </ListItemButton>
-  );
-  if (!check.blocked) return row;
-  // Disabled buttons do not fire pointer events: the tooltip goes on a wrapper.
-  return (
-    <Tooltip title={reasonText(check.blocked)} placement="top-start">
-      <Box>{row}</Box>
-    </Tooltip>
-  );
-};
-
-/** Detail of the selected trait: description, tier, specialization, total cost and the points that pay it. */
-const TraitDetail: FC<{
-  character: Character;
-  trait: Trait;
-  tier?: number;
-  setTier: (tier: number) => void;
-  specialization?: string;
-  setSpecialization: (value: string) => void;
-  purchase: TraitPurchase;
-  pool: DevPointsPool;
-  setPool: (pool: DevPointsPool) => void;
-  /** Choices of a particular trait (the languages of Multilingual). */
-  extra?: ReactNode;
-}> = ({ character, trait, tier, setTier, specialization, setSpecialization, purchase, pool, setPool, extra }) => {
-  const { t } = useTranslation();
-  const traitName = useTraitName();
-  const reasonText = useReasonText();
-  const current = findOwnedTrait(character, trait.id, specialization);
-  const currentTier = current?.tier ?? 0;
-
-  const costRows: KeyValueRow[] = [
-    {
-      label: t('trait-total-cost'),
-      value: purchase.cost,
-      hint: trait.isTierBased
-        ? t('trait-tier-cost', { cost: trait.adquisitionCost, tierCost: trait.tierCost ?? 0 })
-        : undefined,
-    },
-  ];
-  if ((purchase.isImprovement || purchase.isLowering) && current) {
-    costRows.push({ label: t('trait-already-paid'), value: current.cost });
-    costRows.push({ label: t('trait-charged'), value: purchase.charged });
-  }
-  if (purchase.charged < 0) {
-    const pool = purchase.pools[0] ?? 'normal';
-    costRows.push({ label: t(`trait-returns-${pool}`), value: `+${-purchase.charged}` });
-  } else {
-    (['normal', 'bonus', 'flaw'] as const)
-      .filter((pool) => purchase.payment[pool] > 0)
-      .forEach((pool) => costRows.push({ label: t(`trait-pool-${pool}`), value: purchase.payment[pool] }));
-  }
-
-  return (
-    <Stack spacing={2} sx={{ p: { xs: 0, md: 1 } }}>
-      <Box>
-        <Typography variant="h6" component="h3" sx={{ fontFamily: (theme) => theme.fonts?.display }}>
-          {traitName(trait)}
-        </Typography>
-        <ChipRow sx={{ mt: 0.5 }}>
-          <TraitTypeChip isTalent={trait.isTalent} />
-          <Chip size="small" variant="outlined" label={t(trait.category)} />
-          {current && (
-            <Chip
-              size="small"
-              color="info"
-              variant="outlined"
-              label={current.tier ? t('trait-owned-tier', { tier: toRoman(current.tier) }) : t('trait-owned')}
-            />
-          )}
-        </ChipRow>
-      </Box>
-      <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-line' }}>
-        {trait.description || t('no-description')}
-      </Typography>
-      {trait.specialization && (
-        <TraitSpecializationPicker value={specialization ?? ''} trait={trait} onChange={setSpecialization} />
-      )}
-      {trait.isTierBased && (
-        <Box>
-          <SectionLabel>{t('tier')}</SectionLabel>
-          <ToggleButtonGroup
-            exclusive
-            size="small"
-            value={tier ?? null}
-            onChange={(_, value: number | null) => value && setTier(value)}
-            aria-label={t('tier')}
-            sx={{ flexWrap: 'wrap' }}
-          >
-            {Array.from({ length: trait.maxTier ?? 1 }, (_, index) => index + 1).map((option) => (
-              <ToggleButton
-                key={option}
-                value={option}
-                // Spec 077, C10: an owned flaw can be lowered; a talent only goes up
-                disabled={trait.isTalent ? option <= currentTier : option === currentTier}
-                sx={{ minWidth: 44 }}
-              >
-                {toRoman(option)}
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
-          {purchase.isLowering && current?.tier && tier && (
-            <Typography variant="body2" sx={{ mt: 1 }}>
-              {t('trait-lower-summary', {
-                from: toRoman(current.tier),
-                to: toRoman(tier),
-                cost: purchase.charged,
-              })}
-            </Typography>
-          )}
-          {purchase.isImprovement && current?.tier && tier && (
-            <Typography variant="body2" sx={{ mt: 1 }}>
-              {t('trait-improve-summary', {
-                from: toRoman(current.tier),
-                to: toRoman(tier),
-                cost: purchase.charged,
-              })}
-            </Typography>
-          )}
-        </Box>
-      )}
-      {extra}
-      <Divider />
-      {/* Spec 076, A3: the pool that pays it, when the talent policy fixes none */}
-      {purchase.poolChoosable && purchase.charged > 0 && (
-        <Box>
-          <SectionLabel>{t('dev-points-pool')}</SectionLabel>
-          <ToggleButtonGroup
-            exclusive
-            size="small"
-            value={pool}
-            onChange={(_, value: DevPointsPool | null) => value && setPool(value)}
-            aria-label={t('dev-points-pool')}
-            sx={{ flexWrap: 'wrap' }}
-          >
-            {DEV_POINTS_POOLS.map((option) => (
-              <ToggleButton key={option} value={option}>
-                {t(`dev-points-pool-${option}`)}
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
-        </Box>
-      )}
-      <KeyValueList rows={costRows} />
-      {purchase.blocked && <Alert severity="warning">{reasonText(purchase.blocked)}</Alert>}
-      {!purchase.blocked && trait.specialization && !specialization && (
-        <Alert severity="info">{t('trait-specialization-needed')}</Alert>
-      )}
-    </Stack>
   );
 };
 

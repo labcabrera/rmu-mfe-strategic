@@ -1,14 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Alert, Button, Grid, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import {
   Character,
-  fetchCharacters,
-  formatCampaignDate,
   DataTable,
   EmptyState,
+  fetchCharacters,
+  fetchFullPage,
+  formatCampaignDate,
   formatElapsedTime,
   GameTimeLogCharacter,
   isApiError,
@@ -16,16 +17,17 @@ import {
   MAX_PASS_TIME_DAYS,
   NumericInput,
   PASS_TIME_ACTIVITIES,
+  passTime,
   PassTimeActivity,
   PassTimeResult,
-  passTime,
   RmuDialog,
   SectionLabel,
   StrategicGame,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useHealingTables } from '../../../api/healing-tables';
 import RestDialog from '../../../characters/view/health/RestDialog';
-import { useStrategicNotify } from '../../../services/notify-service';
 import PassTimeResults from './PassTimeResults';
 
 const HOURS_PER_DAY = 24;
@@ -54,9 +56,8 @@ const PassTimeDialog: FC<{
 }> = ({ game, open, onClose, onPassed, onConflict }) => {
   const { t } = useTranslation();
   const auth = useAuth();
-  const notify = useStrategicNotify();
+  const notify = useApiNotify();
   const tables = useHealingTables();
-  const [characters, setCharacters] = useState<Character[]>();
   const [days, setDays] = useState(0);
   const [hours, setHours] = useState(8);
   const [note, setNote] = useState('');
@@ -74,11 +75,25 @@ const PassTimeDialog: FC<{
     setActivities({});
     setPreview(undefined);
     setDone(undefined);
-    setCharacters(undefined);
-    fetchCharacters(`gameId==${game.id}`, 0, 100, auth)
-      .then((page) => setCharacters([...page.content].sort((a, b) => a.name.localeCompare(b.name))))
-      .catch(notify.error);
   }, [open, game.id]);
+
+  const queryClient = useQueryClient();
+  const charactersKey = ['pass-time-characters', game.id, open];
+  const charactersQuery = useQuery({
+    // With `open` in the key each opening starts empty and reads them again
+    queryKey: charactersKey,
+    queryFn: () =>
+      fetchFullPage((rsql, page, size) => fetchCharacters(rsql, page, size, auth), `gameId==${game.id}`).then((page) =>
+        [...page.content].sort((a, b) => a.name.localeCompare(b.name))
+      ),
+    enabled: open,
+    gcTime: 0,
+  });
+  const characters = charactersQuery.data;
+
+  useEffect(() => {
+    if (charactersQuery.error) notify.error(charactersQuery.error);
+  }, [charactersQuery.error]);
 
   // Any change of the inputs makes the preview stale
   useEffect(() => setPreview(undefined), [days, hours, activities]);
@@ -341,7 +356,9 @@ const PassTimeDialog: FC<{
           initial={retryInitial}
           onClose={() => setRetry(undefined)}
           onRested={(character) => {
-            setCharacters((current) => current?.map((c) => (c.id === character.id ? character : c)));
+            queryClient.setQueryData<Character[]>(charactersKey, (current) =>
+              current?.map((c) => (c.id === character.id ? character : c))
+            );
             setDone(
               (current) =>
                 current && {
