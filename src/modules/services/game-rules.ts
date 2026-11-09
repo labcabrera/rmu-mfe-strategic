@@ -31,7 +31,7 @@ export const DEFAULT_POWER_LEVEL: Required<StrategicGamePowerLevel> = {
 };
 
 /** Values of a power level a preset fills; the others (development points, traits, swaps) stay as they are. */
-export type PowerLevelPresetValues = Pick<
+type PowerLevelPresetValues = Pick<
   Required<StrategicGamePowerLevel>,
   | 'statRandomMin'
   | 'statBoostTemporary'
@@ -47,7 +47,7 @@ export type PowerLevelPresetValues = Pick<
  * Core Law table 12-1, as rmu-api-strategic has it (workspace spec 079, E). A knack line "+N (+M max)" is N / M knacks
  * of +M; the Average level has none and no rerolls (a minimum of 1).
  */
-export const POWER_LEVEL_PRESET_VALUES: Record<PowerLevelPreset, PowerLevelPresetValues> = {
+const POWER_LEVEL_PRESET_VALUES: Record<PowerLevelPreset, PowerLevelPresetValues> = {
   average: {
     statRandomMin: 1,
     statBoostTemporary: 51,
@@ -161,7 +161,7 @@ export const withGameDefaults = (game: StrategicGame): StrategicGame => ({
 const LORE_CATEGORY_ID = 'lore';
 
 /** Lore skills and languages are exempt from the twice the level limit of intense training (spec 076, P2). */
-export const isLoreOrLanguage = (skill: Pick<CharacterSkill, 'skillId' | 'categoryId' | 'category'>): boolean => {
+const isLoreOrLanguage = (skill: Pick<CharacterSkill, 'skillId' | 'categoryId' | 'category'>): boolean => {
   const category = skill.categoryId ?? skill.category;
   if (category) return category === LORE_CATEGORY_ID;
   return skill.skillId.startsWith('language-') || skill.skillId.endsWith('lore');
@@ -171,7 +171,7 @@ export const isLoreOrLanguage = (skill: Pick<CharacterSkill, 'skillId' | 'catego
 export const intenseTrainingLimit = (level: number): number => 2 * Math.max(level, 1);
 
 /** Why the next rank of a skill cannot be developed in this level, by the rules alone (the points apart). */
-export type RankBlock =
+type RankBlock =
   'err-skill-max-ranks-per-level' | 'err-skill-intense-training-taken' | 'err-skill-intense-training-limit';
 
 export interface NextRankRule {

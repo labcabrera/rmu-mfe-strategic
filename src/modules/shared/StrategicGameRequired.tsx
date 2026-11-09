@@ -1,15 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useAuth } from 'react-oidc-context';
 import { Stack, Typography } from '@mui/material';
 import {
   Breadcrumb,
   CancelButton,
+  fetchFullPage,
   fetchStrategicGames,
   LayoutBase,
   StrategicGame,
   StrategicGamePicker,
-  useNotify,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 /** Shown by the creation pages that need a strategic game when they are opened without a gameId. */
@@ -20,11 +21,11 @@ const StrategicGameRequired: FC<{
   onCancel: () => void;
 }> = ({ breadcrumbs, message, onSelect, onCancel }) => {
   const auth = useAuth();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const [games, setGames] = useState<StrategicGame[]>();
 
   useEffect(() => {
-    fetchStrategicGames('', 0, 100, auth)
+    fetchFullPage((rsql, page, size) => fetchStrategicGames(rsql, page, size, auth), '')
       .then((response) => setGames(response.content))
       .catch(notify.error);
   }, []);

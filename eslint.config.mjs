@@ -34,7 +34,8 @@ export default [
 
       '@typescript-eslint/no-explicit-any': 'warn',
 
-      'no-unused-vars': 'warn',
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'error',
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       eqeqeq: ['error', 'always'],
 

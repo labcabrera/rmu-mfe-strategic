@@ -1,7 +1,7 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import { Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TextField } from '@mui/material';
-import Grid from '@mui/material/Grid';
+import { Grid } from '@mui/material';
 import { Faction, NumericInput, Section } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const FactionForm: FC<{

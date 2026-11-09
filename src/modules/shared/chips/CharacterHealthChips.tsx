@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import HealingIcon from '@mui/icons-material/Healing';
 import { Chip } from '@mui/material';

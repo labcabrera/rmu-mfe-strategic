@@ -24,7 +24,7 @@ const PAGE_ICONS: Record<EconomyPage, React.ReactElement> = {
 };
 
 /** The tabs of an economy page, kept in its `tab` query param, and controls at their right. */
-export interface EconomyTabs {
+interface EconomyTabs {
   sections: SectionDef[];
   value: string;
   onChange: (id: string) => void;

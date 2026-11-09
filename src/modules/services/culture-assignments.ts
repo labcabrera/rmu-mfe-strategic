@@ -7,8 +7,8 @@ import { Culture, CultureAssignmentDto, CultureSkillRank, Skill } from '@labcabr
  * are limited to culture.languages when it is not empty, and maxRanksPerSkill applies per skill and specialization.
  */
 
-export const LANGUAGE_SKILL_IDS = ['language-spoken', 'language-written'];
-export const DEFAULT_CULTURE_MAX_RANKS_PER_SKILL = 2;
+const LANGUAGE_SKILL_IDS = ['language-spoken', 'language-written'];
+const DEFAULT_CULTURE_MAX_RANKS_PER_SKILL = 2;
 
 /** One row of the distribution form. `key` only identifies the row in the UI. */
 export interface CultureAssignmentRow {
@@ -19,7 +19,7 @@ export interface CultureAssignmentRow {
   ranks: number;
 }
 
-export type CultureErrorCode =
+type CultureErrorCode =
   | 'err-culture-incomplete-entry'
   | 'err-culture-wrong-skill'
   | 'err-culture-max-ranks-per-skill'
@@ -86,7 +86,7 @@ export const initialRow = (
 
 const rowKey = (row: CultureAssignmentRow) => `${row.skillId}#${row.specialization.trim()}`;
 
-export const validateCultureEntry = (
+const validateCultureEntry = (
   culture: Culture,
   index: number,
   rows: CultureAssignmentRow[],

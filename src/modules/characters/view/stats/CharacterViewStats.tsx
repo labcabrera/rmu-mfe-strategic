@@ -1,7 +1,7 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import { Dispatch, FC, SetStateAction } from 'react';
 import { Box } from '@mui/material';
 import { Character, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
-import CharacterViewStatsChart from './CharacterViewStatsChart';
+import CharacterViewStatsChart from './LazyStatsChart';
 import CharacterViewStatsTable, { STATS_TABLE_MIN_WIDTH } from './CharacterViewStatsTable';
 
 /** Width the radar chart needs to stay readable beside the table. */

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { CardGrid, EmptyState, Faction } from '@labcabrera-rmu/rmu-react-shared-lib';

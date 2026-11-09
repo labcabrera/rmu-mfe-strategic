@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Button, MenuItem, Stack, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
@@ -11,6 +11,7 @@ import {
   GemCutFactor,
   GemTraits,
   ItemEnchantmentInfo,
+  itemName,
   KeyValueList,
   KeyValueRow,
   MagicItemInfo,
@@ -21,9 +22,8 @@ import {
   setGem,
   StrategicItem,
   unsetGem,
-  itemName,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useStrategicNotify } from '../services/notify-service';
 import { HolderView } from './use-holder';
 
 // Magic items, charges and gems of an owned item (workspace spec 067, decisions 8, 18 and 19).
@@ -42,7 +42,7 @@ export const isUncutGem = (item: StrategicItem) => isGem(item) && (item.cutFacto
 export const settableGems = (view: HolderView, item: StrategicItem) =>
   view.items.filter((each) => isGem(each) && each.id !== item.id);
 
-export const rechargeDays = (item: StrategicItem): number => {
+const rechargeDays = (item: StrategicItem): number => {
   const spells = item.enchantment?.spells ?? [];
   const level = spells.length ? Math.max(...spells.map((spell) => spell.level)) : (item.enchantment?.itemLevel ?? 0);
   return Math.max(1, level);
@@ -62,7 +62,7 @@ type Props = {
 export const ItemMagicDialog: FC<Props> = ({ item, onClose, onChange }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useStrategicNotify();
+  const notify = useApiNotify();
   const [confirmRecharge, setConfirmRecharge] = useState(false);
   const [busy, setBusy] = useState(false);
   const charges = item.charges ?? null;
@@ -186,7 +186,7 @@ export const GemDialog: FC<Omit<Props, 'onChange'>> = ({ item, onClose }) => {
 export const CutGemDialog: FC<Props> = ({ item, onClose, onChange }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useStrategicNotify();
+  const notify = useApiNotify();
   const [factor, setFactor] = useState<GemCutFactor>(GEM_MODERN_CUT_FACTORS[0]);
   const [busy, setBusy] = useState(false);
   const newValue = item.value !== undefined ? roundGold(item.value * factor) : null;
@@ -246,7 +246,7 @@ export const CutGemDialog: FC<Props> = ({ item, onClose, onChange }) => {
 export const GemSettingsDialog: FC<Props & { view: HolderView }> = ({ item, view, onClose, onChange }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useStrategicNotify();
+  const notify = useApiNotify();
   const [gemId, setGemId] = useState('');
   const [busy, setBusy] = useState(false);
   const settings = item.settings ?? [];

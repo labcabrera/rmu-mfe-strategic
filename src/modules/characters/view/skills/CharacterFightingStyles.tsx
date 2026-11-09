@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlineOutlined';
@@ -12,15 +12,15 @@ import {
   EmptyState,
   fetchFightingStyles,
   FightingStyle,
-  FightingStyles,
   isFightingStyleSkill,
   Panel,
   removeStyleAbility,
   SectionLabel,
   StrategicGame,
   StyleAbility,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useStrategicNotify } from '../../../services/notify-service';
+import { useQuery } from '@tanstack/react-query';
 import { isGameMaster } from '../../../shared/permissions';
 
 /** Fighting styles of the character (spec 032): ranks of the style skills allocated to the abilities of the style. */
@@ -35,16 +35,21 @@ export default function CharacterFightingStyles({
 }) {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useStrategicNotify();
-  const [catalog, setCatalog] = useState<FightingStyles>();
+  const notify = useApiNotify();
   const styleSkills = character.skills.filter((s) => isFightingStyleSkill(s.skillId) && !!s.specialization);
+  const query = useQuery({
+    queryKey: ['fighting-styles'],
+    queryFn: () => fetchFightingStyles(auth),
+    enabled: styleSkills.length > 0,
+    gcTime: 0,
+    // A catalog: read once while the section is mounted
+    staleTime: Infinity,
+  });
+  const catalog = query.data;
 
   useEffect(() => {
-    if (styleSkills.length === 0 || catalog) return;
-    fetchFightingStyles(auth)
-      .then(setCatalog)
-      .catch((error) => notify.error(error));
-  }, [styleSkills.length]);
+    if (query.error) notify.error(query.error);
+  }, [query.error]);
 
   if (styleSkills.length === 0) return null;
 
@@ -83,7 +88,7 @@ function StyleCard({
 }) {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useStrategicNotify();
+  const notify = useApiNotify();
   const selections = skill.styleAbilities || [];
   const freeRanks = skill.styleFreeRanks ?? skill.ranks;
 

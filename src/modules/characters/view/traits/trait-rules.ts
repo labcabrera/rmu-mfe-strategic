@@ -6,6 +6,7 @@ import {
   TalentPolicy,
   Trait,
   TraitAcquisitionType,
+  traitCategories,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { resolveOptions, resolvePowerLevel } from '../../../services/game-rules';
 
@@ -14,10 +15,10 @@ import { resolveOptions, resolvePowerLevel } from '../../../services/game-rules'
  * hints and the enabled state of the dialog: the API stays authoritative and its err-* codes are shown when it refuses.
  */
 
-export type DevPointsPool = 'normal' | 'bonus' | 'flaw';
+type DevPointsPool = 'normal' | 'bonus' | 'flaw';
 
 /** Points taken from each pool (positive) or, for a flaw, the pool that receives the points it returns. */
-export interface TraitPaymentPreview {
+interface TraitPaymentPreview {
   normal: number;
   bonus: number;
   flaw: number;
@@ -61,16 +62,16 @@ const poolsOf = (choice: PoolChoice): DevPointsPool[] =>
   choice === 'bonus' ? ['bonus', 'normal'] : choice === 'normal' ? ['normal'] : ['normal', 'bonus'];
 
 /** Character level up to which the character is in creation (the API's isCreationLevel). */
-export const isInCreation = (character: Character): boolean => character.experience.level <= 1;
+const isInCreation = (character: Character): boolean => character.experience.level <= 1;
 
 /** Spec 077, C12: a restricted talent costs half rounded up, a restricted flaw half rounded towards 0 (as the API). */
-export const restrictedCost = (cost: number, isTalent: boolean, restricted: boolean): number => {
+const restrictedCost = (cost: number, isTalent: boolean, restricted: boolean): number => {
   if (!restricted) return cost;
   return isTalent ? Math.ceil(cost / 2) : Math.trunc(cost / 2) || 0;
 };
 
 /** Cost of a trait at a tier: the acquisition cost plus the tier cost for each tier above the first. */
-export const traitCost = (trait: Trait, tier?: number): number => {
+const traitCost = (trait: Trait, tier?: number): number => {
   const base = trait.adquisitionCost || 0;
   if (!trait.isTierBased || !tier || tier <= 1) return base;
   return base + (tier - 1) * (trait.tierCost || 0);
@@ -283,9 +284,9 @@ export const talentPurchaseRulesOf = (game?: StrategicGame): boolean =>
 export const MASTER_PREREQUISITES: TraitAcquisitionType[] = ['training', 'milestone'];
 const AUTOMATIC_PREREQUISITES: TraitAcquisitionType[] = ['race', 'profession', 'natural', 'skill'];
 /** A tier of a talent per 10 ranks of the skill its `skill` prerequisite names. */
-export const RANKS_PER_SKILL_TIER = 10;
+const RANKS_PER_SKILL_TIER = 10;
 /** Character Companion 7.0: one loose flaw, worth up to 20 development points. */
-export const MAX_LOOSE_FLAW_POINTS = 20;
+const MAX_LOOSE_FLAW_POINTS = 20;
 
 /** Ids a catalog prerequisite names: the API sends a comma separated text (older typings say an array). */
 export const prerequisiteValues = (value: unknown): string[] => {
@@ -366,7 +367,7 @@ export const linkableTalents = (character: Character, flaw: Trait, catalog: Map<
       );
 
 /** Flaws of the character linked to a talent. */
-export const linkedFlaws = (character: Character, talent: CharacterTrait): CharacterTrait[] =>
+const linkedFlaws = (character: Character, talent: CharacterTrait): CharacterTrait[] =>
   character.traits.filter(
     (owned) =>
       !owned.isTalent &&
@@ -406,3 +407,67 @@ export const flawLimitReason = (
   );
   return loose.length > 0 ? { key: 'err-flaw-limit' } : undefined;
 };
+
+// ---------------------------------------------------------------------------------------------------------------
+// The list of the add trait dialog: filters and groups.
+// ---------------------------------------------------------------------------------------------------------------
+
+export type TraitTypeFilter = 'all' | 'talent' | 'flaw';
+export const TRAIT_FILTER_ALL = 'all';
+
+export interface TraitRowData {
+  trait: Trait;
+  check: TraitPurchase;
+}
+
+export interface TraitListFilter {
+  search: string;
+  typeFilter: TraitTypeFilter;
+  category: string;
+  onlyAffordable: boolean;
+}
+
+/** Reasons that only depend on the points or the cost limits ("only affordable" hides them). */
+const COST_REASONS = [
+  'trait-reason-max-cost',
+  'trait-reason-not-affordable',
+  'err-talent-policy-bonus-points-only',
+  'err-talent-policy-flaw-points-only',
+  'err-talent-policy-creation-only',
+  'err-dev-points-insufficient',
+];
+
+/** Order of the categories: the catalog ones first, any other one after them. */
+const categoryOrder = (category: string): number => {
+  const index = traitCategories.indexOf(category);
+  return index < 0 ? traitCategories.length : index;
+};
+
+/** The categories of the rows, in order. */
+export const orderedCategories = (rows: TraitRowData[]): string[] =>
+  [...new Set(rows.map((row) => row.trait.category))].sort((a, b) => categoryOrder(a) - categoryOrder(b));
+
+/** The rows that pass the filter, by category in order and by name inside each one. */
+export const groupTraitRows = (
+  rows: TraitRowData[],
+  filter: TraitListFilter,
+  traitName: (trait: Trait) => string
+): [string, TraitRowData[]][] => {
+  const text = filter.search.trim().toLowerCase();
+  const visible = rows.filter(({ trait, check }) => {
+    if (filter.typeFilter === 'talent' && !trait.isTalent) return false;
+    if (filter.typeFilter === 'flaw' && trait.isTalent) return false;
+    if (filter.category !== TRAIT_FILTER_ALL && trait.category !== filter.category) return false;
+    if (filter.onlyAffordable && check.blocked && COST_REASONS.includes(check.blocked.key)) return false;
+    return !text || traitName(trait).toLowerCase().includes(text);
+  });
+  const byCategory = new Map<string, TraitRowData[]>();
+  visible
+    .sort((a, b) => traitName(a.trait).localeCompare(traitName(b.trait)))
+    .forEach((row) => byCategory.set(row.trait.category, [...(byCategory.get(row.trait.category) ?? []), row]));
+  return [...byCategory.entries()].sort(([a], [b]) => categoryOrder(a) - categoryOrder(b));
+};
+
+/** The tier chosen fits the trait: a trait with tiers needs one between the first and its maximum. */
+export const isTierValid = (trait: Trait, tier: number | undefined): boolean =>
+  !trait.isTierBased || (!!tier && tier >= 1 && tier <= (trait.maxTier ?? tier));

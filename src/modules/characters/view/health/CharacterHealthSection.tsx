@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Link as RouterLink } from 'react-router-dom';
@@ -18,6 +18,7 @@ import {
   ChipRow,
   EmptyState,
   fetchCharacters,
+  fetchFullPage,
   HealerCandidate,
   Injury,
   InjuryList,
@@ -31,8 +32,10 @@ import {
   TemporaryModifier,
   TemporaryModifierList,
   updateCharacterInjury,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useStrategicNotify } from '../../../services/notify-service';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import UseHerbDialog from '../../../economy/UseHerbDialog';
 import { isGameMaster as isGameMasterOf } from '../../../shared/permissions';
 import { Bento, span } from '../sections/CharacterPanels';
 import AmputationDialog from './AmputationDialog';
@@ -44,7 +47,6 @@ import InjuryHealingDialog, { HealingStepId } from './InjuryHealingDialog';
 import PoisonCharacterDialog from './PoisonCharacterDialog';
 import RestDialog from './RestDialog';
 import StrenuousFailureDialog from './StrenuousFailureDialog';
-import UseHerbDialog from './UseHerbDialog';
 import {
   activeConditions,
   canFailStrenuous,
@@ -81,8 +83,7 @@ const CharacterHealthSection: FC<{
 }> = ({ character, setCharacter, strategicGame }) => {
   const { t } = useTranslation();
   const auth = useAuth();
-  const notify = useStrategicNotify();
-  const [gameCharacters, setGameCharacters] = useState<Character[]>([]);
+  const notify = useApiNotify();
   const [showHealed, setShowHealed] = useState(false);
   const [healing, setHealing] = useState<{ injuryId: string; step: HealingStepId }>();
   const [editing, setEditing] = useState<{ injury?: Injury }>();
@@ -99,11 +100,20 @@ const CharacterHealthSection: FC<{
   // Adding and editing injuries and resolving conditions are for the game master (the owner of the game).
   const isGameMaster = isGameMasterOf(auth, strategicGame);
 
+  const gameCharactersQuery = useQuery({
+    queryKey: ['game-characters', character.gameId],
+    queryFn: () =>
+      fetchFullPage((rsql, page, size) => fetchCharacters(rsql, page, size, auth), `gameId==${character.gameId}`).then(
+        (page) => page.content
+      ),
+    gcTime: 0,
+    placeholderData: keepPreviousData,
+  });
+  const gameCharacters = gameCharactersQuery.data ?? [];
+
   useEffect(() => {
-    fetchCharacters(`gameId==${character.gameId}`, 0, 100, auth)
-      .then((page) => setGameCharacters(page.content))
-      .catch(notify.error);
-  }, [character.gameId]);
+    if (gameCharactersQuery.error) notify.error(gameCharactersQuery.error);
+  }, [gameCharactersQuery.error]);
 
   const healers: HealerCandidate[] = [
     toHealer(character),

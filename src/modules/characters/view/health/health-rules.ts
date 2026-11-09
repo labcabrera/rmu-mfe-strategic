@@ -5,7 +5,7 @@ import { Character, HealingType, Injury, InjuryStatus, TreatmentProcedure } from
 
 export const MEDICINE_SKILL = 'medicine';
 export const HERBALISM_SKILL = 'herbalism';
-export const BODY_DEVELOPMENT_SKILL = 'body-development';
+const BODY_DEVELOPMENT_SKILL = 'body-development';
 
 export const ALL_PROCEDURES: TreatmentProcedure[] = [
   'pressure',
@@ -73,12 +73,6 @@ export const isProcedureAllowed = (injury: Injury, procedure: TreatmentProcedure
 
 /** Procedures that an injury requiring surgery still admits (workspace spec 068, decision 11). */
 export const SURGERY_ONLY_PROCEDURES: TreatmentProcedure[] = ['surgery', 'magic'];
-
-/** The injury type and severity are in `surgeryRequired` of the core healing tables (none without the list). */
-export const requiresSurgery = (
-  injury: Injury,
-  surgeryRequired: { injuryType: string; severity: string }[] | null | undefined
-): boolean => (surgeryRequired ?? []).some((row) => row.injuryType === injury.type && row.severity === injury.severity);
 
 /** Salve modifier range when the core tables have none (workspace spec 068). */
 export const DEFAULT_SALVE_RANGE = { min: -25, max: 25 };

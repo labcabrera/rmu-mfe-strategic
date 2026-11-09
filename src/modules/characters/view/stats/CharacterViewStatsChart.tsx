@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, useTheme } from '@mui/material';
 import { LoadingState, StatKey, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';

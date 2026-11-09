@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Chip, Tooltip } from '@mui/material';
 import { StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';

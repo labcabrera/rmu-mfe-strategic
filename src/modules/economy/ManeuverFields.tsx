@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Grid, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import {
@@ -55,7 +55,7 @@ const skillOf = (character: Character | undefined, key: string) =>
 export const maneuverBonus = (character: Character | undefined, value: ManeuverValue): number | undefined =>
   value.bonus ?? skillOf(character, value.skillKey)?.totalBonus;
 
-export const maneuverTotal = (character: Character | undefined, value: ManeuverValue, extra = 0): number | null => {
+const maneuverTotal = (character: Character | undefined, value: ManeuverValue, extra = 0): number | null => {
   const bonus = maneuverBonus(character, value);
   if (value.roll === null || bonus === undefined) return null;
   const difficulty = MANEUVER_DIFFICULTIES.find((d) => d.key === value.difficulty)?.value ?? 0;

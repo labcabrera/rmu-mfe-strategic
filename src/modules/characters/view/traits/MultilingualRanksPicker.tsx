@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Alert, Autocomplete, Box, Chip, Grid, Stack, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
@@ -10,9 +10,10 @@ import {
   MULTILINGUAL_RANKS,
   NumericInput,
   SectionLabel,
+  useApiNotify,
   useSpecializationLabel,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useStrategicNotify } from '../../../services/notify-service';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 const LANGUAGE_CATEGORY = 'language';
 
@@ -56,16 +57,24 @@ const MultilingualRanksPicker: FC<{
 }> = ({ realmId, rows, onChange }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useStrategicNotify();
+  const notify = useApiNotify();
   const specializationLabel = useSpecializationLabel();
-  const [languages, setLanguages] = useState<string[]>();
+  const query = useQuery({
+    queryKey: ['languages', realmId],
+    queryFn: () => {
+      const realmQuery = realmId ? `;(realmId==${realmId},realmId==null)` : '';
+      return fetchEnumerations(`category==${LANGUAGE_CATEGORY}${realmQuery}`, 0, 200, auth).then((page) =>
+        page.content.map((e) => e.key)
+      );
+    },
+    gcTime: 0,
+    placeholderData: keepPreviousData,
+  });
+  const languages = query.data;
 
   useEffect(() => {
-    const realmQuery = realmId ? `;(realmId==${realmId},realmId==null)` : '';
-    fetchEnumerations(`category==${LANGUAGE_CATEGORY}${realmQuery}`, 0, 200, auth)
-      .then((page) => setLanguages(page.content.map((e) => e.key)))
-      .catch(notify.error);
-  }, [realmId]);
+    if (query.error) notify.error(query.error);
+  }, [query.error]);
 
   const share = target(rows);
   const assigned = rows.reduce((sum, row) => sum + row.spoken + row.written, 0);

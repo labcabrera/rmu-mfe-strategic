@@ -1,92 +1,22 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { FC, ReactNode, useEffect, useMemo, useState } from 'react';
+import { FC, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from 'react-oidc-context';
+import { Box, Button, Stack } from '@mui/material';
 import {
-  Alert,
-  Box,
-  Button,
-  Checkbox,
-  Chip,
-  FormControlLabel,
-  Grid,
-  MenuItem,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
-import {
-  CAST_SUPPORTS,
-  CastSupport,
   Character,
-  DifficultyPicker,
   FlowSteps,
-  fetchCharacterTreatmentDifficulty,
-  fetchStrategicItems,
-  herbTreats,
-  formatBonus,
   HealerCandidate,
   HealerPicker,
-  HealerSelection,
+  Injury,
   InjuryCard,
-  InjuryCareChips,
-  KeyValue,
-  MANEUVER_DIFFICULTIES,
-  OPEN_D100,
-  resolveHealer,
   RmuDialog,
-  RollBreakdown,
-  rollCharacterInjuryPermanent,
-  rollCharacterInjuryRecovery,
-  RollField,
-  RollModifier,
-  RuleHint,
-  StrategicItem,
-  treatCharacterInjury,
-  TreatInjuryDto,
-  TreatmentDifficulty,
-  TreatmentProcedure,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useHealingTables } from '../../../api/healing-tables';
-import { apiErrorCode, useStrategicNotify } from '../../../services/notify-service';
-import {
-  ALL_PROCEDURES,
-  bodyDevelopmentRanks,
-  DEFAULT_SALVE_RANGE,
-  HEALING_OPTIONS,
-  HealingOption,
-  healingTypeKey,
-  healingTypeOf,
-  isProcedureAllowed,
-  isRecoveryRolled,
-  isTreatable,
-  isUntreated,
-  latestTreatment,
-  recoveryMultiplierOf,
-  requiresSurgery,
-  suggestedProcedures,
-  SURGERY_ONLY_PROCEDURES,
-} from './health-rules';
+import HealingRecoveryStep from './HealingRecoveryStep';
+import HealingTreatmentStep from './HealingTreatmentStep';
+import { HealingStepId, InjuryHealing, useInjuryHealing } from './use-injury-healing';
 
-type StepId = 'healer' | 'treatment' | 'recovery';
-const STEPS: StepId[] = ['healer', 'treatment', 'recovery'];
+const STEPS: HealingStepId[] = ['healer', 'treatment', 'recovery'];
 
-const Line: FC<{ label: string; value: ReactNode }> = ({ label, value }) => (
-  <Stack direction="row" sx={{ justifyContent: 'space-between', gap: 2 }}>
-    <Typography variant="body2" color="text.secondary">
-      {label}
-    </Typography>
-    <Typography variant="body2" sx={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
-      {value}
-    </Typography>
-  </Stack>
-);
-
-/**
- * Healing of one injury in three steps that can be done apart (spec 013 §6.3): the healer, the treatment (Medicine
- * maneuver) and the recovery roll, with the permanent injury roll when the recovery asks for it.
- */
-const InjuryHealingDialog: FC<{
+interface DialogProps {
   character: Character;
   injuryId?: string;
   /** Characters of the strategic game that can heal, the character itself included. */
@@ -94,628 +24,55 @@ const InjuryHealingDialog: FC<{
   /** Own injury penalties of the healer characters by id, which the API adds to their Medicine roll (spec 022). */
   healerPenalties?: Record<string, number>;
   open: boolean;
-  initialStep?: StepId;
+  initialStep?: HealingStepId;
   onClose: () => void;
   onUpdated: (character: Character) => void;
-}> = ({ character, injuryId, healers, healerPenalties = {}, open, initialStep = 'healer', onClose, onUpdated }) => {
+}
+
+const HealingHealerStep: FC<{ character: Character; healers: HealerCandidate[]; healing: InjuryHealing }> = ({
+  character,
+  healers,
+  healing,
+}) => {
   const { t } = useTranslation();
-  const auth = useAuth();
-  const notify = useStrategicNotify();
-  const tables = useHealingTables();
-  const injury = (character.injuries || []).find((item) => item.id === injuryId);
-  const dead = character.status === 'dead';
-
-  const [step, setStep] = useState<StepId>(initialStep);
-  const [healer, setHealer] = useState<HealerSelection>({ mode: 'self' });
-  const [procedure, setProcedure] = useState<TreatmentProcedure>('dress');
-  const [showAll, setShowAll] = useState(false);
-  // Difficulty of each procedure computed by the API, and the override of the game master (undefined: the table's).
-  const [difficulties, setDifficulties] = useState<Partial<Record<TreatmentProcedure, TreatmentDifficulty>>>({});
-  const [difficultiesLoaded, setDifficultiesLoaded] = useState(false);
-  const [override, setOverride] = useState<KeyValue>();
-  const [roll, setRoll] = useState<number | null>(null);
-  const [healingOption, setHealingOption] = useState<HealingOption>('medicine');
-  const [herbalismEnabled, setHerbalismEnabled] = useState(false);
-  const [herbalismRoll, setHerbalismRoll] = useState<number | null>(null);
-  // Spec 062: the herbs the character carries that treat this injury, and the one used
-  const [herbs, setHerbs] = useState<StrategicItem[]>([]);
-  const [herbItemId, setHerbItemId] = useState('');
-  const [treated, setTreated] = useState(false);
-  const [recoveryRoll, setRecoveryRoll] = useState<number | null>(null);
-  const [recoveryDone, setRecoveryDone] = useState(false);
-  const [permanentRequired, setPermanentRequired] = useState(false);
-  const [permanentRoll, setPermanentRoll] = useState<number | null>(null);
-  const [busy, setBusy] = useState(false);
-  // Workspace spec 068: the support of a cast leg, the salve modifier and a refusal for want of surgery
-  const [castSupport, setCastSupport] = useState<CastSupport>('none');
-  const [salveModifier, setSalveModifier] = useState(0);
-  const [surgeryRefused, setSurgeryRefused] = useState(false);
-  const surgeryOnly = !!injury && (surgeryRefused || requiresSurgery(injury, tables?.surgeryRequired));
-  const salveRange = tables?.salveModifier ?? DEFAULT_SALVE_RANGE;
-
-  // The procedures that fit the injury: the suggestions (or all), without the ones the API refuses or has no row for.
-  const procedures = useMemo(() => {
-    if (!injury) return ALL_PROCEDURES;
-    // An injury that requires surgery only admits surgery or magic, whatever the API difficulty says.
-    if (surgeryOnly) return SURGERY_ONLY_PROCEDURES;
-    return (showAll ? ALL_PROCEDURES : suggestedProcedures(injury)).filter(
-      (option) => isProcedureAllowed(injury, option) && difficulties[option]?.applicable !== false
-    );
-  }, [injury, showAll, difficulties, surgeryOnly]);
-
-  // Treatment difficulties from the API, again when a treatment changes what they depend on.
-  useEffect(() => {
-    if (!open || !injury) return;
-    let active = true;
-    setDifficultiesLoaded(false);
-    Promise.allSettled(
-      ALL_PROCEDURES.map((option) => fetchCharacterTreatmentDifficulty(character.id, injury.id, option, auth))
-    ).then((results) => {
-      if (!active) return;
-      const next: Partial<Record<TreatmentProcedure, TreatmentDifficulty>> = {};
-      results.forEach((result, index) => {
-        if (result.status === 'fulfilled') next[ALL_PROCEDURES[index]] = result.value;
-      });
-      setDifficulties(next);
-      setDifficultiesLoaded(true);
-    });
-    return () => {
-      active = false;
-    };
-  }, [open, injuryId, injury?.type, injury?.severity, injury?.location, injury?.bleeding]);
-
-  // Keep a procedure that fits once the difficulties arrive.
-  useEffect(() => {
-    if (procedures.length > 0 && !procedures.includes(procedure)) setProcedure(procedures[0]);
-  }, [procedures]);
-
-  // Fresh state each time the dialog opens on an injury.
-  useEffect(() => {
-    if (!open || !injury) return;
-    const first = suggestedProcedures(injury).find((option) => isProcedureAllowed(injury, option)) ?? 'dress';
-    setStep(initialStep);
-    setHealer({ mode: 'self' });
-    setShowAll(false);
-    setProcedure(first);
-    setDifficulties({});
-    setOverride(undefined);
-    setRoll(null);
-    setHealingOption('medicine');
-    setHerbalismEnabled(false);
-    setHerbalismRoll(null);
-    setHerbItemId('');
-    setCastSupport('none');
-    setSalveModifier(0);
-    setSurgeryRefused(false);
-    fetchStrategicItems(`characterId==${character.id}`, 0, 1000, auth)
-      .then((page) =>
-        setHerbs(
-          page.content.filter(
-            (item) => item.category === 'herb' && herbTreats(item.catalog?.features?.herb, injury.type)
-          )
-        )
-      )
-      .catch(() => setHerbs([]));
-    setTreated(false);
-    setRecoveryRoll(null);
-    setRecoveryDone(false);
-    setPermanentRequired(false);
-    setPermanentRoll(null);
-  }, [open, injuryId]);
-
-  if (!injury) return null;
-
-  const resolvedHealer = resolveHealer(healer, healers, character.id);
-  const healerPenalty = resolvedHealer?.characterId ? healerPenalties[resolvedHealer.characterId] || 0 : 0;
-  const isMagic = procedure === 'magic';
-  const askCastSupport = procedure === 'cast' && injury.location === 'leg';
-  const salveInRange = salveModifier >= salveRange.min && salveModifier <= salveRange.max;
-  // The API difficulty of the procedure; a game master override replaces its grade, the bleeding extra still applies.
-  const computed = difficulties[procedure];
-  const extraDifficulty = computed?.bleedingModifier ?? 0;
-  const difficultyValue = override ? override.value + extraDifficulty : computed?.difficulty;
-  const selectedGrade = override?.key ?? computed?.grade ?? '';
-  const overridden = !!override && override.value !== computed?.base;
-
-  const usesHerbs = procedure === 'herbs' || healingOption === 'herbs' || healingOption === 'magic-and-herbs';
-  const herbItem = herbs.find((item) => item.id === herbItemId);
-  const herbMagical = herbItem?.catalog?.features?.herb?.magical !== false;
-  const herbBonusText = herbItem
-    ? herbMagical
-      ? t('treatment-herb-bonus-magical', {
-          medicine: formatBonus(25),
-          recovery: formatBonus(healingOption === 'magic-and-herbs' ? 75 : 50),
-        })
-      : t('treatment-herb-bonus-mundane', { medicine: formatBonus(25) })
-    : t('treatment-herb-generic');
-
-  const changeProcedure = (next: TreatmentProcedure) => {
-    setProcedure(next);
-    setOverride(undefined);
-    if (next === 'magic') setHealingOption('magic');
-    else if (next === 'herbs') setHealingOption('herbs');
-    else if (healingOption === 'magic' || healingOption === 'herbs') setHealingOption('medicine');
-  };
-
-  const run = (request: Promise<Character>, after: (updated: Character) => void) => {
-    setBusy(true);
-    request
-      .then((updated) => {
-        onUpdated(updated);
-        after(updated);
-      })
-      .catch((error) => {
-        // The tables of the client may be missing or stale: the refusal of the API leaves only surgery and magic.
-        if (apiErrorCode(error) === 'err-treatment-surgery-required') setSurgeryRefused(true);
-        notify.error(error);
-      })
-      .finally(() => setBusy(false));
-  };
-
-  const submitTreatment = () => {
-    if (!resolvedHealer) return;
-    const dto: TreatInjuryDto = {
-      procedure,
-      // Only the override of the game master: otherwise the API computes it.
-      ...(overridden && difficultyValue !== undefined ? { difficulty: difficultyValue } : {}),
-      healingType: healingTypeOf(healingOption),
-      ...(isMagic ? {} : { roll: roll ?? undefined }),
-      ...(resolvedHealer.characterId
-        ? { healerCharacterId: resolvedHealer.characterId }
-        : {
-            healer: {
-              name: resolvedHealer.name,
-              bonus: resolvedHealer.medicine,
-              herbalismBonus: resolvedHealer.herbalism,
-            },
-          }),
-      ...(usesHerbs && herbItemId ? { herbItemId } : {}),
-      ...(askCastSupport ? { castSupport } : {}),
-      ...(procedure === 'salve' ? { salveModifier } : {}),
-      ...(herbalismEnabled && herbalismRoll !== null
-        ? {
-            herbalism: resolvedHealer.characterId
-              ? { roll: herbalismRoll, healerCharacterId: resolvedHealer.characterId }
-              : { roll: herbalismRoll, bonus: resolvedHealer.herbalism },
-          }
-        : {}),
-    };
-    run(treatCharacterInjury(character.id, injury.id, dto, auth), (updated) => {
-      setTreated(true);
-      const treatment = (updated.injuries || []).find((item) => item.id === injury.id)?.treatments.slice(-1)[0];
-      if (treatment) notify.success(t('treatment-applied', { result: t(treatment.result) }));
-      setOverride(undefined);
-    });
-  };
-
-  const submitRecovery = () => {
-    if (recoveryRoll === null) return;
-    run(rollCharacterInjuryRecovery(character.id, injury.id, { roll: recoveryRoll }, auth), (updated) => {
-      setRecoveryDone(true);
-      setPermanentRequired(
-        Boolean((updated as Character & { permanentCheckRequired?: boolean }).permanentCheckRequired)
-      );
-    });
-  };
-
-  const submitPermanent = () => {
-    if (permanentRoll === null) return;
-    run(rollCharacterInjuryPermanent(character.id, injury.id, { roll: permanentRoll }, auth), () => {
-      setPermanentRequired(false);
-      setPermanentRoll(null);
-    });
-  };
-
-  // Treatment preview: roll + Medicine bonus + healer penalties + difficulty (+ Herbalism bonus if that roll succeeds).
-  const treatmentPreview =
-    isMagic || difficultyValue === undefined
-      ? undefined
-      : (roll ?? 0) + (resolvedHealer?.medicine ?? 0) + healerPenalty + difficultyValue;
-  const treatmentDisabled =
-    busy ||
-    !resolvedHealer ||
-    !isTreatable(injury) ||
-    (!isMagic && roll === null) ||
-    (procedure === 'salve' && !salveInRange) ||
-    (herbalismEnabled && herbalismRoll === null);
-
-  // Recovery preview: Body Development ranks + Co bonus + type of healing - |penalty|.
-  const latest = latestTreatment(injury);
-  const healingType = latest?.healingType ?? 'none';
-  const partialModifier = latest?.result === 'partial-success' ? latest.recoveryModifier || 0 : 0;
-  const healingTypeModifier = tables ? (tables.healingTypeModifiers[healingType] ?? 0) + partialModifier : undefined;
-  // Spec 052: the same entries, groups and rules as the API keeps with the recovery
-  const recoveryModifiers: RollModifier[] = [
-    { key: 'body-development-ranks', value: bodyDevelopmentRanks(character), group: 'skill', rule: '§13.1' },
-    { key: 'constitution-bonus', value: character.statistics.co?.totalBonus ?? 0, group: 'skill', rule: '§13.1' },
-    ...(healingTypeModifier !== undefined
-      ? [
-          {
-            key: healingTypeKey(healingType),
-            value: healingTypeModifier - partialModifier,
-            group: 'situation' as const,
-            source: 'healing-type',
-            rule: 'Table 13-1a',
-            params: {
-              healingType: `healing-type-${healingType}`,
-              ...(latest ? { procedure: `procedure-${latest.procedure}` } : {}),
-            },
-          },
-        ]
-      : []),
-    ...(healingTypeModifier !== undefined && partialModifier
-      ? [{ key: 'partial-success', value: partialModifier, group: 'situation' as const, rule: '§13.1' }]
-      : []),
-    { key: 'injury-penalty', value: -Math.abs(injury.penalty || 0), group: 'penalty', rule: '§13.1' },
-  ];
-  const raceMultiplier = recoveryMultiplierOf(character);
-  const recovery = injury.recovery;
-  const recoveryRolled = isRecoveryRolled(injury);
-  const untreated = isUntreated(injury);
-  const canRollRecovery =
-    !dead && !recoveryRolled && injury.type !== 'unknown' && injury.status !== 'permanent' && isTreatable(injury);
-  // An untreated recovery always asks for the permanent roll, light injuries too.
-  const canRollPermanent =
-    !dead &&
-    !!recovery &&
-    !injury.permanent &&
-    (permanentRequired || injury.severity !== 'light' || !!recovery.untreated);
-
-  const difficultyCaption = (() => {
-    if (overridden) return t('treatment-difficulty-override');
-    if (!difficultiesLoaded) return t('loading');
-    if (!computed) return t('treatment-difficulty-unavailable');
-    return computed.matched ? t('treatment-difficulty-table') : t('treatment-difficulty-default');
-  })();
-
-  const healerStep = (
+  const { form, update, resolvedHealer } = healing;
+  return (
     <Stack spacing={2}>
-      <HealerPicker characters={healers} selfId={character.id} value={healer} onChange={setHealer} />
+      <HealerPicker
+        characters={healers}
+        selfId={character.id}
+        value={form.healer}
+        onChange={(healer) => update({ healer })}
+      />
       <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end' }}>
-        <Button onClick={() => setStep('recovery')}>{t('healing-step-recovery')}</Button>
-        <Button variant="contained" disabled={!resolvedHealer} onClick={() => setStep('treatment')}>
+        <Button onClick={() => update({ step: 'recovery' })}>{t('healing-step-recovery')}</Button>
+        <Button variant="contained" disabled={!resolvedHealer} onClick={() => update({ step: 'treatment' })}>
           {t('next')}
         </Button>
       </Stack>
     </Stack>
   );
+};
 
-  const treatmentStep = (
-    <Stack spacing={2}>
-      {!resolvedHealer && <Alert severity="info">{t('healing-choose-healer-first')}</Alert>}
-      {resolvedHealer && (
-        <Typography variant="body2" color="text.secondary">
-          {t('healing-healer-summary', {
-            name: resolvedHealer.name,
-            medicine: formatBonus(resolvedHealer.medicine),
-          })}
-        </Typography>
-      )}
-      {surgeryOnly && <Alert severity="warning">{t('err-treatment-surgery-required')}</Alert>}
-      <Grid container spacing={2}>
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <TextField
-            select
-            fullWidth
-            label={t('treatment-procedure')}
-            value={procedures.includes(procedure) ? procedure : ''}
-            onChange={(event) => changeProcedure(event.target.value as TreatmentProcedure)}
-          >
-            {procedures.map((option) => (
-              <MenuItem key={option} value={option}>
-                {t(`procedure-${option}`)}
-              </MenuItem>
-            ))}
-          </TextField>
-          {!surgeryOnly && (
-            <FormControlLabel
-              control={<Checkbox size="small" checked={showAll} onChange={(_, checked) => setShowAll(checked)} />}
-              label={t('treatment-show-all-procedures')}
-            />
-          )}
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <TextField
-            select
-            fullWidth
-            label={t('healing-type')}
-            value={healingOption}
-            onChange={(event) => setHealingOption(event.target.value as HealingOption)}
-          >
-            {HEALING_OPTIONS.map((option) => (
-              <MenuItem key={option} value={option}>
-                {t(`healing-option-${option}`)}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-        {askCastSupport && (
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField
-              select
-              fullWidth
-              label={t('cast-support')}
-              value={castSupport}
-              onChange={(event) => setCastSupport(event.target.value as CastSupport)}
-              helperText={t('cast-support-help')}
-            >
-              {CAST_SUPPORTS.map((option) => (
-                <MenuItem key={option} value={option}>
-                  {t(`cast-support-${option}`)}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-        )}
-        {procedure === 'salve' && (
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField
-              fullWidth
-              type="number"
-              label={t('salve-modifier')}
-              value={salveModifier}
-              onChange={(event) => setSalveModifier(Math.trunc(Number(event.target.value) || 0))}
-              error={!salveInRange}
-              helperText={t('salve-modifier-help', {
-                min: formatBonus(salveRange.min),
-                max: formatBonus(salveRange.max),
-              })}
-              slotProps={{ htmlInput: { min: salveRange.min, max: salveRange.max, step: 5 } }}
-            />
-          </Grid>
-        )}
-        {usesHerbs && (
-          <Grid size={12}>
-            <TextField
-              select
-              fullWidth
-              label={t('treatment-herb')}
-              value={herbItemId}
-              onChange={(event) => setHerbItemId(event.target.value)}
-              helperText={herbs.length === 0 ? t('treatment-herb-none-carried') : herbBonusText}
-            >
-              <MenuItem value="">{t('treatment-herb-generic-option')}</MenuItem>
-              {herbs.map((item) => (
-                <MenuItem key={item.id} value={item.id}>
-                  {`${t(item.name, item.name)} (${item.amount})`}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-        )}
-        {!isMagic && (
-          <>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <DifficultyPicker
-                value={selectedGrade}
-                onChange={(key) => setOverride(MANEUVER_DIFFICULTIES.find((option) => option.key === key))}
-              />
-              <Typography variant="caption" color="text.secondary" component="div">
-                {difficultyCaption}
-              </Typography>
-              {overridden && (
-                <Button size="small" sx={{ px: 0 }} onClick={() => setOverride(undefined)}>
-                  {t('treatment-difficulty-reset')}
-                </Button>
-              )}
-              {!overridden && (computed?.headSteps ?? 0) > 0 && (
-                <Typography variant="caption" color="text.secondary" component="div">
-                  {t('treatment-head-harder')}
-                </Typography>
-              )}
-              {extraDifficulty !== 0 && (
-                <Typography variant="caption" color="text.secondary" component="div">
-                  {t('treatment-cauterize-extra', { value: extraDifficulty })}
-                </Typography>
-              )}
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <RollField spec={OPEN_D100} value={roll} onChange={(value) => setRoll(value.total)} />
-            </Grid>
-            <Grid size={12}>
-              <FormControlLabel
-                control={
-                  <Checkbox checked={herbalismEnabled} onChange={(_, checked) => setHerbalismEnabled(checked)} />
-                }
-                label={t('treatment-herbalism-roll')}
-              />
-              {herbalismEnabled && (
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ alignItems: { sm: 'center' } }}>
-                  <RollField
-                    spec={OPEN_D100}
-                    label={t('herbalism')}
-                    value={herbalismRoll}
-                    onChange={(value) => setHerbalismRoll(value.total)}
-                  />
-                  <Typography variant="body2" color="text.secondary">
-                    {t('treatment-herbalism-help', {
-                      bonus: formatBonus(resolvedHealer?.herbalism ?? 0),
-                      value: tables ? formatBonus(tables.herbalismBonus) : '',
-                    })}
-                  </Typography>
-                </Stack>
-              )}
-            </Grid>
-          </>
-        )}
-      </Grid>
-      {isMagic ? (
-        <Alert severity="info">{t('treatment-magic-help')}</Alert>
-      ) : (
-        <Box>
-          <Line label={t('roll')} value={roll ?? '-'} />
-          <Line label={t('medicine')} value={formatBonus(resolvedHealer?.medicine ?? 0)} />
-          {healerPenalty !== 0 && <Line label={t('healer-penalty')} value={formatBonus(healerPenalty)} />}
-          <Line label={t('difficulty')} value={difficultyValue === undefined ? '-' : formatBonus(difficultyValue)} />
-          <Line label={t('total')} value={treatmentPreview ?? '-'} />
-          {herbalismEnabled && (
-            <Typography variant="caption" color="text.secondary">
-              {t('treatment-herbalism-preview')}
-            </Typography>
-          )}
-        </Box>
-      )}
-      {treated && latest && (
-        <Alert severity={latest.result.includes('failure') ? 'warning' : 'success'}>
-          {t('treatment-last-result', {
-            procedure: t(`procedure-${latest.procedure}`),
-            total: latest.total,
-            result: t(latest.result),
-            healingType: t(healingTypeKey(latest.healingType)),
-          })}
-          {!!latest.healer.penalty && (
-            <Box component="span" sx={{ display: 'block' }}>
-              {t('treatment-healer-penalty', { value: formatBonus(latest.healer.penalty) })}
-            </Box>
-          )}
-        </Alert>
-      )}
-      {treated && injury.limits && (latest?.procedure === 'splint' || latest?.procedure === 'cast') && (
-        <Alert severity="info">
-          {t('treatment-limits-applied')}
-          <Stack direction="row" useFlexGap sx={{ flexWrap: 'wrap', gap: 0.75, mt: 0.75 }}>
-            <InjuryCareChips
-              injury={{ ...injury, treatmentInProgress: undefined, tourniquet: undefined, reopenOn: undefined }}
-            />
-          </Stack>
-        </Alert>
-      )}
-      {treated && latest?.herb && (
-        <Alert severity="info">
-          {t('treatment-herb-applied', {
-            name: latest.herb.name ? t(latest.herb.name, latest.herb.name) : '',
-            medicine: formatBonus(latest.herb.medicineBonus),
-            recovery: formatBonus(latest.herb.recoveryBonus),
-          })}
-        </Alert>
-      )}
-      {latest?.heatCritical && (
-        <Alert severity="warning">{t('treatment-heat-critical', { severity: latest.heatCritical })}</Alert>
-      )}
-      <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end' }}>
-        <Button onClick={() => setStep('recovery')}>{t('next')}</Button>
-        <Button variant="contained" disabled={treatmentDisabled} onClick={submitTreatment}>
-          {t('treat')}
-        </Button>
-      </Stack>
-    </Stack>
-  );
+const InjuryHealingFlow: FC<Omit<DialogProps, 'injuryId'> & { injury: Injury }> = ({
+  character,
+  injury,
+  healers,
+  healerPenalties = {},
+  open,
+  initialStep = 'healer',
+  onClose,
+  onUpdated,
+}) => {
+  const { t } = useTranslation();
+  const healing = useInjuryHealing({ character, injury, healers, healerPenalties, open, initialStep, onUpdated });
+  const { form, update, resolvedHealer } = healing;
 
-  const recoveryStep = (
-    <Stack spacing={2}>
-      {dead && <Alert severity="error">{t('err-character-dead')}</Alert>}
-      {injury.type === 'unknown' && <Alert severity="warning">{t('err-injury-type-required')}</Alert>}
-      {untreated && !recoveryRolled && <Alert severity="info">{t('recovery-untreated-help')}</Alert>}
-      {recovery?.untreated && recoveryRolled && <Alert severity="info">{t('recovery-untreated-rolled')}</Alert>}
-      {recoveryRolled && isTreatable(injury) && <Alert severity="info">{t('recovery-already-rolled')}</Alert>}
-      <Grid container spacing={2}>
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <RecoveryBreakdown modifiers={recoveryModifiers} roll={recoveryRoll} />
-          {healingTypeModifier === undefined && (
-            <Typography variant="caption" color="text.secondary">
-              {t('healing-tables-unavailable-preview')}
-            </Typography>
-          )}
-        </Grid>
-        {/* One recovery roll per treatment: no roll again until a new treatment. */}
-        {!recoveryRolled && (
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Stack spacing={1.5}>
-              <RollField
-                spec={OPEN_D100}
-                label={t('recovery-roll')}
-                value={recoveryRoll}
-                onChange={(value) => setRecoveryRoll(value.total)}
-                disabled={!canRollRecovery}
-              />
-              <Button
-                variant="contained"
-                disabled={!canRollRecovery || busy || recoveryRoll === null}
-                onClick={submitRecovery}
-              >
-                {recovery ? t('recovery-roll-again') : t('recovery-roll')}
-              </Button>
-            </Stack>
-          </Grid>
-        )}
-      </Grid>
-      {recovery && (
-        <Box>
-          {recoveryDone && (
-            <Alert severity="success" sx={{ mb: 1 }}>
-              {t('recovery-total-days', { count: recovery.totalDays })}
-            </Alert>
-          )}
-          {recovery.breakdown ? (
-            <RollBreakdown
-              context="recovery"
-              modifiers={recovery.breakdown}
-              roll={recovery.roll}
-              total={recovery.total}
-              totalLabel={t('recovery-total')}
-            />
-          ) : (
-            <>
-              <Line label={t('roll')} value={recovery.roll} />
-              <Line label={t('modifier')} value={formatBonus(recovery.modifiers)} />
-              <Line label={t('total')} value={recovery.total} />
-            </>
-          )}
-          {/* Spec 052: which column and multipliers give the days */}
-          {recovery.days ? (
-            <RuleHint
-              title={t('recovery-base-days')}
-              description={t('recovery-days-explanation')}
-              params={recovery.days}
-              reference="Table 13-1a"
-            >
-              <Line label={t('recovery-base-days')} value={recovery.baseDays} />
-            </RuleHint>
-          ) : (
-            <Line label={t('recovery-base-days')} value={recovery.baseDays} />
-          )}
-          <Line label={t('recovery-multiplier')} value={`×${recovery.multiplier}`} />
-          <Line label={t('recovery-total-days-label')} value={recovery.totalDays} />
-          <Line label={t('recovery-remaining-days')} value={recovery.remainingDays} />
-          <Typography variant="caption" color="text.secondary" component="div" sx={{ mt: 0.5 }}>
-            {t('recovery-multiplier-help', { value: raceMultiplier ?? 1 })}
-          </Typography>
-        </Box>
-      )}
-      {canRollPermanent && (
-        <Stack spacing={1.5}>
-          {permanentRequired ? (
-            <Alert severity="warning">{t('permanent-check-required')}</Alert>
-          ) : (
-            <Typography variant="body2" color="text.secondary">
-              {t('permanent-injury-help')}
-            </Typography>
-          )}
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ alignItems: { sm: 'center' } }}>
-            <RollField
-              spec={OPEN_D100}
-              label={t('permanent-roll')}
-              value={permanentRoll}
-              onChange={(value) => setPermanentRoll(value.total)}
-            />
-            <Button variant="outlined" disabled={busy || permanentRoll === null} onClick={submitPermanent}>
-              {t('permanent-roll')}
-            </Button>
-          </Stack>
-        </Stack>
-      )}
-      {injury.permanent && (
-        <Chip
-          color="secondary"
-          variant="outlined"
-          label={t('permanent-penalty-value', { value: injury.permanent.penalty })}
-          sx={{ alignSelf: 'flex-start' }}
-        />
-      )}
-    </Stack>
-  );
-
-  const content: Record<StepId, ReactNode> = { healer: healerStep, treatment: treatmentStep, recovery: recoveryStep };
+  const content: Record<HealingStepId, ReactNode> = {
+    healer: <HealingHealerStep character={character} healers={healers} healing={healing} />,
+    treatment: <HealingTreatmentStep healing={healing} />,
+    recovery: <HealingRecoveryStep healing={healing} />,
+  };
 
   return (
     <RmuDialog open={open} title={t('heal-injury')} subtitle={character.name} maxWidth="md" onClose={onClose}>
@@ -723,8 +80,8 @@ const InjuryHealingDialog: FC<{
         <InjuryCard injury={injury} dense />
         <Box sx={{ mx: -2 }}>
           <FlowSteps
-            activeIndex={STEPS.indexOf(step)}
-            onReview={(id) => id && setStep(id as StepId)}
+            activeIndex={STEPS.indexOf(form.step)}
+            onReview={(id) => id && update({ step: id as HealingStepId })}
             steps={STEPS.map((id) => ({
               id,
               label: t(`healing-step-${id}`),
@@ -738,10 +95,15 @@ const InjuryHealingDialog: FC<{
   );
 };
 
-const RecoveryBreakdown: FC<{ modifiers: RollModifier[]; roll: number | null }> = ({ modifiers, roll }) => {
-  const { t } = useTranslation();
-  return <RollBreakdown context="recovery" modifiers={modifiers} roll={roll} totalLabel={t('recovery-total')} />;
+/**
+ * Healing of one injury in three steps that can be done apart (spec 013 §6.3): the healer, the treatment (Medicine
+ * maneuver) and the recovery roll, with the permanent injury roll when the recovery asks for it.
+ */
+const InjuryHealingDialog: FC<DialogProps> = ({ injuryId, ...props }) => {
+  const injury = (props.character.injuries || []).find((item) => item.id === injuryId);
+  if (!injury) return null;
+  return <InjuryHealingFlow {...props} injury={injury} />;
 };
 
-export type { StepId as HealingStepId };
+export type { HealingStepId };
 export default InjuryHealingDialog;

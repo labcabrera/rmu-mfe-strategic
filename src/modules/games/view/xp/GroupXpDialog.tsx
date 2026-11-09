@@ -1,24 +1,26 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Alert, Checkbox, Grid, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import {
   awardGroupXp,
-  Character,
   DataTable,
   EmptyState,
   fetchCharacters,
+  fetchFullPage,
   GroupXpResult,
   LoadingState,
   NumericInput,
   RmuDialog,
   SectionLabel,
   StrategicGame,
+  useApiNotify,
   XP_EVENT_TYPES,
   XpEventType,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useStrategicNotify } from '../../../services/notify-service';
+import { useQuery } from '@tanstack/react-query';
+import { useBusyAction } from '../../../shared/useBusyAction';
 
 /** At most this experience at a time, as the API. */
 const MAX_GROUP_XP = 100000;
@@ -30,13 +32,12 @@ const MAX_GROUP_XP = 100000;
 const GroupXpDialog: FC<{ game: StrategicGame; open: boolean; onClose: () => void }> = ({ game, open, onClose }) => {
   const { t } = useTranslation();
   const auth = useAuth();
-  const notify = useStrategicNotify();
-  const [characters, setCharacters] = useState<Character[]>();
+  const notify = useApiNotify();
   const [xp, setXp] = useState<number>();
   const [eventType, setEventType] = useState<XpEventType | ''>('');
   const [excluded, setExcluded] = useState<Set<string>>(new Set());
   const [done, setDone] = useState<GroupXpResult>();
-  const [working, setWorking] = useState(false);
+  const { busy: working, run } = useBusyAction();
 
   useEffect(() => {
     if (!open) return;
@@ -44,13 +45,23 @@ const GroupXpDialog: FC<{ game: StrategicGame; open: boolean; onClose: () => voi
     setEventType('');
     setExcluded(new Set());
     setDone(undefined);
-    setCharacters(undefined);
-    fetchCharacters(`gameId==${game.id}`, 0, 100, auth)
-      .then((page) =>
-        setCharacters(page.content.filter((c) => c.status !== 'dead').sort((a, b) => a.name.localeCompare(b.name)))
-      )
-      .catch(notify.error);
   }, [open, game.id]);
+
+  const charactersQuery = useQuery({
+    // With `open` in the key each opening starts empty and reads them again
+    queryKey: ['group-xp-characters', game.id, open],
+    queryFn: () =>
+      fetchFullPage((rsql, page, size) => fetchCharacters(rsql, page, size, auth), `gameId==${game.id}`).then((page) =>
+        page.content.filter((c) => c.status !== 'dead').sort((a, b) => a.name.localeCompare(b.name))
+      ),
+    enabled: open,
+    gcTime: 0,
+  });
+  const characters = charactersQuery.data;
+
+  useEffect(() => {
+    if (charactersQuery.error) notify.error(charactersQuery.error);
+  }, [charactersQuery.error]);
 
   const chosen = useMemo(() => (characters ?? []).filter((c) => !excluded.has(c.id)), [characters, excluded]);
   const toggle = (id: string) =>
@@ -63,14 +74,13 @@ const GroupXpDialog: FC<{ game: StrategicGame; open: boolean; onClose: () => voi
 
   const confirm = () => {
     if (!xp) return;
-    setWorking(true);
-    awardGroupXp(game.id, { xp, characterIds: chosen.map((c) => c.id), ...(eventType ? { eventType } : {}) }, auth)
-      .then((result) => {
+    run(
+      awardGroupXp(game.id, { xp, characterIds: chosen.map((c) => c.id), ...(eventType ? { eventType } : {}) }, auth),
+      (result) => {
         setDone(result);
         notify.success(t('group-xp-done', { xp: result.xp, count: result.characters.filter((c) => !c.error).length }));
-      })
-      .catch(notify.error)
-      .finally(() => setWorking(false));
+      }
+    );
   };
 
   const failed = done?.characters.filter((c) => c.error) ?? [];

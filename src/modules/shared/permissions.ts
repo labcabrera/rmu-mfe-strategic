@@ -4,7 +4,6 @@ import {
   gameAccessAtLeast,
   isAdmin,
   type Character,
-  type Faction,
   type StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 
@@ -19,17 +18,6 @@ export const isGameOwner = (auth: AuthContextProps, game: StrategicGame | undefi
 /** A game master: its owner, a master (spec 071), or an admin. */
 export const isGameMaster = (auth: AuthContextProps, game: StrategicGame | undefined): boolean =>
   isGameOwner(auth, game) || (!!game && gameAccessAtLeast(game.access, 'master'));
-
-/** A player of the game or more: creates characters in it (spec 071). */
-export const isGamePlayer = (auth: AuthContextProps, game: StrategicGame | undefined): boolean =>
-  isGameMaster(auth, game) || (!!game && gameAccessAtLeast(game.access, 'player'));
-
-/** The masters and the players of the faction (spec 072): spend its gold, buy for it and change its armory. */
-export const canWriteFaction = (
-  auth: AuthContextProps,
-  faction: Faction | undefined,
-  game: StrategicGame | undefined
-): boolean => isGameMaster(auth, game) || (!!faction && canWriteStrategic(faction));
 
 /**
  * Who can change (and export) a character (spec 072): the masters and the players of its faction, as the `access` the

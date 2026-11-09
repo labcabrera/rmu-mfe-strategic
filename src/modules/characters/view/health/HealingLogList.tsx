@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Box, List, ListItem, ListItemText, Stack } from '@mui/material';
@@ -10,12 +10,13 @@ import {
   formatBonus,
   HealingLogEntry,
   HealingType,
-  HpBySource,
   HpBreakdown,
+  HpBySource,
   LoadingState,
   RmuPagination,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useStrategicNotify } from '../../../services/notify-service';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { healingTypeKey } from './health-rules';
 
 const PAGE_SIZE = 10;
@@ -156,24 +157,32 @@ const useEntryText = () => {
 const HealingLogList: FC<{ character: Character }> = ({ character }) => {
   const { t, i18n } = useTranslation();
   const auth = useAuth();
-  const notify = useStrategicNotify();
+  const notify = useApiNotify();
   const text = useEntryText();
   const [page, setPage] = useState(0);
-  const [entries, setEntries] = useState<HealingLogEntry[]>();
-  const [totalPages, setTotalPages] = useState(0);
+  const query = useQuery({
+    queryKey: ['healing-log', character.id, page],
+    queryFn: () => fetchCharacterHealingLog(character.id, page, PAGE_SIZE, auth),
+    gcTime: 0,
+    placeholderData: keepPreviousData,
+  });
+  const entries = query.isError ? [] : query.data?.content;
+  const totalPages = query.data?.pagination?.totalPages ?? 0;
+  const { refetch } = query;
 
-  // Reloads when the page changes and when the character changes (a new treatment, rest...).
+  // Reloads when the character changes (a new treatment, rest...); by identity, as each update brings new arrays.
+  const firstRender = useRef(true);
   useEffect(() => {
-    fetchCharacterHealingLog(character.id, page, PAGE_SIZE, auth)
-      .then((result) => {
-        setEntries(result.content);
-        setTotalPages(result.pagination?.totalPages ?? 0);
-      })
-      .catch((error) => {
-        setEntries([]);
-        notify.error(error);
-      });
-  }, [character.id, page, character.hp.current, character.injuries, character.conditions]);
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    refetch();
+  }, [character.hp.current, character.injuries, character.conditions]);
+
+  useEffect(() => {
+    if (query.error) notify.error(query.error);
+  }, [query.error]);
 
   if (!entries) return <LoadingState />;
   if (entries.length === 0) return <EmptyState dense title={t('healing-log-empty')} />;

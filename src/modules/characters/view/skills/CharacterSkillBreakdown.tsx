@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Divider, Stack } from '@mui/material';
 import {

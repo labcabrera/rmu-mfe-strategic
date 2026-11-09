@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -13,6 +13,7 @@ import {
   DetailPage,
   Faction,
   fetchFactions,
+  fetchFullPage,
   fetchStrategicGame,
   fetchTacticalGames,
   formatCampaignDate,
@@ -27,11 +28,11 @@ import {
   span,
   StatPill,
   StrategicGame,
-  TacticalGame,
   updateStrategicGame,
+  useApiNotify,
   useEntity,
-  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import CreateOrImportButton from '../../shared/CreateOrImportButton';
 import { isGameMaster, isGameOwner } from '../../shared/permissions';
 import StrategicGameCardChips from '../list/StrategicGameCardChips';
@@ -57,15 +58,13 @@ export default function StrategicGameViewPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const location = useLocation();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const { gameId } = useParams<{ gameId?: string }>();
   const state = useEntity<StrategicGame>(gameId, (id) => fetchStrategicGame(id, auth), {
     initial: location.state?.strategicGame,
     onError: notify.error,
   });
   const strategicGame = state.entity;
-  const [factions, setFactions] = useState<Faction[]>();
-  const [tacticalGames, setTacticalGames] = useState<TacticalGame[]>();
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [membersOpen, setMembersOpen] = useState(false);
@@ -78,15 +77,39 @@ export default function StrategicGameViewPage() {
   // Spec 071: a public game seen from outside only shows its cover; its factions and tactical games are for members.
   const member = gameAccessAtLeast(strategicGame?.access ?? 'owner', 'spectator');
 
+  const queryClient = useQueryClient();
+  const factionsKey = ['game-factions', strategicGame?.id];
+  const factionsQuery = useQuery({
+    queryKey: factionsKey,
+    queryFn: () =>
+      fetchFullPage((rsql, page, size) => fetchFactions(rsql, page, size, auth), `gameId==${strategicGame!.id}`).then(
+        (data) => data.content
+      ),
+    enabled: !!strategicGame && member,
+    gcTime: 0,
+    placeholderData: keepPreviousData,
+  });
+  const tacticalGamesQuery = useQuery({
+    queryKey: ['game-tactical-games', strategicGame?.id],
+    queryFn: () =>
+      fetchFullPage(
+        (rsql, page, size) => fetchTacticalGames(rsql, page, size, auth),
+        `strategicGameId==${strategicGame!.id}`
+      ).then((data) => data.content),
+    enabled: !!strategicGame && member,
+    gcTime: 0,
+    placeholderData: keepPreviousData,
+  });
+  const factions = factionsQuery.data;
+  const tacticalGames = tacticalGamesQuery.data;
+
   useEffect(() => {
-    if (!strategicGame || !member) return;
-    fetchFactions(`gameId==${strategicGame.id}`, 0, 100, auth)
-      .then((data) => setFactions(data.content))
-      .catch(notify.error);
-    fetchTacticalGames(`strategicGameId==${strategicGame.id}`, 0, 100, auth)
-      .then((data) => setTacticalGames(data.content))
-      .catch(notify.error);
-  }, [strategicGame?.id, member]);
+    if (factionsQuery.error) notify.error(factionsQuery.error);
+  }, [factionsQuery.error]);
+
+  useEffect(() => {
+    if (tacticalGamesQuery.error) notify.error(tacticalGamesQuery.error);
+  }, [tacticalGamesQuery.error]);
 
   // After leaving the game (or losing it) there is nothing left to see.
   const onMembersChanged = (updated: StrategicGame) => {
@@ -94,7 +117,9 @@ export default function StrategicGameViewPage() {
     else navigate('/strategic/games', { replace: true });
   };
   const onFactionChanged = (faction: Faction) =>
-    setFactions((current) => current?.map((f) => (f.id === faction.id ? faction : f)));
+    queryClient.setQueryData<Faction[]>(factionsKey, (current) =>
+      current?.map((f) => (f.id === faction.id ? faction : f))
+    );
 
   const master = isGameMaster(auth, strategicGame);
   const owner = isGameOwner(auth, strategicGame);

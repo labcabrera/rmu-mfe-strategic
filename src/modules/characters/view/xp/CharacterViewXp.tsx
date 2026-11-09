@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Badge, Box, Button, Divider, Grid, Stack, Typography } from '@mui/material';
@@ -6,14 +6,14 @@ import {
   AddButton,
   addCharacterXP,
   Character,
+  EntityCard,
   LoadingState,
   NumericInput,
   Panel,
   RmuDialog,
-  EntityCard,
   Section,
   StrategicGame,
-  useNotify,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { resolvePowerLevel } from '../../../services/game-rules';
 
@@ -53,7 +53,7 @@ const CharacterViewExperience: FC<{
   strategicGame: StrategicGame;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
 }> = ({ character, strategicGame, setCharacter }) => {
-  const notify = useNotify();
+  const notify = useApiNotify();
   const { t } = useTranslation();
   const auth = useAuth();
   const [openAddXpDialog, setOpenAddXpDialog] = useState(false);

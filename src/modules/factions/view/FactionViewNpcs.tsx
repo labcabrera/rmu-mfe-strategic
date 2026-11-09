@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import AddIcon from '@mui/icons-material/Add';
@@ -15,8 +15,8 @@ import {
   StrategicGame,
   updateFactionNpcs,
   useCampaignNpcs,
-  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { useBusyAction } from '../../shared/useBusyAction';
 
 /**
  * The NPCs of a faction (spec 055): guards, mercenaries, mounts… with their alias, specimens and notes. They can be
@@ -36,21 +36,16 @@ export default function FactionViewNpcs({
 }) {
   const { t } = useTranslation();
   const auth = useAuth();
-  const notify = useNotify();
   const npcs = useCampaignNpcs(game?.realmId);
   const [editing, setEditing] = useState<number | 'new' | null>(null);
-  const [saving, setSaving] = useState(false);
+  const { busy: saving, run } = useBusyAction();
   const entries = faction.npcs ?? [];
 
   const save = (next: FactionNpcInput[]) => {
-    setSaving(true);
-    updateFactionNpcs(faction.id, next, auth)
-      .then((updated) => {
-        onChanged(updated);
-        setEditing(null);
-      })
-      .catch(notify.error)
-      .finally(() => setSaving(false));
+    run(updateFactionNpcs(faction.id, next, auth), (updated) => {
+      onChanged(updated);
+      setEditing(null);
+    });
   };
 
   const onSave = (entry: NpcEntry) => {

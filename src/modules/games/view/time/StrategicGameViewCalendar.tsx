@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Box, Button, Collapse, List, ListItem, ListItemText, Stack, Typography } from '@mui/material';
@@ -13,8 +13,9 @@ import {
   RmuPagination,
   SectionLabel,
   StrategicGame,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useStrategicNotify } from '../../../services/notify-service';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import PassTimeResults from './PassTimeResults';
 
 const PAGE_SIZE = 5;
@@ -32,16 +33,24 @@ const StrategicGameViewCalendar: FC<{
 }> = ({ game, canPassTime, onPassTime, refreshKey }) => {
   const { t, i18n } = useTranslation();
   const auth = useAuth();
-  const notify = useStrategicNotify();
+  const notify = useApiNotify();
   const [page, setPage] = useState(0);
-  const [log, setLog] = useState<{ content: GameTimeLogEntry[]; totalPages: number }>();
   const [expanded, setExpanded] = useState<string>();
+  const query = useQuery({
+    queryKey: ['game-time-log', game.id, page, refreshKey],
+    queryFn: () =>
+      fetchGameTimeLog(game.id, page, PAGE_SIZE, auth).then((data) => ({
+        content: data.content,
+        totalPages: data.pagination.totalPages,
+      })),
+    gcTime: 0,
+    placeholderData: keepPreviousData,
+  });
+  const log = query.data;
 
   useEffect(() => {
-    fetchGameTimeLog(game.id, page, PAGE_SIZE, auth)
-      .then((data) => setLog({ content: data.content, totalPages: data.pagination.totalPages }))
-      .catch(notify.error);
-  }, [game.id, page, refreshKey]);
+    if (query.error) notify.error(query.error);
+  }, [query.error]);
 
   const entryText = (entry: GameTimeLogEntry) =>
     entry.type === 'adjust'

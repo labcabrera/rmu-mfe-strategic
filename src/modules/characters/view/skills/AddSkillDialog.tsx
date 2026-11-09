@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Dispatch, SetStateAction } from 'react';
+import { useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Button, Grid } from '@mui/material';
@@ -11,7 +11,7 @@ import {
   Skill,
   SkillSelector,
   StrategicGame,
-  useNotify,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 export default function AddSkillDialog({
@@ -30,7 +30,7 @@ export default function AddSkillDialog({
 }) {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const [formData, setFormData] = useState<AddSkill>({ ranks: 0 } as AddSkill);
   const [validFormData, setValidFormData] = useState<boolean>(false);
   const [selectedSkill, setSelectedSkill] = useState<Skill>();

@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [develop, master]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: app
+      # The shared lib is not on npm: package.json takes it from the sibling checkout.
+      - uses: actions/checkout@v4
+        with:
+          repository: labcabrera/rmu-react-shared-lib
+          ref: develop
+          path: rmu-react-shared-lib
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: app/.nvmrc
+      - name: Build the shared lib
+        working-directory: rmu-react-shared-lib
+        run: npm ci --ignore-scripts && npm run build
+      - name: Install
+        working-directory: app
+        run: npm ci --ignore-scripts
+      - name: Lint
+        working-directory: app
+        run: npx eslint src
+      - name: Types
+        working-directory: app
+        run: npx tsc --noEmit
+      - name: Tests
+        working-directory: app
+        run: npm test --if-present
+      - name: Build
+        working-directory: app
+        run: npm run build

@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Alert,
@@ -27,12 +27,11 @@ import {
   materialsFor,
   MoneyDisplay,
   Panel,
+  signed,
   WORKSHOP_QUALITIES,
   WorkshopQuality,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { TFunction } from 'i18next';
-
-const signed = (value: number) => (value > 0 ? `+${value}` : `${value}`);
 
 /** A material in the selector: its name and what it gives (bonus, durability, workability). */
 const materialLine = (material: Material, t: TFunction) =>
@@ -224,7 +223,7 @@ const CraftQualityStep: FC<{
 };
 
 /** Cost, maneuver modifiers, hours and the bonuses of the item the API quoted. */
-export const CraftPlanSummary: FC<{ plan: CraftingPlan; free: boolean }> = ({ plan, free }) => {
+const CraftPlanSummary: FC<{ plan: CraftingPlan; free: boolean }> = ({ plan, free }) => {
   const { t } = useTranslation();
   const bonuses: string[] = [];
   const target = plan.bonusTarget

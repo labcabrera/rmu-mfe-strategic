@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -7,6 +7,7 @@ import {
   createStrategicGame,
   EntityImage,
   ErrorState,
+  fetchFullPage,
   fetchRealms,
   fetchStrategicGame,
   FormPage,
@@ -16,13 +17,13 @@ import {
   StrategicGame,
   TechnicalInfo,
   updateStrategicGame,
+  useApiNotify,
   useEntity,
-  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { DEFAULT_OPTIONS, DEFAULT_POWER_LEVEL, withGameDefaults } from '../../services/game-rules';
 import { DEFAULT_REALM_IMAGE } from '../../services/image-service';
-import StrategicGameForm from './StrategicGameForm';
 import { isGameOwner } from '../../shared/permissions';
+import StrategicGameForm from './StrategicGameForm';
 
 const EMPTY_STRATEGIC_GAME = {
   name: '',
@@ -41,7 +42,7 @@ export default function StrategicGameFormPage({ mode }: { mode: 'create' | 'edit
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const { gameId } = useParams<{ gameId?: string }>();
   const existing = useEntity<StrategicGame>(
     mode === 'edit' ? gameId : undefined,
@@ -57,7 +58,7 @@ export default function StrategicGameFormPage({ mode }: { mode: 'create' | 'edit
     let data: StrategicGame | undefined = EMPTY_STRATEGIC_GAME;
     if (mode === 'edit') {
       if (!existing.entity) return;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id, owner, access, members, joinRequests, realmReadable, ...rest } = existing.entity;
       // The API fills the defaults, but an update must send the full power level and options anyway
       data = withGameDefaults(rest as StrategicGame);
@@ -68,7 +69,7 @@ export default function StrategicGameFormPage({ mode }: { mode: 'create' | 'edit
 
   useEffect(() => {
     if (mode !== 'create') return;
-    fetchRealms('', 0, 100, auth)
+    fetchFullPage((rsql, page, size) => fetchRealms(rsql, page, size, auth), '')
       .then((data) => setRealms(data.content))
       .catch(notify.error);
   }, []);

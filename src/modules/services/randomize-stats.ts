@@ -6,10 +6,10 @@ export type CreationStats = CreateCharacterDto['statistics'];
 const STAT_MAX = 100;
 
 /** Random integer between min and max, both included. */
-export const rollBetween = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
+const rollBetween = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
 
 /** d100 roll rerolled below the game's statRandomMin. */
-export const randomStatValue = (statRandomMin: number): number =>
+const randomStatValue = (statRandomMin: number): number =>
   rollBetween(Math.min(Math.max(1, statRandomMin || 1), STAT_MAX), STAT_MAX);
 
 /**

@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Autocomplete, Box, Button, Chip, Stack, TextField, Typography } from '@mui/material';
@@ -8,13 +8,13 @@ import {
   canWriteStrategic,
   Faction,
   fetchFriends,
-  Friend,
   Panel,
   removeFactionPlayer,
   span,
   StrategicGame,
-  useNotify,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { useQuery } from '@tanstack/react-query';
 
 interface Candidate {
   userId: string;
@@ -32,18 +32,25 @@ const FactionViewPlayers: FC<{
 }> = ({ faction, game, onChanged }) => {
   const { t } = useTranslation();
   const auth = useAuth();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const userId = auth.user?.profile?.sub;
   const master = canManageStrategic(faction);
   const player = !master && canWriteStrategic(faction);
   const players = faction.players ?? [];
-  const [friends, setFriends] = useState<Friend[]>();
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [busy, setBusy] = useState(false);
 
+  const friendsQuery = useQuery({
+    queryKey: ['friends'],
+    queryFn: () => fetchFriends(auth),
+    enabled: player,
+    gcTime: 0,
+  });
+  const friends = friendsQuery.data;
+
   useEffect(() => {
-    if (player) fetchFriends(auth).then(setFriends).catch(notify.error);
-  }, [player]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (friendsQuery.error) notify.error(friendsQuery.error);
+  }, [friendsQuery.error]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Masters choose among the players of the game; a player of the faction among their friends.
   const candidates = useMemo<Candidate[]>(() => {
@@ -76,7 +83,12 @@ const FactionViewPlayers: FC<{
         extra={
           userId &&
           players.includes(userId) && (
-            <Button size="small" color="warning" disabled={busy} onClick={() => run(() => removeFactionPlayer(faction.id, 'me', auth))}>
+            <Button
+              size="small"
+              color="warning"
+              disabled={busy}
+              onClick={() => run(() => removeFactionPlayer(faction.id, 'me', auth))}
+            >
               {t('leave-faction')}
             </Button>
           )
@@ -115,7 +127,11 @@ const FactionViewPlayers: FC<{
                 isOptionEqualToValue={(option, value) => option.userId === value.userId}
                 noOptionsText={t(master ? 'faction-players-no-candidates' : 'share-no-friends')}
                 renderInput={(params) => (
-                  <TextField {...params} name={fieldName} label={t(master ? 'game-member-role-player' : 'share-friend')} />
+                  <TextField
+                    {...params}
+                    name={fieldName}
+                    label={t(master ? 'game-member-role-player' : 'share-friend')}
+                  />
                 )}
               />
               <Button variant="contained" onClick={add} disabled={!candidate || busy}>

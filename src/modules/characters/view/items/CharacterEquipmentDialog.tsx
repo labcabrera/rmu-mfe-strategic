@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Box, Chip, Stack, Typography } from '@mui/material';
@@ -17,7 +17,7 @@ import {
   SelectableCard,
   StrategicItem,
   unequipItem,
-  useNotify,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 const isOneHandedWeapon = (item: StrategicItem) => !!item.weapon?.modes.some((mode) => mode.type === 'one-hand');
@@ -114,7 +114,7 @@ export default function CharacterEquipmentDialog({
 }) {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const slotItemId = character.equipment.slots[slot];
   const options = useMemo(() => slotOptions(items, slot), [items, slot]);
   const equipped = items.find((item) => item.id === slotItemId);

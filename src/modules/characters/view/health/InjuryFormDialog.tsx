@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Grid, TextField } from '@mui/material';
@@ -15,8 +15,8 @@ import {
   NumericInput,
   RmuDialog,
   updateCharacterInjury,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useStrategicNotify } from '../../../services/notify-service';
 
 const TYPES: InjuryType[] = ['bone', 'cut-burn', 'muscle-tendon', 'organ', 'poison-disease', 'skin-tissue', 'unknown'];
 const SEVERITIES: InjurySeverity[] = ['light', 'medium', 'severe'];
@@ -58,7 +58,7 @@ const InjuryFormDialog: FC<{
 }> = ({ character, injury, open, onClose, onSaved }) => {
   const { t } = useTranslation();
   const auth = useAuth();
-  const notify = useStrategicNotify();
+  const notify = useApiNotify();
   const [form, setForm] = useState<FormState>(initialState(injury));
   const [saving, setSaving] = useState(false);
 

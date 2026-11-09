@@ -1,15 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { Alert, Box, Button, Chip, Divider, Grid, LinearProgress, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Divider, Grid, LinearProgress, Stack, Typography } from '@mui/material';
 import {
   cancelEnchantment,
   completeEnchantment,
   ConfirmDialog,
   deleteEnchantment,
   EnchantmentProject,
-  EnchantmentScr,
   enchantmentTotalDays,
   fetchEnchantment,
   isEnchantmentActive,
@@ -17,20 +16,19 @@ import {
   LoadingState,
   MoneyDisplay,
   NumericInput,
-  OPEN_D100,
   progressEnchantment,
   resumeEnchantment,
   RmuDialog,
-  RollField,
   SectionLabel,
   sendEnchantmentFailureRolls,
   StatusBadge,
   suspendEnchantment,
   updateEnchantment,
-  useNotify,
+  useApiNotify,
   useSpellName,
-  useTableText,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { EnchantmentAdjustDialog, ScrResult } from './EnchantmentAdjustDialog';
 import EnchantmentPlanView from './EnchantmentPlanView';
 import { enchantmentPercent, pendingFailures, STATUS_COLORS } from './enchantment-format';
 
@@ -50,17 +48,27 @@ const EnchantmentProjectDialog: FC<{
   const auth = useAuth();
   const { t } = useTranslation();
   const translatedSpellName = useSpellName();
-  const notify = useNotify();
-  const [project, setProject] = useState<EnchantmentProject | undefined>(initial);
+  const notify = useApiNotify();
+  const queryClient = useQueryClient();
   const [busy, setBusy] = useState(false);
   const [days, setDays] = useState<number | null>(1);
   const [failureRolls, setFailureRolls] = useState<Record<string, number>>({});
   const [adjusting, setAdjusting] = useState(false);
   const [confirm, setConfirm] = useState<Confirm>();
 
+  const projectKey = ['enchantment', projectId];
+  const query = useQuery({
+    queryKey: projectKey,
+    queryFn: () => fetchEnchantment(projectId, auth),
+    initialData: initial,
+    gcTime: 0,
+  });
+  const project = query.data;
+  const setProject = (updated: EnchantmentProject) => queryClient.setQueryData(projectKey, updated);
+
   useEffect(() => {
-    fetchEnchantment(projectId, auth).then(setProject).catch(notify.error);
-  }, [projectId]);
+    if (query.error) notify.error(query.error);
+  }, [query.error]);
 
   const run = (action: () => Promise<EnchantmentProject>, message?: string) => {
     setBusy(true);
@@ -274,129 +282,6 @@ const EnchantmentProjectDialog: FC<{
           onClose={() => setConfirm(undefined)}
         />
       )}
-    </RmuDialog>
-  );
-};
-
-/** The SCR of one spell: its roll and total, and on a failure the failure roll and the row of its table. */
-const ScrResult: FC<{
-  scr: EnchantmentScr;
-  name: string;
-  roll: number | undefined;
-  onRoll: (value: number) => void;
-}> = ({ scr, name, roll, onRoll }) => {
-  const { t } = useTranslation();
-  // Workspace spec 086: the English text of a table entry, translated when there is one
-  const tableText = useTableText();
-  return (
-    <Stack spacing={1} sx={{ pl: 1, borderLeft: 3, borderColor: scr.failed ? 'error.main' : 'success.main' }}>
-      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
-        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-          {name}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {t('enchantment-scr-line', { roll: scr.roll, total: scr.total })}
-        </Typography>
-        <Chip
-          size="small"
-          color={scr.failed ? 'error' : 'success'}
-          label={t(scr.failed ? 'enchantment-scr-failed' : 'enchantment-scr-passed')}
-        />
-        {scr.failure?.serendipity && (
-          <Chip size="small" color="secondary" label={t(`enchantment-serendipity-${scr.failure.serendipity}`)} />
-        )}
-      </Stack>
-      {scr.failed && scr.failureRoll === null && (
-        <Stack direction="row" spacing={2} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
-          <RollField
-            spec={OPEN_D100}
-            label={t('enchantment-failure-roll')}
-            value={roll}
-            onChange={(value) => onRoll(value.total)}
-          />
-          <Typography variant="caption" color="text.secondary">
-            {t('enchantment-failure-modifier', { value: scr.failureModifier })}
-          </Typography>
-        </Stack>
-      )}
-      {scr.failed && scr.failureRoll !== null && (
-        <Box>
-          <Typography variant="caption" color="text.secondary">
-            {t('enchantment-failure-line', {
-              table: t(`alchemy-failure-table-${scr.failure?.table ?? ''}`),
-              roll: scr.failureRoll,
-              modifier: scr.failureModifier,
-              total: scr.failureRoll + scr.failureModifier,
-            })}
-          </Typography>
-          {scr.failure && (
-            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-              {tableText(scr.failure.text)}
-            </Typography>
-          )}
-        </Box>
-      )}
-    </Stack>
-  );
-};
-
-/** Extra days and cost of the failures (the cost is charged to the payer), and notes. */
-const EnchantmentAdjustDialog: FC<{
-  project: EnchantmentProject;
-  onClose: () => void;
-  onSave: (dto: { extraDays: number; extraCost: number; notes: string | null }) => void;
-}> = ({ project, onClose, onSave }) => {
-  const { t } = useTranslation();
-  const [extraDays, setExtraDays] = useState<number | null>(project.extraDays);
-  const [extraCost, setExtraCost] = useState<number | null>(project.extraCost);
-  const [notes, setNotes] = useState(project.notes ?? '');
-  return (
-    <RmuDialog
-      open
-      maxWidth="sm"
-      title={t('enchantment-adjust')}
-      subtitle={t(project.itemName, project.itemName)}
-      onDismiss={onClose}
-      buttons={
-        <>
-          <Button onClick={onClose}>{t('cancel')}</Button>
-          <Button
-            variant="contained"
-            onClick={() =>
-              onSave({ extraDays: extraDays ?? 0, extraCost: extraCost ?? 0, notes: notes.trim() || null })
-            }
-          >
-            {t('save')}
-          </Button>
-        </>
-      }
-    >
-      <Stack spacing={2}>
-        <Typography variant="body2" color="text.secondary">
-          {t('enchantment-adjust-hint')}
-        </Typography>
-        <Grid container spacing={2}>
-          <Grid size={6}>
-            <NumericInput
-              label={t('enchantment-extra-days')}
-              value={extraDays}
-              onChange={setExtraDays}
-              min={0}
-              integer
-            />
-          </Grid>
-          <Grid size={6}>
-            <NumericInput
-              label={t('enchantment-extra-cost')}
-              value={extraCost}
-              onChange={setExtraCost}
-              min={0}
-              maxFractionDigits={2}
-            />
-          </Grid>
-        </Grid>
-        <TextField label={t('notes')} value={notes} onChange={(e) => setNotes(e.target.value)} multiline minRows={3} />
-      </Stack>
     </RmuDialog>
   );
 };

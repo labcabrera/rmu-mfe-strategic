@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Alert, Button, Stack, TextField } from '@mui/material';
@@ -9,8 +9,10 @@ import {
   removeJoinRequest,
   requestJoinGame,
   StrategicGame,
-  useNotify,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useBusyAction } from '../../shared/useBusyAction';
 
 const MAX_MESSAGE = 500;
 
@@ -21,35 +23,39 @@ const MAX_MESSAGE = 500;
 const StrategicGameViewJoin: FC<{ game: StrategicGame }> = ({ game }) => {
   const { t } = useTranslation();
   const auth = useAuth();
-  const notify = useNotify();
-  const [request, setRequest] = useState<GameJoinRequest | null>();
+  const notify = useApiNotify();
+  const queryClient = useQueryClient();
   const [message, setMessage] = useState('');
-  const [busy, setBusy] = useState(false);
+  const { busy, run } = useBusyAction();
 
-  useEffect(() => {
-    fetchGameMembers(game.id, auth)
-      .then((data) => setRequest(data.joinRequests?.[0] ?? null))
-      // Without a request the API answers 403: nothing to show.
-      .catch(() => setRequest(null));
-  }, [game.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  const requestKey = ['game-join-request', game.id];
+  const query = useQuery({
+    queryKey: requestKey,
+    queryFn: () =>
+      fetchGameMembers(game.id, auth)
+        .then((data) => data.joinRequests?.[0] ?? null)
+        // Without a request the API answers 403: nothing to show.
+        .catch(() => null),
+    gcTime: 0,
+    placeholderData: keepPreviousData,
+  });
+  const request = query.data;
+  const setRequest = (value: GameJoinRequest | null) => queryClient.setQueryData(requestKey, value);
 
   const send = () => {
-    setBusy(true);
-    requestJoinGame(game.id, message.trim() || undefined, auth)
-      .then(() => {
-        notify.success(t('join-request-sent'));
-        setRequest({ userId: auth.user?.profile?.sub ?? '', userName: '', message, requestedAt: new Date().toISOString() });
-      })
-      .catch(notify.error)
-      .finally(() => setBusy(false));
+    run(requestJoinGame(game.id, message.trim() || undefined, auth), () => {
+      notify.success(t('join-request-sent'));
+      setRequest({
+        userId: auth.user?.profile?.sub ?? '',
+        userName: '',
+        message,
+        requestedAt: new Date().toISOString(),
+      });
+    });
   };
 
   const withdraw = () => {
-    setBusy(true);
-    removeJoinRequest(game.id, 'me', auth)
-      .then(() => setRequest(null))
-      .catch(notify.error)
-      .finally(() => setBusy(false));
+    run(removeJoinRequest(game.id, 'me', auth), () => setRequest(null));
   };
 
   // The field name outside the JSX: the i18n lint reads strings there as visible text.

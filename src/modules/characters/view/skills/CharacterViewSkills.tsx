@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import ViewAgendaIcon from '@mui/icons-material/ViewAgenda';
@@ -30,7 +30,6 @@ import {
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import {
   intenseTrainingLimit,
-  MAX_PROFESSIONAL_SKILLS,
   MAX_RANKS_PER_LEVEL,
   resolveOptions,
   resolvePowerLevel,
@@ -40,6 +39,7 @@ import AddSkillDialog from './AddSkillDialog';
 import CharacterFightingStyles from './CharacterFightingStyles';
 import CharacterSkillBreakdown from './CharacterSkillBreakdown';
 import CharacterSkillTable from './CharacterSkillTable';
+import { pendingProfessionalBonuses } from './skill-rules';
 
 const STORAGE_KEY = 'character-display-skill-table';
 
@@ -264,14 +264,8 @@ function ProfessionalBonusesAlert({
 }) {
   const { t, i18n } = useTranslation();
   if (!profession) return null;
-  const count = (type: string) => character.skills.filter((skill) => skill.professional?.includes(type)).length;
-  const professional = Math.max(0, MAX_PROFESSIONAL_SKILLS - count('professional'));
-  const knacks = Math.max(0, resolvePowerLevel(strategicGame?.powerLevel).knackCount - count('knack'));
+  const { professional, knacks, needsMoreSkills } = pendingProfessionalBonuses(character, profession, strategicGame);
   if (professional === 0 && knacks === 0) return null;
-  // Only the skills of the profession that the character has can be marked
-  const candidates = character.skills.filter((skill) =>
-    (profession.professionalSkills as string[]).includes(skill.skillId)
-  ).length;
   return (
     <Alert
       severity="info"
@@ -289,7 +283,7 @@ function ProfessionalBonusesAlert({
           ...(knacks > 0 ? [t('professional-bonuses-knacks', { count: knacks })] : []),
         ]),
       })}
-      {professional > 0 && candidates < MAX_PROFESSIONAL_SKILLS && ` ${t('professional-bonuses-add-skills')}`}
+      {needsMoreSkills && ` ${t('professional-bonuses-add-skills')}`}
     </Alert>
   );
 }

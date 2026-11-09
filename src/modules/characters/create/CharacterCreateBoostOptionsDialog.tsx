@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
@@ -186,7 +186,7 @@ const CharacterCreateBoostOptionsDialog: FC<{
                   selected={selectedStats.includes(s)}
                 >
                   <TableCell padding="checkbox">
-                    <Checkbox checked={selectedStats.includes(s)} onChange={() => toggleSelect(s)} />
+                    <Checkbox checked={selectedStats.includes(s)} onClick={(event) => event.stopPropagation()} onChange={() => toggleSelect(s)} />
                   </TableCell>
                   <TableCell>{t(s)}</TableCell>
                   <TableCell align="right">{statistics[s]?.potential ?? '-'}</TableCell>

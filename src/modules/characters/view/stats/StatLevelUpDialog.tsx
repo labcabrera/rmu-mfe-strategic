@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Grid, Stack, Typography } from '@mui/material';
@@ -10,8 +10,8 @@ import {
   StatKey,
   updateCharacterTemporaryStat,
   UpdateTemporaryStatDto,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useStrategicNotify } from '../../../services/notify-service';
 import { getStatGainRoll, StatGainRoll } from '../../../services/stat-service';
 
 const StatLevelUpDialog: FC<{
@@ -23,7 +23,7 @@ const StatLevelUpDialog: FC<{
 }> = ({ character, stat, open, setCharacter, onClose }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useStrategicNotify();
+  const notify = useApiNotify();
   const [roll, setRoll] = useState<number>();
   const [gainRoll, setGainRoll] = useState<StatGainRoll>();
   const selectedStat = stat ? character.statistics[stat] : undefined;

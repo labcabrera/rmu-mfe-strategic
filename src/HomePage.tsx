@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { EntityCard, CardGrid, LayoutBase } from '@labcabrera-rmu/rmu-react-shared-lib';

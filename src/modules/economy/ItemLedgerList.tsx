@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Box, Button, Chip, Stack, Typography } from '@mui/material';
@@ -7,11 +7,11 @@ import {
   EmptyState,
   fetchItemLedger,
   ItemHolder,
-  ItemLedgerEntry,
   LoadingState,
   MoneyDisplay,
-  useNotify,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
 
 const PAGE_SIZE = 20;
 
@@ -40,23 +40,25 @@ const ItemLedgerList: FC<{
 }> = ({ rsql, perspective, names = {}, refreshKey }) => {
   const auth = useAuth();
   const { t, i18n } = useTranslation();
-  const notify = useNotify();
-  const [entries, setEntries] = useState<ItemLedgerEntry[]>();
-  const [page, setPage] = useState(0);
-  const [last, setLast] = useState(true);
+  const notify = useApiNotify();
+  // `refreshKey` may be any object, so it counts by identity: a change starts the list again from its first page.
+  const [generation, setGeneration] = useState({ refreshKey, count: 0 });
+  if (generation.refreshKey !== refreshKey) setGeneration({ refreshKey, count: generation.count + 1 });
 
-  const load = (next: number) =>
-    fetchItemLedger(rsql, next, PAGE_SIZE, auth)
-      .then((data) => {
-        setEntries((current) => (next === 0 ? data.content : [...(current ?? []), ...data.content]));
-        setPage(next);
-        setLast(data.content.length < PAGE_SIZE);
-      })
-      .catch(notify.error);
+  const query = useInfiniteQuery({
+    queryKey: ['item-ledger', rsql, generation.count],
+    queryFn: ({ pageParam }) => fetchItemLedger(rsql, pageParam, PAGE_SIZE, auth),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, _pages, lastPageParam) =>
+      lastPage.content.length < PAGE_SIZE ? undefined : lastPageParam + 1,
+    gcTime: 0,
+    placeholderData: keepPreviousData,
+  });
+  const entries = query.data?.pages.flatMap((page) => page.content);
 
   useEffect(() => {
-    load(0);
-  }, [rsql, refreshKey]);
+    if (query.error) notify.error(query.error);
+  }, [query.error]);
 
   if (!entries) return <LoadingState />;
   if (entries.length === 0) return <EmptyState title={t('ledger-empty')} />;
@@ -105,8 +107,8 @@ const ItemLedgerList: FC<{
           </Stack>
         );
       })}
-      {!last && (
-        <Button onClick={() => load(page + 1)} sx={{ alignSelf: 'center' }}>
+      {query.hasNextPage && (
+        <Button onClick={() => query.fetchNextPage()} sx={{ alignSelf: 'center' }}>
           {t('load-more')}
         </Button>
       )}

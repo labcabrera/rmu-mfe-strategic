@@ -16,16 +16,15 @@ import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import TuneIcon from '@mui/icons-material/Tune';
 import {
   Character,
+  isHealingHerb,
   ItemAction,
   ItemInventory,
-  isHealingHerb,
   RmuDialog,
   StrategicItem,
   updateCarriedStatus,
-  useNotify,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import UseHerbDialog from '../characters/view/health/UseHerbDialog';
-import CharacterItemModifiersDialog from '../characters/view/items/CharacterItemModifiersDialog';
+import CharacterItemModifiersDialog from './CharacterItemModifiersDialog';
 import ItemLedgerList from './ItemLedgerList';
 import {
   CutGemDialog,
@@ -43,6 +42,7 @@ import {
   SellItemDialog,
   TransferItemDialog,
 } from './ItemOperationDialogs';
+import UseHerbDialog from './UseHerbDialog';
 import { GOLD_COIN, HolderView } from './use-holder';
 
 type Operation =
@@ -89,7 +89,7 @@ const HolderInventory: FC<{
 }> = ({ view, onChanged, equippedIds, equippedSlots, highlightedId, onHoverItem, emptyAction }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const [operation, setOperation] = useState<{ kind: Operation; item: StrategicItem }>();
   const close = () => setOperation(undefined);
   const done = () => {

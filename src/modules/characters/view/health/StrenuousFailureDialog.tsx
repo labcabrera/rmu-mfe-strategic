@@ -1,9 +1,15 @@
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { Checkbox, FormControlLabel, Stack, Typography } from '@mui/material';
-import { Character, failCharacterInjuryStrenuous, Injury, RmuDialog } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useStrategicNotify } from '../../../services/notify-service';
+import {
+  Character,
+  failCharacterInjuryStrenuous,
+  Injury,
+  RmuDialog,
+  useApiNotify,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
+import { useBusyAction } from '../../../shared/useBusyAction';
 
 /**
  * Workspace spec 079, C2 (§13.1): a strenuous activity failed while a treated injury recovered. The injury is active
@@ -19,9 +25,9 @@ const StrenuousFailureDialog: FC<{
 }> = ({ character, injury, open, onClose, onUpdated }) => {
   const { t } = useTranslation();
   const auth = useAuth();
-  const notify = useStrategicNotify();
+  const notify = useApiNotify();
   const [absolute, setAbsolute] = useState(false);
-  const [busy, setBusy] = useState(false);
+  const { busy, run } = useBusyAction();
 
   useEffect(() => {
     if (open) setAbsolute(false);
@@ -29,15 +35,11 @@ const StrenuousFailureDialog: FC<{
 
   const submit = () => {
     if (!injury) return;
-    setBusy(true);
-    failCharacterInjuryStrenuous(character.id, injury.id, { absolute }, auth)
-      .then((updated) => {
-        onUpdated(updated);
-        notify.success(t('strenuous-failure-applied'));
-        onClose();
-      })
-      .catch(notify.error)
-      .finally(() => setBusy(false));
+    run(failCharacterInjuryStrenuous(character.id, injury.id, { absolute }, auth), (updated) => {
+      onUpdated(updated);
+      notify.success(t('strenuous-failure-applied'));
+      onClose();
+    });
   };
 
   return (

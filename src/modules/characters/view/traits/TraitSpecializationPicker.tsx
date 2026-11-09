@@ -1,15 +1,16 @@
-import React, { useState, useEffect, FC } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { TextField } from '@mui/material';
 import {
+  ELEMENTS,
+  EnumPicker,
   fetchEnumerations,
+  fetchFullPage,
   fetchRaces,
   fetchSkillCategories,
   fetchSkills,
   fetchSpellLists,
-  ELEMENTS,
-  EnumPicker,
   LoadingState,
   REALM_TYPES,
   Skill,
@@ -18,8 +19,9 @@ import {
   SpellListPicker,
   STATS,
   Trait,
-  useNotify,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { useQuery } from '@tanstack/react-query';
 
 const COMBAT_SKILL_CATEGORY = 'combat-training';
 
@@ -50,7 +52,7 @@ const SpellListSpecializationPicker: FC<{ value: string | null; onChange: (code:
   onChange,
 }) => {
   const auth = useAuth();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const [lists, setLists] = useState<SpellList[]>();
 
   useEffect(() => {
@@ -83,11 +85,11 @@ const loadSpecializations = async (specialization: string, auth: ReturnType<type
   // Workspace spec 079, D4: core has no `elemental-type` enumeration; the elements tactical reads (i18n `element-<id>`)
   if (specialization === ELEMENTAL_TYPE) return [...ELEMENTS];
   if (specialization === 'skill-category') {
-    const response = await fetchSkillCategories('', 0, 100, auth);
+    const response = await fetchFullPage((rsql, page, size) => fetchSkillCategories(rsql, page, size, auth), '');
     return response.content.map((category) => category.id);
   }
   if (specialization === 'race') {
-    const response = await fetchRaces('', 0, 100, auth);
+    const response = await fetchFullPage((rsql, page, size) => fetchRaces(rsql, page, size, auth), '');
     return response.content.map((race) => race.name);
   }
   if (SKILL_SPECIALIZATIONS.includes(specialization)) {
@@ -95,7 +97,10 @@ const loadSpecializations = async (specialization: string, auth: ReturnType<type
     const response = await fetchSkills(rsql, 0, 500, auth);
     return filterCombatSkills(response.content, specialization).map((skill) => skill.id);
   }
-  const response = await fetchEnumerations(`category==${specialization}`, 0, 100, auth);
+  const response = await fetchFullPage(
+    (rsql, page, size) => fetchEnumerations(rsql, page, size, auth),
+    `category==${specialization}`
+  );
   return response.content.map((e) => e.key);
 };
 
@@ -105,22 +110,20 @@ const TraitSpecializationPicker: FC<{
   onChange: (value: string) => void;
 }> = ({ value, trait, onChange }) => {
   const auth = useAuth();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const { t } = useTranslation();
-  const [availableSpecializations, setAvailableSpecializations] = useState<string[]>();
+  const specialization = trait?.specialization;
+  const query = useQuery({
+    queryKey: ['trait-specializations', specialization],
+    queryFn: () => loadSpecializations(specialization as string, auth),
+    enabled: !!specialization && specialization !== TEXT_SPECIALIZATION && specialization !== SPELL_LIST_SPECIALIZATION,
+    gcTime: 0,
+  });
+  const availableSpecializations = query.data;
 
   useEffect(() => {
-    if (
-      !trait?.specialization ||
-      trait.specialization === TEXT_SPECIALIZATION ||
-      trait.specialization === SPELL_LIST_SPECIALIZATION
-    )
-      return;
-    setAvailableSpecializations(undefined);
-    loadSpecializations(trait.specialization, auth)
-      .then((options) => setAvailableSpecializations(options))
-      .catch((err) => notify.error(err));
-  }, [trait?.specialization]);
+    if (query.error) notify.error(query.error);
+  }, [query.error]);
 
   if (!trait) return null;
 

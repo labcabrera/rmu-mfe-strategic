@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import {
@@ -51,10 +51,11 @@ import {
   RollField,
   SearchField,
   StrategicItem,
+  useApiNotify,
   useModifierLabel,
-  useNotify,
   useSpellName,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { useQuery } from '@tanstack/react-query';
 import { GOLD_COIN, HolderView } from '../economy/use-holder';
 import EnchantmentPlanView from './EnchantmentPlanView';
 import { errorCode } from './enchantment-format';
@@ -107,7 +108,7 @@ const EnchantmentWizard: FC<{
   const auth = useAuth();
   const { t } = useTranslation();
   const spellName = useSpellName();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const modifierLabel = useModifierLabel();
   const [step, setStep] = useState(0);
   const alchemists = view.members;
@@ -115,7 +116,6 @@ const EnchantmentWizard: FC<{
   const alchemist = alchemists.find((member) => member.id === alchemistId) ?? view.character;
   const [payer, setPayer] = useState<PayerOption>('holder');
   const [item, setItem] = useState<StrategicItem>();
-  const [grimoire, setGrimoire] = useState<GrimoireSpell[]>();
   const [search, setSearch] = useState('');
   const [chosen, setChosen] = useState<Record<string, SpellChoice>>({});
   const [powerLevel, setPowerLevel] = useState<PowerLevel>(DEFAULT_POWER_LEVEL);
@@ -125,23 +125,32 @@ const EnchantmentWizard: FC<{
   const [busy, setBusy] = useState(false);
 
   // Spec 079: the power level preset of the game, when it has one, instead of Superior
-  useEffect(() => {
-    if (!view.gameId) return;
-    fetchStrategicGame(view.gameId, auth)
-      .then((game) => game.powerLevel?.preset && setPowerLevel(game.powerLevel.preset))
-      .catch(() => undefined);
-  }, [view.gameId]);
+  const gameQuery = useQuery({
+    queryKey: ['enchantment-game', view.gameId],
+    queryFn: () => fetchStrategicGame(view.gameId, auth).catch(() => null),
+    enabled: !!view.gameId,
+    gcTime: 0,
+  });
+  const gamePreset = gameQuery.data?.powerLevel?.preset;
 
   useEffect(() => {
-    setGrimoire(undefined);
+    if (gamePreset) setPowerLevel(gamePreset);
+  }, [gamePreset]);
+
+  const grimoireQuery = useQuery({
+    queryKey: ['enchantment-grimoire', alchemistId],
+    queryFn: () => fetchCharacterSpells(alchemistId, auth).then((lists) => flatten(lists)),
+    enabled: !!alchemistId,
+    gcTime: 0,
+  });
+  const grimoire = grimoireQuery.isError ? [] : grimoireQuery.data;
+
+  useEffect(() => {
+    if (grimoireQuery.error) notify.error(grimoireQuery.error);
+  }, [grimoireQuery.error]);
+
+  useEffect(() => {
     setChosen({});
-    if (!alchemistId) return;
-    fetchCharacterSpells(alchemistId, auth)
-      .then((lists) => setGrimoire(flatten(lists)))
-      .catch((e) => {
-        setGrimoire([]);
-        notify.error(e);
-      });
   }, [alchemistId]);
 
   const busyItemIds = useMemo(
@@ -170,15 +179,20 @@ const EnchantmentWizard: FC<{
     setPlan(undefined);
     setPlanError(undefined);
     if (!request) return;
+    let active = true;
     const timer = setTimeout(() => {
       quoteEnchantment(request, auth)
         .then((quoted) => {
+          if (!active) return;
           setPlan(quoted);
           setPlanError(undefined);
         })
-        .catch((e) => setPlanError(errorCode(e)));
+        .catch((e) => active && setPlanError(errorCode(e)));
     }, QUOTE_DELAY_MS);
-    return () => clearTimeout(timer);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
   }, [request]);
 
   const payerHolder = (): ItemHolder | null | undefined => {

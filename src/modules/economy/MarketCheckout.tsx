@@ -33,13 +33,14 @@ import {
   PurchaseItemOptions,
   PurchaseOrderLine,
   PurchaseOrderQuote,
-  QuotePurchaseOrderDto,
   quotePurchaseOrder,
+  QuotePurchaseOrderDto,
   roundGold,
   SectionLabel,
   SelectableCard,
+  useApiNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useStrategicNotify } from '../services/notify-service';
+import { useBusyAction } from '../shared/useBusyAction';
 import PurchaseOptionsFields, { arePurchaseOptionsValid } from './PurchaseOptionsFields';
 import {
   emptyTrading,
@@ -71,7 +72,7 @@ export const isCartValid = (cart: CartLine[]): boolean =>
   cart.every((line) => arePurchaseOptionsValid(line.item, line.options));
 
 /** Items of a type that does not stack one purchase creates (strategic, spec 041). */
-export const MAX_ITEMS_PER_PURCHASE = 100;
+const MAX_ITEMS_PER_PURCHASE = 100;
 
 const PAYER_MODES: PayerMode[] = ['holder', 'faction', 'split'];
 
@@ -209,7 +210,7 @@ const MarketCheckout: FC<{
 }> = ({ view, cart, setCart, onCancel, onDone }) => {
   const auth = useAuth();
   const { t } = useTranslation();
-  const notify = useStrategicNotify();
+  const notify = useApiNotify();
   const { tables } = useTradingTables();
   const modifiers = useTradingModifiers();
   const isCharacter = view.holder.kind === 'character';
@@ -218,7 +219,7 @@ const MarketCheckout: FC<{
   const [conditions, setConditions] = useState<ModifierSelectionValues>({});
   const [trading, setTrading] = useState<TradingValue>(() => emptyTrading(view.character, true));
   const [payer, setPayer] = useState<PayerMode>();
-  const [busy, setBusy] = useState(false);
+  const { busy, run } = useBusyAction();
 
   const negotiated = method === 'negotiated';
   const negotiator = negotiatorOf(trading, view.character, view.members);
@@ -264,24 +265,23 @@ const MarketCheckout: FC<{
 
   const onPay = () => {
     if (!payer) return;
-    setBusy(true);
-    placePurchaseOrder(
-      {
-        buyer: view.holder,
-        lines,
-        ...(isCharacter ? { payer } : {}),
-        ...(factors.length ? { factors } : {}),
-        ...(tradingDto ? { trading: tradingDto } : {}),
-      },
-      auth
-    )
-      .then(() => {
+    run(
+      placePurchaseOrder(
+        {
+          buyer: view.holder,
+          lines,
+          ...(isCharacter ? { payer } : {}),
+          ...(factors.length ? { factors } : {}),
+          ...(tradingDto ? { trading: tradingDto } : {}),
+        },
+        auth
+      ),
+      () => {
         notify.success(t('purchase-done'));
         setCart([]);
         onDone();
-      })
-      .catch(notify.error)
-      .finally(() => setBusy(false));
+      }
+    );
   };
 
   const stepContent = [

@@ -1,12 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Box, Chip, Stack, Typography } from '@mui/material';
 import {
   Bento,
-  Character,
+  canManageStrategic,
+  canWriteStrategic,
   CollectionMode,
   CollectionModeSwitch,
   deleteFaction,
@@ -17,11 +18,10 @@ import {
   Faction,
   fetchCharacters,
   fetchFaction,
+  fetchFullPage,
   fetchStrategicGame,
   ImageSelectorDialog,
   importCharacter,
-  canManageStrategic,
-  canWriteStrategic,
   ImportDialog,
   ImportRequest,
   ImportResult,
@@ -30,20 +30,20 @@ import {
   Panel,
   span,
   StatPill,
-  StrategicGame,
   updateFaction,
+  useApiNotify,
   useCollectionMode,
   useEntity,
-  useNotify,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { DEFAULT_FACTION_IMAGE_PATH } from '../../services/image-service';
 import CreateOrImportButton from '../../shared/CreateOrImportButton';
 import { isGameMaster } from '../../shared/permissions';
-import FactionViewPlayers from './FactionViewPlayers';
 import FactionViewArmory from './FactionViewArmory';
 import FactionViewCharactersTable from './FactionViewCharacterTable';
 import FactionViewCharacters from './FactionViewCharacters';
 import FactionViewNpcs from './FactionViewNpcs';
+import FactionViewPlayers from './FactionViewPlayers';
 
 const CHARACTER_VIEW_MODES: CollectionMode[] = ['cards', 'table'];
 
@@ -56,15 +56,13 @@ export default function FactionViewPage() {
   const auth = useAuth();
   const { t } = useTranslation();
   const location = useLocation();
-  const notify = useNotify();
+  const notify = useApiNotify();
   const { factionId } = useParams<{ factionId: string }>();
   const state = useEntity<Faction>(factionId, (id) => fetchFaction(id, auth), {
     initial: location.state?.faction,
     onError: notify.error,
   });
   const faction = state.entity;
-  const [game, setGame] = useState<StrategicGame>();
-  const [characters, setCharacters] = useState<Character[]>();
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [characterViewMode, setCharacterViewMode] = useCollectionMode(
@@ -72,15 +70,33 @@ export default function FactionViewPage() {
     CHARACTER_VIEW_MODES
   );
 
+  const gameQuery = useQuery({
+    queryKey: ['faction-game', faction?.gameId],
+    queryFn: () => fetchStrategicGame(faction!.gameId, auth),
+    enabled: !!faction,
+    gcTime: 0,
+    placeholderData: keepPreviousData,
+  });
+  const charactersQuery = useQuery({
+    queryKey: ['faction-characters', faction?.id],
+    queryFn: () =>
+      fetchFullPage((rsql, page, size) => fetchCharacters(rsql, page, size, auth), `faction.id==${faction!.id}`).then(
+        (data) => data.content
+      ),
+    enabled: !!faction,
+    gcTime: 0,
+    placeholderData: keepPreviousData,
+  });
+  const game = gameQuery.data;
+  const characters = charactersQuery.data;
+
   useEffect(() => {
-    if (!faction) return;
-    fetchStrategicGame(faction.gameId, auth)
-      .then((data: StrategicGame) => setGame(data))
-      .catch(notify.error);
-    fetchCharacters(`faction.id==${faction.id}`, 0, 100, auth)
-      .then((data) => setCharacters(data.content))
-      .catch(notify.error);
-  }, [faction?.id]);
+    if (gameQuery.error) notify.error(gameQuery.error);
+  }, [gameQuery.error]);
+
+  useEffect(() => {
+    if (charactersQuery.error) notify.error(charactersQuery.error);
+  }, [charactersQuery.error]);
 
   const onDelete = (entity: Faction) =>
     deleteFaction(entity.id, auth)
@@ -152,18 +168,14 @@ export default function FactionViewPage() {
             ]
           : undefined,
         pills: [
-              <StatPill
-                key="gold"
-                label={t('gold')}
-                value={<MoneyDisplay gold={entity.management.availableGold} />}
-              />,
-              <StatPill key="characters" label={t('characters')} value={characters?.length ?? '—'} />,
-              <StatPill key="levels" label={t('total-levels')} value={totalLevels ?? '—'} />,
-              <StatPill
-                key="npcs"
-                label={t('npcs')}
-                value={(entity.npcs ?? []).reduce((sum, npc) => sum + npc.count, 0)}
-              />,
+          <StatPill key="gold" label={t('gold')} value={<MoneyDisplay gold={entity.management.availableGold} />} />,
+          <StatPill key="characters" label={t('characters')} value={characters?.length ?? '—'} />,
+          <StatPill key="levels" label={t('total-levels')} value={totalLevels ?? '—'} />,
+          <StatPill
+            key="npcs"
+            label={t('npcs')}
+            value={(entity.npcs ?? []).reduce((sum, npc) => sum + npc.count, 0)}
+          />,
         ],
       })}
     >
@@ -212,12 +224,7 @@ export default function FactionViewPage() {
           </Box>
           <FactionViewPlayers faction={entity} game={game} onChanged={state.setEntity} />
           <FactionViewNpcs faction={entity} game={game} canEdit={gameMaster} onChanged={state.setEntity} />
-          <FactionViewArmory
-            faction={entity}
-            gameMaster={gameMaster}
-            canWrite={writer}
-            onGoldChanged={state.refresh}
-          />
+          <FactionViewArmory faction={entity} gameMaster={gameMaster} canWrite={writer} onGoldChanged={state.refresh} />
           <ImportDialog
             open={importOpen}
             title={t('import-character')}
