@@ -90,7 +90,7 @@ export default function CharacterListPage() {
           Icon={CasinoOutlinedIcon}
           tooltip={t('loot-tables-title')}
           ariaLabel={t('loot-tables-title')}
-          onClick={() => navigate('/strategic/characters/treasure-tables')}
+          onClick={() => navigate('/items/treasure-tables')}
         />,
       ]}
       filtersLayout="side"

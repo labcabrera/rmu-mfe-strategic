@@ -8,7 +8,6 @@ const CharacterCreatePage = lazy(() => import('./modules/characters/create/Chara
 const CharacterEditPage = lazy(() => import('./modules/characters/form/CharacterEditPage'));
 const CharacterListPage = lazy(() => import('./modules/characters/list/CharacterListPage'));
 const CharacterViewPage = lazy(() => import('./modules/characters/view/CharacterViewPage'));
-const TreasureTablesPage = lazy(() => import('./modules/treasure-tables/TreasureTablesPage'));
 const MarketPage = lazy(() => import('./modules/economy/MarketPage'));
 const WorkshopPage = lazy(() => import('./modules/economy/WorkshopPage'));
 const EnchantmentsPage = lazy(() => import('./modules/enchantments/EnchantmentsPage'));
@@ -39,7 +38,6 @@ const App: FC = () => (
       <Route path="/factions/create" element={<FactionFormPage key="create" mode="create" />} />
       <Route path="/characters" element={<CharacterListPage />} />
       <Route path="/characters/view/:characterId" element={<CharacterViewPage />} />
-      <Route path="/characters/treasure-tables" element={<TreasureTablesPage />} />
       <Route path="/characters/create" element={<CharacterCreatePage />} />
       <Route path="/characters/edit/:characterId" element={<CharacterEditPage />} />
       <Route path="/characters/trade/:characterId" element={<TradeRedirect />} />

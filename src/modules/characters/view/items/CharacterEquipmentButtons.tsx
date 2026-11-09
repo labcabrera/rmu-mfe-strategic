@@ -46,7 +46,7 @@ export default function CharacterEquipmentButtons({
       <Button
         variant="outlined"
         startIcon={<CasinoOutlinedIcon />}
-        onClick={() => navigate(`/strategic/characters/treasure-tables?characterId=${character.id}`)}
+        onClick={() => navigate(`/items/treasure-tables?characterId=${character.id}`)}
       >
         {t('loot-tables-title')}
       </Button>
