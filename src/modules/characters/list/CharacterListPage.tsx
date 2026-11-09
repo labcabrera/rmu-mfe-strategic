@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
+import CasinoOutlinedIcon from '@mui/icons-material/CasinoOutlined';
 import {
   Character,
   Faction,
@@ -15,6 +16,7 @@ import {
   FilterSearchField,
   FilterSection,
   ListPage,
+  RmuIconButton,
   StrategicGame,
   StrategicGamePicker,
   useApiNotify,
@@ -82,6 +84,15 @@ export default function CharacterListPage() {
         { name: t('characters') },
       ]}
       query={query}
+      actions={[
+        <RmuIconButton
+          key="treasure-tables"
+          Icon={CasinoOutlinedIcon}
+          tooltip={t('loot-tables-title')}
+          ariaLabel={t('loot-tables-title')}
+          onClick={() => navigate('/strategic/characters/treasure-tables')}
+        />,
+      ]}
       filtersLayout="side"
       filterState={filters}
       filtersStorageKey="strategic.characters"

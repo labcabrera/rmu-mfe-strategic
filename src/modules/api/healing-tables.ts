@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+ 
 import { useAuth } from 'react-oidc-context';
 import { fetchHealingTables, HealingTables } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { useQuery } from '@tanstack/react-query';

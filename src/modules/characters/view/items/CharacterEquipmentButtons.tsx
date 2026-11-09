@@ -3,6 +3,7 @@ import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import BuildIcon from '@mui/icons-material/Build';
+import CasinoOutlinedIcon from '@mui/icons-material/CasinoOutlined';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import { Button, Stack } from '@mui/material';
 import { Character, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
@@ -41,6 +42,13 @@ export default function CharacterEquipmentButtons({
         onClick={() => navigate(holderPath('enchantments', holder))}
       >
         {t('enchantments')}
+      </Button>
+      <Button
+        variant="outlined"
+        startIcon={<CasinoOutlinedIcon />}
+        onClick={() => navigate(`/strategic/characters/treasure-tables?characterId=${character.id}`)}
+      >
+        {t('loot-tables-title')}
       </Button>
       {isGameMaster(auth, strategicGame) && (
         <HolderTreasureButton variant="outlined" holder={holder} gameId={character.gameId} onChanged={onChanged} />
