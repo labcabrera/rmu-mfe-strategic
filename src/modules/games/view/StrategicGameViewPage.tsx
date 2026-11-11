@@ -249,7 +249,6 @@ export default function StrategicGameViewPage() {
                   onPassTime={() => setPassTimeOpen(true)}
                   refreshKey={timeLogKey}
                 />
-                <ChronicleSection game={game} master={master} />
                 <Panel
                   title={t('factions')}
                   extra={
@@ -273,6 +272,7 @@ export default function StrategicGameViewPage() {
                 >
                   <StrategicGameViewTacticalGames tacticalGames={tacticalGames} factions={factions} />
                 </Panel>
+                <ChronicleSection game={game} master={master} />
               </>
             )}
           </Stack>
