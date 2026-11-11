@@ -1,21 +1,11 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
-import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
-import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
-import CropSquareIcon from '@mui/icons-material/CropSquare';
-import SquareIcon from '@mui/icons-material/Square';
-import StarIcon from '@mui/icons-material/Star';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
-import TurnedInIcon from '@mui/icons-material/TurnedIn';
-import TurnedInNotIcon from '@mui/icons-material/TurnedInNot';
+import { Dispatch, Fragment, SetStateAction, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
-  Box,
-  ButtonGroup,
-  IconButton,
   Paper,
-  Stack,
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TableRow,
   Tooltip,
@@ -24,322 +14,119 @@ import {
 import {
   Character,
   CharacterSkill,
-  DeleteButton,
-  deleteCharacterSkill,
-  deleteSkill,
-  levelDownSkill,
-  levelUpSkill,
+  DevPointsPool,
+  EmptyState,
   Profession,
-  setUpProfessionalSkill,
+  skillCategoryOf,
+  StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../../../ErrorContext';
-import { useAuth } from 'react-oidc-context';
-import { useTranslation } from 'react-i18next';
+import { MAX_PROFESSIONAL_SKILLS, resolvePowerLevel } from '../../../services/game-rules';
+import { COLUMNS, EXPAND, ProfessionalType, SkillRow, TableContext, WIDE } from './CharacterSkillRow';
 
-const maxProfessionalSkills = 10;
-const maxKnackSkills = 2;
+const OTHER_CATEGORY = 'other';
 
-const CharacterSkillTable: FC<{
+/**
+ * The skills of a character as a compact table: grouped by category, each row with the rank stepper of the level, the
+ * professional and knack marks next to the name and the delete action in a menu. The details of a row show the
+ * breakdown of the total in one line and, on phones, the columns that do not fit. `skills` comes already filtered and
+ * sorted by name; the groups keep that order.
+ */
+export default function CharacterSkillTable({
+  character,
+  skills,
+  setCharacter,
+  profession,
+  strategicGame,
+  pool = 'auto',
+}: {
   character: Character;
+  skills?: CharacterSkill[];
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
   profession?: Profession;
-}> = ({ character, setCharacter, profession }) => {
-  const { t } = useTranslation();
-  const currentKnackSkills = character.skills.filter((s) => s.professional?.includes('knack')).length;
-  const currentProfessionalSkills = character.skills.filter((s) => s.professional?.includes('professional')).length;
+  strategicGame?: StrategicGame;
+  pool?: DevPointsPool;
+}) {
+  const { t, i18n } = useTranslation();
+  const displayedSkills = skills ?? character.skills;
+  const count = (type: ProfessionalType) => character.skills.filter((s) => s.professional?.includes(type)).length;
+  const context: TableContext = {
+    character,
+    setCharacter,
+    profession,
+    strategicGame,
+    pool,
+    marked: { professional: count('professional'), knack: count('knack') },
+    limits: { professional: MAX_PROFESSIONAL_SKILLS, knack: resolvePowerLevel(strategicGame?.powerLevel).knackCount },
+  };
+
+  const groups = useMemo(() => {
+    const byCategory = new Map<string, CharacterSkill[]>();
+    displayedSkills.forEach((skill) => {
+      const category = skillCategoryOf(skill) ?? OTHER_CATEGORY;
+      byCategory.set(category, [...(byCategory.get(category) ?? []), skill]);
+    });
+    return [...byCategory.entries()].sort(([a], [b]) => t(a).localeCompare(t(b), i18n.language));
+  }, [displayedSkills, t, i18n.language]);
 
   return (
-    <Paper>
-      <Table size="small">
+    <TableContainer component={Paper} variant="outlined">
+      <Table
+        size="small"
+        sx={{
+          '& td, & th': { px: { xs: 0.5, sm: 1 } },
+          // Phones: tighter icon buttons, so that the total and the menu fit
+          '& .MuiIconButton-sizeSmall': { p: { xs: 0.25, sm: 0.625 } },
+          // The expand and menu buttons need no padding around them
+          '& tr > td:first-of-type:not([colspan]), & tr > td:last-of-type:not([colspan]), & th:first-of-type, & th:last-of-type':
+            { px: 0.25, width: 40 },
+        }}
+      >
         <TableHead>
           <TableRow>
-            <TableCell align="left">{t('Skill')}</TableCell>
-            <TableCell align="left">
-              <Tooltip title={t('Specializacion')}>
-                <Typography variant="body2">
-                  <b>Spec</b>
-                </Typography>
+            <TableCell sx={EXPAND} />
+            <TableCell>{t('skill')}</TableCell>
+            <TableCell sx={WIDE}>{t('stats')}</TableCell>
+            <TableCell align="center">
+              <Tooltip title={t('developed-ranks')}>
+                <span>{t('dev-ranks')}</span>
               </Tooltip>
             </TableCell>
-            <TableCell align="left">Stats</TableCell>
-
-            <TableCell align="right">
-              <Tooltip title={t('Developed ranks')}>
-                <Typography variant="body2">
-                  <b>{t('Ranks')}</b>
-                </Typography>
+            <TableCell align="right" sx={WIDE}>
+              {t('ranks')}
+            </TableCell>
+            <TableCell align="right">{t('total')}</TableCell>
+            <TableCell align="right" sx={WIDE}>
+              <Tooltip title={t('development-cost')}>
+                <span>{t('cost')}</span>
               </Tooltip>
             </TableCell>
-            <TableCell align="right">
-              <Tooltip title={t('Rank bonus')}>
-                <Typography variant="body2">
-                  <b>Rank</b>
-                </Typography>
-              </Tooltip>
-            </TableCell>
-            <TableCell align="right">
-              <Tooltip title={t('Stat bonus')}>
-                <Typography variant="body2">
-                  <b>Stat</b>
-                </Typography>
-              </Tooltip>
-            </TableCell>
-            <TableCell align="right">
-              <Tooltip title={t('Racial bonus')}>
-                <Typography variant="body2">
-                  <b>Racial</b>
-                </Typography>
-              </Tooltip>
-            </TableCell>
-            <TableCell align="right">
-              <Tooltip title={t('Profession bonus')}>
-                <Typography variant="body2">
-                  <b>Proffesion</b>
-                </Typography>
-              </Tooltip>
-            </TableCell>
-            <TableCell align="right">Custom</TableCell>
-            <TableCell align="right">Total</TableCell>
-            <TableCell align="right">
-              <Tooltip title={t('Development cost')}>
-                <Typography variant="body2">
-                  <b>Dev</b>
-                </Typography>
-              </Tooltip>
-            </TableCell>
-            <TableCell align="left">
-              <Tooltip title={t('Developed ranks')}>
-                <Typography variant="body2">
-                  <b>{t('Dev Ranks')}</b>
-                </Typography>
-              </Tooltip>
-            </TableCell>
-            <TableCell align="left">
-              <Tooltip title={t('Development points available / total')}>
-                <Typography variant="subtitle2">
-                  DP: {character.experience.availableDevPoints} / {character.experience.devPoints}
-                </Typography>
-              </Tooltip>
-            </TableCell>
+            <TableCell sx={{ width: 40, px: 0.5 }} />
           </TableRow>
         </TableHead>
         <TableBody>
-          {character?.skills.map((item, index) => (
-            <CharacterViewSkillsEntry
-              key={index}
-              skill={item}
-              character={character}
-              setCharacter={setCharacter}
-              profession={profession}
-              currentKnackSkills={currentKnackSkills}
-              currentProfessionalSkills={currentProfessionalSkills}
-            />
+          {groups.map(([category, list]) => (
+            <Fragment key={category}>
+              <TableRow>
+                <TableCell colSpan={COLUMNS} sx={{ bgcolor: 'action.hover', py: 0.25 }}>
+                  <Typography variant="overline" color="text.secondary">
+                    {`${t(category)} · ${list.length}`}
+                  </Typography>
+                </TableCell>
+              </TableRow>
+              {list.map((skill) => (
+                <SkillRow key={`${skill.skillId}::${skill.specialization ?? ''}`} skill={skill} context={context} />
+              ))}
+            </Fragment>
           ))}
+          {displayedSkills.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={COLUMNS}>
+                <EmptyState dense title={t('not-found-skills')} />
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
-    </Paper>
+    </TableContainer>
   );
-};
-
-const CharacterViewSkillsEntry: FC<{
-  character: Character;
-  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
-  skill: CharacterSkill;
-  profession?: Profession;
-  currentKnackSkills: number;
-  currentProfessionalSkills: number;
-}> = ({ character, setCharacter, skill, profession, currentKnackSkills, currentProfessionalSkills }) => {
-  const auth = useAuth();
-  const { t } = useTranslation(); 
-  const { showError } = useError();
-  const isProfessional = skill.professional?.includes('professional');
-  const isKnack = skill.professional?.includes('knack');
-
-  const handleLevelUp = () => {
-    levelUpSkill(character.id, skill.skillId, skill.specialization, auth)
-      .then((updated) => setCharacter(updated))
-      .catch((error: any) => showError(error.message));
-  };
-
-  const handleLevelDown = () => {
-    levelDownSkill(character.id, skill.skillId, skill.specialization, auth)
-      .then((updated) => setCharacter(updated))
-      .catch((error: any) => showError(error.message));
-  };
-
-  const handleSetUpProfessionalSkill = (skillObj: CharacterSkill) => {
-    const array = skillObj.professional || [];
-    if (array.includes('professional')) {
-      //remove
-      const index = array.indexOf('professional');
-      if (index > -1) {
-        array.splice(index, 1);
-      }
-    } else {
-      //add
-      array.push('professional');
-    }
-    setUpProfessionalSkill(character.id, skillObj.skillId, skillObj.specialization, array, auth)
-      .then((updated) => setCharacter(updated))
-      .catch((error: any) => showError(error.message));
-  };
-
-  const handleSetUpKnackSkill = (skillObj: CharacterSkill) => {
-    const array = skillObj.professional || [];
-    if (array.includes('knack')) {
-      //remove
-      const index = array.indexOf('knack');
-      if (index > -1) {
-        array.splice(index, 1);
-      }
-    } else {
-      //add
-      array.push('knack');
-    }
-    setUpProfessionalSkill(character.id, skillObj.skillId, skillObj.specialization, array, auth)
-      .then((updated) => setCharacter(updated))
-      .catch((error: any) => showError(error.message));
-  };
-
-  const handleDeleteSkill = (skill: CharacterSkill) => {
-    deleteCharacterSkill(character.id, skill.skillId, skill.specialization, auth)
-      .then((updated) => setCharacter(updated))
-      .catch((error) => showError(error.message));
-  };
-
-  const isLevelUpDisabled = () => {
-    //TODO read allow 3rd rank from game settings
-    const rank = Math.min(skill.ranksDeveloped, 1);
-    const cost = skill.development[rank];
-    return character.experience.availableDevPoints < cost || skill.ranksDeveloped > 2;
-  };
-
-  const isLevelDownDisabled = () => {
-    return skill.ranksDeveloped < 1;
-  };
-
-  const isDeletedDisabled = () => {
-    if (skill.skillId === 'body-development') return true;
-    return skill.ranks > skill.ranksDeveloped;
-  };
-
-  const getColor = (value: number) => {
-    if (value < 0) return 'error.main';
-    if (value > 0) return 'success.main';
-    return 'inherit';
-  };
-
-  const isAvailableProfessionSkill = (skillObj: CharacterSkill) => {
-    return profession && profession.professionalSkills.includes(skillObj.skillId);
-  };
-
-  const getStatistics = (skill: CharacterSkill) => {
-    return skill.statistics && skill.statistics.length > 0 ? skill.statistics.join('/').toLowerCase() : '-';
-  };
-
-  return (
-    <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-      <TableCell component="th" scope="row">
-        {t(skill.skillId)}
-      </TableCell>
-      <TableCell component="th" scope="row">
-        {skill.specialization ? t(skill.specialization) : '-'}
-      </TableCell>
-      <TableCell align="left">{getStatistics(skill)}</TableCell>
-
-      <TableCell align="right">
-        <Typography variant="body2">
-          <b>{skill.ranks}</b>
-        </Typography>
-      </TableCell>
-      <TableCell
-        align="right"
-        sx={{
-          color: getColor(skill.developmentBonus),
-        }}
-      >
-        {skill.developmentBonus}
-      </TableCell>
-      <TableCell
-        align="right"
-        sx={{
-          color: getColor(skill.statBonus),
-        }}
-      >
-        {skill.statBonus}
-      </TableCell>
-      <TableCell align="right" sx={{ color: getColor(skill.racialBonus) }}>
-        {skill.racialBonus}
-      </TableCell>
-      <TableCell align="right" sx={{ color: getColor(skill.professionalBonus) }}>
-        {skill.professionalBonus}
-      </TableCell>
-      <TableCell
-        align="right"
-        sx={{ color: skill.customBonus === 0 ? undefined : skill.customBonus > 0 ? 'success.main' : 'error.main' }}
-      >
-        {skill.customBonus}
-      </TableCell>
-      <TableCell
-        align="right"
-        sx={{
-          color: getColor(skill.totalBonus),
-          fontWeight: 'bold',
-        }}
-      >
-        {skill.totalBonus}
-      </TableCell>
-      <TableCell align="right">{skill.development?.join(' / ') || '-'}</TableCell>
-      <TableCell align="right">
-        <Stack direction="row" spacing={0}>
-          {Array.from({ length: 3 }, (_, idx) => idx + 1).map((rank) => (
-            <Box key={rank} component="span" sx={{ display: 'inline-flex', mx: 0, p: 0 }}>
-              {rank <= skill.ranksDeveloped ? (
-                <SquareIcon sx={{ mx: 0, p: 0 }} fontSize="small" />
-              ) : (
-                <CropSquareIcon sx={{ mx: 0, p: 0 }} fontSize="small" />
-              )}
-            </Box>
-          ))}
-        </Stack>
-      </TableCell>
-      <TableCell align="left">
-        <ButtonGroup>
-          <IconButton onClick={handleLevelUp} disabled={isLevelUpDisabled()} color="primary">
-            <ArrowCircleUpIcon />
-          </IconButton>
-          <IconButton onClick={handleLevelDown} disabled={isLevelDownDisabled()} color="primary">
-            <ArrowCircleDownIcon />
-          </IconButton>
-          <DeleteButton onClick={() => handleDeleteSkill(skill)} disabled={isDeletedDisabled()} />
-          {isAvailableProfessionSkill(skill) && (
-            <>
-              <Tooltip title={t('Professional skill')}>
-                <IconButton
-                  aria-label="set-professional"
-                  onClick={() => handleSetUpProfessionalSkill(skill)}
-                  disabled={!isProfessional && currentProfessionalSkills >= maxProfessionalSkills}
-                  color="primary"
-                >
-                  {isProfessional ? <TurnedInIcon /> : <TurnedInNotIcon />}
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('Knack skill')}>
-                <IconButton
-                  aria-label="set-knack"
-                  onClick={() => handleSetUpKnackSkill(skill)}
-                  color="primary"
-                  disabled={!isKnack && currentKnackSkills >= maxKnackSkills}
-                >
-                  {isKnack ? <StarIcon /> : <StarBorderIcon />}
-                </IconButton>
-              </Tooltip>
-            </>
-          )}
-        </ButtonGroup>
-      </TableCell>
-    </TableRow>
-  );
-};
-
-export default CharacterSkillTable;
+}

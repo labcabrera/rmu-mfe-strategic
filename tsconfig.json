@@ -2,7 +2,11 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ESNext",
-    "lib": ["DOM", "DOM.Iterable", "ES2021"],
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2021"
+    ],
     "jsx": "react-jsx",
     "allowJs": true,
     "checkJs": false,
@@ -15,8 +19,21 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "strictPropertyInitialization": false,
-    "ignoreDeprecations": "6.0"
+    "ignoreDeprecations": "6.0",
+    "paths": {
+      "@mui/*": [
+        "./node_modules/@mui/*"
+      ]
+    }
   },
-  "include": ["src//*", "public//*"],
-  "exclude": ["node_modules", "dist", "build", "scripts"]
+  "include": [
+    "src//*",
+    "public//*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "scripts"
+  ]
 }

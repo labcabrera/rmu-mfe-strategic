@@ -1,0 +1,136 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import {
+  createStrategicGame,
+  EntityImage,
+  ErrorState,
+  fetchFullPage,
+  fetchRealms,
+  fetchStrategicGame,
+  FormPage,
+  LoadingState,
+  NotFound,
+  Realm,
+  StrategicGame,
+  TechnicalInfo,
+  updateStrategicGame,
+  useApiNotify,
+  useEntity,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
+import { DEFAULT_OPTIONS, DEFAULT_POWER_LEVEL, withGameDefaults } from '../../services/game-rules';
+import { DEFAULT_REALM_IMAGE } from '../../services/image-service';
+import { isGameOwner } from '../../shared/permissions';
+import StrategicGameForm from './StrategicGameForm';
+
+const EMPTY_STRATEGIC_GAME = {
+  name: '',
+  realmId: '',
+  options: { ...DEFAULT_OPTIONS },
+  powerLevel: { ...DEFAULT_POWER_LEVEL },
+  description: '',
+  imageUrl: 'images/generic/strategic.png',
+  accessType: 'private',
+  calendar: { startDate: '', elapsedDays: 0, elapsedHours: 0, currentDay: 1 },
+} as StrategicGame;
+
+/** Create and edit page of a strategic game. The realm can only be chosen on creation. */
+export default function StrategicGameFormPage({ mode }: { mode: 'create' | 'edit' }) {
+  const auth = useAuth();
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const notify = useApiNotify();
+  const { gameId } = useParams<{ gameId?: string }>();
+  const existing = useEntity<StrategicGame>(
+    mode === 'edit' ? gameId : undefined,
+    (id) => fetchStrategicGame(id, auth),
+    { initial: location.state?.strategicGame, onError: notify.error }
+  );
+  const [realms, setRealms] = useState<Realm[]>([]);
+  const [formData, setFormData] = useState<StrategicGame>();
+  const [initialData, setInitialData] = useState<string>();
+
+  useEffect(() => {
+    if (formData) return;
+    let data: StrategicGame | undefined = EMPTY_STRATEGIC_GAME;
+    if (mode === 'edit') {
+      if (!existing.entity) return;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { id, owner, access, members, joinRequests, realmReadable, ...rest } = existing.entity;
+      // The API fills the defaults, but an update must send the full power level and options anyway
+      data = withGameDefaults(rest as StrategicGame);
+    }
+    setFormData(data);
+    setInitialData(JSON.stringify(data));
+  }, [existing.entity]);
+
+  useEffect(() => {
+    if (mode !== 'create') return;
+    fetchFullPage((rsql, page, size) => fetchRealms(rsql, page, size, auth), '')
+      .then((data) => setRealms(data.content))
+      .catch(notify.error);
+  }, []);
+
+  const onSave = () => {
+    if (!formData) return;
+    const request =
+      mode === 'create' ? createStrategicGame(formData, auth) : updateStrategicGame(gameId!, formData, auth);
+    request
+      .then((data: StrategicGame) => navigate(`/strategic/games/view/${data.id}`, { state: { strategicGame: data } }))
+      .catch(notify.error);
+  };
+
+  const onCancel = () => {
+    if (mode === 'create') navigate('/strategic/games');
+    else navigate(`/strategic/games/view/${gameId}`, { state: { strategicGame: existing.entity } });
+  };
+
+  const isValid = !!formData?.name?.trim() && (mode === 'edit' || !!formData.realmId);
+
+  return (
+    <FormPage
+      breadcrumbs={[
+        { name: t('home'), link: '/' },
+        { name: t('strategic-module'), link: '/strategic' },
+        { name: t('strategic-games'), link: '/strategic/games' },
+        { name: t(mode === 'create' ? 'create' : 'edit') },
+      ]}
+      onSave={onSave}
+      onCancel={onCancel}
+      saveDisabled={!isValid}
+      dirty={!!formData && JSON.stringify(formData) !== initialData}
+      leftPanel={
+        formData && (
+          <EntityImage
+            image={formData.imageUrl || DEFAULT_REALM_IMAGE}
+            onImageChange={(imageUrl) => setFormData({ ...formData, imageUrl })}
+          />
+        )
+      }
+    >
+      {formData ? (
+        <>
+          <StrategicGameForm
+            formData={formData}
+            setFormData={setFormData as Dispatch<SetStateAction<StrategicGame>>}
+            realms={mode === 'create' ? realms : undefined}
+            editing={mode === 'edit'}
+            canChangeVisibility={mode === 'create' || isGameOwner(auth, existing.entity)}
+          />
+          <TechnicalInfo>
+            <pre>{JSON.stringify(formData, null, 2)}</pre>
+          </TechnicalInfo>
+        </>
+      ) : existing.notFound ? (
+        <NotFound />
+      ) : existing.error ? (
+        <ErrorState error={existing.error} onRetry={existing.refresh} />
+      ) : (
+        <LoadingState variant="detail" />
+      )}
+    </FormPage>
+  );
+}

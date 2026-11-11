@@ -1,218 +1,171 @@
-import React, { useState, useEffect, FC, Dispatch, SetStateAction } from 'react';
+import { Dispatch, FC, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from 'react-oidc-context';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Box, Button, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Grid,
-  MenuItem,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import {
-  addCharacterTrait,
-  AddTraitDto,
+  BonusDevPointsSummary,
   Character,
-  fetchTraits,
-  TechnicalInfo,
-  Trait,
-  traitCategories,
+  EmptyState,
+  RmuDialog,
+  StrategicGame,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../../../ErrorContext';
-import SelectTraitSpecialization from './SelectTraitSpecialization';
+import { resolvePowerLevel } from '../../../services/game-rules';
+import TalentPolicyChip from '../../../shared/chips/TalentPolicyChip';
+import MultilingualRanksPicker from './MultilingualRanksPicker';
+import TraitDetail from './TraitDetail';
+import TraitListPanel from './TraitListPanel';
+import TraitPurchaseRules from './TraitPurchaseRules';
+import { talentPolicyOf } from './trait-rules';
+import { useAddTraitForm } from './use-add-trait-form';
 
+/**
+ * Trait selector: a searchable list grouped by category with the cost and the reason a trait cannot be bought, and a
+ * detail panel with the tier, the specialization, the total cost and the points that pay it. Full screen below `md`,
+ * where the list and the detail are two steps. Everything is reset on close.
+ */
 const AddTraitDialog: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
+  strategicGame?: StrategicGame;
   open: boolean;
   onClose: () => void;
-}> = ({ character, setCharacter, open, onClose }) => {
-  const auth = useAuth();
+}> = ({ character, setCharacter, strategicGame, open, onClose }) => {
   const { t } = useTranslation();
-  const { showError } = useError();
   const theme = useTheme();
-
-  const [traits, setTraits] = useState<Trait[]>([]);
-  const [formData, setFormData] = useState<AddTraitDto>({} as AddTraitDto);
-  const [selectedTrait, setSelectedTrait] = useState<Trait>();
-  const [selectedTraitCategory, setSelectedTraitCategory] = useState<string>();
-
-  const bindTraits = () => {
-    fetchTraits(`category==${selectedTraitCategory}`, 0, 200, auth)
-      .then((data) => setTraits(data.content))
-      .catch((error) => showError(error.message));
-  };
-
-  const onAddTrait = () => {
-    addCharacterTrait(character.id, formData, auth)
-      .then((updatedCharacter) => {
-        setCharacter(updatedCharacter);
-        reset();
-        onClose();
-      })
-      .catch((err) => showError(err.message));
-  };
-
-  const handleTraitChange = (trait: Trait) => {
-    setSelectedTrait(trait || null);
-    if (trait) {
-      setFormData({
-        traitId: trait.id,
-        tier: trait.isTierBased ? 1 : undefined,
-        specialization: undefined,
-      });
-    } else {
-      reset();
-    }
-  };
-
-  const onCloseClick = () => {
-    reset();
-    onClose();
-  };
-
-  const reset = () => {
-    setFormData({} as AddTraitDto);
-  };
-
-  useEffect(() => {
-    if (selectedTraitCategory) {
-      bindTraits();
-    }
-  }, [selectedTraitCategory]);
-
-  if (!traits || !traitCategories) return <p>Loading...</p>;
+  const compact = useMediaQuery(theme.breakpoints.down('md'));
+  const state = useAddTraitForm({ character, setCharacter, strategicGame, open, onClose });
+  const {
+    form,
+    update,
+    catalog,
+    gameMaster,
+    rulesOn,
+    current,
+    purchase,
+    acquisitions,
+    linkable,
+    multilingual,
+    valid,
+    changeSpecialization,
+    submit,
+    handleClose,
+  } = state;
+  const { selected, tier, specialization, showDetail, submitting, pool } = form;
+  const powerLevel = resolvePowerLevel(strategicGame?.powerLevel);
+  const listVisible = !compact || !showDetail;
+  const detailVisible = !compact || showDetail;
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
-      <DialogTitle>{t('add-trait')}</DialogTitle>
-      <DialogContent>
-        <Grid container spacing={2} sx={{ mt: 1 }}>
-          <Grid size={4}>
-            <SelectionList
-              value={selectedTraitCategory}
-              options={traitCategories}
-              onChange={(e) => setSelectedTraitCategory(e)}
-              formatter={(e) => e}
-            />
-          </Grid>
-          <Grid size={4}>
-            <SelectionList
-              value={selectedTrait}
-              options={traits}
-              onChange={(e) => handleTraitChange(e)}
-              formatter={(e) => `${t(e.name)} (${e.adquisitionCost})`}
-              colorFormatter={(e) => (e.isTalent === false ? theme.palette.error.main : theme.palette.success.main)}
-            />
-          </Grid>
-          <Grid size={4}>
-            <TraitForm trait={selectedTrait} formData={formData} setFormData={setFormData} />
-          </Grid>
-          <TechnicalInfo>
-            <pre>Trait: {JSON.stringify(selectedTrait, null, 2)}</pre>
-            <pre>FormData: {JSON.stringify(formData, null, 2)}</pre>
-          </TechnicalInfo>
-        </Grid>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onCloseClick}>{t('cancel')}</Button>
-        <Button onClick={onAddTrait} variant="contained" disabled={false}>
-          {t('add')}
+    <RmuDialog
+      open={open}
+      title={t('add-trait')}
+      fullScreen={compact}
+      maxWidth="lg"
+      paperSx={compact ? undefined : { height: '85vh' }}
+      onCancel={handleClose}
+      buttons={
+        <Button onClick={submit} variant="contained" disabled={!valid || submitting}>
+          {purchase?.isImprovement ? t('trait-improve') : purchase?.isLowering ? t('trait-lower') : t('add')}
         </Button>
-      </DialogActions>
-    </Dialog>
-  );
-};
-
-const SelectionList: FC<{
-  value: any;
-  options: any[];
-  onChange: (value: any) => void;
-  formatter: (value: any) => any;
-  colorFormatter?: (value: any) => any | undefined;
-}> = ({ value, options, onChange, formatter, colorFormatter }) => {
-  const getColor = (e: any) => {
-    if (!colorFormatter) return undefined;
-    return colorFormatter(e);
-  };
-
-  return (
-    <Box sx={{ display: 'flex' }}>
-      <ToggleButtonGroup
-        orientation="vertical"
-        value={value}
-        exclusive
-        onChange={(_event, skill) => onChange(skill)}
-        size="small"
-        fullWidth
-      >
-        {options.map((s) => (
-          <ToggleButton key={`option-${s.id}`} value={s} sx={{ justifyContent: 'flex-start', color: getColor(s) }}>
-            {formatter(s)}
-          </ToggleButton>
-        ))}
-      </ToggleButtonGroup>
-    </Box>
-  );
-};
-
-const TraitForm: FC<{
-  trait: Trait | undefined;
-  formData: AddTraitDto;
-  setFormData: Dispatch<SetStateAction<AddTraitDto>>;
-}> = ({ trait, formData, setFormData }) => {
-  const { t } = useTranslation();
-
-  if (!trait) return;
-
-  return (
-    <Grid container spacing={1}>
-      {trait.isTierBased && (
-        <Grid size={12}>
-          <TextField
-            select
-            label={t('tier')}
-            value={formData.tier || null}
-            onChange={(e) => setFormData({ ...formData, tier: Number.parseInt(e.target.value) })}
-            fullWidth
-          >
-            {Array.from({ length: trait.maxTier }, (_, i) => i).map((option, index) => (
-              <MenuItem key={index} value={option + 1}>
-                {option + 1}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-      )}
-      {trait.specialization && (
-        <Grid size={12}>
-          <SelectTraitSpecialization
-            value={formData.specialization}
-            trait={trait}
-            onChange={(e) => setFormData({ ...formData, specialization: e })}
-          />
-        </Grid>
-      )}
-      <>
-        <Typography variant="body2" color="secondary">
-          {trait.description}
-        </Typography>
-        {trait.isTierBased && (
-          <>
-            <Typography variant="body2" color="secondary">
-              {t('cost')}: {trait.adquisitionCost} + ({trait.tierCost} x tier)
-            </Typography>
-          </>
+      }
+    >
+      <Stack sx={{ gap: 2, minHeight: 0, height: '100%' }}>
+        {compact && showDetail && (
+          <Box>
+            <Button startIcon={<ArrowBackIcon />} onClick={() => update({ showDetail: false })}>
+              {t('back')}
+            </Button>
+          </Box>
         )}
-      </>
-    </Grid>
+        <Stack
+          direction="row"
+          sx={{ flexWrap: 'wrap', alignItems: 'center', columnGap: 3, rowGap: 1 }}
+          aria-label={t('trait-resources')}
+        >
+          <Typography variant="body2" color="text.secondary">
+            {t('dp-available')}: <b>{character.experience.availableDevPoints ?? 0}</b>
+          </Typography>
+          <BonusDevPointsSummary
+            character={character}
+            strategicGame={strategicGame}
+            limit={powerLevel.raceDevPointsPerLevel}
+          />
+          <Typography variant="body2" color="text.secondary">
+            {t('max-trait-cost')}: <b>{powerLevel.maxTraitCost}</b>
+          </Typography>
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+            <Typography variant="body2" color="text.secondary">
+              {t('talent-policy')}:
+            </Typography>
+            <TalentPolicyChip policy={talentPolicyOf(strategicGame)} />
+          </Stack>
+        </Stack>
+        <Box
+          sx={{
+            flex: 1,
+            minHeight: 0,
+            display: 'grid',
+            gap: 2,
+            gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 5fr) minmax(0, 7fr)' },
+          }}
+        >
+          {listVisible && (
+            <Box sx={{ minHeight: { xs: 320, md: 0 }, display: 'flex' }}>
+              <TraitListPanel character={character} state={state} />
+            </Box>
+          )}
+          {detailVisible && (
+            <Box sx={{ minHeight: 0, overflowY: 'auto' }}>
+              {selected && purchase ? (
+                <TraitDetail
+                  character={character}
+                  trait={selected}
+                  tier={tier}
+                  setTier={(value) => update({ tier: value })}
+                  specialization={specialization}
+                  setSpecialization={changeSpecialization}
+                  purchase={purchase}
+                  pool={pool}
+                  setPool={(value) => update({ pool: value })}
+                  extra={
+                    <>
+                      {multilingual && (
+                        <MultilingualRanksPicker
+                          realmId={strategicGame?.realmId}
+                          rows={form.languageRows}
+                          onChange={(languageRows) => update({ languageRows })}
+                        />
+                      )}
+                      <TraitPurchaseRules
+                        trait={selected}
+                        catalog={catalog}
+                        current={current}
+                        rulesOn={rulesOn}
+                        gameMaster={gameMaster}
+                        acquisitions={acquisitions}
+                        chosen={form.chosenPrerequisite}
+                        setChosen={(chosenPrerequisite) => update({ chosenPrerequisite })}
+                        prerequisiteNote={form.prerequisiteNote}
+                        setPrerequisiteNote={(prerequisiteNote) => update({ prerequisiteNote })}
+                        linkable={linkable}
+                        linkKey={form.linkKey}
+                        setLinkKey={(linkKey) => update({ linkKey })}
+                        restricted={form.restricted}
+                        setRestricted={(restricted) => update({ restricted })}
+                        restrictedNote={form.restrictedNote}
+                        setRestrictedNote={(restrictedNote) => update({ restrictedNote })}
+                      />
+                    </>
+                  }
+                />
+              ) : (
+                <EmptyState dense title={t('trait-select-hint')} />
+              )}
+            </Box>
+          )}
+        </Box>
+      </Stack>
+    </RmuDialog>
   );
 };
 

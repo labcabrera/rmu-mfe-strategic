@@ -1,0 +1,21 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "start:live",
+      "detail": "webpack dev server on :8082 (the rmu-platform gateway falls back to it when rmu-mfe-strategic is stopped)",
+      "type": "npm",
+      "script": "start:live",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "webpack",
+        "pattern": { "regexp": "^\\s*ERROR in (.*)$", "file": 1 },
+        "background": {
+          "activeBegins": true,
+          "beginsPattern": "Compiling\\.\\.\\.",
+          "endsPattern": "Compiled successfully!|Compilation Failed!"
+        }
+      }
+    }
+  ]
+}

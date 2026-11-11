@@ -1,4 +1,6 @@
-export const getStatBonus = (temporary) => {
+import type { RollSpec } from '@labcabrera-rmu/rmu-react-shared-lib';
+
+const getStatBonus = (temporary: number) => {
   switch (temporary) {
     case 1:
       return -15;
@@ -135,3 +137,52 @@ export const getStatBonus = (temporary) => {
       throw new Error('Temporary value out of range (1-100)');
   }
 };
+
+/** Bonus of a stat value, 0 for values out of the 1-100 range (stats not rolled yet). */
+export const safeStatBonus = (value: number | undefined): number =>
+  value && value >= 1 && value <= 100 ? getStatBonus(value) : 0;
+
+export interface StatGainRoll {
+  /** Die label, for example 'd10' or 'd3 - 1'. */
+  dice: string;
+  min: number;
+  max: number;
+  /** The die as a roll, for the roll field and the random gain. */
+  spec: RollSpec;
+}
+
+const gainDie = (sides: number, modifier = 0): StatGainRoll => ({
+  dice: modifier ? `d${sides} - ${-modifier}` : `d${sides}`,
+  min: 1 + modifier,
+  max: sides + modifier,
+  spec: { dice: 1, sides, openEnded: 'none', ...(modifier ? { modifier } : {}) },
+});
+
+/** Die of a stat gain roll by the current temporary value (the API validates the same bands). */
+export const getStatGainRoll = (temporary: number): StatGainRoll => {
+  if (temporary < 7) return gainDie(3, -1);
+  if (temporary < 9) return gainDie(3);
+  if (temporary < 19) return gainDie(6);
+  if (temporary < 82) return gainDie(10);
+  if (temporary < 91) return gainDie(6);
+  if (temporary < 93) return gainDie(3);
+  return gainDie(3, -1);
+};
+
+export interface StatBonusBand {
+  bonus: number;
+  min: number;
+  max: number;
+}
+
+/** Ranges of stat values that share a bonus, from the lowest bonus to the highest. */
+export const STAT_BONUS_BANDS: StatBonusBand[] = Array.from({ length: 100 }, (_, i) => i + 1).reduce<StatBonusBand[]>(
+  (bands, value) => {
+    const bonus = getStatBonus(value);
+    const last = bands[bands.length - 1];
+    if (last && last.bonus === bonus) last.max = value;
+    else bands.push({ bonus, min: value, max: value });
+    return bands;
+  },
+  []
+);

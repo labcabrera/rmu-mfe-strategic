@@ -1,33 +1,30 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import Grid from '@mui/material/Grid';
-import { Character, Faction, RmuTextCard } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { gridSizeCard } from '../../services/display';
+import { Character, CollectionView, EmptyState, LoadingState } from '@labcabrera-rmu/rmu-react-shared-lib';
+import CharacterCard from '../../characters/CharacterCard';
 
-const FactionViewCharacters: FC<{
-  faction: Faction;
-  characters: Character[];
-}> = ({ faction, characters }) => {
+/** Characters of a faction as showcase cards: race and profession, level, hit points and defensive bonus. */
+const FactionViewCharacters: FC<{ characters?: Character[] }> = ({ characters }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  if (!faction || !characters) return <>Loading...</>;
+  if (!characters) return <LoadingState />;
+  if (characters.length === 0) return <EmptyState title={t('no-characters-have-been-created')} />;
 
   return (
-    <Grid container spacing={1}>
-      {characters.map((character) => (
-        <Grid key={character.id} size={gridSizeCard}>
-          <RmuTextCard
-            value={character.name}
-            subtitle={`${character.info.race.name} - ${t(character.info.professionId)} - ${character.experience.availableLevel}`}
-            image={character.imageUrl || ''}
-            onClick={() => navigate(`/strategic/characters/view/${character.id}`, { state: { character } })}
-          />
-        </Grid>
-      ))}
-      <Grid size={12}>{characters.length === 0 && <p>{t('No characters have been created')}</p>}</Grid>
-    </Grid>
+    <CollectionView
+      items={characters}
+      getKey={(character) => character.id}
+      mode="cards"
+      config={{ modes: ['cards'], storageKey: 'strategic.faction-characters' }}
+      renderItem={(character) => (
+        <CharacterCard
+          character={character}
+          onClick={() => navigate(`/strategic/characters/view/${character.id}`, { state: { character } })}
+        />
+      )}
+    />
   );
 };
 

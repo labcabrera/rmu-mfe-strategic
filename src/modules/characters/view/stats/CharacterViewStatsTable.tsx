@@ -1,17 +1,27 @@
-import React, { Dispatch, FC, Fragment, SetStateAction, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Chip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import { Character, LevelUpButton, StatKey, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { Box, Chip } from '@mui/material';
+import {
+  Character,
+  DataTable,
+  DataTableColumn,
+  LevelUpButton,
+  StatKey,
+  STATS,
+  StrategicGame,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
+import { spendableDevPoints, STAT_GAIN_DEV_POINTS_COST } from '../../../services/game-rules';
 import StatLevelUpDialog from './StatLevelUpDialog';
 
-const LEVEL_UP_STAT_COST = 4;
+/** Width that fits every column of the compact stats table (8 columns); narrower panels scroll it. */
+export const STATS_TABLE_MIN_WIDTH = 520;
 
 const CharacterViewStatsTable: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
-}> = ({ character, setCharacter }) => {
-  if (!character) return <div>Loading...</div>;
-
+  strategicGame?: StrategicGame;
+}> = ({ character, setCharacter, strategicGame }) => {
+  const { t } = useTranslation();
   const [levelUpStatDialogOpen, setLevelUpStatDialogOpen] = useState<boolean>(false);
   const [levelUpStat, setLevelUpStat] = useState<StatKey>();
 
@@ -25,35 +35,59 @@ const CharacterViewStatsTable: FC<{
     setLevelUpStat(undefined);
   };
 
+  const canLevelUp =
+    character.experience.availableStatLevelUp > 0 ||
+    spendableDevPoints(character, strategicGame) >= STAT_GAIN_DEV_POINTS_COST;
+  const freeUpdate = character.experience.availableStatLevelUp > 0;
+  const statistic = (stat: StatKey) => character.statistics[stat];
+  const modifier = (stat: StatKey, key: string) => statistic(stat).modifiers[key] || 0;
+  const colored = (value: number, color: (value: number) => string, bold = false) => (
+    <Box component="span" sx={{ color: color(value), fontWeight: bold ? 600 : undefined }}>
+      {value}
+    </Box>
+  );
+  const number = (
+    key: string,
+    header: string,
+    value: (stat: StatKey) => number,
+    color: (value: number) => string,
+    bold = false
+  ): DataTableColumn<StatKey> => ({
+    key,
+    header,
+    align: 'right',
+    render: (stat) => colored(value(stat), color, bold),
+  });
+
   return (
     <>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }}>
-          <TableHead>
-            <TableRow>
-              <TableCell align="left">Stat</TableCell>
-              <TableCell align="right">P</TableCell>
-              <TableCell align="right">T</TableCell>
-              <TableCell align="right">Bon</TableCell>
-              <TableCell align="right">Rac</TableCell>
-              <TableCell align="right">Cus</TableCell>
-              <TableCell align="right">Tot</TableCell>
-              <TableCell align="right">
-                {character.experience.availableStatLevelUp > 0 && (
-                  <Chip label={`+${character.experience.availableStatLevelUp}`} color="success" />
-                )}
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {STATS.map((key, index) => (
-              <Fragment key={index}>
-                <CharacterViewStatsEntry stat={key} character={character} onLevelUp={onLevelUpButtonClick} />
-              </Fragment>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <DataTable
+        rows={STATS.filter((stat) => !!character.statistics[stat].modifiers)}
+        getKey={(stat) => stat}
+        columns={[
+          { key: 'stat', header: t('stat'), render: (stat) => t(stat) },
+          number('potential', t('potential-short'), (stat) => statistic(stat).potential, statColor),
+          number('temporary', t('temporary-short'), (stat) => statistic(stat).temporary, statColor),
+          number('bonus', t('bonus-short'), (stat) => modifier(stat, 'stat'), bonusColor),
+          number('racial', t('racial-short'), (stat) => modifier(stat, 'racial'), bonusColor),
+          number('custom', t('custom-short'), (stat) => modifier(stat, 'trait'), bonusColor),
+          number('total', t('total-short'), (stat) => statistic(stat).totalBonus, bonusColor, true),
+          {
+            key: 'level-up',
+            header:
+              character.experience.availableStatLevelUp > 0 ? (
+                <Chip label={`+${character.experience.availableStatLevelUp}`} color="success" />
+              ) : (
+                ''
+              ),
+            align: 'right',
+            render: (stat) =>
+              canLevelUp && (
+                <LevelUpButton onClick={() => onLevelUpButtonClick(stat)} color={freeUpdate ? 'success' : undefined} />
+              ),
+          },
+        ]}
+      />
       <StatLevelUpDialog
         character={character}
         stat={levelUpStat}
@@ -65,62 +99,16 @@ const CharacterViewStatsTable: FC<{
   );
 };
 
-const CharacterViewStatsEntry: FC<{
-  stat: StatKey;
-  character: Character;
-  onLevelUp: (stat: StatKey) => void;
-}> = ({ stat, character, onLevelUp }) => {
-  const { t } = useTranslation();
+const bonusColor = (value: number) => {
+  if (value < 0) return 'error.main';
+  if (value > 0) return 'success.main';
+  return 'inherit';
+};
 
-  if (!character.statistics[stat].modifiers) return;
-  const potential = character.statistics[stat].potential;
-  const temporary = character.statistics[stat].temporary;
-  const statBonus = character.statistics[stat].modifiers['stat'] || 0;
-  const racial = character.statistics[stat].modifiers['racial'] || 0;
-  const trait = character.statistics[stat].modifiers['trait'] || 0;
-  const totalBonus = character.statistics[stat].totalBonus;
-  const freeUpdate = character.experience.availableStatLevelUp > 0;
-
-  const getColor = (value: number) => {
-    if (value < 0) return 'error.main';
-    if (value > 0) return 'success.main';
-    return 'inherit';
-  };
-
-  const getStatColor = (value: number) => {
-    if (value > 75) return 'success.main';
-    if (value < 45) return 'error.main';
-    return 'inherit';
-  };
-
-  return (
-    <TableRow>
-      <TableCell>{t(stat)}</TableCell>
-      <TableCell align="right" sx={{ color: getStatColor(potential) }}>
-        {potential}
-      </TableCell>
-      <TableCell align="right" sx={{ color: getStatColor(temporary) }}>
-        {temporary}
-      </TableCell>
-      <TableCell align="right" sx={{ color: getColor(statBonus) }}>
-        {statBonus}
-      </TableCell>
-      <TableCell align="right" sx={{ color: getColor(racial) }}>
-        {racial}
-      </TableCell>
-      <TableCell align="right" sx={{ color: getColor(trait) }}>
-        {trait}
-      </TableCell>
-      <TableCell align="right" sx={{ color: getColor(totalBonus), fontWeight: 'bold' }}>
-        {totalBonus}
-      </TableCell>
-      <TableCell align="right">
-        {character.experience.availableDevPoints >= LEVEL_UP_STAT_COST && (
-          <LevelUpButton onClick={() => onLevelUp(stat)} color={freeUpdate ? 'success' : undefined} />
-        )}
-      </TableCell>
-    </TableRow>
-  );
+const statColor = (value: number) => {
+  if (value > 75) return 'success.main';
+  if (value < 45) return 'error.main';
+  return 'inherit';
 };
 
 export default CharacterViewStatsTable;

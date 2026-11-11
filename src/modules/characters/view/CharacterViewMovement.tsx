@@ -1,9 +1,17 @@
-import React, { FC, Fragment } from 'react';
+import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import { CategorySeparator, Character, Pace, RmuTextCard, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { imageBaseUrl } from '../../services/config';
-import { gridSizeCard, greyScale } from '../../services/display';
+import { Box, Grid } from '@mui/material';
+import {
+  CategorySeparator,
+  Character,
+  DataTable,
+  DataTableColumn,
+  gridSizeCard,
+  LoadingState,
+  Pace,
+  EntityCard,
+  StrategicGame,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 
 interface TableItem {
   pace: Pace;
@@ -70,7 +78,7 @@ const CharacterViewMovement: FC<{
   strategicGame: StrategicGame;
 }> = ({ character, strategicGame }) => {
   const { t } = useTranslation();
-  if (!character || !strategicGame) return <div>Loading...</div>;
+  if (!character || !strategicGame) return <LoadingState />;
 
   const bmr = character.movement.baseMovementRate;
   const scale = strategicGame.options?.boardScaleMultiplier || 1;
@@ -82,36 +90,49 @@ const CharacterViewMovement: FC<{
   const isDisabledPace = (pace: Pace): boolean => {
     const index = movementTable.findIndex((e) => pace === e.pace);
     const maxIndex = movementTable.findIndex((e) => character.movement.maxPace === e.pace);
-    console.log(`${pace} ${index} ${maxIndex}`);
     return index > maxIndex;
   };
+
+  // The paces above the maximum pace of the character are dimmed in the secondary colour.
+  const paceCell = (item: TableItem, content: React.ReactNode) => (
+    <Box component="span" sx={{ color: isDisabledPace(item.pace) ? 'secondary.main' : 'primary.main' }}>
+      {content}
+    </Box>
+  );
+  const column = (
+    key: string,
+    header: string,
+    value: (item: TableItem) => React.ReactNode,
+    align: 'left' | 'right' = 'right'
+  ): DataTableColumn<TableItem> => ({ key, header, align, render: (item) => paceCell(item, value(item)) });
+  const columns: DataTableColumn<TableItem>[] = [
+    column('pace', t('pace'), (item) => t(item.pace), 'left'),
+    column('round', t('round'), (item) => t('bmr-multiplier', { value: item.roundModifier })),
+    column('phase', t('phase'), (item) => t('bmr-multiplier', { value: item.phaseModifier })),
+    column('penalty', t('penalty'), (item) => item.penalty || '-'),
+    column('ap', t('action-points-short'), (item) => item.ap || '-'),
+    column('load-limit', t('load-limit'), (item) => (item.loadLimit ? `${item.loadLimit}%` : '-')),
+    column('round-feet', t('round'), (item) => `${round(item.roundModifier * bmr)}'`),
+    column('phase-feet', t('phase'), (item) => `${round(item.phaseModifier * bmr)}'`),
+    column('round-scaled', t('round-scaled'), (item) => round(item.roundModifier * bmr * scale)),
+    column('phase-scaled', t('phase-scaled'), (item) => round(item.phaseModifier * bmr * scale)),
+  ];
 
   return (
     <>
       <CategorySeparator text={t('movement')} />
       <Grid container spacing={1}>
         <Grid size={gridSizeCard}>
-          <RmuTextCard
-            value={bmr}
-            subtitle={t('base-movement-rate')}
-            image={`${imageBaseUrl}images/generic/stride-bonus.png`}
-            grayscale={greyScale}
-          />
+          <EntityCard title={`${bmr}`} subtitle={t('base-movement-rate')} noImage />
         </Grid>
         <Grid size={gridSizeCard}>
-          <RmuTextCard
-            value={t(character.movement.maxPace)}
-            subtitle={t('max-pace')}
-            image={`${imageBaseUrl}images/generic/stride-bonus.png`}
-            grayscale={greyScale}
-          />
+          <EntityCard title={`${t(character.movement.maxPace)}`} subtitle={t('max-pace')} noImage />
         </Grid>
         <Grid size={gridSizeCard}>
-          <RmuTextCard
-            value={t(`difficulty-${character.equipment.movementBaseDifficulty || '-'}`)}
+          <EntityCard
+            title={`${t(`difficulty-${character.equipment.movementBaseDifficulty || '-'}`)}`}
             subtitle={t('base-difficulty')}
-            image={`${imageBaseUrl}images/generic/stride-bonus.png`}
-            grayscale={greyScale}
+            noImage
           />
         </Grid>
       </Grid>
@@ -120,71 +141,18 @@ const CharacterViewMovement: FC<{
         {character.movement?.modifiers &&
           Object.entries(character.movement.modifiers).map(([key, value]) => (
             <Grid key={key} size={gridSizeCard}>
-              <RmuTextCard
-                value={value}
-                subtitle={t(key)}
-                image={`${imageBaseUrl}images/generic/stride-bonus.png`}
-                grayscale={greyScale}
-              />
+              <EntityCard title={`${value}`} subtitle={t(key)} noImage />
             </Grid>
           ))}
       </Grid>
       <CategorySeparator text={t('board-scale')} />
       <Grid container spacing={1}>
         <Grid size={gridSizeCard}>
-          <RmuTextCard
-            value={scale}
-            subtitle={t('board-scale')}
-            image={`${imageBaseUrl}images/generic/stride-bonus.png`}
-            grayscale={greyScale}
-          />
+          <EntityCard title={`${scale}`} subtitle={t('board-scale')} noImage />
         </Grid>
       </Grid>
-      <CategorySeparator text={t('Speed table')} />
-      <TableContainer component={Paper}>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>Pace</TableCell>
-              <TableCell align="right">Round</TableCell>
-              <TableCell align="right">Phase</TableCell>
-              <TableCell align="right">Penalty</TableCell>
-              <TableCell align="right">AP</TableCell>
-              <TableCell align="right">Load limit</TableCell>
-              <TableCell align="right">Round</TableCell>
-              <TableCell align="right">Phase</TableCell>
-              <TableCell align="right">Round Scaled</TableCell>
-              <TableCell align="right">Phase Scaled</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {movementTable.map((item, index) => {
-              const disabled = isDisabledPace(item.pace);
-              return (
-                <TableRow
-                  key={index}
-                  sx={{
-                    '& td, & th': {
-                      color: (theme) => (disabled ? theme.palette.secondary.main : theme.palette.primary.main),
-                    },
-                  }}
-                >
-                  <TableCell>{t(item.pace)}</TableCell>
-                  <TableCell align="right">{item.roundModifier}x BMR</TableCell>
-                  <TableCell align="right">{item.phaseModifier}x BMR</TableCell>
-                  <TableCell align="right">{item.penalty || '-'}</TableCell>
-                  <TableCell align="right">{item.ap || '-'}</TableCell>
-                  <TableCell align="right">{item.loadLimit ? `${item.loadLimit}%` : '-'}</TableCell>
-                  <TableCell align="right">{round(item.roundModifier * bmr)}'</TableCell>
-                  <TableCell align="right">{round(item.phaseModifier * bmr)}'</TableCell>
-                  <TableCell align="right">{round(item.roundModifier * bmr * scale)}</TableCell>
-                  <TableCell align="right">{round(item.phaseModifier * bmr * scale)}</TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <CategorySeparator text={t('speed-table')} />
+      <DataTable rows={movementTable} getKey={(item) => item.pace} columns={columns} />
     </>
   );
 };

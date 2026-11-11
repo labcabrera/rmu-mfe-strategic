@@ -1,110 +1,81 @@
-import React, { FC, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { CreateCharacterDto, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { StatBonusFormData } from './CharacterCreate';
+import { Box } from '@mui/material';
+import { CreateCharacterDto, DataTable, StatKey, STATS } from '@labcabrera-rmu/rmu-react-shared-lib';
 
-const CharacterStats: FC<{
-  key: string;
-  statKey: string;
-  statName: string;
-  formData: CreateCharacterDto;
-  statBonusFormData: StatBonusFormData;
-}> = ({ statKey, statName, formData, statBonusFormData }) => {
-  const { t } = useTranslation();
+interface StatBonus {
+  potential: number;
+  temporary: number;
+}
 
-  const getColor = (value: number): string => {
-    if (value > 0) return 'success.main';
-    if (value < 0) return 'error.main';
-    return 'inherit';
-  };
+export interface StatBonusFormData {
+  [key: string]: StatBonus;
+}
 
-  const getTotal = (): number => {
-    const stat = formData.statistics[statKey];
-    const bonus = statBonusFormData[statKey];
-    return stat.racial || 0 + bonus.temporary;
-  };
-
-  return (
-    <>
-      <TableRow key={statKey} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-        <TableCell component="th" scope="row">
-          {t(statName)}
-        </TableCell>
-        <TableCell align="right" sx={{ fontWeight: 'bold' }}>
-          {formData.statistics[statKey].potential}
-        </TableCell>
-        <TableCell
-          align="right"
-          sx={{
-            color: getColor(statBonusFormData[statKey].potential),
-          }}
-        >
-          {statBonusFormData[statKey].potential}
-        </TableCell>
-        <TableCell align="right">{formData.statistics[statKey].temporary}</TableCell>
-        <TableCell
-          align="right"
-          sx={{
-            color: getColor(statBonusFormData[statKey].temporary),
-          }}
-        >
-          {statBonusFormData[statKey].temporary}
-        </TableCell>
-        <TableCell
-          align="right"
-          sx={{
-            color: getColor(formData.statistics[statKey].racial),
-          }}
-        >
-          {formData.statistics[statKey].racial}
-        </TableCell>
-        <TableCell
-          align="right"
-          sx={{
-            color: getColor(getTotal()),
-            fontWeight: 'bold',
-          }}
-        >
-          {getTotal()}
-        </TableCell>
-      </TableRow>
-    </>
-  );
+const bonusColor = (value: number): string => {
+  if (value > 0) return 'success.main';
+  if (value < 0) return 'error.main';
+  return 'inherit';
 };
 
-const CharacterCreateStats: FC<{
+/** The stats of the character being created: potential and temporary with their bonuses, racial and total. */
+export default function CharacterCreateStats({
+  formData,
+  statBonusFormData,
+}: {
   formData: CreateCharacterDto;
   statBonusFormData: StatBonusFormData;
-}> = ({ formData, statBonusFormData }) => {
+}) {
   const { t } = useTranslation();
+  const total = (key: StatKey) => (formData.statistics[key].racial || 0) + statBonusFormData[key].temporary;
+  const colored = (value: number | undefined, color?: string, bold = false) => (
+    <Box component="span" sx={{ color, fontWeight: bold ? 600 : undefined }}>
+      {value}
+    </Box>
+  );
 
   return (
-    <Table sx={{ minWidth: 650 }} aria-label="stats table" size="small">
-      <TableHead>
-        <TableRow>
-          <TableCell align="left">Stat</TableCell>
-          <TableCell align="right">{t('potential-short')}</TableCell>
-          <TableCell align="right">{t('potential-bonus-short')}</TableCell>
-          <TableCell align="right">{t('temporary-short')}</TableCell>
-          <TableCell align="right">{t('temporary-bonus-short')}</TableCell>
-          <TableCell align="right">{t('racial')}</TableCell>
-          <TableCell align="right">{t('total')}</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {STATS.map((key) => (
-          <CharacterStats
-            key={key}
-            statKey={key}
-            statName={t(key)}
-            formData={formData}
-            statBonusFormData={statBonusFormData}
-          />
-        ))}
-      </TableBody>
-    </Table>
+    <DataTable
+      rows={[...STATS]}
+      getKey={(key) => key}
+      columns={[
+        { key: 'stat', header: t('stat'), render: (key) => t(key) },
+        {
+          key: 'potential',
+          header: t('potential-short'),
+          align: 'right',
+          render: (key) => colored(formData.statistics[key].potential, undefined, true),
+        },
+        {
+          key: 'potential-bonus',
+          header: t('potential-bonus-short'),
+          align: 'right',
+          render: (key) => colored(statBonusFormData[key].potential, bonusColor(statBonusFormData[key].potential)),
+        },
+        {
+          key: 'temporary',
+          header: t('temporary-short'),
+          align: 'right',
+          render: (key) => formData.statistics[key].temporary,
+        },
+        {
+          key: 'temporary-bonus',
+          header: t('temporary-bonus-short'),
+          align: 'right',
+          render: (key) => colored(statBonusFormData[key].temporary, bonusColor(statBonusFormData[key].temporary)),
+        },
+        {
+          key: 'racial',
+          header: t('racial'),
+          align: 'right',
+          render: (key) => colored(formData.statistics[key].racial, bonusColor(formData.statistics[key].racial || 0)),
+        },
+        {
+          key: 'total',
+          header: t('total'),
+          align: 'right',
+          render: (key) => colored(total(key), bonusColor(total(key)), true),
+        },
+      ]}
+    />
   );
-};
-
-export default CharacterCreateStats;
+}

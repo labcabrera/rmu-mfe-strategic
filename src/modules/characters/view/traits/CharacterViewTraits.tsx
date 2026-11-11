@@ -1,82 +1,133 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Grid, Stack, Typography } from '@mui/material';
-import { CategorySeparator, AddButton, RmuCard, Character, CharacterTrait } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { imageBaseUrl } from '../../../services/config';
-import { gridSizeCard } from '../../../services/display';
+import { Box, Chip, List, ListItemButton, Stack, Tooltip, Typography } from '@mui/material';
+import {
+  AddButton,
+  Character,
+  CharacterTrait,
+  EmptyState,
+  LoadingState,
+  Panel,
+  StrategicGame,
+  TraitTypeChip,
+} from '@labcabrera-rmu/rmu-react-shared-lib';
 import { toRoman } from '../../../services/roman-number-service';
+import MissingReferenceChip from '../../../shared/chips/MissingReferenceChip';
 import AddTraitDialog from './AddTraitDialog';
 import CharacterViewTraitDialog from './CharacterViewTraitDialog';
+import { useTraitSpecializationLabel } from './use-trait-specialization-label';
 
+/** Traits of the character: name and tier, specialization, type, source and the development points paid. */
 const CharacterViewTraits: FC<{
   character: Character;
   setCharacter: Dispatch<SetStateAction<Character | undefined>>;
-}> = ({ character, setCharacter }) => {
+  strategicGame?: StrategicGame;
+}> = ({ character, setCharacter, strategicGame }) => {
   const { t } = useTranslation();
   const [openAddTraitDialog, setOpenAddTraitDialog] = useState(false);
   const [openTraitDialog, setOpenTraitDialog] = useState(false);
-  const [traitId, setTraitId] = useState<string | null>(null);
   const [characterTrait, setCharacterTrait] = useState<CharacterTrait>();
+  const specializationLabel = useTraitSpecializationLabel(character?.traits ?? []);
 
-  if (!character) return <div>Loading for character...</div>;
+  if (!character) return <LoadingState />;
+
+  const linkedTalentName = (traitId: string) => {
+    const talent = character.traits.find((owned) => owned.traitId === traitId);
+    return t(traitId, { defaultValue: talent?.traitName ?? traitId });
+  };
 
   const handleTraitView = (trait: CharacterTrait) => {
     setCharacterTrait(trait);
-    setTraitId(traitId);
     setOpenTraitDialog(true);
   };
 
   return (
     <>
-      <Grid container spacing={1}>
-        <Grid size={12}>
-          <CategorySeparator text={t('Traits')}>
-            <AddButton onClick={() => setOpenAddTraitDialog(true)} />
-          </CategorySeparator>
-        </Grid>
-        <Grid size={12}>
-          <Grid container spacing={1}>
+      <Panel title={t('traits')} extra={<AddButton onClick={() => setOpenAddTraitDialog(true)} />}>
+        {character.traits.length === 0 ? (
+          <EmptyState dense title={t('character-no-traits')} />
+        ) : (
+          <List dense disablePadding>
             {character.traits.map((trait, index) => (
-              <Grid size={gridSizeCard} key={index}>
-                <RmuCard
-                  key={index}
-                  image={
-                    trait.isTalent
-                      ? `${imageBaseUrl}images/generic/trait.png`
-                      : `${imageBaseUrl}images/generic/disease.png`
-                  }
-                  onClick={() => handleTraitView(trait)}
-                >
-                  <Stack direction="column">
-                    <Typography>
-                      {t(trait.traitId)} {toRoman(trait.tier)}
+              <ListItemButton
+                key={`${trait.traitId}-${trait.specialization ?? ''}-${trait.source ?? ''}-${index}`}
+                onClick={() => handleTraitView(trait)}
+                divider={index < character.traits.length - 1}
+                sx={{ gap: 1, flexWrap: { xs: 'wrap', sm: 'nowrap' }, px: 1 }}
+              >
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
+                    {t(trait.traitId, { defaultValue: trait.traitName })} {toRoman(trait.tier)}
+                  </Typography>
+                  {trait.specialization && (
+                    <Typography variant="caption" color="text.secondary" noWrap component="div">
+                      {specializationLabel(trait.specialization)}
                     </Typography>
-                    <Typography color="secondary">
-                      <em>{trait.specialization ? t(trait.specialization) : 'None'}</em>
+                  )}
+                  {trait.linkedTo && (
+                    <Typography variant="caption" color="text.secondary" noWrap component="div">
+                      {t('trait-linked-to', { talent: linkedTalentName(trait.linkedTo.traitId) })}
                     </Typography>
-                  </Stack>
-                </RmuCard>
-              </Grid>
+                  )}
+                </Box>
+                <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', flex: 'none' }}>
+                  {trait.source === 'race' && (
+                    <Chip label={t('trait-source-race')} size="small" color="primary" variant="outlined" />
+                  )}
+                  {trait.missingReference && <MissingReferenceChip />}
+                  {/* Spec 077: a flaw waiting for the game master, a restricted trait */}
+                  {trait.pendingApproval && (
+                    <Tooltip title={t('trait-pending-approval-help')}>
+                      <Chip label={t('trait-pending-approval')} size="small" color="warning" />
+                    </Tooltip>
+                  )}
+                  {trait.restricted && (
+                    <Tooltip title={trait.restricted.note || t('trait-restricted-help')}>
+                      <Chip label={t('trait-restricted')} size="small" variant="outlined" />
+                    </Tooltip>
+                  )}
+                  <TraitTypeChip isTalent={trait.isTalent} />
+                  {trait.source !== 'race' && <TraitPaidChip trait={trait} />}
+                </Stack>
+              </ListItemButton>
             ))}
-          </Grid>
-          {character.traits.length === 0 && <div>This character has no traits.</div>}
-        </Grid>
-      </Grid>
+          </List>
+        )}
+      </Panel>
       <AddTraitDialog
         character={character}
         setCharacter={setCharacter}
+        strategicGame={strategicGame}
         open={openAddTraitDialog}
         onClose={() => setOpenAddTraitDialog(false)}
       />
-      <CharacterViewTraitDialog
-        character={character}
-        setCharacter={setCharacter}
-        characterTrait={characterTrait!}
-        open={openTraitDialog}
-        onClose={() => setOpenTraitDialog(false)}
-      />
+      {characterTrait && (
+        <CharacterViewTraitDialog
+          character={character}
+          setCharacter={setCharacter}
+          characterTrait={characterTrait}
+          open={openTraitDialog}
+          onClose={() => setOpenTraitDialog(false)}
+        />
+      )}
     </>
   );
+};
+
+/** Development points the trait cost (returned ones for flaws), with the pools in a tooltip when they are known. */
+const TraitPaidChip: FC<{ trait: CharacterTrait }> = ({ trait }) => {
+  const { t } = useTranslation();
+  const cost = trait.cost || 0;
+  const label = cost < 0 ? t('trait-dp-returned', { dp: -cost }) : t('trait-dp-paid', { dp: cost });
+  const paid = trait.paidWith;
+  const breakdown = paid
+    ? (['normal', 'bonus', 'flaw'] as const)
+        .filter((pool) => paid[pool] !== 0)
+        .map((pool) => `${t(`trait-pool-${pool}`)}: ${Math.abs(paid[pool])}`)
+        .join(' · ')
+    : '';
+  const chip = <Chip size="small" variant="outlined" label={label} />;
+  return breakdown ? <Tooltip title={breakdown}>{chip}</Tooltip> : chip;
 };
 
 export default CharacterViewTraits;

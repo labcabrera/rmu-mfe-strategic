@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug strategic in the shell (gateway)",
+      "detail": "Stop the container first: `make mfe-dev s=strategic` in rmu-platform",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost/strategic",
+      "webRoot": "${workspaceFolder}",
+      "preLaunchTask": "start:live",
+      "sourceMapPathOverrides": {
+        "webpack://strategic/./*": "${workspaceFolder}/*"
+      }
+    },
+    {
+      "name": "Debug strategic standalone (:8082)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:8082",
+      "webRoot": "${workspaceFolder}",
+      "preLaunchTask": "start:live",
+      "sourceMapPathOverrides": {
+        "webpack://strategic/./*": "${workspaceFolder}/*"
+      }
+    }
+  ]
+}

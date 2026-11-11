@@ -1,12 +1,12 @@
 import js from '@eslint/js';
-import importPlugin from 'eslint-plugin-import';
-import jsxA11y from 'eslint-plugin-jsx-a11y';
-import react from 'eslint-plugin-react';
+import i18next from 'eslint-plugin-i18next';
 import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
+// Shared by the shared lib, the shell and every MFE: keep the copies identical.
 export default [
+  { ignores: ['dist/**', 'node_modules/**', 'storybook-static/**', 'coverage/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -25,33 +25,65 @@ export default [
       },
     },
     plugins: {
-      react,
       'react-hooks': reactHooks,
-      'jsx-a11y': jsxA11y,
-      import: importPlugin,
+      i18next,
     },
     rules: {
-      'react/react-in-jsx-scope': 'off',
-      'react/prop-types': 'off',
-
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
 
       '@typescript-eslint/no-explicit-any': 'warn',
 
-      'no-unused-vars': 'warn',
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'error',
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       eqeqeq: ['error', 'always'],
-    },
-    settings: {
-      react: {
-        version: 'detect',
-      },
-      'import/resolver': {
-        node: {
-          extensions: ['.js', '.jsx', '.ts', '.tsx'],
+
+      // Entity images are squares (spec 058): no circular MUI Avatar, which is the default without `variant`.
+      // Use EntityAvatar or EntityImage; only the account avatar of the user is a circle (disable the rule there).
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "JSXOpeningElement[name.name='Avatar']:not(:has(JSXAttribute[name.name='variant']))",
+          message: 'Avatar is circular without `variant`: entity images are square (spec 058). Use EntityAvatar.',
         },
-      },
+        {
+          selector: "JSXOpeningElement[name.name='Avatar'] > JSXAttribute[name.name='variant'][value.value='circular']",
+          message: 'Entity images are square (spec 058): only the account avatar of the user is circular.',
+        },
+      ],
+
+      // Spec 066: the MFEs use the wrappers of rmu-react-shared-lib (RmuDialog, FlowSteps, RmuPagination,
+      // LoadingState). The library itself builds those wrappers, so it shows these warnings by design.
+      'no-restricted-imports': [
+        'warn',
+        {
+          paths: [
+            {
+              name: '@mui/material',
+              importNames: ['Dialog', 'Stepper', 'Pagination', 'CircularProgress'],
+              message:
+                'Use the rmu-react-shared-lib wrapper: RmuDialog/ConfirmDialog, FlowSteps, RmuPagination or LoadingState (spec 066).',
+            },
+          ],
+        },
+      ],
+
+      // Every visible string goes through i18n: JSX text and the attributes users see or hear.
+      'i18next/no-literal-string': [
+        'error',
+        {
+          mode: 'jsx-only',
+          'jsx-attributes': {
+            include: ['label', 'title', 'placeholder', 'aria-label', 'helperText', 'alt', 'subtitle', 'text'],
+          },
+        },
+      ],
     },
+  },
+  {
+    // Stories and tests hold sample data, not UI text.
+    files: ['**/*.stories.{ts,tsx}', '**/*.test.{ts,tsx}', 'src/test/**', '.storybook/**'],
+    rules: { 'i18next/no-literal-string': 'off' },
   },
 ];

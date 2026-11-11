@@ -1,47 +1,56 @@
-import React, { FC } from 'react';
-import { Route, Routes } from 'react-router-dom';
-import { Box, ThemeProvider } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { NotFound } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { ErrorProvider } from './ErrorContext';
-import CharacterCreate from './modules/characters/create/CharacterCreate';
-import CharacterList from './modules/characters/list/CharacterList';
-import CharacterUpdate from './modules/characters/update/CharacterUpdate';
-import CharacterView from './modules/characters/view/CharacterView';
-import FactionCreate from './modules/factions/create/FactionCreate';
-import FactionUpdate from './modules/factions/update/FactionUpdate';
-import FactionView from './modules/factions/view/FactionView';
-import StrategicGameCreate from './modules/games/create/StrategicGameCreate';
-import StrategicGameList from './modules/games/list/StrategicGameList';
-import StrategicGameEdit from './modules/games/update/StrategicGameUpdate';
-import StrategicGameView from './modules/games/view/StrategicGameView';
-import TradeView from './modules/trade/TradeView';
+import { lazy, FC } from 'react';
+import { Navigate, Route, Routes, useParams } from 'react-router-dom';
+import { MfeRoot, NotFound } from '@labcabrera-rmu/rmu-react-shared-lib';
 
-const App: FC = () => {
-  return (
-    <ThemeProvider theme={useTheme()}>
-      <ErrorProvider>
-        <Box sx={{ p: 2 }}>
-          <Routes>
-            <Route path="/" element={<StrategicGameList />} />
-            <Route path="/games" element={<StrategicGameList />} />
-            <Route path="/games/view/:gameId" element={<StrategicGameView />} />
-            <Route path="/games/edit/:gameId" element={<StrategicGameEdit />} />
-            <Route path="/games/create" element={<StrategicGameCreate />} />
-            <Route path="/factions/view/:factionId" element={<FactionView />} />
-            <Route path="/factions/edit/:factionId" element={<FactionUpdate />} />
-            <Route path="/factions/create" element={<FactionCreate />} />
-            <Route path="/characters" element={<CharacterList />} />
-            <Route path="/characters/view/:characterId" element={<CharacterView />} />
-            <Route path="/characters/create" element={<CharacterCreate />} />
-            <Route path="/characters/edit/:characterId" element={<CharacterUpdate />} />
-            <Route path="/characters/trade/:characterId" element={<TradeView />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Box>
-      </ErrorProvider>
-    </ThemeProvider>
-  );
+// Workspace spec 091, E1: every page is its own chunk; the Suspense is in MfeRoot / the shell layout.
+const HomePage = lazy(() => import('./HomePage'));
+const ChapterEditPage = lazy(() => import('./modules/chronicle/ChapterEditPage'));
+const ChapterViewPage = lazy(() => import('./modules/chronicle/ChapterViewPage'));
+const CharacterCreatePage = lazy(() => import('./modules/characters/create/CharacterCreatePage'));
+const CharacterEditPage = lazy(() => import('./modules/characters/form/CharacterEditPage'));
+const CharacterListPage = lazy(() => import('./modules/characters/list/CharacterListPage'));
+const CharacterViewPage = lazy(() => import('./modules/characters/view/CharacterViewPage'));
+const MarketPage = lazy(() => import('./modules/economy/MarketPage'));
+const WorkshopPage = lazy(() => import('./modules/economy/WorkshopPage'));
+const EnchantmentsPage = lazy(() => import('./modules/enchantments/EnchantmentsPage'));
+const FactionFormPage = lazy(() => import('./modules/factions/form/FactionFormPage'));
+const FactionListPage = lazy(() => import('./modules/factions/list/FactionListPage'));
+const FactionViewPage = lazy(() => import('./modules/factions/view/FactionViewPage'));
+const StrategicGameFormPage = lazy(() => import('./modules/games/form/StrategicGameFormPage'));
+const StrategicGameListPage = lazy(() => import('./modules/games/list/StrategicGameListPage'));
+const StrategicGameViewPage = lazy(() => import('./modules/games/view/StrategicGameViewPage'));
+
+/** The trade page of a character became its market (spec 023). */
+const TradeRedirect: FC = () => {
+  const { characterId } = useParams<{ characterId: string }>();
+  return <Navigate to={`/strategic/market/character/${characterId}`} replace />;
 };
+
+const App: FC = () => (
+  <MfeRoot sx={{ p: 2 }} namespace="strategic">
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/games" element={<StrategicGameListPage />} />
+      <Route path="/games/view/:gameId" element={<StrategicGameViewPage />} />
+      <Route path="/games/view/:gameId/chronicle/:chapterId" element={<ChapterViewPage />} />
+      <Route path="/games/view/:gameId/chronicle/:chapterId/edit" element={<ChapterEditPage />} />
+      <Route path="/games/edit/:gameId" element={<StrategicGameFormPage key="edit" mode="edit" />} />
+      <Route path="/games/create" element={<StrategicGameFormPage key="create" mode="create" />} />
+      <Route path="/factions" element={<FactionListPage />} />
+      <Route path="/factions/view/:factionId" element={<FactionViewPage />} />
+      <Route path="/factions/edit/:factionId" element={<FactionFormPage key="edit" mode="edit" />} />
+      <Route path="/factions/create" element={<FactionFormPage key="create" mode="create" />} />
+      <Route path="/characters" element={<CharacterListPage />} />
+      <Route path="/characters/view/:characterId" element={<CharacterViewPage />} />
+      <Route path="/characters/create" element={<CharacterCreatePage />} />
+      <Route path="/characters/edit/:characterId" element={<CharacterEditPage />} />
+      <Route path="/characters/trade/:characterId" element={<TradeRedirect />} />
+      <Route path="/market/:holderKind/:holderId" element={<MarketPage />} />
+      <Route path="/workshop/:holderKind/:holderId" element={<WorkshopPage />} />
+      <Route path="/enchantments/:holderKind/:holderId" element={<EnchantmentsPage />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  </MfeRoot>
+);
 
 export default App;

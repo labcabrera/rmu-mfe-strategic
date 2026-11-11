@@ -1,61 +1,58 @@
-import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import BuildIcon from '@mui/icons-material/Build';
+import CasinoOutlinedIcon from '@mui/icons-material/CasinoOutlined';
+import StorefrontIcon from '@mui/icons-material/Storefront';
 import { Button, Stack } from '@mui/material';
-import { StrategicItem, createStrategicItem, Character, fetchCharacter } from '@labcabrera-rmu/rmu-react-shared-lib';
-import { useError } from '../../../../ErrorContext';
-import CharacterViewAddItemDialog from './CharacterAddItemDialog';
+import { Character, StrategicGame } from '@labcabrera-rmu/rmu-react-shared-lib';
+import { HolderTreasureButton } from '../../../economy/HolderMagicButtons';
+import { holderPath } from '../../../economy/use-holder';
+import { isGameMaster } from '../../../shared/permissions';
 
+/**
+ * Links of the equipment of a character to its market (buy and sell), workshop (craft and repair) and enchantments,
+ * and a random treasure the game master awards to it (spec 067).
+ */
 export default function CharacterEquipmentButtons({
   character,
-  setCharacter,
+  strategicGame,
+  onChanged,
 }: {
   character: Character;
-  setCharacter: Dispatch<SetStateAction<Character | undefined>>;
+  strategicGame?: StrategicGame;
+  onChanged: () => void;
 }) {
   const auth = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { showError } = useError();
-  const [openAddItemDialog, setOpenAddItemDialog] = useState(false);
-
-  const onItemAdded = (formData: Partial<StrategicItem>) => {
-    formData.gameId = character.gameId;
-    formData.characterId = character.id;
-    createStrategicItem(formData, auth)
-      .then(() => {
-        bindCharacter();
-      })
-      .catch((err) => showError(err.message));
-  };
-
-  const bindCharacter = () => {
-    fetchCharacter(character.id, auth)
-      .then((response) => setCharacter(response))
-      .catch((err) => showError(err.message));
-  };
-
-  if (!setCharacter) return <p>Loading...</p>;
-
+  const holder = { kind: 'character' as const, id: character.id };
   return (
-    <>
-      <Stack direction="row" spacing={1}>
-        <Button variant="outlined" onClick={() => setOpenAddItemDialog(true)}>
-          {t('buy')}
-        </Button>
-        <Button variant="outlined" onClick={() => navigate(`/strategic/characters/trade/${character.id}`)}>
-          {t('trading')}
-        </Button>
-        <Button variant="outlined" onClick={() => navigate(`/strategic/characters/craft/${character.id}`)}>
-          {t('craft')}
-        </Button>
-      </Stack>
-      <CharacterViewAddItemDialog
-        open={openAddItemDialog}
-        onClose={() => setOpenAddItemDialog(false)}
-        onItemAdded={(addItemDto) => onItemAdded(addItemDto)}
-      />
-    </>
+    <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
+      <Button variant="outlined" startIcon={<StorefrontIcon />} onClick={() => navigate(holderPath('market', holder))}>
+        {t('market')}
+      </Button>
+      <Button variant="outlined" startIcon={<BuildIcon />} onClick={() => navigate(holderPath('workshop', holder))}>
+        {t('workshop')}
+      </Button>
+      <Button
+        variant="outlined"
+        startIcon={<AutoAwesomeIcon />}
+        onClick={() => navigate(holderPath('enchantments', holder))}
+      >
+        {t('enchantments')}
+      </Button>
+      <Button
+        variant="outlined"
+        startIcon={<CasinoOutlinedIcon />}
+        onClick={() => navigate(`/items/treasure-tables?characterId=${character.id}`)}
+      >
+        {t('loot-tables-title')}
+      </Button>
+      {isGameMaster(auth, strategicGame) && (
+        <HolderTreasureButton variant="outlined" holder={holder} gameId={character.gameId} onChanged={onChanged} />
+      )}
+    </Stack>
   );
 }
