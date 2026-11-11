@@ -1,6 +1,6 @@
 {
   "name": "rmu-mfe-strategic",
-  "version": "0.10.0",
+  "version": "0.10.1-SNAPSHOT",
   "scripts": {
     "build": "rm -rf dist && webpack --mode production",
     "build:dev": "webpack --mode development",
