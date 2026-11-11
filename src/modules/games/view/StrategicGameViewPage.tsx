@@ -33,6 +33,7 @@ import {
   useEntity,
 } from '@labcabrera-rmu/rmu-react-shared-lib';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
+import ChronicleSection from '../../chronicle/ChronicleSection';
 import CreateOrImportButton from '../../shared/CreateOrImportButton';
 import { isGameMaster, isGameOwner } from '../../shared/permissions';
 import StrategicGameCardChips from '../list/StrategicGameCardChips';
@@ -248,6 +249,7 @@ export default function StrategicGameViewPage() {
                   onPassTime={() => setPassTimeOpen(true)}
                   refreshKey={timeLogKey}
                 />
+                <ChronicleSection game={game} master={master} />
                 <Panel
                   title={t('factions')}
                   extra={

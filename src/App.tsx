@@ -4,6 +4,8 @@ import { MfeRoot, NotFound } from '@labcabrera-rmu/rmu-react-shared-lib';
 
 // Workspace spec 091, E1: every page is its own chunk; the Suspense is in MfeRoot / the shell layout.
 const HomePage = lazy(() => import('./HomePage'));
+const ChapterEditPage = lazy(() => import('./modules/chronicle/ChapterEditPage'));
+const ChapterViewPage = lazy(() => import('./modules/chronicle/ChapterViewPage'));
 const CharacterCreatePage = lazy(() => import('./modules/characters/create/CharacterCreatePage'));
 const CharacterEditPage = lazy(() => import('./modules/characters/form/CharacterEditPage'));
 const CharacterListPage = lazy(() => import('./modules/characters/list/CharacterListPage'));
@@ -30,6 +32,8 @@ const App: FC = () => (
       <Route path="/" element={<HomePage />} />
       <Route path="/games" element={<StrategicGameListPage />} />
       <Route path="/games/view/:gameId" element={<StrategicGameViewPage />} />
+      <Route path="/games/view/:gameId/chronicle/:chapterId" element={<ChapterViewPage />} />
+      <Route path="/games/view/:gameId/chronicle/:chapterId/edit" element={<ChapterEditPage />} />
       <Route path="/games/edit/:gameId" element={<StrategicGameFormPage key="edit" mode="edit" />} />
       <Route path="/games/create" element={<StrategicGameFormPage key="create" mode="create" />} />
       <Route path="/factions" element={<FactionListPage />} />
